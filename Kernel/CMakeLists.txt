@@ -1,0 +1,47 @@
+
+#
+#  Kernel project
+#
+project(Kernel)
+
+set( INC_FILES 
+   inc/Kernel/Creator.h
+   inc/Kernel/DataService.h
+   inc/Kernel/DllExport.h
+   inc/Kernel/DynamicFactory.h
+   inc/Kernel/Logger.h
+   inc/Kernel/Notification.h
+   )
+set( SRC_FILES 
+  src/DataService.cpp
+  src/Logger.cpp
+  src/Notification.cpp
+  )
+add_library( Kernel SHARED ${SRC_FILES} ${INC_FILES} )
+include_directories(inc)
+set_target_properties ( Kernel PROPERTIES COMPILE_DEFINITIONS IN_KERNEL )
+
+#target_link_libraries(Numeric
+#debug ${GSL_LIB_DEBUG}
+#optimized ${GSL_LIB} Numeric
+#)
+
+#
+#  Kernel Test project
+#
+#project(KernelTest)
+#
+#set( INC_FILES )
+#set( SRC_FILES 
+#  test/main.cpp
+#  test/SomeFunctionTest.cpp
+#  test/VectorTest.cpp
+#)
+
+#add_executable(KernelTest ${SRC_FILES} ${INC_FILES})
+#include_directories(test ${THIRD_PARTY_INCLUDE_DIR} )
+#target_link_libraries(KernelTest 
+#debug Kernel
+#optimized Kernel
+#)
+
