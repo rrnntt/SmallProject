@@ -31,8 +31,7 @@ set( MOC_HEADERS
 )
 
 # OpenSceneGraph source directory
-#set( OSG_DIR "C:/Users/hqs74821/Documents/stuff/OSG/OpenSceneGraph-3.0.0-rc4")
-set( OSG_DIR "C:/Work/OSG/OpenSceneGraph-3.0.0-rc4")
+#set( OSG_DIR "C:/Work/OSG/OpenSceneGraph-3.0.0-rc4")
 # OSG includes
 set( OSG_INCUDEDIR "${OSG_DIR}/include")
 set( OSG_BUILDINCLUDEDIR "${OSG_DIR}/../Build/include")

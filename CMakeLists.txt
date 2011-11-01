@@ -42,9 +42,11 @@ set( GTEST_LIBS "optimized;${GTEST_RELEASE_LIB};debug;${GTEST_DEBUG_LIB};")
 #set( Boost_INCLUDE_DIR "C:/Users/hqs74821/Work/mantid/Code/Third_Party/include")
 find_package( Boost )
 find_package( Qt4 )
+find_path( OSG_DIR "include/osg/Referenced" )
 
 include_directories( ${Boost_INCLUDE_DIR} "${PROJECT_SOURCE_DIR}/Kernel/inc")
 
 add_subdirectory(Numeric)
 add_subdirectory(Kernel)
+add_subdirectory(Formula)
 add_subdirectory(GUI)
