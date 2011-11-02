@@ -1,6 +1,7 @@
 #
 #  SmallProject
 #
+
 cmake_minimum_required (VERSION 2.8)
 
 set( THIRD_PARTY_DIR "${PROJECT_SOURCE_DIR}/Third_Party" )
