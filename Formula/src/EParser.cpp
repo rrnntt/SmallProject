@@ -6,6 +6,41 @@
 namespace Formula
 {
 
+std::string::const_iterator IParser::match(std::string::const_iterator start,std::string::const_iterator end)
+{
+  if (start == end)
+  {
+    m_start = m_end = end;
+    return m_end;
+  }
+  m_start = start;
+  m_end = this->test(start,end);
+
+  return m_start;
+}
+
+std::string::const_iterator CharParser::test(std::string::const_iterator start,std::string::const_iterator end) const
+{
+  if (m_chars.empty())
+  {// match any char if string is not empty
+    return ++start;
+  }
+  else
+  {// match specific char (one of the m_chars)
+    auto found = m_chars.find(*start);
+    if ( found == std::string::npos )
+    {
+      return start;
+    }
+    else
+    {
+      return ++start;
+    }
+  }
+  return start;
+}
+
+/*--- EParser ---*/  
 EParser::EParser()
 {
 
