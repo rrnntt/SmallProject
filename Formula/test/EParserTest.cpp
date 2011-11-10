@@ -6,7 +6,7 @@
 
 using namespace Formula;
 
-TEST(EParserTest, Simple) 
+TEST(EParserTest, Char) 
 {
   EXPECT_EQ(1+1,2);
   std::cerr << "Hello!\n";

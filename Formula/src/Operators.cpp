@@ -25,7 +25,7 @@ void Operators::add_operators(const std::vector<std::string>& ops)
     {
       char c = str[j];
       if ( c == ' ' ) continue;
-      m_symbols.insert(c);
+      m_bin_symbols.insert(c);
     }
   }
 
@@ -38,7 +38,7 @@ void Operators::add_unary(const std::set<std::string>& ops)
   {
     for(std::string::const_iterator c=it->begin();c!=it->end();c++)
     {
-      m_symbols.insert(*c);
+      m_un_symbols.insert(*c);
     }
   }
 }
@@ -57,7 +57,12 @@ bool Operators::is_unary(const std::string& op)const
 
 bool Operators::is_op_symbol(const char c)const
 {
-  return m_symbols.count(c) != 0;
+  return m_bin_symbols.count(c) != 0;
+}
+
+bool Operators::is_un_symbol(const char c)const
+{
+  return m_un_symbols.count(c) != 0;
 }
 
 const std::string& Operators::binary(size_t prec)const
@@ -78,4 +83,14 @@ std::string Operators::what_is_binary_name(const std::string& op)const
     return Str::split(binary(prec),' ')[0];
   }
   return "";
+}
+
+std::string Operators::getBinSymbols()const
+{
+  return std::string(m_bin_symbols.begin(),m_bin_symbols.end());
+}
+
+std::string Operators::getUnSymbols()const
+{
+  return std::string(m_un_symbols.begin(),m_un_symbols.end());
 }

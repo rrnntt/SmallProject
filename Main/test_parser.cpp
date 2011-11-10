@@ -122,7 +122,7 @@ void test_parser()
     p->addParser(new NumberParser);
     p->addParser(new CharParser('+'));
     p->addParser(new NumberParser);
-    BracketParser par(p ,false);
+    BracketParser par(p);
     //par.addParser(new TermParser);
     //par.addParser(new CharParser(" "),'*');
     //par.addParser(new BracketParser);
@@ -136,5 +136,46 @@ void test_parser()
         p->getParser(4)->match() << ' ' << std::endl;
     });
   }
+  //-----------------------------------------------------
+  {
+    std::string str = "fun ( x + y )";
+    NameBracketParser fun;
+
+    it = fun.match(str);
+
+    checkMatch(fun,[&fun](){
+      std::cerr << "t1=" << fun.getParser(0)->match() << " t2=" << fun.getParser(2)->match() << std::endl;
+    });
+  }
+
+  //-----------------------------------------------------
+  {
+    std::string str = " - x + y * 18 - (a + (b/c))";
+    EParser parser;
+    parser.parse(str);
+    parser.log();
+
+  }
+
+  //-----------------------------------------------------
+  {
+    std::string str = " - (x + y )";
+    EParser parser;
+    //parser.parse(str);
+    //parser.log();
+
+  }
+
+  //-----------------------------------------------------
+  {
+    //std::string str = " sin (x + y )*1+somefun(x,1,2,sin(x))";
+    std::string str = "(x + 1)";
+    EParser parser;
+    parser.parse(str);
+    parser.log();
+    std::cerr << parser.operators()->getBinSymbols() << std::endl;
+
+  }
+
 }
 

@@ -43,6 +43,9 @@ public:
    * @return True if it is true
    */
   bool is_op_symbol(const char c)const;
+  bool is_un_symbol(const char c)const;
+  std::string getBinSymbols()const;
+  std::string getUnSymbols()const;
 
   /**
     * return main binary operator name for precedence prec
@@ -60,7 +63,8 @@ private:
   std::vector<std::string> m_binary;          ///< Binary operators in reverse precedence order
   std::set<std::string>    m_unary;           ///< Unary operators
   std::map<const std::string, size_t> m_precedence; ///< Map of the operator precedence order
-  std::set<char> m_symbols;                   ///< All the symbols that are used in the binary operators
+  std::set<char> m_bin_symbols;                   ///< All the symbols that are used in the binary operators
+  std::set<char> m_un_symbols;                   ///< All the symbols that are used in the unary operators
   std::map<std::string, char> m_op_number;    ///<
 };
 

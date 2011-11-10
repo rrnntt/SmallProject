@@ -3,6 +3,7 @@
 //#include <boost/spirit/include/qi.hpp>
 #include <locale>
 #include <stdexcept>
+#include <iostream>
 
 namespace Formula
 {
@@ -20,6 +21,8 @@ std::string::const_iterator IParser::match(std::string::const_iterator start,std
   if (start == end)
   {
     m_start = m_end = end;
+    m_hasMatch = this->matchEmpty();
+    m_empty = true;
     return m_end;
   }
   m_start = start;
@@ -27,7 +30,8 @@ std::string::const_iterator IParser::match(std::string::const_iterator start,std
 
   if (m_end == m_start)
   {
-    m_end = m_start;
+    m_end = m_start; //?
+    m_empty = true;
   }
   else
   {
@@ -158,6 +162,7 @@ std::string::const_iterator ListParser::test(std::string::const_iterator start,s
   if ( !h->parser->hasMatch() && m_multiplicity == ZeroMany )
   {
     m_hasMatch = true;
+    m_empty = true;
     return start;
   }
 
@@ -178,7 +183,8 @@ std::string::const_iterator ListParser::test(std::string::const_iterator start,s
 
 //-----------------------------------------------------
 AltParser::AltParser(const AltParser& p):
-MultiParser(p)
+MultiParser(p),
+m_goodParser(nullptr)
 {
 }
 
@@ -190,6 +196,7 @@ std::string::const_iterator AltParser::test(std::string::const_iterator start,st
     it = h->parser->match(it,end); // can use test(...) here?
     if (h->parser->hasMatch())
     {
+      m_goodParser = h->parser;
       return it;
     }
   }
@@ -245,6 +252,8 @@ std::string::const_iterator NumberParser::test(std::string::const_iterator start
 TermParser::TermParser():
 AltParser()
 {
+  addParser(new NameBracketParser);
+  addParser(new BracketParser);
   addParser(new VarNameParser);
   addParser(new NumberParser);
 }
@@ -255,20 +264,34 @@ AltParser(p)
 }
 
 //-----------------------------------------------------
-BracketParser::BracketParser(IParser* p,bool recursive):
+BracketParser::BracketParser(IParser* p):
 MultiParser(),
 m_bra("("),
-m_ket(")"),
-m_recursive(recursive)
+m_ket(")")
 {
-  addParser(p);
+  if (p)
+  {
+    addParser(p);
+  }
+  else
+  {
+    addParser(new AllParser);
+  }
 }
 
-BracketParser::BracketParser(const std::string& bra, const std::string& ket):
+BracketParser::BracketParser(const std::string& bra, const std::string& ket, IParser* p):
 MultiParser(),
 m_bra(bra),
 m_ket(ket)
 {
+  if (p)
+  {
+    addParser(p);
+  }
+  else
+  {
+    addParser(new AllParser);
+  }
 }
 
 BracketParser::BracketParser(const BracketParser& p):
@@ -329,16 +352,45 @@ std::string::const_iterator BracketParser::test(std::string::const_iterator star
   }
   if (level == 0)
   {
-    auto inner_start = start + m_bra.size();
-    auto inner_end = end - m_ket.size();
-    IParser* parser = getParser(0);
-    parser->match(inner_start,inner_end);
-    if (parser->hasMatch())
+    if (size() > 0)
+    {
+      IParser* parser = getParser(0);
+      auto inner_start = start + m_bra.size();
+      auto inner_end = end - m_ket.size();
+      parser->match(inner_start,inner_end);
+      if (parser->hasMatch())
+      {
+        return it;
+      }
+    }
+    else
     {
       return it;
     }
   }
   return start;
+}
+
+//-----------------------------------------------------
+NameBracketParser::NameBracketParser(IParser* p):
+SeqParser()
+{
+  m_name = static_cast<VarNameParser*>(addParser(new VarNameParser));
+  addParser(new CharParser(' '),'*');
+  m_brackets = static_cast<BracketParser*>(addParser(new BracketParser(p)));
+}
+
+NameBracketParser::NameBracketParser(const std::string& bra, const std::string& ket, IParser* p):
+SeqParser()
+{
+  m_name = static_cast<VarNameParser*>(addParser(new VarNameParser));
+  addParser(new CharParser(' '),'*');
+  m_brackets = static_cast<BracketParser*>(addParser(new BracketParser(bra,ket,p)));
+}
+
+NameBracketParser::NameBracketParser(const NameBracketParser& p):
+SeqParser(p)
+{
 }
 
 //-----------------------------------------------------
@@ -369,6 +421,153 @@ EParser::EParser()
 
 void EParser::parse(const std::string& str)
 {
+  parse(str.begin(),str.end());
+}
+
+void EParser::parse(std::string::const_iterator start,std::string::const_iterator end)
+{
+  m_terms.clear();
+  m_op = "";
+  m_funct = "";
+
+  SeqParser expr;
+  expr.addParser(new CharParser(' '),'*');
+  IParser* un = expr.addParser(new CharParser(m_operators->getUnSymbols()),'*');
+  expr.addParser(new CharParser(' '),'*');
+  TermParser* firstTerm = static_cast<TermParser*>(expr.addParser(new TermParser()));
+
+  SeqParser* terms = new SeqParser;
+  terms->addParser(new CharParser(' '),'*');
+  terms->addParser(new CharParser(m_operators->getBinSymbols()),'*');
+  terms->addParser(new CharParser(' '),'*');
+  terms->addParser(new TermParser());
+
+  ListParser* otherTerms = static_cast<ListParser*>(expr.addParser(terms,'*'));
+
+  expr.match(start,end);
+
+  if (expr.hasMatch())
+  {
+    if (terms->isEmpty())
+    {// One term
+      if ( !un->isEmpty() )
+      {// has unary operator
+        std::string un_op = un->match();
+        m_funct = un_op;
+        m_terms.push_back(EParser());
+        EParser& ep = m_terms.back();
+        ep.setFunct(firstTerm->getParser());
+      }
+      else
+      {// no unary operator
+        setFunct(firstTerm->getParser());
+      }
+    }
+    else
+    {// multiple terms
+      m_op = "";
+      m_funct = "void";
+      EParser& ep = addTerm(firstTerm->getParser());
+      if (un->hasMatch())
+      {
+        ep.m_op = un->match();
+      }
+      for(size_t i = 0; i < otherTerms->size(); ++i)
+      {
+        SeqParser* term = static_cast<SeqParser*>(otherTerms->getParser(i));
+        if (term->hasMatch())
+        {
+          EParser& ep = addTerm(term->getParser(3)); // TermParser
+          ep.m_op = term->getParser(1)->match();
+        }
+      }
+    }
+    std::cerr << "Found " << expr.match() << std::endl;
+  }
+  else
+  {
+    std::cerr << "Parsing failed\n";
+    m_funct = "void";
+  }
+
+}
+
+void EParser::setFunct(IParser* parser)
+{
+  TermParser* term = dynamic_cast<TermParser*>(parser);
+  if(term)
+  {
+    parser = term->getParser();
+  }
+  VarNameParser* var = dynamic_cast<VarNameParser*>(parser);
+  NumberParser* num = dynamic_cast<NumberParser*>(parser);
+  if (var || num)
+  {
+    m_funct = parser->match();
+    return;
+  }
+  
+  BracketParser* brak = dynamic_cast<BracketParser*>(parser);
+  if (brak)
+  {
+    auto start = brak->getInnerStart();
+    auto end = brak->getInnerEnd();
+    this->parse(start,end);
+    return;
+  }
+
+  NameBracketParser* fun = dynamic_cast<NameBracketParser*>(parser);
+  if (fun)
+  {
+    m_funct = fun->getParser(0)->match();
+    EParser ep;
+    ep.parse(fun->getInnerStart(),fun->getInnerEnd());
+    if (ep.m_funct != "void")
+    {
+      m_terms.push_back(ep);
+    }
+    else
+    {
+      for(auto term = ep.m_terms.begin();term!=ep.m_terms.end();++term)
+      {
+        m_terms.push_back(*term);
+        //EParser& ep = m_terms.back();
+      }
+    }
+    return;
+  }
+  
+  //addParser(new BracketParser);
+
+  throw std::runtime_error("setFunct failed");
+}
+
+EParser& EParser::addTerm(IParser* parser)
+{
+  m_terms.push_back(EParser());
+  EParser& ep = m_terms.back();
+  ep.setFunct(parser);
+  return ep;
+}
+
+void EParser::log(const std::string& padding)
+{
+  std::cerr << padding << m_op << '['<<m_funct<<']';
+  if (!m_terms.empty())
+  {
+    std::cerr <<"(";
+  }
+  std::cerr << std::endl;
+  for(auto term=m_terms.begin(); term!=m_terms.end();++term)
+  {
+    term->log(padding + "  ");
+  }
+  std::cerr << padding ;
+  if (!m_terms.empty())
+  {
+    std::cerr <<")";
+  }
+  std::cerr << std::endl;
 }
 
 } // Formula

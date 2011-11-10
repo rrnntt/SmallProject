@@ -21,8 +21,12 @@ namespace Formula
     virtual IParser* clone() const = 0;
     virtual std::string::const_iterator match(std::string::const_iterator start,std::string::const_iterator end);
     virtual std::string::const_iterator match(const std::string& str);
+    virtual bool matchEmpty()const{return false;}
     bool hasMatch() const {return m_hasMatch;}
+    bool isEmpty() const {return m_empty;/*m_start == m_end;*/}
     std::string match() const {return std::string(m_start,m_end);}
+    std::string::const_iterator getStart()const{return m_start;}
+    std::string::const_iterator getEnd()const{return m_end;}
   protected:
     /**
     * Tries to match string starting at start. If unsuccessful returns start. If successful returns
@@ -34,6 +38,7 @@ namespace Formula
     std::string::const_iterator m_start;
     std::string::const_iterator m_end;
     bool m_hasMatch;
+    bool m_empty;
   };
 
   //------------------------------------------------------------
@@ -56,11 +61,28 @@ namespace Formula
     EmptyParser():IParser(){}
     EmptyParser(const EmptyParser& chp){}
     IParser* clone() const{return new EmptyParser(*this);}
+    bool matchEmpty()const{return true;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) 
     {
       m_hasMatch = true;
+      m_empty = true;
       return start;
+    }
+  };
+
+  //------------------------------------------------------------
+  class FORMULA_EXPORT AllParser: public IParser
+  {
+  public:
+    AllParser():IParser(){}
+    AllParser(const AllParser& chp){}
+    IParser* clone() const{return new AllParser(*this);}
+  protected:
+    virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) 
+    {
+      m_empty = start == end;
+      return end;
     }
   };
 
@@ -103,6 +125,7 @@ namespace Formula
     ListParser(IParser* p, Mutiplicity m = OneMany);
     ListParser(const ListParser& p);
     IParser* clone()const{return new ListParser(*this);}
+    bool matchEmpty()const{return m_multiplicity == ZeroMany;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     Mutiplicity m_multiplicity;
@@ -116,8 +139,10 @@ namespace Formula
     AltParser(const AltParser& p);
     IParser* clone()const{return new AltParser(*this);}
     using MultiParser::addParser;
+    IParser* getParser()const{return m_goodParser;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
+    IParser* m_goodParser; ///< parser that had a match
   };
 
   //------------------------------------------------------------
@@ -154,6 +179,39 @@ namespace Formula
   };
 
   //------------------------------------------------------------
+  class FORMULA_EXPORT BracketParser: public MultiParser
+  {
+  public:
+    BracketParser(IParser* p = nullptr);
+    BracketParser(const std::string& bra, const std::string& ket, IParser* p = nullptr);
+    BracketParser(const BracketParser& p);
+    IParser* clone()const{return new BracketParser(*this);}
+    std::string::const_iterator getInnerStart()const{return m_start + m_bra.size();}
+    std::string::const_iterator getInnerEnd()const{return m_end - m_ket.size();}
+  protected:
+    enum Part{Bra,Ket,Other};
+    virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
+    std::string::const_iterator isBraKet(const std::string& bra_or_ket, std::string::const_iterator start,std::string::const_iterator end) ;
+    std::string m_bra;
+    std::string m_ket;
+  };
+
+  //------------------------------------------------------------
+  class FORMULA_EXPORT NameBracketParser: public SeqParser
+  {
+  public:
+    NameBracketParser(IParser* p = nullptr);
+    NameBracketParser(const std::string& bra, const std::string& ket, IParser* p = nullptr);
+    NameBracketParser(const NameBracketParser& p);
+    IParser* clone()const{return new NameBracketParser(*this);}
+    std::string::const_iterator getInnerStart()const{return m_brackets->getInnerStart();}
+    std::string::const_iterator getInnerEnd()const{return m_brackets->getInnerEnd();}
+  protected:
+    VarNameParser* m_name;
+    BracketParser* m_brackets;
+  };
+
+  //------------------------------------------------------------
   class FORMULA_EXPORT TermParser: public AltParser
   {
   public:
@@ -163,29 +221,18 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT BracketParser: public MultiParser
+  class FORMULA_EXPORT EParser
   {
   public:
-    BracketParser(IParser* p,bool recursive);
-    BracketParser(const std::string& bra, const std::string& ket);
-    BracketParser(const BracketParser& p);
-    IParser* clone()const{return new BracketParser(*this);}
-  protected:
-    enum Part{Bra,Ket,Other};
-    virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
-    std::string::const_iterator isBraKet(const std::string& bra_or_ket, std::string::const_iterator start,std::string::const_iterator end) ;
-    std::string m_bra;
-    std::string m_ket;
-    bool m_recursive;
-  };
-
-  //------------------------------------------------------------
-class FORMULA_EXPORT EParser
-{
-public:
     EParser();
     void parse(const std::string& str);
-private:
+    void log(const std::string& padding = "");
+    Operators_ptr operators() {return m_operators;}
+  protected:
+
+    void parse(std::string::const_iterator start,std::string::const_iterator end);
+    void setFunct(IParser* parser);
+    EParser& addTerm(IParser* parser);
 
     std::string m_funct; ///< Function name
     std::string m_op;    ///< Operator connecting this expression to its sibling on the left
@@ -193,7 +240,7 @@ private:
 
     Operators_ptr m_operators;
 
-};
+  };
 
 } // Formula
 
