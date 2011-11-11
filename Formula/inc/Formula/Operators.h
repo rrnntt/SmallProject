@@ -16,7 +16,7 @@ class FORMULA_EXPORT Operators
 public:
   /**
    * Returns the precedence of operator op. Precedence starts with 1
-   * and 0 means op is not a binary opeerator
+   * and 0 means op is not a binary operator
    * @param op The operator
    * @return The precedence
    */

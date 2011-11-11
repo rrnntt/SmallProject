@@ -343,6 +343,7 @@ std::string::const_iterator BracketParser::test(std::string::const_iterator star
       {
         it = it1;
         --level;
+        if (level == 0) break;
       }
       else
       {
@@ -391,6 +392,8 @@ SeqParser()
 NameBracketParser::NameBracketParser(const NameBracketParser& p):
 SeqParser(p)
 {
+  m_name = static_cast<VarNameParser*>(getParser(0));
+  m_brackets = static_cast<BracketParser*>(getParser(2));
 }
 
 //-----------------------------------------------------
@@ -419,6 +422,17 @@ EParser::EParser()
   m_operators->add_unary(unary);
 }
 
+EParser::~EParser()
+{
+  for(auto ep = m_terms.begin(); ep !=m_terms.end(); ++ep)
+  {
+    if (*ep != nullptr)
+    {
+      delete *ep;
+    }
+  }
+}
+
 void EParser::parse(const std::string& str)
 {
   parse(str.begin(),str.end());
@@ -436,10 +450,11 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
   expr.addParser(new CharParser(' '),'*');
   TermParser* firstTerm = static_cast<TermParser*>(expr.addParser(new TermParser()));
 
+  std::string symbols = m_operators->getBinSymbols() + m_operators->getUnSymbols() + " ";
   SeqParser* terms = new SeqParser;
-  terms->addParser(new CharParser(' '),'*');
-  terms->addParser(new CharParser(m_operators->getBinSymbols()),'*');
-  terms->addParser(new CharParser(' '),'*');
+  //terms->addParser(new CharParser(' '),'*');
+  terms->addParser(new CharParser(symbols),'+');
+  //terms->addParser(new CharParser(' '),'*');
   terms->addParser(new TermParser());
 
   ListParser* otherTerms = static_cast<ListParser*>(expr.addParser(terms,'*'));
@@ -448,15 +463,16 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
 
   if (expr.hasMatch())
   {
-    if (terms->isEmpty())
+    // 
+    if (otherTerms->isEmpty())
     {// One term
       if ( !un->isEmpty() )
       {// has unary operator
         std::string un_op = un->match();
         m_funct = un_op;
-        m_terms.push_back(EParser());
-        EParser& ep = m_terms.back();
-        ep.setFunct(firstTerm->getParser());
+        EParser* ep = new EParser;
+        m_terms.push_back(ep);
+        ep->setFunct(firstTerm->getParser());
       }
       else
       {// no unary operator
@@ -465,28 +481,29 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
     }
     else
     {// multiple terms
+
       m_op = "";
       m_funct = "void";
-      EParser& ep = addTerm(firstTerm->getParser());
+      EParser* ep = addTerm(firstTerm->getParser());
       if (un->hasMatch())
       {
-        ep.m_op = un->match();
+        ep->m_op = un->match();
       }
       for(size_t i = 0; i < otherTerms->size(); ++i)
       {
         SeqParser* term = static_cast<SeqParser*>(otherTerms->getParser(i));
         if (term->hasMatch())
         {
-          EParser& ep = addTerm(term->getParser(3)); // TermParser
-          ep.m_op = term->getParser(1)->match();
+          EParser* ep = addTerm(term->getParser(1)); // TermParser
+          ep->m_op = term->getParser(0)->match();    // List of CharParser
         }
       }
     }
-    std::cerr << "Found " << expr.match() << std::endl;
+
+    sortPrecedence();
   }
   else
   {
-    std::cerr << "Parsing failed\n";
     m_funct = "void";
   }
 
@@ -520,19 +537,20 @@ void EParser::setFunct(IParser* parser)
   if (fun)
   {
     m_funct = fun->getParser(0)->match();
-    EParser ep;
-    ep.parse(fun->getInnerStart(),fun->getInnerEnd());
-    if (ep.m_funct != "void")
+    EParser* ep = new EParser;
+    ep->parse(fun->getInnerStart(),fun->getInnerEnd());
+    if (ep->m_funct != "void")
     {
       m_terms.push_back(ep);
     }
     else
     {
-      for(auto term = ep.m_terms.begin();term!=ep.m_terms.end();++term)
-      {
-        m_terms.push_back(*term);
-        //EParser& ep = m_terms.back();
-      }
+      moveTerms(ep);
+      //for(auto term = ep.m_terms.begin();term!=ep.m_terms.end();++term)
+      //{
+      //  m_terms.push_back(*term);
+      //  //EParser& ep = m_terms.back();
+      //}
     }
     return;
   }
@@ -542,17 +560,66 @@ void EParser::setFunct(IParser* parser)
   throw std::runtime_error("setFunct failed");
 }
 
-EParser& EParser::addTerm(IParser* parser)
+EParser* EParser::addTerm(IParser* parser)
 {
-  m_terms.push_back(EParser());
-  EParser& ep = m_terms.back();
-  ep.setFunct(parser);
+  EParser* ep = new EParser;
+  ep->setFunct(parser);
+  m_terms.push_back(ep);
   return ep;
+}
+
+/**
+ * Rearrange the terms according to operator precedence.
+ */
+void EParser::sortPrecedence()
+{
+  if (m_funct != "void") return;
+  if (m_terms.empty()) return;
+  size_t prec = 1000;
+  for(auto term=m_terms.begin(); term!=m_terms.end(); ++term)
+  {
+    (**term).sortPrecedence();
+    SeqParser op;
+    IParser* bin = nullptr;
+    if (term != m_terms.begin())
+    {
+      bin = op.addParser(new CharParser(m_operators->getBinSymbols()),'*');
+      op.addParser(new CharParser(' '),'*');
+    }
+    IParser* un = op.addParser(new CharParser(m_operators->getUnSymbols()),'*');
+    op.match(m_op);
+    if (un->hasMatch() && !un->isEmpty())
+    {
+      EParser* new_term = new EParser;
+      new_term->m_terms.push_back(*term);
+      *term = new_term;
+      (**term).m_funct = un->match();
+      if (bin && bin->hasMatch())
+      {
+        (**term).m_op = bin->match();
+      }
+      else
+      {
+        (**term).m_op = "";
+      }
+    }
+    if (bin)
+    {
+      std::string mop = bin->hasMatch() ? bin->match() : "*"; //?
+      size_t p = m_operators->op_prec(mop);
+      if (p < prec)
+      {
+        prec = p;
+      }
+    }
+  }
+  std::cerr << "binary " << prec << ' ' << m_operators->binary(prec) << std::endl;
 }
 
 void EParser::log(const std::string& padding)
 {
-  std::cerr << padding << m_op << '['<<m_funct<<']';
+  std::string op = m_op.empty() ? " " : m_op;
+  std::cerr << padding << op << '['<<m_funct<<']';
   if (!m_terms.empty())
   {
     std::cerr <<"(";
@@ -560,14 +627,26 @@ void EParser::log(const std::string& padding)
   std::cerr << std::endl;
   for(auto term=m_terms.begin(); term!=m_terms.end();++term)
   {
-    term->log(padding + "  ");
+    (**term).log(padding + "  ");
   }
-  std::cerr << padding ;
   if (!m_terms.empty())
   {
+    std::cerr << padding ;
     std::cerr <<")";
+    std::cerr << std::endl;
   }
-  std::cerr << std::endl;
+}
+
+/**
+ * Move all terms from ep and push back it to this
+ */
+void EParser::moveTerms(EParser* ep)
+{
+  for(auto term=ep->m_terms.begin(); term!=ep->m_terms.end();++term)
+  {
+    m_terms.push_back(*term);
+  }
+  ep->m_terms.clear();
 }
 
 } // Formula

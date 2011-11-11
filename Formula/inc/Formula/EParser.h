@@ -16,7 +16,7 @@ namespace Formula
   class FORMULA_EXPORT IParser
   {
   public:
-    IParser():m_hasMatch(false){}
+    IParser():m_hasMatch(false),m_empty(false){}
     virtual ~IParser(){}
     virtual IParser* clone() const = 0;
     virtual std::string::const_iterator match(std::string::const_iterator start,std::string::const_iterator end);
@@ -225,6 +225,7 @@ namespace Formula
   {
   public:
     EParser();
+    ~EParser();
     void parse(const std::string& str);
     void log(const std::string& padding = "");
     Operators_ptr operators() {return m_operators;}
@@ -232,11 +233,13 @@ namespace Formula
 
     void parse(std::string::const_iterator start,std::string::const_iterator end);
     void setFunct(IParser* parser);
-    EParser& addTerm(IParser* parser);
+    EParser* addTerm(IParser* parser);
+    void moveTerms(EParser* ep);
+    void sortPrecedence();
 
     std::string m_funct; ///< Function name
     std::string m_op;    ///< Operator connecting this expression to its sibling on the left
-    std::vector<EParser> m_terms;///< Child expressions (function arguments)
+    std::vector<EParser*> m_terms;///< Child expressions (function arguments)
 
     Operators_ptr m_operators;
 

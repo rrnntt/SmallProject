@@ -3,6 +3,6 @@
 
 int main( int argc, char** argv )
 {
-  test_parser();
+  test_eparser();
   return 0;
 }

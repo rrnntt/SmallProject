@@ -168,14 +168,22 @@ void test_parser()
 
   //-----------------------------------------------------
   {
-    //std::string str = " sin (x + y )*1+somefun(x,1,2,sin(x))";
-    std::string str = "(x + 1)";
+    //std::string str = " sin (x + y ) * 1 + somefun(x,1,2,sin(x))";
+    //std::string str = "somefun(x,1,2,sin(x))";
+    std::string str = "sin(x)+1";
     EParser parser;
     parser.parse(str);
     parser.log();
-    std::cerr << parser.operators()->getBinSymbols() << std::endl;
 
   }
 
 }
 
+void test_eparser()
+{
+    //std::string str = " sin (x + y ) * 1 + somefun(x,1,2,sin(x))";
+    std::string str = "a+b";
+    EParser parser;
+    parser.parse(str);
+    parser.log();
+}
