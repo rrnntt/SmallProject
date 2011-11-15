@@ -55,6 +55,18 @@ namespace Formula
   };
 
   //------------------------------------------------------------
+  class FORMULA_EXPORT StringParser: public IParser
+  {
+  public:
+    StringParser(const std::string& str):IParser(),m_string(str){}
+    StringParser(const StringParser& p):IParser(),m_string(p.m_string){}
+    IParser* clone() const{return new StringParser(*this);}
+  protected:
+    virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
+    std::string m_string; ///< alternative matches
+  };
+
+  //------------------------------------------------------------
   class FORMULA_EXPORT EmptyParser: public IParser
   {
   public:
@@ -236,10 +248,12 @@ namespace Formula
     EParser* addTerm(IParser* parser);
     void moveTerms(EParser* ep);
     void sortPrecedence();
+    IParser* createBinParser()const;
 
     std::string m_funct; ///< Function name
     std::string m_op;    ///< Operator connecting this expression to its sibling on the left
-    std::vector<EParser*> m_terms;///< Child expressions (function arguments)
+    typedef std::vector<EParser*> TermsVector;
+    TermsVector m_terms;///< Child expressions (function arguments)
 
     Operators_ptr m_operators;
 

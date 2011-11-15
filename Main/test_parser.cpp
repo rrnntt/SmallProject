@@ -177,12 +177,21 @@ void test_parser()
 
   }
 
+  //-----------------------------------------------------
+  {
+    std::string str = "abc123";
+    StringParser parser("abc");
+    it = parser.match(str.begin(),str.end());
+    checkMatch(parser);
+  }
+
 }
 
 void test_eparser()
 {
     //std::string str = " sin (x + y ) * 1 + somefun(x,1,2,sin(x))";
-    std::string str = "a+b";
+    std::string str = "3*(a + b)* c / t + 2*sin(x+-1)";
+    //std::string str = "x+-1";
     EParser parser;
     parser.parse(str);
     parser.log();

@@ -85,6 +85,15 @@ std::string Operators::what_is_binary_name(const std::string& op)const
   return "";
 }
 
+std::string Operators::what_is_binary_name(size_t prec)const
+{
+  if (prec > 0)
+  {
+    return Str::split(binary(prec),' ')[0];
+  }
+  return "";
+}
+
 std::string Operators::getBinSymbols()const
 {
   return std::string(m_bin_symbols.begin(),m_bin_symbols.end());
@@ -93,4 +102,15 @@ std::string Operators::getBinSymbols()const
 std::string Operators::getUnSymbols()const
 {
   return std::string(m_un_symbols.begin(),m_un_symbols.end());
+}
+
+std::vector<std::string> Operators::getAllBinary()const
+{
+  std::vector<std::string> res;
+  for(size_t i=0;i<m_binary.size();i++)
+  {
+    std::vector<std::string> vops = Str::split(m_binary[i],' ');
+    res.insert(res.end(),vops.begin(),vops.end());
+  }
+  return res;
 }

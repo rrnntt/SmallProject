@@ -54,10 +54,15 @@ public:
 
   size_t precedence(const std::string& op){return m_precedence[op];}
 
+  size_t maxPrecedence()const{return m_binary.size() + 1;}
+
+  std::vector<std::string> getAllBinary()const;
+
   /**
     * Get name of the main binary operator: for "+" and "-" it will be "+"
     */
   std::string what_is_binary_name(const std::string& op)const;
+  std::string what_is_binary_name(size_t prec)const;
 
 private:
   std::vector<std::string> m_binary;          ///< Binary operators in reverse precedence order

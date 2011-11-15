@@ -1,6 +1,7 @@
 #include "Formula/EParser.h"
 
 //#include <boost/spirit/include/qi.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <locale>
 #include <stdexcept>
 #include <iostream>
@@ -67,6 +68,28 @@ std::string::const_iterator CharParser::test(std::string::const_iterator start,s
     {
       return ++start;
     }
+  }
+  return start;
+}
+
+//-----------------------------------------------------
+std::string::const_iterator StringParser::test(std::string::const_iterator start,std::string::const_iterator end) 
+{
+  if (m_string.empty())
+  {
+    return start;
+  }
+  else
+  {
+    auto it = start;
+    auto mit = m_string.begin();
+    while( it != end && mit != m_string.end() && *it == *mit )
+    {
+      ++it;
+      ++mit;
+    }
+    if (mit != m_string.end()) return start;
+    return it;
   }
   return start;
 }
@@ -568,35 +591,57 @@ EParser* EParser::addTerm(IParser* parser)
   return ep;
 }
 
+IParser* EParser::createBinParser()const
+{
+  std::vector<std::string> ops = m_operators->getAllBinary();
+  AltParser* parser = new AltParser;
+  std::for_each(ops.begin(),ops.end(),[&parser](std::string& s){
+    parser->addParser(new StringParser(s));
+  });
+  return parser;
+}
+
 /**
  * Rearrange the terms according to operator precedence.
  */
 void EParser::sortPrecedence()
 {
-  if (m_funct != "void") return;
+  if ( !m_funct.empty() && m_funct != "void") return;
   if (m_terms.empty()) return;
+  boost::scoped_ptr<IParser> BinaryParser(createBinParser());
+  // Find the smallest precedence prec
   size_t prec = 1000;
   for(auto term=m_terms.begin(); term!=m_terms.end(); ++term)
   {
-    (**term).sortPrecedence();
+    // Build parser to parse a binary op followed by optional unary operator,
+    // all surroun
     SeqParser op;
     IParser* bin = nullptr;
+    // Binary ops start with the second term
     if (term != m_terms.begin())
     {
-      bin = op.addParser(new CharParser(m_operators->getBinSymbols()),'*');
       op.addParser(new CharParser(' '),'*');
+      //bin = op.addParser(new CharParser(m_operators->getBinSymbols()),'*');
+      bin = op.addParser(BinaryParser->clone());
     }
+    op.addParser(new CharParser(' '),'*');
     IParser* un = op.addParser(new CharParser(m_operators->getUnSymbols()),'*');
-    op.match(m_op);
-    if (un->hasMatch() && !un->isEmpty())
+    op.addParser(new CharParser(' '),'*');
+    //std::cerr << "op='" << (**term).m_op << "'\n";
+    op.match((**term).m_op);
+    std::string un_op = un->hasMatch() && !un->isEmpty() ? un->match() : "";
+    std::string bin_op = bin && bin->hasMatch() ? bin->match() : "";
+    // if term has a unary op, make that op the function and the term its argument
+    if (!un_op.empty())
     {
       EParser* new_term = new EParser;
       new_term->m_terms.push_back(*term);
       *term = new_term;
-      (**term).m_funct = un->match();
+      (**term).m_funct = un_op;
+      (**term).m_terms[0]->m_op = "";
       if (bin && bin->hasMatch())
       {
-        (**term).m_op = bin->match();
+        (**term).m_op = bin_op;
       }
       else
       {
@@ -605,15 +650,47 @@ void EParser::sortPrecedence()
     }
     if (bin)
     {
-      std::string mop = bin->hasMatch() ? bin->match() : "*"; //?
-      size_t p = m_operators->op_prec(mop);
+      if (bin_op.empty()) bin_op = "*";
+      
+      (**term).m_op = bin_op;
+      size_t p = m_operators->op_prec(bin_op);
       if (p < prec)
       {
         prec = p;
       }
     }
+    // sort the children
+    (**term).sortPrecedence();
   }
-  std::cerr << "binary " << prec << ' ' << m_operators->binary(prec) << std::endl;
+
+  m_funct = m_operators->what_is_binary_name(prec);
+  std::vector<EParser*> new_terms;
+  size_t i0 = 0;
+  for(size_t i=1; i <= m_terms.size(); ++i)
+  {
+    if ( i == m_terms.size() || m_operators->precedence(m_terms[i]->m_op) == prec )
+    {
+      EParser* p = nullptr;
+      if (i - i0 > 1)
+      {
+        p = new EParser;
+        p->m_op = m_terms[i0]->m_op;
+        m_terms[i0]->m_op = "";
+        for(size_t j = i0; j < i; ++j)
+        {
+          p->m_terms.push_back(m_terms[j]);
+        }
+        p->sortPrecedence();
+      }
+      else
+      {
+        p = m_terms[i0];
+      }
+      i0 = i;
+      new_terms.push_back(p);
+    }
+  }
+  m_terms.assign(new_terms.begin(),new_terms.end());
 }
 
 void EParser::log(const std::string& padding)
