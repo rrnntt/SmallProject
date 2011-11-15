@@ -24,7 +24,7 @@ namespace Formula
     * @param ns The namespace
     * @param p An initialised parser
     */
-  Expression::Expression(Namespace_ptr ns,const Parser& p)
+  Expression::Expression(Namespace_ptr ns,const EParser& p)
   :m_namespace(ns),m_object(),m_op(p.operator_name())
   {
     fromParser(p);
@@ -39,7 +39,7 @@ namespace Formula
   :m_namespace(ns),m_object()
   {
     defaultOperators();
-    Parser p(m_operators);
+    EParser p(m_operators);
     p.parse(str);
     fromParser(p);
   }
@@ -62,7 +62,7 @@ namespace Formula
   :m_namespace(new Namespace()),m_object()
   {
     defaultOperators();
-    Parser p(m_operators);
+    EParser p(m_operators);
     p.parse(str);
     fromParser(p);
   }
@@ -96,19 +96,19 @@ namespace Formula
     m_operators->add_unary(unary);
   }
 
-  void Expression::fromParser(const Parser& p)
+  void Expression::fromParser(const EParser& p)
   {
     m_op = p.operator_name();
     bool special_case = p.name() == "+";
     if (p.isFunct())
     {
       // create the arguments first
-      for(Parser::iterator it=p.begin();it!= p.end();it++)
+      for(EParser::iterator it=p.begin();it!= p.end();it++)
       {
-        if (special_case &&(it->name() == "-" && it->size() == 1))
+        if (special_case &&((**it).name() == "-" && (**it).size() == 1))
         {
           special_case = false;
-          Expression* arg = new Expression(m_namespace,*(it->begin()));
+          Expression* arg = new Expression(m_namespace,*((**it).begin()));
           arg->m_op = "-";
           m_terms.push_back(boost::shared_ptr<Expression>(arg));
         }

@@ -237,10 +237,32 @@ namespace Formula
   {
   public:
     EParser();
+    EParser(const std::vector<std::string>& binary,const std::set<std::string>& unary);
+    EParser(Operators_ptr operators);
+    EParser(const EParser& p);
+    EParser(const EParser* p);
     ~EParser();
     void parse(const std::string& str);
     void log(const std::string& padding = "");
-    Operators_ptr operators() {return m_operators;}
+    Operators_ptr operators() const {return m_operators;}
+      /// Returns this expression as a string. It does not simply returns the input string 
+      /// but recreates it.
+      std::string str(bool printOp = false)const;
+    /// Returns true if the expression is a function (i.e. has arguments)
+    bool isFunct()const{return m_terms.size() > 0;}
+    /// Returns the name of the expression which is a function or variable name.
+    std::string name()const{return m_funct;}
+    /// Returns the the expression's binary operator on its left. Can be an empty string.
+    std::string operator_name()const{return m_op;}
+    /// Returns the top level terms of the expression (function arguments). For a variable
+    /// it empty.
+    const std::vector<EParser*>& terms()const{return m_terms;}
+    /// Returns the number of argumens
+    size_t size()const{return m_terms.size();}
+    typedef std::vector<EParser*>::const_iterator iterator;
+    iterator begin()const{return m_terms.begin();}
+    iterator end()const{return m_terms.end();}
+    const EParser* operator[](size_t i)const{return m_terms.at(i);}
   protected:
 
     void parse(std::string::const_iterator start,std::string::const_iterator end);
@@ -252,8 +274,7 @@ namespace Formula
 
     std::string m_funct; ///< Function name
     std::string m_op;    ///< Operator connecting this expression to its sibling on the left
-    typedef std::vector<EParser*> TermsVector;
-    TermsVector m_terms;///< Child expressions (function arguments)
+    std::vector<EParser*> m_terms;///< Child expressions (function arguments)
 
     Operators_ptr m_operators;
 

@@ -59,7 +59,7 @@ namespace Formula
       /// it empty.
       const std::vector<Parser>& terms()const{return m_terms;}
       /// Returns the number of argumens
-      int size()const{return m_terms.size();}
+      size_t size()const{return m_terms.size();}
       typedef std::vector<Parser>::const_iterator iterator;
       iterator begin()const{return m_terms.begin();}
       iterator end()const{return m_terms.end();}

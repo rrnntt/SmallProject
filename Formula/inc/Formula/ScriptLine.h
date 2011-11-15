@@ -17,7 +17,7 @@ class Expression;
 class ScriptModule;
 class ScriptLineBlock;
 class ScriptFunction;
-class Parser;
+class EParser;
 
 class FORMULA_EXPORT ScriptLine
 {
@@ -59,9 +59,9 @@ class FORMULA_EXPORT ScriptLineCall: public ScriptLine
 {
 public:
   ScriptLineCall(boost::shared_ptr<Namespace> ns,ScriptFunctionGetter& getter,const std::string& line);
-  ScriptLineCall(boost::shared_ptr<Namespace> ns,ScriptFunctionGetter& getter,const Parser& code);
+  ScriptLineCall(boost::shared_ptr<Namespace> ns,ScriptFunctionGetter& getter,const EParser& code);
   void setArgument(const std::string& argName,const std::string& varName);
-  void setArgument(const std::string& argName,const Parser& varName);
+  void setArgument(const std::string& argName,const EParser& varName);
   void eval();
   void check();
 private:
@@ -78,12 +78,12 @@ public:
   virtual void eval();
   void addLine(const std::string& line);
   void addLines(const std::string& line);
-  void addLine(const Parser& parser);
-  void addLines(const Parser& parser);
+  void addLine(const EParser& parser);
+  void addLines(const EParser& parser);
   Namespace& getLocalNamespace(){return *m_local_namespace;}
   boost::shared_ptr<Namespace> getLocalNamespace_ptr(){return m_local_namespace;}
 protected:
-  ScriptLine* createLine(const Parser& parser);
+  ScriptLine* createLine(const EParser& parser);
   boost::shared_ptr<Namespace> m_local_namespace;
   std::vector<ScriptLine_ptr> m_lines;
 };
@@ -110,7 +110,7 @@ public:
   void defineArgument(const std::string& type,const std::string& name, const std::string& value = "");
   void setArgument(const std::string& name,const Variable& value);
   void setArgument(const std::string& name,const std::string& value);
-  int nArguments()const{return m_arguments.size();}
+  size_t nArguments()const{return m_arguments.size();}
   const std::vector<std::string>& arguments()const{return m_arguments;}
   std::string name()const;
   ScriptModule& getModule(){return *m_module;}

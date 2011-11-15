@@ -5,6 +5,7 @@
 #include <locale>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 
 namespace Formula
 {
@@ -445,6 +446,32 @@ EParser::EParser()
   m_operators->add_unary(unary);
 }
 
+/// contructor
+EParser::EParser(const std::vector<std::string>& binary,const std::set<std::string>& unary)
+{
+  m_operators.reset(new Operators());
+  m_operators->add_operators(binary);
+  m_operators->add_unary(unary);
+}
+
+EParser::EParser(Operators_ptr operators)
+{
+  m_operators = operators;
+}
+
+EParser::EParser(const EParser& expr):
+m_funct(expr.m_funct),
+m_op(expr.m_op),
+m_terms(expr.m_terms),
+m_operators(expr.m_operators)
+{
+}
+
+EParser::EParser(const EParser* pexpr)
+:m_operators(pexpr->m_operators)
+{
+}
+
 EParser::~EParser()
 {
   for(auto ep = m_terms.begin(); ep !=m_terms.end(); ++ep)
@@ -725,5 +752,34 @@ void EParser::moveTerms(EParser* ep)
   }
   ep->m_terms.clear();
 }
+
+std::string EParser::str(bool printOp)const
+{
+  std::ostringstream res;
+  if (printOp)
+  {
+    res << m_op.c_str();
+  }
+  size_t prec = m_operators->op_prec(m_funct);
+  if (!prec || size() == 1)
+  {
+    res << m_funct.c_str();
+    prec = 1000;
+  }
+
+  if (m_terms.size())
+  {
+    bool bk = prec > m_operators->op_prec(m_terms[0]->m_funct);
+    if (bk) res << '(' ;
+    for(size_t i=0;i<m_terms.size();i++)
+    {
+      res << m_terms[i]->str(true).c_str();
+    }
+    if (bk) res <<')';
+  }
+  return res.str();
+}
+
+
 
 } // Formula

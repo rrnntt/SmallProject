@@ -3,7 +3,7 @@
 
 #include "Formula/DllExport.h"
 #include "Formula/Namespace.h"
-#include "Formula/Parser.h"
+#include "Formula/EParser.h"
 
 class Operators;
 
@@ -20,7 +20,7 @@ public:
   /// Default constructor
   Expression(Namespace_ptr nc);
   /// Constructor
-  Expression(Namespace_ptr nc,const Parser& p);
+  Expression(Namespace_ptr nc,const EParser& p);
   /// Constructor
   Expression(Namespace_ptr nc,const std::string& str);
   /// Constructor. str must contain only constants
@@ -33,7 +33,7 @@ public:
   /// Return the terms
   const std::vector<Expression_ptr>& terms()const{return m_terms;}
   /// Number of arguments
-  int size()const{return m_terms.size();}
+  size_t size()const{return m_terms.size();}
   /// Name of the expression
   const std::string name()const;
   /// The object
@@ -76,7 +76,7 @@ protected:
   /// Maximum precedence to be assigned to functions with names
   static size_t max_precedence();
   void defaultOperators();
-  void fromParser(const Parser& p);
+  void fromParser(const EParser& p);
   void setVariable(const std::string& aName);
   void setFunction(const std::string& aName);
 
