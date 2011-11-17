@@ -57,6 +57,7 @@ set( SRC_FILES
   test/BoolTest.cpp
   test/DummyVarTest.cpp
   test/EParserTest.cpp
+  test/ExpressionTest.cpp
   test/ParserTest.cpp
   test/VariableTest.cpp
   test/VariableFactoryTest.cpp

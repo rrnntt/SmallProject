@@ -190,8 +190,8 @@ void test_parser()
 void test_eparser()
 {
     //std::string str = " sin (x + y ) * 1 + somefun(x,1,2,sin(x))";
-    std::string str = "3*(a + b)* c / t + 2*sin(x+-1)";
-    //std::string str = "x+-1";
+    //std::string str = "3*(a + b)* c / t + 2*sin(x+-1)";
+    std::string str = "x = - 1 + y";
     EParser parser;
     parser.parse(str);
     parser.log();

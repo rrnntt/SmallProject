@@ -108,13 +108,13 @@ namespace Formula
         if (special_case &&((**it).name() == "-" && (**it).size() == 1))
         {
           special_case = false;
-          Expression* arg = new Expression(m_namespace,*((**it).begin()));
+          Expression* arg = new Expression(m_namespace,**((**it).begin()));
           arg->m_op = "-";
           m_terms.push_back(boost::shared_ptr<Expression>(arg));
         }
         else
         {
-          Expression* arg = new Expression(m_namespace,*it);
+          Expression* arg = new Expression(m_namespace,**it);
           m_terms.push_back(boost::shared_ptr<Expression>(arg));
         }
       }
