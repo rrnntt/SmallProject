@@ -1,6 +1,6 @@
-#include "Problem/Problem.h"
+#include "Teach/Problem.h"
 
-namespace Problem
+namespace Teach
 {
 
 

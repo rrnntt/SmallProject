@@ -1,26 +1,27 @@
 #ifndef PROBLEM_TEXT_H
 #define PROBLEM_TEXT_H
 
-#include "Problem/DllExport.h"
+#include "Teach/DllExport.h"
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include <ostream>
 #include <vector>
+#include <string>
 
-namespace Problem
+namespace Teach
 {
 
-class PROBLEM_EXPORT Text
+class TEACH_EXPORT Text
 {
 public:
   Text(){}
   ~Text(){}
-  class PROBLEM_EXPORT Part
+  class TEACH_EXPORT Part
   {
   public:
     virtual ~Part(){}
     //virtual void print(std::ostream& os)const = 0;
-    virtual std::ostream& operator<<(std::ostream& os)const = 0;
+    virtual std::ostream& operator<<(std::ostream& os)const {return os;}
   };
   void append(Part* part);
 protected:
@@ -31,7 +32,7 @@ class StringPart: public Text::Part
 {
 public:
   //virtual void print(std::ostream& os)const { os << m_string; }
-  virtual std::ostream& operator<<(std::ostream& os)const { /*os << m_string;*/ return os;}
+  virtual std::ostream& operator<<(std::ostream& os)const { os << m_string; return os;}
 protected:
   std::string m_string;
 };

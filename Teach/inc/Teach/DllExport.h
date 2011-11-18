@@ -1,10 +1,10 @@
 #ifndef PROBLEM_DLLEXPORT_H
 #define PROBLEM_DLLEXPORT_H
 
-#if defined(IN_PROBLEM)
-#  define PROBLEM_EXPORT __declspec( dllexport )
+#if defined(IN_TEACH)
+#  define TEACH_EXPORT __declspec( dllexport )
 #else
-#  define PROBLEM_EXPORT __declspec( dllimport )
+#  define TEACH_EXPORT __declspec( dllimport )
 #endif
 
 #ifdef _WIN32

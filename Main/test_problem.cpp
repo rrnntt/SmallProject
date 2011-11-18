@@ -1,9 +1,9 @@
-#include "Problem/Problem.h"
-#include "Problem/Text.h"
+#include "Teach/Problem.h"
+#include "Teach/Text.h"
 
 #include <iostream>
 
-using namespace Problem;
+using namespace Teach;
 
 void test_problem()
 {

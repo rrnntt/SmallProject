@@ -1,12 +1,12 @@
 #ifndef PROBLEM_PROBLEM_H
 #define PROBLEM_PROBLEM_H
 
-#include "Problem/DllExport.h"
+#include "Teach/DllExport.h"
 
-namespace Problem
+namespace Teach
 {
 
-class PROBLEM_EXPORT Problem
+class TEACH_EXPORT Problem
 {
 public:
 };

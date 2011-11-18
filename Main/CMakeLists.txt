@@ -20,11 +20,11 @@ add_executable( Main ${SRC_FILES} ${INC_FILES} )
 include_directories(inc 
 ../Kernel/inc
 ../Formula/inc
-../Problem/inc
+../Teach/inc
 #../Numeric/inc
 ${THIRD_PARTY_INCLUDE_DIR}
 )
 
 target_link_libraries(Main
-Numeric Kernel Formula Problem
+Numeric Kernel Formula Teach
 )

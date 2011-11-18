@@ -1,6 +1,6 @@
-#include "Problem/Text.h"
+#include "Teach/Text.h"
 
-namespace Problem
+namespace Teach
 {
 
   void Text::append(Part* part)

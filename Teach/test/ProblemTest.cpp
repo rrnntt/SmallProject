@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
 
-#include "Problem/Problem.h"
+#include "Teach/Problem.h"
 
 #include <iostream>
 #include <sstream>
 
-using namespace Problem;
+using namespace Teach;
 
 TEST(ProblemTest, Tst) {
 }
