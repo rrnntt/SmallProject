@@ -8,6 +8,7 @@ namespace Problem
 
 class PROBLEM_EXPORT Problem
 {
+public:
 };
 
 } // Problem
