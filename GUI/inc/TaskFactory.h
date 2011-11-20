@@ -8,7 +8,7 @@ class TaskFactory: public Kernel::DynamicFactory<Task>
 {
 public:
   TaskFactory();
-	static TaskFactory& instance();
+  static TaskFactory& instance();
 protected:
 };
 

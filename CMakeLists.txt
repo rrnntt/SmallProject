@@ -47,8 +47,9 @@ find_path( OSG_DIR "include/osg/Referenced" )
 
 include_directories( ${Boost_INCLUDE_DIR} "${PROJECT_SOURCE_DIR}/Kernel/inc")
 
-add_subdirectory(Numeric)
 add_subdirectory(Kernel)
+add_subdirectory(API)
+add_subdirectory(Numeric)
 add_subdirectory(Formula)
 add_subdirectory(Teach)
 add_subdirectory(GUI)

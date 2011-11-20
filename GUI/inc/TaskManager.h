@@ -7,7 +7,7 @@
 class TaskManager: public Kernel::DataService<Task>
 {
 public:
-	static TaskManager& instance();
+  static TaskManager& instance();
   void setFrontTask(const std::string& taskName);
 protected:
   TaskManager(const std::string& name);
