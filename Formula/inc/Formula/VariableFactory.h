@@ -2,14 +2,14 @@
 #define VARIABLEFACTORY_H
 
 #include "Formula/DllExport.h"
-//#include "SingletonHolder.h"
+#include "API/Singleton.h"
 #include "Kernel/DynamicFactory.h"
 #include "Formula/Variable.h"
 
 namespace Formula
 {
 
-class FORMULA_EXPORT VariableFactory: public Kernel::DynamicFactory<Variable>
+class FORMULA_EXPORT VariableFactory: public Kernel::DynamicFactory<Variable>, public API::Singleton
 {
   VariableFactory(){}
 public:

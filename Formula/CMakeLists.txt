@@ -43,8 +43,9 @@ set( SRC_FILES
   src/VariableFactory.cpp
   )
 add_library( Formula SHARED ${SRC_FILES} ${INC_FILES} )
-include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})
+include_directories(inc ../API/inc ${THIRD_PARTY_INCLUDE_DIR})
 set_target_properties ( Formula PROPERTIES COMPILE_DEFINITIONS IN_FORMULA )
+target_link_libraries(Formula API)
 
 #
 #  Formula Test project

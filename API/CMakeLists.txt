@@ -6,6 +6,7 @@ project(API)
 set( INC_FILES 
    inc/API/DllExport.h
    inc/API/Framework.h
+   inc/API/Singleton.h
    )
 set( SRC_FILES 
   src/Framework.cpp
