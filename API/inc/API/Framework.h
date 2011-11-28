@@ -4,7 +4,8 @@
 #include "API/DllExport.h"
 #include "API/Singleton.h"
 
-#include <boost/ptr_container/ptr_vector.hpp>
+//#include <boost/ptr_container/ptr_map.hpp>
+#include <map>
 
 namespace API
 {
@@ -13,9 +14,13 @@ class API_EXPORT Framework
 {
 public:
   static Framework& instance();
+  void registerSingleton(const std::string& name, Singleton* singleton);
+  Singleton* getSingleton(const std::string& name);
+  ~Framework();
 protected:
   Framework();
-  boost::ptr_vector<Singleton> m_singletons;
+  //boost::ptr_map<std::string,Singleton> m_singletons;
+  std::map<std::string,Singleton*> m_singletons;
 };
 
 } // API

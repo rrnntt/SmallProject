@@ -7,9 +7,13 @@ set( INC_FILES
    inc/API/DllExport.h
    inc/API/Framework.h
    inc/API/Singleton.h
+   inc/API/Workspace.h
+   inc/API/WorkspaceFactory.h
    )
 set( SRC_FILES 
-  src/Framework.cpp
+   src/Framework.cpp
+   src/Workspace.cpp
+   src/WorkspaceFactory.cpp
   )
 add_library( API SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})

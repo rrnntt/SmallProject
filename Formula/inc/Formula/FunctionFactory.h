@@ -2,18 +2,19 @@
 #define FUNCTIONFACTORY_H
 
 #include "Formula/DllExport.h"
-//#include "SingletonHolder.h"
-#include "Kernel/DynamicFactory.h"
 #include "Formula/Function.h"
+#include "Kernel/DynamicFactory.h"
+#include "API/Singleton.h"
 
 namespace Formula
 {
 
-class FORMULA_EXPORT FunctionFactory: public Kernel::DynamicFactory<Function>
+class FORMULA_EXPORT FunctionFactory: public Kernel::DynamicFactory<Function>, protected API::Singleton
 {
 public:
   /// constructor
   FunctionFactory();
+  virtual std::string name() const {return "FunctionFactory";}
   /// Returns reference to the global instance of the factory
   static FunctionFactory& instance();
   template<class F>

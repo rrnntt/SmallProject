@@ -146,76 +146,29 @@ set( SRC_FILES
   )
   
 set( MOC_HEADERS
-	src/qwt_text.h
-	src/qwt_text_engine.h
 	src/qwt_text_label.h
 	src/qwt_thermo.h
-	src/qwt_valuelist.h
 	src/qwt_wheel.h
 	src/qwt_counter.h
-	src/qwt_curve_fitter.h
-	src/qwt_data.h
 	src/qwt_dial.h
-	src/qwt_dial_needle.h
-	src/qwt_double_interval.h
-	src/qwt_double_range.h
-	src/qwt_double_rect.h
 	src/qwt_dyngrid_layout.h
-	src/qwt_event_pattern.h
-	src/qwt_global.h
-	src/qwt_interval_data.h
 	src/qwt_knob.h
-	src/qwt_layout_metrics.h
 	src/qwt_legend.h
 	src/qwt_legend_item.h
-	src/qwt_legend_itemmanager.h
 	src/qwt_magnifier.h
-	src/qwt_math.h
-	src/qwt_paint_buffer.h
-	src/qwt_painter.h
 	src/qwt_panner.h
 	src/qwt_picker.h
-	src/qwt_picker_machine.h
 	src/qwt_plot.h
 	src/qwt_plot_canvas.h
-	src/qwt_plot_curve.h
-	src/qwt_plot_dict.h
-	src/qwt_plot_grid.h
-	src/qwt_plot_item.h
-	src/qwt_plot_layout.h
 	src/qwt_plot_magnifier.h
-	src/qwt_plot_marker.h
 	src/qwt_plot_panner.h
 	src/qwt_plot_picker.h
-	src/qwt_plot_printfilter.h
-	src/qwt_plot_rasteritem.h
-	src/qwt_plot_rescaler.h
-	src/qwt_plot_scaleitem.h
-	src/qwt_plot_spectrogram.h
-	src/qwt_plot_svgitem.h
 	src/qwt_plot_zoomer.h
-	src/qwt_polygon.h
-	src/qwt_raster_data.h
-	src/qwt_round_scale_draw.h
-	src/qwt_scale_div.h
-	src/qwt_scale_draw.h
-	src/qwt_scale_engine.h
-	src/qwt_scale_map.h
 	src/qwt_scale_widget.h
 	src/qwt_slider.h
-	src/qwt_spline.h
-	src/qwt_symbol.h
-	src/qwt.h
-	src/qwt_abstract_scale.h
-	src/qwt_abstract_scale_draw.h
 	src/qwt_abstract_slider.h
 	src/qwt_analog_clock.h
-	src/qwt_array.h
-	src/qwt_arrow_button.h
-	src/qwt_clipper.h
-	src/qwt_color_map.h
 	src/qwt_compass.h
-	src/qwt_compass_rose.h
 )
 
 qt_wrap_cpp(qwt MOC_FILES ${MOC_HEADERS})

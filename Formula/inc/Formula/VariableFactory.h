@@ -11,8 +11,10 @@ namespace Formula
 
 class FORMULA_EXPORT VariableFactory: public Kernel::DynamicFactory<Variable>, public API::Singleton
 {
-  VariableFactory(){}
+  VariableFactory();
 public:
+  ~VariableFactory();
+  virtual std::string name() const {return "VariableFactory";}
   static VariableFactory& instance();
 };
 

@@ -3,10 +3,12 @@
 
 #include "Task.h"
 #include "Kernel/DataService.h"
+#include "API/Singleton.h"
 
-class TaskManager: public Kernel::DataService<Task>
+class TaskManager: public Kernel::DataService<Task>, protected API::Singleton
 {
 public:
+  virtual std::string name() const {return "TaskManager";}
   static TaskManager& instance();
   void setFrontTask(const std::string& taskName);
 protected:

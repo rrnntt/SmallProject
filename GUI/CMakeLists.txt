@@ -68,7 +68,7 @@ set( OSG_ANIMATION_LIBS "optimized;${OSG_ANIMATION_RELEASE_LIB};debug;${OSG_ANIM
 qt_wrap_cpp(Plotter MOC_FILES ${MOC_HEADERS})
 
 add_executable( Plotter ${SRC_FILES} ${INC_FILES} ${MOC_FILES})
-include_directories(inc ../Numeric/inc
+include_directories(inc ../Numeric/inc ../API/inc
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."
 ${QT_QTCORE_INCLUDE_DIR}
@@ -79,7 +79,7 @@ ${OSG_BUILDINCLUDEDIR}
 )
 
 target_link_libraries(Plotter
-Numeric Kernel
+Kernel API Numeric
 )
 
 target_link_libraries(Plotter

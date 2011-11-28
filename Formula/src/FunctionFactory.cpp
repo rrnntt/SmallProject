@@ -1,4 +1,5 @@
 #include "Formula/FunctionFactory.h"
+#include "API/Framework.h"
 
 namespace Formula
 {
@@ -8,8 +9,17 @@ namespace Formula
 
   FunctionFactory& FunctionFactory::instance()
   {
-    static FunctionFactory ff;
-    return ff;
+    API::Singleton* s = API::Framework::instance().getSingleton("FunctionFactory");
+    if (s == nullptr)
+    {
+      FunctionFactory *vf = new FunctionFactory();
+      API::Framework::instance().registerSingleton("FunctionFactory",vf);
+      return *vf;
+    }
+    else
+    {
+      return *static_cast<FunctionFactory*>(s);
+    }
   }
 
   /**
