@@ -1,4 +1,6 @@
 #include "gtest/gtest.h"
+#include "DataObjects/TableWorkspace.h"
+#include "API/WorkspaceFactory.h"
 
 #include <iostream>
 

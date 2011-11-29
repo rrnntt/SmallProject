@@ -8,6 +8,9 @@ set( INC_FILES
    inc/Kernel/Creator.h
    inc/Kernel/DataService.h
    inc/Kernel/DllExport.h
+   inc/Kernel/DllOpen.h
+   inc/Kernel/LibraryManager.h
+   inc/Kernel/LibraryWrapper.h
    inc/Kernel/DynamicFactory.h
    inc/Kernel/Logger.h
    inc/Kernel/Notification.h
@@ -16,6 +19,9 @@ set( SRC_FILES
   src/DataService.cpp
   src/Logger.cpp
   src/Notification.cpp
+  src/DllOpen.cpp
+  src/LibraryManager.cpp
+  src/LibraryWrapper.cpp
   )
 add_library( Kernel SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc)
