@@ -22,6 +22,7 @@ Framework& Framework::instance()
 
 Framework::Framework()
 {
+  m_libraryManager.OpenAllLibraries(".");
 }
 
 /**

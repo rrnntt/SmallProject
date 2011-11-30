@@ -3,6 +3,7 @@
 
 #include "API/DllExport.h"
 #include "API/Singleton.h"
+#include "Kernel/LibraryManager.h"
 
 //#include <boost/ptr_container/ptr_map.hpp>
 #include <map>
@@ -19,8 +20,8 @@ public:
   ~Framework();
 protected:
   Framework();
-  //boost::ptr_map<std::string,Singleton> m_singletons;
   std::map<std::string,Singleton*> m_singletons;
+  Kernel::LibraryManager m_libraryManager;
 };
 
 } // API

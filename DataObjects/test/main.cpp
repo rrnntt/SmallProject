@@ -7,12 +7,12 @@ int main(int argc, char **argv) {
   //return RUN_ALL_TESTS();
 
   //DataObjects::TableWorkspace
-  API::Workspace* ws = API::WorkspaceFactory::instance().create("TableWorkspace");
-  if (ws)
+  try
   {
+    API::Workspace* ws = API::WorkspaceFactory::instance().create("TableWorkspace");
     std::cerr << "OK" << std::endl;
   }
-  else
+  catch(...)
   {
     std::cerr << "Fialed" << std::endl;
   }

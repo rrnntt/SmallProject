@@ -44,8 +44,10 @@ set( GTEST_LIBS "optimized;${GTEST_RELEASE_LIB};debug;${GTEST_DEBUG_LIB};")
 find_package( Boost )
 find_package( Qt4 )
 find_path( OSG_DIR "include/osg/Referenced" )
+add_definitions( -DBOOST_ALL_DYN_LINK )
 
 include_directories( ${Boost_INCLUDE_DIR} "${PROJECT_SOURCE_DIR}/Kernel/inc")
+link_directories(${THIRD_PARTY_LIB_DIR})
 
 add_subdirectory(Kernel)
 add_subdirectory(API)

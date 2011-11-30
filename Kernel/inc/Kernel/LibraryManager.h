@@ -21,18 +21,18 @@ namespace Kernel
   class KERNEL_EXPORT LibraryManager
   {
   public:
+    ///Private Constructor
+    LibraryManager();
+    ///Private Destructor
+    virtual ~LibraryManager();
     //opens all suitable libraries on a given path
     int OpenAllLibraries(const std::string&, bool isRecursive=false);
   private:
 
-    ///Private Constructor
-    LibraryManager();
     /// Private copy constructor - NO COPY ALLOWED
     LibraryManager(const LibraryManager&);
     /// Private assignment operator - NO ASSIGNMENT ALLOWED
     LibraryManager& operator = (const LibraryManager&);
-    ///Private Destructor
-    virtual ~LibraryManager();
 
     /// Load a given library
     bool loadLibrary(const std::string & filepath);

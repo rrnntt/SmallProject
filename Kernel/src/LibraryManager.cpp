@@ -5,6 +5,10 @@
 #include "Kernel/Logger.h"
 
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+#include <set>
+
+using namespace boost::filesystem;
 
 namespace Kernel
 {
@@ -13,7 +17,7 @@ namespace Kernel
   LibraryManager::LibraryManager() 
     : g_log(Logger::get("LibraryManager"))
   {
-    g_log.debug() << "LibraryManager created." << std::endl;
+    g_log.debug( "LibraryManager created." );
   }
 
   /// Destructor
@@ -29,37 +33,38 @@ namespace Kernel
   int LibraryManager::OpenAllLibraries(const std::string& filePath,
     bool isRecursive)
   {
-    g_log.debug() << "Opening all libraries in " << filePath << "\n";
+    g_log.debug( "Opening all libraries in " + filePath );
     int libCount = 0;
     //validate inputs
-    Poco::File libPath;
+    //Poco::File libPath;
+    path libPath;
     try
     {
-      libPath = Poco::File(filePath);
+      libPath = path(filePath);
     }
     catch(...)
     {
       return libCount;
     }
-    if ( libPath.exists() && libPath.isDirectory() )
+    if ( exists(libPath) && is_directory(libPath) )
     {
       DllOpen::addSearchDirectory(filePath);
       // Iteratate over the available files
-      Poco::DirectoryIterator end_itr;
-      for (Poco::DirectoryIterator itr(libPath); itr != end_itr; ++itr)
+      directory_iterator end_itr;
+      for (directory_iterator itr(libPath); itr != end_itr; ++itr)
       {
-        const Poco::Path & item = itr.path();
-        if ( item.isDirectory() )
+        const path & item = *itr;
+        if ( is_directory(item) )
         {
           if (isRecursive)
           {
-            libCount += OpenAllLibraries(item.toString());
+            libCount += OpenAllLibraries(item.string());
           }
         }
         else
         {
-          if( skip(item.toString()) ) continue;
-          if( loadLibrary(item.toString()) ) 
+          if( skip(item.string()) ) continue;
+          if( loadLibrary(item.string()) ) 
           {
             ++libCount;
           }
@@ -88,25 +93,26 @@ namespace Kernel
   */
   bool LibraryManager::skip(const std::string & filename)
   {
-    static std::set<std::string> excludes;
-    static bool initialized(false);
-    if( !initialized )
-    {
-      std::string excludeStr = ConfigService::Instance().getString("plugins.exclude");
-      boost::split(excludes, excludeStr, boost::is_any_of(":;"), boost::token_compress_on);
-      initialized = true;
-    }
-    bool skipme(false);
-    for( std::set<std::string>::const_iterator itr = excludes.begin(); itr != excludes.end();
-      ++itr)
-    {
-      if( filename.find(*itr) != std::string::npos)
-      {
-        skipme = true;
-        break;
-      }
-    }
-    return skipme;
+    return false;
+  //  static std::set<std::string> excludes;
+  //  static bool initialized(false);
+  //  if( !initialized )
+  //  {
+  //    std::string excludeStr = ConfigService::Instance().getString("plugins.exclude");
+  //    boost::split(excludes, excludeStr, boost::is_any_of(":;"), boost::token_compress_on);
+  //    initialized = true;
+  //  }
+  //  bool skipme(false);
+  //  for( std::set<std::string>::const_iterator itr = excludes.begin(); itr != excludes.end();
+  //    ++itr)
+  //  {
+  //    if( filename.find(*itr) != std::string::npos)
+  //    {
+  //      skipme = true;
+  //      break;
+  //    }
+  //  }
+  //  return skipme;
   }
 
   /** 
@@ -116,7 +122,7 @@ namespace Kernel
   bool LibraryManager::loadLibrary(const std::string & filepath)
   {
     // Get the name of the library.
-    std::string libName = DllOpen::ConvertToLibName(Poco::Path(filepath).getFileName());
+    std::string libName = DllOpen::ConvertToLibName(path(filepath).filename().string());
     if( libName.empty() ) return false;
     // The wrapper will unload the library when it is deleted
     boost::shared_ptr<LibraryWrapper> dlwrap(new LibraryWrapper);
@@ -125,14 +131,10 @@ namespace Kernel
     //Check that a libray with this name has not already been loaded
     if (OpenLibs.find(libNameLower) == OpenLibs.end())
     {
-      Poco::Path directory(filepath);
-      directory.makeParent();
-      if (g_log.is(Poco::Message::PRIO_DEBUG))
-      {
-        g_log.debug() << "Trying to open library: " << libName << " from " << directory.toString() << " ...";
-      }
+      path directory = path(filepath).parent_path();
+      g_log.debug( "Trying to open library: " + libName + " from " + directory.string() + " ..." );
       //Try to open the library
-      if (dlwrap->OpenLibrary(libName, directory.toString()))
+      if (dlwrap->OpenLibrary(libName, directory.string()))
       {
         //Successfully opened, so add to map
         g_log.debug("Opened library: " + libName + ".\n");
@@ -146,7 +148,7 @@ namespace Kernel
     }
     else
     {
-      g_log.debug() << libName << " already opened, skipping load\n";
+      g_log.debug( libName + " already opened, skipping load\n" );
     }
     return false;
   }

@@ -15,6 +15,7 @@ class KERNEL_EXPORT Logger
 public:
   static Logger& get(const std::string& name);
   template<class T> std::ostream& operator<<(const T& out);
+  void debug(const std::string&);
   void error(const std::string&);
   void information(const std::string&);
   void warning(const std::string&);

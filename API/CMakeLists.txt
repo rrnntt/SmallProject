@@ -18,6 +18,7 @@ set( SRC_FILES
 add_library( API SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})
 set_target_properties ( API PROPERTIES COMPILE_DEFINITIONS IN_API )
+target_link_libraries(API Kernel)
 
 #
 #  API Test project
