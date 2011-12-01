@@ -1,4 +1,4 @@
-#include "Formula/EParser.h"
+#include "Kernel/EParser.h"
 
 //#include <boost/spirit/include/qi.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace Formula
+namespace Kernel
 {
 
   /**
@@ -789,4 +789,4 @@ std::string EParser::str(bool printOp)const
 
 
 
-} // Formula
+} // Kernel

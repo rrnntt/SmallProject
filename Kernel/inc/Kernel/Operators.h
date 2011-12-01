@@ -1,7 +1,7 @@
-#ifndef OPERATORS_H
-#define OPERATORS_H
+#ifndef KERNEL_OPERATORS_H
+#define KERNEL_OPERATORS_H
 
-#include "Formula/DllExport.h"
+#include "Kernel/DllExport.h"
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
@@ -11,7 +11,7 @@
 /**
  * Keeps operator that can be used in an expression
  */
-class FORMULA_EXPORT Operators
+class KERNEL_EXPORT Operators
 {
 public:
   /**
@@ -75,4 +75,4 @@ private:
 
 typedef boost::shared_ptr<Operators> Operators_ptr;
 
-#endif // OPERATORS_H
+#endif // KERNEL_OPERATORS_H

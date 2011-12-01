@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
-#include "Formula/EParser.h"
+#include "Kernel/EParser.h"
 
 #include <iostream>
 #include <string>
 
-using namespace Formula;
+using namespace Kernel;
 
 TEST(EParserTest, Char) 
 {

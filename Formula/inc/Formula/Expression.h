@@ -3,7 +3,7 @@
 
 #include "Formula/DllExport.h"
 #include "Formula/Namespace.h"
-#include "Formula/EParser.h"
+#include "Kernel/EParser.h"
 
 class Operators;
 
@@ -20,7 +20,7 @@ public:
   /// Default constructor
   Expression(Namespace_ptr nc);
   /// Constructor
-  Expression(Namespace_ptr nc,const EParser& p);
+  Expression(Namespace_ptr nc,const Kernel::EParser& p);
   /// Constructor
   Expression(Namespace_ptr nc,const std::string& str);
   /// Constructor. str must contain only constants
@@ -76,7 +76,7 @@ protected:
   /// Maximum precedence to be assigned to functions with names
   static size_t max_precedence();
   void defaultOperators();
-  void fromParser(const EParser& p);
+  void fromParser(const Kernel::EParser& p);
   void setVariable(const std::string& aName);
   void setFunction(const std::string& aName);
 

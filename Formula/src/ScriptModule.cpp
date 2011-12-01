@@ -163,7 +163,7 @@ namespace Formula
     */
   boost::shared_ptr<Variable> ScriptModule::runFunction(const std::string& fnStr)
   {
-    EParser pars;
+    Kernel::EParser pars;
     pars.parse(fnStr);
     std::string fnName = pars.name();
     ScriptFunction_ptr fun = getFunction(fnName);
@@ -173,7 +173,7 @@ namespace Formula
       const std::vector<std::string>& argNames = fun->arguments();
       for(int i=0;i<pars.size();++i)
       {
-        const EParser& arg = pars[i];
+        const Kernel::EParser& arg = pars[i];
         if (!keyWords){ keyWords = (arg.name() == "=");}
         if (!keyWords)
         {

@@ -1,4 +1,4 @@
-#include "Formula/Str.h"
+#include "Kernel/Str.h"
 
 namespace Str
 {

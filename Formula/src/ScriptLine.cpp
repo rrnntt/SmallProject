@@ -57,7 +57,7 @@ namespace Formula
     */
   ScriptLineCall::ScriptLineCall(boost::shared_ptr<Namespace> ns,
                                  ScriptFunctionGetter& getter,
-                                 const EParser& code):
+                                 const Kernel::EParser& code):
       m_namespace(ns)
   {
     std::string name(code.name());
@@ -68,13 +68,13 @@ namespace Formula
     }
     for(int i=0;i<code.size();++i) // looping the function arguments
     {
-      const EParser& arg = code[i];
+      const Kernel::EParser& arg = code[i];
       if (arg.name() != "=")
       {
         throw std::invalid_argument("Actual function arguments must be passed as name=value");
       }
       std::string name = arg[0]->name();
-      const EParser& value = arg[1];
+      const Kernel::EParser& value = arg[1];
       setArgument(name,value);
     }
     check();
@@ -91,7 +91,7 @@ namespace Formula
     m_arguments[argName] = var;
   }
 
-  void ScriptLineCall::setArgument(const std::string& argName,const EParser& varName)
+  void ScriptLineCall::setArgument(const std::string& argName,const Kernel::EParser& varName)
   {
     Expression expr(m_namespace,varName);
     Variable_ptr var(expr.eval().clone());
@@ -140,12 +140,12 @@ namespace Formula
 
   void ScriptLineBlock::addLines(const std::string& lines)
   {
-    EParser code;
+    Kernel::EParser code;
     code.parse(lines);
     addLines(code);
   }
 
-  void ScriptLineBlock::addLines(const EParser& parser)
+  void ScriptLineBlock::addLines(const Kernel::EParser& parser)
   {
     if (parser.name() == ";")
     {
@@ -169,12 +169,12 @@ namespace Formula
     */
   void ScriptLineBlock::addLine(const std::string& line)
   {
-    EParser code;
+    Kernel::EParser code;
     code.parse(line);
     addLine(code);
   }
 
-  void ScriptLineBlock::addLine(const EParser& code)
+  void ScriptLineBlock::addLine(const Kernel::EParser& code)
   {
     ScriptLine* line = createLine(code);
     if (line)
@@ -187,7 +187,7 @@ namespace Formula
     }
   }
 
-  ScriptLine* ScriptLineBlock::createLine(const EParser& code)
+  ScriptLine* ScriptLineBlock::createLine(const Kernel::EParser& code)
   {
     if (code.name() == ":") // define variable
     {
@@ -208,7 +208,7 @@ namespace Formula
     else if (code.name() == "=") // assign new value
     {
       std::string name = code[0]->name();
-      const EParser& value = code[1];
+      const Kernel::EParser& value = code[1];
       return new ScriptLineSet(m_local_namespace,name,Expression_ptr(new Expression(m_local_namespace,value)));
     }
     else if (code.name() == "if") // if(cond1:expr1,cond2:(expr2;expr3;expr4;...),def_expr)
@@ -217,7 +217,7 @@ namespace Formula
       size_t n = code.size();
       for(size_t i=0;i<n;++i)
       {
-        const EParser& clause = code[i];
+        const Kernel::EParser& clause = code[i];
         if (clause.name() == ":")
         {
           Expression* cond = new Expression(m_local_namespace,clause[0]);
@@ -254,13 +254,13 @@ namespace Formula
       ScriptLineCall* call = new ScriptLineCall(m_local_namespace,*this,fnName);
       for(int i=0;i<code.size();++i) // looping the function arguments
       {
-        const EParser& arg = code[i];
+        const Kernel::EParser& arg = code[i];
         if (arg.name() != "=")
         {
           throw std::invalid_argument("Actual function arguments must be passed as name=value");
         }
         std::string name = arg[0]->name();
-        const EParser& value = arg[1];
+        const Kernel::EParser& value = arg[1];
         call->setArgument(name,value);
       }
       call->check();

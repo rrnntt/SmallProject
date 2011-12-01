@@ -2,7 +2,7 @@
 #define FORMULA_PARSER_H
 
 #include "Formula/DllExport.h"
-#include "Formula/Operators.h"
+#include "Kernel/Operators.h"
 
 #include <boost/shared_ptr.hpp>
 #include <string>

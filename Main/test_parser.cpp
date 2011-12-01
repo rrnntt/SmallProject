@@ -1,8 +1,8 @@
-#include "Formula/EParser.h"
+#include "Kernel/EParser.h"
 
 #include <iostream>
 
-using namespace Formula;
+using namespace Kernel;
 
 template<class FUN>
 void checkMatch(const IParser& parser,FUN fun)

@@ -14,6 +14,9 @@ set( INC_FILES
    inc/Kernel/DynamicFactory.h
    inc/Kernel/Logger.h
    inc/Kernel/Notification.h
+   inc/Kernel/EParser.h
+   inc/Kernel/Operators.h
+   inc/Kernel/Str.h
    )
 set( SRC_FILES 
   src/DataService.cpp
@@ -22,6 +25,9 @@ set( SRC_FILES
   src/DllOpen.cpp
   src/LibraryManager.cpp
   src/LibraryWrapper.cpp
+  src/EParser.cpp
+  src/Operators.cpp
+  src/Str.cpp
   )
 add_library( Kernel SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc)
@@ -35,19 +41,17 @@ set_target_properties ( Kernel PROPERTIES COMPILE_DEFINITIONS IN_KERNEL )
 #
 #  Kernel Test project
 #
-#project(KernelTest)
-#
-#set( INC_FILES )
-#set( SRC_FILES 
-#  test/main.cpp
-#  test/SomeFunctionTest.cpp
-#  test/VectorTest.cpp
-#)
+project(KernelTest)
 
-#add_executable(KernelTest ${SRC_FILES} ${INC_FILES})
-#include_directories(test ${THIRD_PARTY_INCLUDE_DIR} )
-#target_link_libraries(KernelTest 
-#debug Kernel
-#optimized Kernel
-#)
+set( INC_FILES )
+set( SRC_FILES 
+  test/main.cpp
+  test/EParserTest.cpp
+)
+
+add_executable(KernelTest ${SRC_FILES} ${INC_FILES})
+include_directories(test ${THIRD_PARTY_INCLUDE_DIR} )
+find_library(GTEST_DEBUG_LIB gtest_d "${THIRD_PARTY_LIB_DIR}")
+find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
+target_link_libraries(KernelTest ${GTEST_LIBS} Kernel)
 

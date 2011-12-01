@@ -1,6 +1,6 @@
 #include "Formula/Namespace.h"
 #include "Formula/Object.h"
-#include "Formula/Str.h"
+#include "Kernel/Str.h"
 
 #include "Formula/VariableFactory.h"
 #include "Formula/Function.h"

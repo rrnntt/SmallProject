@@ -1,5 +1,5 @@
-#include "Formula/Operators.h"
-#include "Formula/Str.h"
+#include "Kernel/Operators.h"
+#include "Kernel/Str.h"
 
 #include <stdexcept>
 

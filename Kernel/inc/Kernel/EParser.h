@@ -1,8 +1,8 @@
-#ifndef FORMULA_EPARSER_H
-#define FORMULA_EPARSER_H
+#ifndef KERNEL_EPARSER_H
+#define KERNEL_EPARSER_H
 
-#include "Formula/DllExport.h"
-#include "Formula/Operators.h"
+#include "Kernel/DllExport.h"
+#include "Kernel/Operators.h"
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -10,10 +10,10 @@
 #include <map>
 #include <set>
 
-namespace Formula
+namespace Kernel
 {
   //------------------------------------------------------------
-  class FORMULA_EXPORT IParser
+  class KERNEL_EXPORT IParser
   {
   public:
     IParser():m_hasMatch(false),m_empty(false){}
@@ -42,7 +42,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT CharParser: public IParser
+  class KERNEL_EXPORT CharParser: public IParser
   {
   public:
     CharParser(char c = 0):IParser(){if (c) m_chars.push_back(c);}
@@ -55,7 +55,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT StringParser: public IParser
+  class KERNEL_EXPORT StringParser: public IParser
   {
   public:
     StringParser(const std::string& str):IParser(),m_string(str){}
@@ -67,7 +67,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT EmptyParser: public IParser
+  class KERNEL_EXPORT EmptyParser: public IParser
   {
   public:
     EmptyParser():IParser(){}
@@ -84,7 +84,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT AllParser: public IParser
+  class KERNEL_EXPORT AllParser: public IParser
   {
   public:
     AllParser():IParser(){}
@@ -99,7 +99,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT MultiParser: public IParser
+  class KERNEL_EXPORT MultiParser: public IParser
   {
   public:
     MultiParser():IParser(){}
@@ -117,7 +117,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT SeqParser: public MultiParser
+  class KERNEL_EXPORT SeqParser: public MultiParser
   {
   public:
     SeqParser():MultiParser(){}
@@ -130,7 +130,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT ListParser: public MultiParser
+  class KERNEL_EXPORT ListParser: public MultiParser
   {
   public:
     enum Mutiplicity {One,OneMany,ZeroMany};
@@ -144,7 +144,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT AltParser: public MultiParser
+  class KERNEL_EXPORT AltParser: public MultiParser
   {
   public:
     AltParser():MultiParser(){}
@@ -158,7 +158,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT WordParser: public IParser
+  class KERNEL_EXPORT WordParser: public IParser
   {
   public:
     WordParser():IParser(){}
@@ -169,7 +169,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT VarNameParser: public IParser
+  class KERNEL_EXPORT VarNameParser: public IParser
   {
   public:
     VarNameParser():IParser(){}
@@ -180,7 +180,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT NumberParser: public IParser
+  class KERNEL_EXPORT NumberParser: public IParser
   {
   public:
     NumberParser():IParser(){}
@@ -191,7 +191,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT BracketParser: public MultiParser
+  class KERNEL_EXPORT BracketParser: public MultiParser
   {
   public:
     BracketParser(IParser* p = nullptr);
@@ -209,7 +209,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT NameBracketParser: public SeqParser
+  class KERNEL_EXPORT NameBracketParser: public SeqParser
   {
   public:
     NameBracketParser(IParser* p = nullptr);
@@ -224,7 +224,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT TermParser: public AltParser
+  class KERNEL_EXPORT TermParser: public AltParser
   {
   public:
     TermParser();
@@ -233,7 +233,7 @@ namespace Formula
   };
 
   //------------------------------------------------------------
-  class FORMULA_EXPORT EParser
+  class KERNEL_EXPORT EParser
   {
   public:
     EParser();
@@ -280,6 +280,6 @@ namespace Formula
 
   };
 
-} // Formula
+} // Kernel
 
-#endif // FORMULA_EPARSER_H
+#endif // KERNEL_EPARSER_H

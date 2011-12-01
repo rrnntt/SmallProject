@@ -24,7 +24,7 @@ namespace Formula
     * @param ns The namespace
     * @param p An initialised parser
     */
-  Expression::Expression(Namespace_ptr ns,const EParser& p)
+  Expression::Expression(Namespace_ptr ns,const Kernel::EParser& p)
   :m_namespace(ns),m_object(),m_op(p.operator_name())
   {
     fromParser(p);
@@ -39,7 +39,7 @@ namespace Formula
   :m_namespace(ns),m_object()
   {
     defaultOperators();
-    EParser p(m_operators);
+    Kernel::EParser p(m_operators);
     p.parse(str);
     fromParser(p);
   }
@@ -62,7 +62,7 @@ namespace Formula
   :m_namespace(new Namespace()),m_object()
   {
     defaultOperators();
-    EParser p(m_operators);
+    Kernel::EParser p(m_operators);
     p.parse(str);
     fromParser(p);
   }
@@ -96,14 +96,14 @@ namespace Formula
     m_operators->add_unary(unary);
   }
 
-  void Expression::fromParser(const EParser& p)
+  void Expression::fromParser(const Kernel::EParser& p)
   {
     m_op = p.operator_name();
     bool special_case = p.name() == "+";
     if (p.isFunct())
     {
       // create the arguments first
-      for(EParser::iterator it=p.begin();it!= p.end();it++)
+      for(Kernel::EParser::iterator it=p.begin();it!= p.end();it++)
       {
         if (special_case &&((**it).name() == "-" && (**it).size() == 1))
         {

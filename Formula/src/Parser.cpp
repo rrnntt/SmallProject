@@ -1,5 +1,5 @@
 #include "Formula/Parser.h"
-#include "Formula/Str.h"
+#include "Kernel/Str.h"
 
 #include <sstream>
 #include <iostream>
