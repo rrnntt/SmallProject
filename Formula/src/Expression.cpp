@@ -333,4 +333,39 @@ namespace Formula
     return vars.empty();
   }
 
+  std::string Expression::orderedString()const
+  {
+    std::string res = m_name;
+    if (isVariable()) return res;
+    std::multiset<std::string> str;
+    if (isBinary())
+    {
+      for(auto t = begin(); t != end(); ++t)
+      {
+        std::string op = (**t).m_op;
+        if (op.empty())
+        {
+          op = m_name;
+        }
+        str.insert(op+(**t).orderedString());
+      }
+      res += "(";
+      for(auto s = str.begin(); s != str.end(); ++s)
+      {
+        res += *s;
+      }
+      res += ")";
+    }
+    else
+    {
+      res += "(";
+      for(auto t = begin(); t != end(); ++t)
+      {
+        res += (**t).orderedString() + ",";
+      }
+      res += ")";
+    }
+    return res;
+  }
+
 } // Formula

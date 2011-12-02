@@ -13,15 +13,23 @@ set( SRC_FILES
   src/Text.cpp
   )
 add_library( Teach SHARED ${SRC_FILES} ${INC_FILES} )
-include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})
+include_directories(inc 
+../Kernel/inc
+../API/inc
+../Formula/inc
+${THIRD_PARTY_INCLUDE_DIR}
+)
 set_target_properties ( Teach PROPERTIES COMPILE_DEFINITIONS IN_TEACH )
+target_link_libraries(Teach
+Kernel API Formula 
+)
 
 #
 #  TeachTest project
 #
 project(TeachTest)
 
-#set( INC_FILES test/DummyVar.h )
+set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/ProblemTest.cpp

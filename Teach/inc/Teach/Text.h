@@ -2,9 +2,11 @@
 #define PROBLEM_TEXT_H
 
 #include "Teach/DllExport.h"
+#include "Kernel/EParser.h"
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include <ostream>
+#include <istream>
 #include <vector>
 #include <string>
 
@@ -20,23 +22,36 @@ public:
   {
   public:
     virtual ~Part(){}
-    //virtual void print(std::ostream& os)const = 0;
-    virtual std::ostream& operator<<(std::ostream& os)const {return os;}
+    virtual void print(std::ostream& os)const {}
   };
   void append(Part* part);
+  void print(std::ostream& os, bool endline = false)const;
+  void read(std::istream& is);
+  void read(std::string& str);
 protected:
   boost::ptr_vector<Part> m_parts;
 };
 
-class StringPart: public Text::Part
+class TEACH_EXPORT StringPart: public Text::Part
 {
 public:
-  //virtual void print(std::ostream& os)const { os << m_string; }
-  virtual std::ostream& operator<<(std::ostream& os)const { os << m_string; return os;}
+  StringPart(const std::string& str):m_string(str){}
+  virtual void print(std::ostream& os)const { os << m_string; }
 protected:
   std::string m_string;
 };
 
+class TEACH_EXPORT ExpressionPart: public Text::Part
+{
+public:
+  ExpressionPart(const std::string& str);
+  virtual void print(std::ostream& os)const;
+protected:
+  Kernel::EParser m_expression;
+};
+
 } // Problem
+
+TEACH_EXPORT std::ostream& operator<<(std::ostream& os,const Teach::Text& text);
 
 #endif // PROBLEM_TEXT_H

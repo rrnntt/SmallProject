@@ -19,6 +19,7 @@ set( SRC_FILES
 add_executable( Main ${SRC_FILES} ${INC_FILES} )
 include_directories(inc 
 ../Kernel/inc
+../API/inc
 ../Formula/inc
 ../Teach/inc
 #../Numeric/inc
@@ -26,5 +27,6 @@ ${THIRD_PARTY_INCLUDE_DIR}
 )
 
 target_link_libraries(Main
-Numeric Kernel Formula Teach
+Kernel API Formula Teach
+#Numeric 
 )

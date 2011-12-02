@@ -14,14 +14,17 @@ namespace API
 class API_EXPORT Framework
 {
 public:
+  ~Framework();
   static Framework& instance();
   void registerSingleton(const std::string& name, Singleton* singleton);
   Singleton* getSingleton(const std::string& name);
-  ~Framework();
+  void parseCommandLine(int argc, char** argv);
+  const std::string binDirectory() const;
 protected:
   Framework();
   std::map<std::string,Singleton*> m_singletons;
   Kernel::LibraryManager m_libraryManager;
+  std::string m_binDirectory;
 };
 
 } // API

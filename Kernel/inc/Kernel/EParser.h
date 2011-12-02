@@ -24,9 +24,10 @@ namespace Kernel
     virtual bool matchEmpty()const{return false;}
     bool hasMatch() const {return m_hasMatch;}
     bool isEmpty() const {return m_empty;/*m_start == m_end;*/}
-    std::string match() const {return std::string(m_start,m_end);}
+    //std::string match() const {return std::string(m_start,m_end);}
+    std::string match() const {return std::string(m_start,m_start + m_n);}
     std::string::const_iterator getStart()const{return m_start;}
-    std::string::const_iterator getEnd()const{return m_end;}
+    std::string::const_iterator getEnd()const{return m_start + m_n;}
   protected:
     /**
     * Tries to match string starting at start. If unsuccessful returns start. If successful returns
@@ -36,7 +37,8 @@ namespace Kernel
     */
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end)  = 0;
     std::string::const_iterator m_start;
-    std::string::const_iterator m_end;
+    //std::string::const_iterator m_end;
+    std::string::size_type m_n;
     bool m_hasMatch;
     bool m_empty;
   };
@@ -107,6 +109,13 @@ namespace Kernel
     ~MultiParser();
     size_t size()const{return m_parsers.size();}
     IParser* getParser(size_t i)const{return m_parsers.at(i).parser;}
+    template<class P>
+    P* get(size_t i)const{return dynamic_cast<P*>(m_parsers.at(i).parser);}
+    template<class P>
+    P* get(size_t i,size_t j)const
+    {
+      return get<MultiParser>(i)->get<P>(j);
+    }
   protected:
     IParser* addParser(IParser* parser);
     struct ParserHolder
@@ -199,7 +208,8 @@ namespace Kernel
     BracketParser(const BracketParser& p);
     IParser* clone()const{return new BracketParser(*this);}
     std::string::const_iterator getInnerStart()const{return m_start + m_bra.size();}
-    std::string::const_iterator getInnerEnd()const{return m_end - m_ket.size();}
+    //std::string::const_iterator getInnerEnd()const{return m_end - m_ket.size();}
+    std::string::const_iterator getInnerEnd()const{return m_start + m_n - m_ket.size();}
   protected:
     enum Part{Bra,Ket,Other};
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
@@ -263,6 +273,7 @@ namespace Kernel
     iterator begin()const{return m_terms.begin();}
     iterator end()const{return m_terms.end();}
     const EParser* operator[](size_t i)const{return m_terms.at(i);}
+    std::set<std::string> getVariables() const;
   protected:
 
     void parse(std::string::const_iterator start,std::string::const_iterator end);

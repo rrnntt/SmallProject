@@ -1,6 +1,9 @@
 #include "API/Framework.h"
 
+#include <boost/filesystem.hpp>
 #include <iostream>
+
+using namespace boost::filesystem;
 
 namespace API
 {
@@ -70,6 +73,21 @@ Singleton* Framework::getSingleton(const std::string& name)
     }
     return nullptr;
   }
+}
+
+void Framework::parseCommandLine(int argc, char** argv)
+{
+  path binPath(argv[0]);
+  m_binDirectory = binPath.parent_path().string()+"/";
+}
+
+const std::string Framework::binDirectory() const
+{
+  if (m_binDirectory.empty())
+  {
+    throw std::runtime_error("Bin directory is not known");
+  }
+  return m_binDirectory;
 }
 
 } // API

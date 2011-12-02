@@ -84,3 +84,18 @@ TEST(ExpressionTest, Namespace)
     EXPECT_EQ(e9.eval().toString(),"False");
 
   }
+
+TEST(ExpressionTest,orderedString)
+{
+    Formula::Namespace_ptr ns(new Formula::Namespace());
+    ns->addVariable("Scalar","x");
+    ns->addVariable("Scalar","y");
+    ns->addVariable("Scalar","z");
+    ns->addVariable("Scalar","a");
+    ns->addVariable("Scalar","b");
+    Formula::Expression e1(ns,"x-y - sin(b)= z");
+    Formula::Expression e2(ns,"z=-y - sin(b) + x");
+    std::cerr << e1.orderedString() << std::endl;
+    std::cerr << e2.orderedString() << std::endl;
+    EXPECT_EQ(e1.orderedString(),e2.orderedString());
+}

@@ -66,15 +66,13 @@ TEST(EParserTest, Word)
   SeqParser seq3;
   seq3.addParser(new WordParser());
   seq3.addParser(new CharParser(' '),'*');
-  seq3.addParser(new CharParser("+-=<>"));
-  seq3.addParser(new CharParser(' '),'*');
   seq3.addParser(new WordParser());
 
   seq3.match(str3.begin(),str3.end());
 
   EXPECT_TRUE(seq3.hasMatch());
-  EXPECT_EQ(seq3.getParser(0)->match(),"xyz");
-  EXPECT_EQ(seq3.getParser(4)->match(),"12");
+  EXPECT_EQ(seq3.getParser(0)->match(),"xyz=");
+  EXPECT_EQ(seq3.getParser(2)->match(),"12");
 }
 
 TEST(EParserTest, VarName) 

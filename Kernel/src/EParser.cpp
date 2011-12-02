@@ -19,28 +19,52 @@ namespace Kernel
    */
 std::string::const_iterator IParser::match(std::string::const_iterator start,std::string::const_iterator end)
 {
+  //m_hasMatch = false;
+  //if (start == end)
+  //{
+  //  m_start = m_end = end;
+  //  m_hasMatch = this->matchEmpty();
+  //  m_empty = true;
+  //  return m_end;
+  //}
+  //m_start = start;
+  //m_end = this->test(start,end);
+
+  //if (m_end == m_start)
+  //{
+  //  m_end = m_start; //?
+  //  m_empty = true;
+  //}
+  //else
+  //{
+  //  m_hasMatch = true;
+  //}
+
+  //return m_end;
   m_hasMatch = false;
   if (start == end)
   {
-    m_start = m_end = end;
+    m_start = end;
+    m_n = 0;
     m_hasMatch = this->matchEmpty();
     m_empty = true;
-    return m_end;
+    return m_start;
   }
   m_start = start;
-  m_end = this->test(start,end);
+  std::string::const_iterator _end = this->test(start,end);
 
-  if (m_end == m_start)
+  if (_end == m_start)
   {
-    m_end = m_start; //?
+    m_n = 0;
     m_empty = true;
   }
   else
   {
     m_hasMatch = true;
   }
+  m_n = _end - m_start;
 
-  return m_end;
+  return _end;
 }
 
 /**
@@ -234,7 +258,7 @@ WordParser::WordParser(const WordParser& p)
 
 std::string::const_iterator WordParser::test(std::string::const_iterator start,std::string::const_iterator end) 
 {
-  return std::find_if_not(start,end,isalnum);
+  return std::find_if(start,end,isspace);
 }
 
 //-----------------------------------------------------
@@ -785,6 +809,23 @@ std::string EParser::str(bool printOp)const
     if (bk) res <<')';
   }
   return res.str();
+}
+
+std::set<std::string> EParser::getVariables() const
+{
+  std::set<std::string> vars;
+  if (!isFunct())
+  {
+    vars.insert(m_funct);
+    return vars;
+  }
+
+  for(auto t = begin(); t != end(); ++t)
+  {
+    std::set<std::string> v = (**t).getVariables();
+    vars.insert(v.begin(),v.end());
+  }
+  return vars;
 }
 
 
