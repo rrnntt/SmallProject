@@ -9,9 +9,16 @@ set( INC_FILES
    inc/OSGWidget.h
    inc/OSGPhysModel.h
    inc/Model.h
+   inc/Plot.h
+   inc/PlotDialog.h
+   inc/PlotDefaults.h
+   inc/FileTask.h
    inc/Task.h
+   inc/Table.h
    inc/TaskFactory.h
    inc/TaskManager.h
+   inc/CurveManager.h
+   inc/SubWindow.h
    )
 set( SRC_FILES 
   src/Demo.cpp
@@ -20,14 +27,30 @@ set( SRC_FILES
   src/OSGWidget.cpp
   src/OSGPhysModel.cpp
   src/Model.cpp
+  src/Plot.cpp
+  src/PlotDialog.cpp
+  src/PlotDefaults.cpp
   src/Task.cpp
+  src/FileTask.cpp
+  src/Table.cpp
   src/TaskFactory.cpp
   src/TaskManager.cpp
+  src/CurveManager.cpp
+  src/SubWindow.cpp
   )
   
 set( MOC_HEADERS
    inc/MainWindow.h
    inc/OSGWidget.h
+   inc/PlotDialog.h
+   inc/Table.h
+   inc/FileTask.h
+   inc/Task.h
+   inc/SubWindow.h
+)
+
+set( UI_FILES
+   inc/PlotDialog.ui
 )
 
 # OpenSceneGraph source directory
@@ -65,10 +88,12 @@ set( OSG_ANIMATION_DEBUG_LIB "${OSG_LIBDIR}/osgAnimationd.lib")
 set( OSG_ANIMATION_RELEASE_LIB "${OSG_LIBDIR}/osgAnimation.lib")
 set( OSG_ANIMATION_LIBS "optimized;${OSG_ANIMATION_RELEASE_LIB};debug;${OSG_ANIMATION_DEBUG_LIB};")
 
-qt_wrap_cpp(Plotter MOC_FILES ${MOC_HEADERS})
+qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
+qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
-add_executable( Plotter ${SRC_FILES} ${INC_FILES} ${MOC_FILES})
-include_directories(inc ../Numeric/inc ../API/inc
+add_executable( Plotter ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
+include_directories(inc ../Numeric/inc ../API/inc ../DataObjects/inc ../qwt/src
+"${CMAKE_BINARY_DIR}/GUI"
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."
 ${QT_QTCORE_INCLUDE_DIR}
@@ -79,7 +104,7 @@ ${OSG_BUILDINCLUDEDIR}
 )
 
 target_link_libraries(Plotter
-Kernel API Numeric
+Kernel API Numeric DataObjects qwt
 )
 
 target_link_libraries(Plotter

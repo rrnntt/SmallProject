@@ -94,6 +94,8 @@ namespace DataObjects
     static Kernel::Logger& g_log;
   };
 
+  typedef boost::shared_ptr<TableWorkspace> TableWorkspace_ptr;
+
 } // DataObjects
 
 #endif // DATAOBJECTS_TableWorkspace_H

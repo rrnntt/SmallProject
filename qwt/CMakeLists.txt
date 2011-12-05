@@ -174,6 +174,7 @@ set( MOC_HEADERS
 qt_wrap_cpp(qwt MOC_FILES ${MOC_HEADERS})
 
 add_library( qwt SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES})
+set_target_properties ( qwt PROPERTIES COMPILE_DEFINITIONS QWT_MAKEDLL )
 include_directories(
 "${QT_QTCORE_INCLUDE_DIR}/.."
 ${QT_QTCORE_INCLUDE_DIR}

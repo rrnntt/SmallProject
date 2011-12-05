@@ -17,7 +17,8 @@ DECLARE_WORKSPACE(TableWorkspace);
 
 Kernel::Logger& TableWorkspace::g_log(Kernel::Logger::get("TableWorkspace"));
 
-TableWorkspace::TableWorkspace()
+TableWorkspace::TableWorkspace():
+m_rowCount(0)
 {
   std::cerr<<"TableWorkspace\n";
 }

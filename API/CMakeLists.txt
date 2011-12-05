@@ -9,11 +9,13 @@ set( INC_FILES
    inc/API/Singleton.h
    inc/API/Workspace.h
    inc/API/WorkspaceFactory.h
+   inc/API/WorkspaceManager.h
    )
 set( SRC_FILES 
    src/Framework.cpp
    src/Workspace.cpp
    src/WorkspaceFactory.cpp
+   src/WorkspaceManager.cpp
   )
 add_library( API SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})

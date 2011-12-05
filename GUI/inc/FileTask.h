@@ -1,0 +1,21 @@
+#ifndef FILETASK_H
+#define FILETASK_H
+
+#include "Task.h"
+#include <QtCore/QObject>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+
+class FileTask: public Task
+{
+  Q_OBJECT
+public:
+  FileTask();
+  virtual Type type() const{return Background;}
+private slots:
+  void newTable();
+private:
+  QAction *m_newTable;
+};
+
+#endif /*FILETASK_H*/

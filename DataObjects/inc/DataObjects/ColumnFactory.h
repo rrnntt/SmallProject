@@ -21,7 +21,7 @@ public:
 #define DECLARE_COLUMN(DataType,TypeName) \
     namespace{ \
     int register_column_##TypeName(  \
-    (DataHandling::ColumnFactory::instance().subscribe< DataType >(#TypeName),0)); \
+    (DataObjects::ColumnFactory::instance().subscribe< DataType >(#TypeName),0)); \
     }
 
 #endif // DATAOBJECTS_COLUMNFACTORY_H

@@ -37,6 +37,9 @@ public:
     /// Prints
     virtual void print(std::ostream& s, int index) const = 0;
 
+    /// Return value of a cell as a string
+    std::string asString(size_t i) const;
+
     /// Templated method for returning a value. No type checks are done.
     template<class T>
     T& cell(int index)

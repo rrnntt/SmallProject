@@ -1,5 +1,8 @@
 #include "MainWindow.h"
 #include "OSGWidget.h"
+#include "FileTask.h"
+#include "TaskManager.h"
+#include "SubWindow.h"
 
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
@@ -29,6 +32,11 @@ MainWindow::~MainWindow()
 QMdiSubWindow* MainWindow::newSubWindow(QWidget* widget)
 {
     QMdiSubWindow* subwnd = m_mdiArea->addSubWindow(widget);
+    if (dynamic_cast<SubWindow*>(widget))
+    {
+      connect(widget,SIGNAL(setMdiTitle(const QString&)),subwnd,SLOT(setWindowTitle(const QString&)));
+      subwnd->setWindowTitle(dynamic_cast<SubWindow*>(widget)->title());
+    }
     subwnd->resize(300,200);
     subwnd->show();
     return subwnd;
@@ -36,6 +44,12 @@ QMdiSubWindow* MainWindow::newSubWindow(QWidget* widget)
 
 void MainWindow::createMenus()
  {
+   // File menu
+   FileTask* fileTask = new FileTask();
+   fileTask->setMainWindow(this);
+   TaskManager::instance().add("FileTask",fileTask);
+   menuBar()->addMenu(fileTask->menu());
+
    QMenu* addMenu = menuBar()->addMenu(tr("&Open"));
 
    m_openOSGWindow = new QAction("OSG window", this);
