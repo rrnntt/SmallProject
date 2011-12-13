@@ -26,17 +26,20 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-  std::cerr << "MainWindow destryed\n";
+  std::cerr << "MainWindow destroyed\n";
 }
 
 QMdiSubWindow* MainWindow::newSubWindow(QWidget* widget)
 {
     QMdiSubWindow* subwnd = m_mdiArea->addSubWindow(widget);
-    if (dynamic_cast<SubWindow*>(widget))
-    {
-      connect(widget,SIGNAL(setMdiTitle(const QString&)),subwnd,SLOT(setWindowTitle(const QString&)));
-      subwnd->setWindowTitle(dynamic_cast<SubWindow*>(widget)->title());
-    }
+    //if (dynamic_cast<SubWindow*>(widget))
+    //{
+    //  std::cerr << "SubWindow\n";
+    //  connect(widget,SIGNAL(setMdiTitle(const QString&)),subwnd,SLOT(setWindowTitle(const QString&)));
+    //  subwnd->setWindowTitle(dynamic_cast<SubWindow*>(widget)->title());
+    //}
+    //else
+    //  std::cerr << "Not SubWindow\n";
     subwnd->resize(300,200);
     subwnd->show();
     return subwnd;

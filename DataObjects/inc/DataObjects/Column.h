@@ -4,6 +4,7 @@
 #include "DataObjects/DllExport.h"
 
 #include <ostream>
+#include <istream>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
@@ -37,8 +38,14 @@ public:
     /// Prints
     virtual void print(std::ostream& s, int index) const = 0;
 
+    /// Reads
+    virtual void read(std::istream& s, int index) = 0;
+
     /// Return value of a cell as a string
     std::string asString(size_t i) const;
+
+    /// Read value from a string
+    void fromString(const std::string& str,size_t i);
 
     /// Templated method for returning a value. No type checks are done.
     template<class T>
@@ -104,6 +111,7 @@ struct DATAOBJECTS_EXPORT Boolean
 
 /// Printing Boolean to an output stream
 DATAOBJECTS_EXPORT std::ostream& operator<<(std::ostream& ,const Boolean& );
+DATAOBJECTS_EXPORT std::istream& operator>>(std::istream& ,Boolean& );
 
 typedef boost::shared_ptr<Column> Column_ptr;
 

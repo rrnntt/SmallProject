@@ -167,6 +167,24 @@ void TableWorkspace::removeRow(int index)
     --m_rowCount;
 }
 
+/**
+ * Removes a number of rows simultaneously.
+ * @param index :: Index of the first row to delete
+ * @param count :: number of rows to delete
+ */
+void TableWorkspace::removeRows(int index, size_t count)
+{
+  if (count == 0) return;
+  if (index >= rowCount() || index + count >= rowCount())
+  {
+    throw std::range_error("TableWorkspace row index out of range");
+  }
+  for(int i = index + count - 1;i <= index; --i)
+  {
+    removeRow(i);
+  }
+}
+
 std::vector<std::string> TableWorkspace::getColumnNames()
 {
     std::vector<std::string> nameList;

@@ -39,6 +39,8 @@ namespace DataObjects
     int insertRow(int index);
     /// Delets a row if it exists.
     void removeRow(int index);
+    /// Delets several rows if they exist.
+    void removeRows(int index, size_t count);
 
   private:
 

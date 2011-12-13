@@ -3,6 +3,8 @@
 
 #include <QtGui/QWidget>
 
+class QMenu;
+
 class SubWindow: public QWidget
 {
   Q_OBJECT
@@ -10,6 +12,7 @@ public:
   SubWindow(QWidget *parent = NULL):QWidget(parent){}
   void setTitle(const QString& title);
   QString title() const {return m_title;}
+  virtual QMenu* makeContext() const {return nullptr;}
 signals:
   void setMdiTitle(const QString&);
 protected:

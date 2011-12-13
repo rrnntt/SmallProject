@@ -51,6 +51,7 @@ namespace DataObjects
     const std::type_info& get_pointer_type_info()const{return typeid(Type*);}
     /// Output to an ostream.
     void print(std::ostream& s, int index)const{s << m_data[index];}
+    void read(std::istream& s, int index) {s >> m_data[index];}
     /// Type check
     bool isBool()const{return typeid(Type) == typeid(Boolean);}
     /// Memory used by the column
