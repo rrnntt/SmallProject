@@ -41,6 +41,8 @@ namespace DataObjects
     void removeRow(int index);
     /// Delets several rows if they exist.
     void removeRows(int index, size_t count);
+    /// Save into an asci file
+    void saveAsci(const std::string& fileName, const std::string& sep = ",") const;
 
   private:
 

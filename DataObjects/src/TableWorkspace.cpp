@@ -5,10 +5,10 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 DECLARE_NUMERICTABLECOLUMN(int,int);
 DECLARE_NUMERICTABLECOLUMN(double,double);
-DECLARE_TABLECOLUMN(std::string,string);
 
 namespace DataObjects
 {
@@ -192,6 +192,31 @@ std::vector<std::string> TableWorkspace::getColumnNames()
     for(column_it ci=m_columns.begin();ci!=m_columns.end();ci++)
         nameList.push_back((*ci)->name());
     return nameList;
+}
+
+/**
+ * Save into a file.
+ * @param fileName :: The file name.
+ * @param sep :: Column separator.
+ */
+void TableWorkspace::saveAsci(const std::string& fileName, const std::string& sep) const
+{
+  std::ofstream fil(fileName.c_str());
+  for(int j = 0; j < columnCount(); ++j)
+  {
+    Column_ptr col = getColumn(j);
+    fil << '#' << col->type() << ':' << col->name() << std::endl;
+  }
+  for(int i = 0; i < rowCount(); ++i)
+  {
+    for(int j = 0; j < columnCount(); ++j)
+    {
+      if (j > 0) fil << sep;
+      m_columns[j]->saveAsci(fil,i);
+    }
+    fil << std::endl;
+  }
+  fil.close();
 }
 
 } // DataObjects

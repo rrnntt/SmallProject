@@ -41,6 +41,12 @@ public:
     /// Reads
     virtual void read(std::istream& s, int index) = 0;
 
+    /// Save into a file
+    virtual void saveAsci(std::ostream& s, int index) const;
+
+    /// Read from a file
+    virtual void loadAsci(std::istream& s, int index);
+
     /// Return value of a cell as a string
     std::string asString(size_t i) const;
 

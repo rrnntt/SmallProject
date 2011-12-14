@@ -75,7 +75,6 @@ namespace DataObjects
     void remove(int index){m_data.erase(m_data.begin()+index);}
     /// Returns a pointer to the data element.
     void* void_pointer(int index){return &m_data[index];}
-  private:
     /// Column data
     std::vector<Type> m_data;
     friend class TableWorkspace;

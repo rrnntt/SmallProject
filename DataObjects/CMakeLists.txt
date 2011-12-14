@@ -8,6 +8,7 @@ set( INC_FILES
    inc/DataObjects/Column.h
    inc/DataObjects/NumericColumn.h
    inc/DataObjects/ColumnFactory.h
+   inc/DataObjects/StringColumn.h
    inc/DataObjects/TableColumn.h
    inc/DataObjects/TableWorkspace.h
    inc/DataObjects/Unit.h
@@ -16,6 +17,7 @@ set( SRC_FILES
    src/Column.cpp
    src/NumericColumn.cpp
    src/ColumnFactory.cpp
+   src/StringColumn.cpp
    src/TableColumn.cpp
    src/TableWorkspace.cpp
    src/Unit.cpp

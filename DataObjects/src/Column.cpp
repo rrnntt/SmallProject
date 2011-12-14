@@ -38,4 +38,16 @@ void Column::fromString(const std::string& str,size_t i)
   this->read(istr,i);
 }
 
+/// Save into a file
+void Column::saveAsci(std::ostream& s, int index) const
+{
+  this->print(s,index);
+}
+
+/// Read from a file
+void Column::loadAsci(std::istream& s, int index)
+{
+  this->read(s,index);
+}
+
 } // DataObjects
