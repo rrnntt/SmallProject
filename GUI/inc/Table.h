@@ -19,6 +19,7 @@ protected slots:
   void insertRow();
   void removeRows();
   void insertColumn();
+  void removeSelectedColumns();
   void execMenu(QMenu* menu);
 protected:
   void	contextMenuEvent( QContextMenuEvent* e );
@@ -27,6 +28,7 @@ protected:
   QAction* m_insertRow;
   QAction* m_removeRows;
   QAction* m_insertColumn;
+  QAction* m_removeSelectedColumns;
 };
 
 class TableModel: public QAbstractItemModel
@@ -46,7 +48,8 @@ public:
   virtual bool	insertRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
   //virtual bool	removeColumns ( int column, int count, const QModelIndex & parent = QModelIndex() );
   virtual bool	removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
-  bool	insertColumnBefore( int column, const std::string& type, const std::string& name );
+  bool insertColumnBefore( int column, const std::string& type, const std::string& name );
+  bool removeColumnNumbers(const QList<int>& names);
 protected:
   DataObjects::TableWorkspace_ptr m_workspace;
 };

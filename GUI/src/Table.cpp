@@ -29,6 +29,10 @@ QTableView(parent)
 
   m_insertColumn = new QAction("Insert column",this);
   connect(m_insertColumn,SIGNAL(triggered()),this,SLOT(insertColumn()));
+
+  m_removeSelectedColumns = new QAction("Remove columns",this);
+  connect(m_removeSelectedColumns,SIGNAL(triggered()),this,SLOT(removeSelectedColumns()));
+
 }
 
 void Table::contextMenuEvent( QContextMenuEvent* e )
@@ -49,6 +53,7 @@ bool Table::eventFilter(QObject* watched, QEvent* e)
     {
       QMenu* context = new QMenu(this);
       context->addAction(m_insertColumn);
+      context->addAction(m_removeSelectedColumns);
       emit showMenu(context);
       return true;
     }
@@ -126,6 +131,21 @@ void Table::insertColumn()
     static_cast<TableModel*>(model())->insertColumnBefore(selList[0].column(),
       dlg.getType(),dlg.getName());
   }
+}
+
+void Table::removeSelectedColumns()
+{
+  QItemSelectionModel* sel = selectionModel();
+  if (!sel->hasSelection()) return;
+  QModelIndexList	selList = sel->selectedColumns();
+  if (selList.isEmpty()) return;
+  QList<int> columns;
+  foreach(const QModelIndex& index,selList)
+  {
+    columns << index.column();
+  }
+
+  static_cast<TableModel*>(model())->removeColumnNumbers(columns);
 }
 
 void Table::execMenu(QMenu* menu)
@@ -241,5 +261,22 @@ bool TableModel::insertColumnBefore( int column, const std::string& type, const 
   this->beginInsertColumns(QModelIndex(),column,column);
   m_workspace->addColumn(type,name);
   this->endInsertColumns();
+  return true;
+}
+
+
+bool TableModel::removeColumnNumbers(const QList<int>& columns)
+{
+  std::vector<std::string> names = m_workspace->getColumnNames();
+  foreach(int col,columns)
+  {
+    this->beginRemoveColumns(QModelIndex(),col,col);
+    m_workspace->removeColumn(names[col]);
+    this->endRemoveColumns();
+  }
+  if (columnCount() == 0)
+  {
+    insertColumnBefore(0,"double","X");
+  }
   return true;
 }
