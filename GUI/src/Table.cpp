@@ -1,4 +1,5 @@
 #include "Table.h"
+#include "AddTableColumnDialog.h"
 
 #include <QtGui/QHeaderView>
 #include <QtGui/QContextMenuEvent>
@@ -7,6 +8,8 @@
 #include <QMenu>
 
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 Table::Table(DataObjects::TableWorkspace_ptr ws,QWidget* parent):
 QTableView(parent)
@@ -15,10 +18,17 @@ QTableView(parent)
   setModel(model);
   this->horizontalHeader()->installEventFilter(this);
   this->verticalHeader()->installEventFilter(this);
+  connect(this,SIGNAL(showMenu(QMenu*)),this,SLOT(execMenu(QMenu*)));
 
   // Actions
   m_insertRow = new QAction("Insert row",this);
   connect(m_insertRow,SIGNAL(triggered()),this,SLOT(insertRow()));
+
+  m_removeRows = new QAction("Remove rows",this);
+  connect(m_removeRows,SIGNAL(triggered()),this,SLOT(removeRows()));
+
+  m_insertColumn = new QAction("Insert column",this);
+  connect(m_insertColumn,SIGNAL(triggered()),this,SLOT(insertColumn()));
 }
 
 void Table::contextMenuEvent( QContextMenuEvent* e )
@@ -37,16 +47,18 @@ bool Table::eventFilter(QObject* watched, QEvent* e)
     // context menu for the horizontal header (with column names)
     if (watched == this->horizontalHeader())
     {
-      std::cerr << "horizontal\n";
+      QMenu* context = new QMenu(this);
+      context->addAction(m_insertColumn);
+      emit showMenu(context);
       return true;
     }
     // context menu for the vertical header (with row numbers)
     if (watched == this->verticalHeader())
     {
-      std::cerr << "vertical\n";
-      QMenu context;
-      context.addAction(m_insertRow);
-      context.exec(QCursor::pos());
+      QMenu* context = new QMenu(this);
+      context->addAction(m_insertRow);
+      context->addAction(m_removeRows);
+      emit showMenu(context);
       return true;
     }
   }
@@ -64,6 +76,61 @@ void Table::insertRow()
   if (selList.isEmpty()) return;
   QModelIndex index = selList[0];
   model()->insertRow(index.row());
+}
+
+/**
+ * Remove selected rows.
+ */
+void Table::removeRows()
+{
+  QItemSelectionModel* sel = selectionModel();
+  if (!sel->hasSelection()) return;
+  QModelIndexList	selList = sel->selectedRows();
+  if (selList.isEmpty()) return;
+  std::vector<int> rows;
+  foreach(const QModelIndex& index,selList)
+  {
+    rows.push_back(index.row());
+  }
+  std::sort(rows.begin(),rows.end(),std::greater<int>());
+
+  auto start = rows.begin();
+  for(auto row = start; row != rows.end(); ++row)
+  {
+    auto row1 = row + 1;
+    if (row1 == rows.end())
+    {
+      std::cerr << "remove " << *row << ' ' << int(row1 - start) << std::endl;
+      model()->removeRows(*row,int(row1 - start));
+    }
+    else if (*row - *row1 != 1)
+    {
+      model()->removeRows(*row,int(row1 - start));
+      if (row1 != rows.end())
+      {
+        start = row1;
+      }
+    }
+  }
+}
+
+void Table::insertColumn()
+{
+  QItemSelectionModel* sel = selectionModel();
+  if (!sel->hasSelection()) return;
+  QModelIndexList	selList = sel->selectedColumns();
+  if (selList.isEmpty()) return;
+  AddTableColumnDialog dlg(this);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    static_cast<TableModel*>(model())->insertColumnBefore(selList[0].column(),
+      dlg.getType(),dlg.getName());
+  }
+}
+
+void Table::execMenu(QMenu* menu)
+{
+  menu->exec(QCursor::pos());
 }
 
 /*-----------------------------------------------------------------*/
@@ -155,7 +222,24 @@ bool	TableModel::insertRows ( int row, int count, const QModelIndex & parent )
 //bool	TableModel::removeColumns ( int column, int count, const QModelIndex & parent )
 //{
 //}
-//
-//bool	TableModel::removeRows ( int row, int count, const QModelIndex & parent )
-//{
-//}
+
+bool	TableModel::removeRows ( int row, int count, const QModelIndex & parent )
+{
+  beginRemoveRows(parent,row,row+count-1);
+  m_workspace->removeRows(row,count);
+  endRemoveRows();
+  if ( rowCount() == 0 )
+  {
+    insertRows(1,1);
+  }
+  return true;
+}
+
+bool TableModel::insertColumnBefore( int column, const std::string& type, const std::string& name )
+{
+  if (name.empty() || type.empty()) return false;
+  this->beginInsertColumns(QModelIndex(),column,column);
+  m_workspace->addColumn(type,name);
+  this->endInsertColumns();
+  return true;
+}

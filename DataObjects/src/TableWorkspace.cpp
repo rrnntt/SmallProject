@@ -175,11 +175,11 @@ void TableWorkspace::removeRow(int index)
 void TableWorkspace::removeRows(int index, size_t count)
 {
   if (count == 0) return;
-  if (index >= rowCount() || index + count >= rowCount())
+  if (index >= rowCount() || index + count > rowCount())
   {
     throw std::range_error("TableWorkspace row index out of range");
   }
-  for(int i = index + count - 1;i <= index; --i)
+  for(int i = index + count - 1;i >= index; --i)
   {
     removeRow(i);
   }

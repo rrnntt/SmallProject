@@ -6,19 +6,27 @@
 #include <QtCore/QAbstractItemModel>
 
 class QAction;
+class QMenu;
 
 class Table: public QTableView
 {
   Q_OBJECT
 public:
   Table(DataObjects::TableWorkspace_ptr ws,QWidget* parent = NULL);
+signals:
+  void showMenu(QMenu*);
 protected slots:
   void insertRow();
+  void removeRows();
+  void insertColumn();
+  void execMenu(QMenu* menu);
 protected:
   void	contextMenuEvent( QContextMenuEvent* e );
   bool eventFilter(QObject* watched, QEvent* e);
 
   QAction* m_insertRow;
+  QAction* m_removeRows;
+  QAction* m_insertColumn;
 };
 
 class TableModel: public QAbstractItemModel
@@ -37,7 +45,8 @@ public:
   //virtual bool	insertColumns ( int column, int count, const QModelIndex & parent = QModelIndex() );
   virtual bool	insertRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
   //virtual bool	removeColumns ( int column, int count, const QModelIndex & parent = QModelIndex() );
-  //virtual bool	removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
+  virtual bool	removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
+  bool	insertColumnBefore( int column, const std::string& type, const std::string& name );
 protected:
   DataObjects::TableWorkspace_ptr m_workspace;
 };

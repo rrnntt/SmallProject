@@ -4,6 +4,7 @@
 project(Plotter)
 
 set( INC_FILES 
+   inc/AddTableColumnDialog.h
    inc/Demo.h
    inc/MainWindow.h
    inc/OSGWidget.h
@@ -21,6 +22,7 @@ set( INC_FILES
    inc/SubWindow.h
    )
 set( SRC_FILES 
+  src/AddTableColumnDialog.cpp
   src/Demo.cpp
   src/main.cpp
   src/MainWindow.cpp
@@ -40,6 +42,7 @@ set( SRC_FILES
   )
   
 set( MOC_HEADERS
+   inc/AddTableColumnDialog.h
    inc/MainWindow.h
    inc/OSGWidget.h
    inc/PlotDialog.h
@@ -51,6 +54,7 @@ set( MOC_HEADERS
 
 set( UI_FILES
    inc/PlotDialog.ui
+   inc/AddTableColumnDialog.ui
 )
 
 # OpenSceneGraph source directory
