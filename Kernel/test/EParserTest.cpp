@@ -15,6 +15,24 @@ TEST(EParserTest, Char)
   EXPECT_EQ(ch.match(),"H");
 }
 
+TEST(EParserTest, NotString) 
+{
+  std::string str("abc,def");
+  NotStringParser parser(",");
+  parser.match(str);
+  EXPECT_TRUE(parser.hasMatch());
+  EXPECT_EQ(parser.match(),"abc");
+}
+
+TEST(EParserTest, NotString1) 
+{
+  std::string str(",abc,,def");
+  NotStringParser parser(",,");
+  parser.match(str);
+  EXPECT_TRUE(parser.hasMatch());
+  EXPECT_EQ(parser.match(),",abc");
+}
+
 TEST(EParserTest, SeqList) 
 {
   SeqParser seq;

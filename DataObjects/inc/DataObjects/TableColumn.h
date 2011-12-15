@@ -133,6 +133,10 @@ namespace DataObjects
     {
       return double(TableColumn<Type>::data()[index]);
     }
+    void setDouble(int index, double value)
+    {
+      TableColumn<Type>::data()[index] = value;
+    }
   };
 } // DataObjects
 

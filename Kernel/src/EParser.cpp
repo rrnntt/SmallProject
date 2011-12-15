@@ -19,28 +19,6 @@ namespace Kernel
    */
 std::string::const_iterator IParser::match(std::string::const_iterator start,std::string::const_iterator end)
 {
-  //m_hasMatch = false;
-  //if (start == end)
-  //{
-  //  m_start = m_end = end;
-  //  m_hasMatch = this->matchEmpty();
-  //  m_empty = true;
-  //  return m_end;
-  //}
-  //m_start = start;
-  //m_end = this->test(start,end);
-
-  //if (m_end == m_start)
-  //{
-  //  m_end = m_start; //?
-  //  m_empty = true;
-  //}
-  //else
-  //{
-  //  m_hasMatch = true;
-  //}
-
-  //return m_end;
   m_hasMatch = false;
   if (start == end)
   {
@@ -70,9 +48,9 @@ std::string::const_iterator IParser::match(std::string::const_iterator start,std
 /**
  * Overloaded method to match the whole string
  */
-std::string::const_iterator IParser::match(const std::string& str)
+std::string::const_iterator IParser::match(const std::string& str, std::string::size_type i)
 {
-  return match(str.begin(),str.end());
+  return match(str.begin() + i,str.end());
 }
 
 //-----------------------------------------------------
@@ -98,6 +76,28 @@ std::string::const_iterator CharParser::test(std::string::const_iterator start,s
 }
 
 //-----------------------------------------------------
+std::string::const_iterator NotParser::test(std::string::const_iterator start,std::string::const_iterator end) 
+{
+  if (m_chars.empty())
+  {// match nothing
+    return start;
+  }
+  else
+  {// match any char that not in the m_chars)
+    auto found = m_chars.find(*start);
+    if ( found == std::string::npos )
+    {// match
+      return ++start;
+    }
+    else
+    {// not match
+      return start;
+    }
+  }
+  return start;
+}
+
+//-----------------------------------------------------
 std::string::const_iterator StringParser::test(std::string::const_iterator start,std::string::const_iterator end) 
 {
   if (m_string.empty())
@@ -117,6 +117,34 @@ std::string::const_iterator StringParser::test(std::string::const_iterator start
     return it;
   }
   return start;
+}
+
+//-----------------------------------------------------
+std::string::const_iterator NotStringParser::test(std::string::const_iterator start,std::string::const_iterator end) 
+{
+  if (m_string.empty())
+  {
+    return end;
+  }
+  auto it = start;
+  auto mit = m_string.begin();
+  while( it != end && mit != m_string.end() )
+  {
+    if (*it != *mit)
+    {
+      mit = m_string.begin();
+    }
+    else
+    {
+      ++mit;
+    }
+    ++it;
+  }
+  if (mit == m_string.end())
+  {// if m_string found return the part of the string which ends where m_string starts
+    return it - m_string.size();
+  }
+  return end;
 }
 
 //-----------------------------------------------------
@@ -258,7 +286,14 @@ WordParser::WordParser(const WordParser& p)
 
 std::string::const_iterator WordParser::test(std::string::const_iterator start,std::string::const_iterator end) 
 {
-  return std::find_if(start,end,isspace);
+  if (m_exclude.empty())
+  {
+    return std::find_if(start,end,isspace);
+  }
+  const std::string& exc = m_exclude;
+  return std::find_if(start,end,[&exc](char c)->bool{
+    return isspace(c) || exc.find(c) != std::string::npos;
+  });
 }
 
 //-----------------------------------------------------

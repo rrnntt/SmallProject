@@ -25,6 +25,9 @@ namespace DataObjects
     /// Read from a file
     virtual void loadAsci(std::istream& s, int index);
 
+    /// Read value from a string
+    virtual void fromString(const std::string& str,size_t i);
+
   };
 } // DataObjects
 

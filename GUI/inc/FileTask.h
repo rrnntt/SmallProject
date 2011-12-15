@@ -14,8 +14,10 @@ public:
   virtual Type type() const{return Background;}
 private slots:
   void newTable();
+  void loadAsciiTable();
 private:
   QAction *m_newTable;
+  QAction *m_loadAsciiTable;
 };
 
 #endif /*FILETASK_H*/

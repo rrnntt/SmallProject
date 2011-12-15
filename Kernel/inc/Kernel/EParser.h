@@ -20,7 +20,7 @@ namespace Kernel
     virtual ~IParser(){}
     virtual IParser* clone() const = 0;
     virtual std::string::const_iterator match(std::string::const_iterator start,std::string::const_iterator end);
-    virtual std::string::const_iterator match(const std::string& str);
+    virtual std::string::const_iterator match(const std::string& str, std::string::size_type i = 0);
     virtual bool matchEmpty()const{return false;}
     bool hasMatch() const {return m_hasMatch;}
     bool isEmpty() const {return m_empty;/*m_start == m_end;*/}
@@ -57,6 +57,18 @@ namespace Kernel
   };
 
   //------------------------------------------------------------
+  class KERNEL_EXPORT NotParser: public IParser
+  {
+  public:
+    NotParser(const std::string& chars):IParser(),m_chars(chars){}
+    NotParser(const NotParser& chp):IParser(),m_chars(chp.m_chars){}
+    IParser* clone() const{return new NotParser(*this);}
+  protected:
+    virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
+    std::string m_chars; ///< alternative matches
+  };
+
+  //------------------------------------------------------------
   class KERNEL_EXPORT StringParser: public IParser
   {
   public:
@@ -65,7 +77,19 @@ namespace Kernel
     IParser* clone() const{return new StringParser(*this);}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
-    std::string m_string; ///< alternative matches
+    std::string m_string; ///< string to matche
+  };
+
+  //------------------------------------------------------------
+  class KERNEL_EXPORT NotStringParser: public IParser
+  {
+  public:
+    NotStringParser(const std::string& str):IParser(),m_string(str){}
+    NotStringParser(const NotStringParser& p):IParser(),m_string(p.m_string){}
+    IParser* clone() const{return new NotStringParser(*this);}
+  protected:
+    virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
+    std::string m_string; ///< doesn't match this string
   };
 
   //------------------------------------------------------------
@@ -170,11 +194,12 @@ namespace Kernel
   class KERNEL_EXPORT WordParser: public IParser
   {
   public:
-    WordParser():IParser(){}
+    WordParser(const std::string& exclude = ""):IParser(),m_exclude(exclude){}
     WordParser(const WordParser& p);
     IParser* clone()const{return new WordParser(*this);}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
+    std::string m_exclude;
   };
 
   //------------------------------------------------------------

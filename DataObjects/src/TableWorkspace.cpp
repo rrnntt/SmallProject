@@ -1,6 +1,9 @@
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/TableColumn.h"
 #include "API/WorkspaceFactory.h"
+#include "Kernel/EParser.h"
+#include "Formula/Expression.h"
+#include "Formula/Scalar.h"
 
 #include <iostream>
 #include <string>
@@ -48,7 +51,7 @@ bool TableWorkspace::addColumn(const std::string& type, const std::string& name)
         }
     try
     {
-        Column* c = ColumnFactory::instance().create(type);
+        Column* c = ColumnFactory::instance().createColumn(type);
         m_columns.push_back(boost::shared_ptr<Column>(c));
         c->setName(name);
         resizeColumn(c,rowCount());
@@ -199,11 +202,13 @@ std::vector<std::string> TableWorkspace::getColumnNames()
  * @param fileName :: The file name.
  * @param sep :: Column separator.
  */
-void TableWorkspace::saveAsci(const std::string& fileName, const std::string& sep) const
+void TableWorkspace::saveAscii(const std::string& fileName, const std::string& sep) const
 {
   std::ofstream fil(fileName.c_str());
+  fil << "#sep=" << sep << std::endl;
   for(int j = 0; j < columnCount(); ++j)
   {
+    // save column type and name
     Column_ptr col = getColumn(j);
     fil << '#' << col->type() << ':' << col->name() << std::endl;
   }
@@ -217,6 +222,129 @@ void TableWorkspace::saveAsci(const std::string& fileName, const std::string& se
     fil << std::endl;
   }
   fil.close();
+}
+
+void TableWorkspace::loadAscii(const std::string& fileName)
+{
+  std::ifstream fil(fileName.c_str());
+  if (!fil) return;
+
+  std::string sep; // column separator
+  bool doneHeader = false; // done reading the header
+  size_t row = 0; // current row index
+  size_t n; // number of columns
+
+  Kernel::SeqParser dataParser;
+
+  std::string str;
+  while(std::getline(fil,str))
+  {
+    if (str.empty()) continue;
+    if (str[0] == '#')
+    {// comments and header info
+      if (doneHeader) continue; // this can only be a comment
+
+      // parse column structure descriptor
+      Kernel::SeqParser* columnParser = new Kernel::SeqParser();
+      columnParser->addParser(new Kernel::WordParser(":"));
+      columnParser->addParser(new Kernel::CharParser(':'));
+      columnParser->addParser(new Kernel::WordParser);
+
+      // separator parser
+      Kernel::SeqParser* sepParser = new Kernel::SeqParser();
+      sepParser->addParser(new Kernel::StringParser("sep="));
+      sepParser->addParser(new Kernel::WordParser);
+
+      // parse info fileds (after #)
+      Kernel::AltParser infoParser;
+      infoParser.addParser(sepParser);
+      infoParser.addParser(columnParser);
+      
+      infoParser.match(str,1);
+
+      if (!infoParser.hasMatch()) continue;
+
+      Kernel::SeqParser* seq = dynamic_cast<Kernel::SeqParser*>(infoParser.getParser());
+
+      if (!seq) continue; // ??
+
+      if (seq == sepParser)
+      {// reading the separator
+        sep = seq->getParser(1)->match();
+      }
+      else if (seq == columnParser)
+      {// reading column descriptor
+        std::string type = seq->getParser(0)->match();
+        std::string name = seq->getParser(2)->match();
+        this->addColumn(type,name);
+      }
+
+    }
+    else
+    {// column data
+      if (!doneHeader)
+      {
+        doneHeader = true;
+        n = columnCount();
+        if (n == 0) throw std::runtime_error("No columns created");
+        for(size_t col = 0; col < n - 1; ++col)
+        {
+          dataParser.addParser( new Kernel::NotStringParser(sep));// TODO: replace with custom parser
+          dataParser.addParser( new Kernel::StringParser(sep));
+        }
+        dataParser.addParser( new Kernel::AllParser);
+      }
+      dataParser.match(str);
+      if (dataParser.hasMatch())
+      {
+        insertRow(row);
+        for(size_t col = 0; col < n; ++col)
+        {
+          std::istringstream istr(dataParser.getParser(col*2)->match());
+          m_columns[col]->read(istr,row);
+        }
+        ++row;
+      }
+    }// end column data
+  }// end getline
+}
+
+/**
+ * Fill numeric column with data using Formula::Expression
+ * @param colName :: Column name. Must be numeric
+ * @param expr :: Expression to calculate the values
+ */
+void TableWorkspace::fillColumn(const std::string& colName,const std::string& expr)
+{
+  Formula::Namespace_ptr ns(new Formula::Namespace);
+  double row = 0.0;
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"row");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"i");
+
+  boost::shared_ptr<NumericColumn> numColumn = boost::dynamic_pointer_cast<NumericColumn>(
+    getColumn(colName)
+    );
+  if ( !numColumn)
+  {
+    std::cerr << "Cannot fill non-numeric column using Expression" << std::endl;
+    return;
+  }
+
+  try
+  {
+    Formula::Expression e(ns,expr);
+    size_t n = rowCount();
+    for(size_t i = 0; i < n; ++i)
+    {
+      row = static_cast<double>(i);
+      double value = e.eval().as<Formula::Scalar>();
+      numColumn->setDouble(i,value);
+    }
+  }
+  catch(std::exception& ex)
+  {
+    std::cerr << "Expression failed: " << ex.what() << std::endl;
+  }
 }
 
 } // DataObjects

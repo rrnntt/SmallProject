@@ -23,9 +23,9 @@ set( SRC_FILES
    src/Unit.cpp
   )
 add_library( DataObjects SHARED ${SRC_FILES} ${INC_FILES} )
-include_directories(inc ../Kernel/inc ../API/inc ${THIRD_PARTY_INCLUDE_DIR})
+include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ${THIRD_PARTY_INCLUDE_DIR})
 set_target_properties ( DataObjects PROPERTIES COMPILE_DEFINITIONS IN_DATAOBJECTS )
-target_link_libraries(DataObjects Kernel API)
+target_link_libraries(DataObjects Kernel API Formula)
 
 #
 #  DataObjects Test project
@@ -42,6 +42,6 @@ include_directories(test ${THIRD_PARTY_INCLUDE_DIR} )
 find_library(GTEST_DEBUG_LIB gtest_d "${THIRD_PARTY_LIB_DIR}")
 find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
 target_link_libraries(DataObjectsTest 
-${GTEST_LIBS} DataObjects
+${GTEST_LIBS} DataObjects 
 )
 

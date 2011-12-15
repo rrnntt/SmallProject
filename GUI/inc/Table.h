@@ -29,6 +29,7 @@ protected:
   QAction* m_removeRows;
   QAction* m_insertColumn;
   QAction* m_removeSelectedColumns;
+  QAction* m_saveAscii;
 };
 
 class TableModel: public QAbstractItemModel
@@ -50,6 +51,8 @@ public:
   virtual bool	removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
   bool insertColumnBefore( int column, const std::string& type, const std::string& name );
   bool removeColumnNumbers(const QList<int>& names);
+public slots:
+  void saveAscii();
 protected:
   DataObjects::TableWorkspace_ptr m_workspace;
 };

@@ -42,7 +42,11 @@ namespace DataObjects
     /// Delets several rows if they exist.
     void removeRows(int index, size_t count);
     /// Save into an asci file
-    void saveAsci(const std::string& fileName, const std::string& sep = ",") const;
+    void saveAscii(const std::string& fileName, const std::string& sep = ",") const;
+    /// Load from an asci file
+    void loadAscii(const std::string& fileName);
+    /// Fill numeric column with data using Formula::Expression
+    void fillColumn(const std::string& colName,const std::string& expr);
 
   private:
 

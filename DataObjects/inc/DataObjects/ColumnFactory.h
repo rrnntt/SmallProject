@@ -14,6 +14,7 @@ class DATAOBJECTS_EXPORT ColumnFactory: public Kernel::DynamicFactory<Column>, p
 public:
   virtual std::string name() const {return "ColumnFactory";}
   static ColumnFactory& instance();
+  Column* createColumn(const std::string& type);
 };
 
 } // DataObjects

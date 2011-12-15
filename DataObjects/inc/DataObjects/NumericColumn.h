@@ -11,6 +11,7 @@ class DATAOBJECTS_EXPORT NumericColumn
 {
 public:
   virtual double getDouble(int index)const = 0;
+  virtual void setDouble(int index, double value) = 0;
 };
 
 } // DataObjects

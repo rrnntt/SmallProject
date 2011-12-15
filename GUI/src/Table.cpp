@@ -5,6 +5,7 @@
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QAction>
 #include <QtGui/QItemSelectionModel>
+#include <QtGui/QFileDialog>
 #include <QMenu>
 
 #include <iostream>
@@ -33,11 +34,17 @@ QTableView(parent)
   m_removeSelectedColumns = new QAction("Remove columns",this);
   connect(m_removeSelectedColumns,SIGNAL(triggered()),this,SLOT(removeSelectedColumns()));
 
+  m_saveAscii = new QAction("Save ASCII",this);
+  connect(m_saveAscii,SIGNAL(triggered()),model,SLOT(saveAscii()));
+
 }
 
 void Table::contextMenuEvent( QContextMenuEvent* e )
 {
   std::cerr << "Context\n";
+  QMenu* context = new QMenu(this);
+  context->addAction(m_saveAscii);
+  emit showMenu(context);
 }
 
 /**
@@ -168,7 +175,7 @@ int	TableModel::columnCount ( const QModelIndex & parent ) const
 
 QVariant	TableModel::data ( const QModelIndex & index, int role ) const
 {
-  if (role == Qt::DisplayRole)
+  if (role == Qt::DisplayRole || role == Qt::EditRole)
   {
     DataObjects::Column_ptr c = m_workspace->getColumn(index.column());
     return QVariant::fromValue(QString::fromStdString(c->asString(index.row())));
@@ -279,4 +286,13 @@ bool TableModel::removeColumnNumbers(const QList<int>& columns)
     insertColumnBefore(0,"double","X");
   }
   return true;
+}
+
+void TableModel::saveAscii()
+{
+  QString fileName = QFileDialog::getSaveFileName(NULL,"Save Table");
+  if ( !fileName.isEmpty() )
+  {
+    m_workspace->saveAscii(fileName.toStdString());
+  }
 }

@@ -48,10 +48,10 @@ public:
     virtual void loadAsci(std::istream& s, int index);
 
     /// Return value of a cell as a string
-    std::string asString(size_t i) const;
+    virtual std::string asString(size_t i) const;
 
     /// Read value from a string
-    void fromString(const std::string& str,size_t i);
+    virtual void fromString(const std::string& str,size_t i);
 
     /// Templated method for returning a value. No type checks are done.
     template<class T>

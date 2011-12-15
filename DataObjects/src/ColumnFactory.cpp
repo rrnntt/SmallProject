@@ -19,4 +19,11 @@ namespace DataObjects
     }
   }
 
+  Column* ColumnFactory::createColumn(const std::string& type)
+  {
+    Column* column = create(type);
+    column->m_type = type;
+    return column;
+  }
+
 } // DataObjects
