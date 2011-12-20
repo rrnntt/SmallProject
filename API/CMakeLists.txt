@@ -6,6 +6,7 @@ project(API)
 set( INC_FILES 
    inc/API/DllExport.h
    inc/API/Framework.h
+   inc/API/PropertyFactory.h
    inc/API/Singleton.h
    inc/API/Workspace.h
    inc/API/WorkspaceFactory.h
@@ -13,6 +14,7 @@ set( INC_FILES
    )
 set( SRC_FILES 
    src/Framework.cpp
+   src/PropertyFactory.cpp
    src/Workspace.cpp
    src/WorkspaceFactory.cpp
    src/WorkspaceManager.cpp

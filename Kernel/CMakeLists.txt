@@ -6,6 +6,7 @@ project(Kernel)
 
 set( INC_FILES 
    inc/Kernel/Creator.h
+   inc/Kernel/CommonProperties.h
    inc/Kernel/DataService.h
    inc/Kernel/DllExport.h
    inc/Kernel/DllOpen.h
@@ -16,9 +17,12 @@ set( INC_FILES
    inc/Kernel/Notification.h
    inc/Kernel/EParser.h
    inc/Kernel/Operators.h
+   inc/Kernel/Property.h
+   inc/Kernel/PropertyManager.h
    inc/Kernel/Str.h
    )
 set( SRC_FILES 
+  src/CommonProperties.cpp
   src/DataService.cpp
   src/Logger.cpp
   src/Notification.cpp
@@ -27,6 +31,8 @@ set( SRC_FILES
   src/LibraryWrapper.cpp
   src/EParser.cpp
   src/Operators.cpp
+  src/Property.cpp
+  src/PropertyManager.cpp
   src/Str.cpp
   )
 add_library( Kernel SHARED ${SRC_FILES} ${INC_FILES} )
@@ -47,6 +53,7 @@ set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/EParserTest.cpp
+  test/PropertyTest.cpp
 )
 
 add_executable(KernelTest ${SRC_FILES} ${INC_FILES})

@@ -16,6 +16,7 @@ set( INC_FILES
    inc/FileTask.h
    inc/Task.h
    inc/Table.h
+   inc/TableDialog.h
    inc/TaskFactory.h
    inc/TaskManager.h
    inc/CurveManager.h
@@ -35,6 +36,7 @@ set( SRC_FILES
   src/Task.cpp
   src/FileTask.cpp
   src/Table.cpp
+  src/TableDialog.cpp
   src/TaskFactory.cpp
   src/TaskManager.cpp
   src/CurveManager.cpp
@@ -47,6 +49,7 @@ set( MOC_HEADERS
    inc/OSGWidget.h
    inc/PlotDialog.h
    inc/Table.h
+   inc/TableDialog.h
    inc/FileTask.h
    inc/Task.h
    inc/SubWindow.h
@@ -55,6 +58,7 @@ set( MOC_HEADERS
 set( UI_FILES
    inc/PlotDialog.ui
    inc/AddTableColumnDialog.ui
+   inc/TableDialog.ui
 )
 
 # OpenSceneGraph source directory

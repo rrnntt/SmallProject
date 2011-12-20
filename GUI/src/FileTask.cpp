@@ -1,14 +1,28 @@
+//----------------------------
+//  Local includes
+//----------------------------
 #include "FileTask.h"
 #include "TaskFactory.h"
 #include "MainWindow.h"
 #include "Table.h"
+#include "TableDialog.h"
+
+//----------------------------
+//  Other project includes
+//----------------------------
 #include "API/WorkspaceFactory.h"
 #include "API/WorkspaceManager.h"
 
+//----------------------------
+//  Qt includes
+//----------------------------
 #include <QtGui/QMdiSubWindow>
 #include <QtGui/QFileDialog>
 #include <QtCore/QFileInfo>
 
+//----------------------------
+//  C++ includes
+//----------------------------
 #include <iostream>
 
 DECLARE_TASK(FileTask);

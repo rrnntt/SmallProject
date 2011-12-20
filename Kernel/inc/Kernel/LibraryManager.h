@@ -1,5 +1,5 @@
-#ifndef MANTID_KERNEL_LIBRARY_MANAGER_H_
-#define MANTID_KERNEL_LIBRARY_MANAGER_H_
+#ifndef KERNEL_LIBRARY_MANAGER_H_
+#define KERNEL_LIBRARY_MANAGER_H_
 
 //----------------------------------------------------------------------
 // Includes
@@ -48,4 +48,4 @@ namespace Kernel
 
 } // namespace Kernel
 
-#endif //MANTID_KERNEL_LIBRARY_MANAGER_H_
+#endif //KERNEL_LIBRARY_MANAGER_H_
