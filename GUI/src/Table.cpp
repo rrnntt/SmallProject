@@ -8,6 +8,7 @@
 #include <QtGui/QFileDialog>
 #include <QMenu>
 
+#include <QEvent>
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -17,6 +18,7 @@ QTableView(parent)
 {
   TableModel* model = new TableModel(ws,this);
   setModel(model);
+
   this->horizontalHeader()->installEventFilter(this);
   this->verticalHeader()->installEventFilter(this);
   connect(this,SIGNAL(showMenu(QMenu*)),this,SLOT(execMenu(QMenu*)));
@@ -37,6 +39,7 @@ QTableView(parent)
   m_saveAscii = new QAction("Save ASCII",this);
   connect(m_saveAscii,SIGNAL(triggered()),model,SLOT(saveAscii()));
 
+  this->setEditTriggers(QAbstractItemView::AllEditTriggers);
 }
 
 void Table::contextMenuEvent( QContextMenuEvent* e )
@@ -161,6 +164,13 @@ void Table::execMenu(QMenu* menu)
 }
 
 /*-----------------------------------------------------------------*/
+bool Table::event(QEvent* ev)
+{
+  std::cerr << ev->type() << std::endl;
+  return QTableView::event(ev);
+}
+
+/* --- TableModel --- */
 
 TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):
 QAbstractItemModel(parent),

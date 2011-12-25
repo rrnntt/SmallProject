@@ -14,7 +14,6 @@ class Plot: public QwtPlot
 public:
   Plot(QWidget *parent = NULL);
   //Plot(boost::shared_ptr<const Formula::Expression> expr,QWidget *parent = NULL);
-
   //void addExpression(boost::shared_ptr<const Formula::Expression> expr);
 protected:
   void init();

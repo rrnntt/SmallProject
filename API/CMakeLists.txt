@@ -4,6 +4,8 @@
 project(API)
 
 set( INC_FILES 
+   inc/API/Algorithm.h
+   inc/API/AlgorithmFactory.h
    inc/API/DllExport.h
    inc/API/Framework.h
    inc/API/PropertyFactory.h
@@ -13,6 +15,8 @@ set( INC_FILES
    inc/API/WorkspaceManager.h
    )
 set( SRC_FILES 
+   src/Algorithm.cpp
+   src/AlgorithmFactory.cpp
    src/Framework.cpp
    src/PropertyFactory.cpp
    src/Workspace.cpp

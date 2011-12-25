@@ -19,7 +19,7 @@ MainWindow::MainWindow()
   :QMainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
-  setGeometry(900,900,300,200);
+  //setGeometry(900,900,300,200);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
   createMenus();

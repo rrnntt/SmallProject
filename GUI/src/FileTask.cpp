@@ -25,7 +25,7 @@
 //----------------------------
 #include <iostream>
 
-DECLARE_TASK(FileTask);
+//DECLARE_TASK(FileTask);
 
 FileTask::FileTask()
 {
