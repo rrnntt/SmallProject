@@ -1,5 +1,5 @@
-#ifndef API_WORKSPACEFACTORY_H
-#define API_WORKSPACEFACTORY_H
+#ifndef API_ALGORITHMFACTORY_H
+#define API_ALGORITHMFACTORY_H
 
 #include "Kernel/DynamicFactory.h"
 #include "API/DllExport.h"
@@ -9,17 +9,17 @@
 namespace API
 {
 
-class API_EXPORT WorkspaceFactory: public Kernel::DynamicFactory<Workspace>, protected Singleton
+class API_EXPORT AlgorithmFactory: public Kernel::DynamicFactory<Algorithm>, protected Singleton
 {
-  WorkspaceFactory();
+  AlgorithmFactory();
 public:
-  virtual std::string name() const {return "WorkspaceFactory";}
-  static WorkspaceFactory& instance();
+  virtual std::string name() const {return "AlgorithmFactory";}
+  static AlgorithmFactory& instance();
 };
 
 } // API
 
-#define DECLARE_WORKSPACE(type) \
-int declare_workspace_##type( (API::WorkspaceFactory::instance().subscribe<type>(#type),0));
+#define DECLARE_ALGORITHM(type) \
+int declare_algorithm_##type( (API::AlgorithmFactory::instance().subscribe<type>(#type),0));
 
-#endif // API_WORKSPACEFACTORY_H
+#endif // API_ALGORITHMFACTORY_H

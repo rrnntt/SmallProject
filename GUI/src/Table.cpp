@@ -163,13 +163,6 @@ void Table::execMenu(QMenu* menu)
   menu->exec(QCursor::pos());
 }
 
-/*-----------------------------------------------------------------*/
-bool Table::event(QEvent* ev)
-{
-  std::cerr << ev->type() << std::endl;
-  return QTableView::event(ev);
-}
-
 /* --- TableModel --- */
 
 TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):

@@ -13,6 +13,7 @@ set( INC_FILES
    inc/API/Workspace.h
    inc/API/WorkspaceFactory.h
    inc/API/WorkspaceManager.h
+   inc/API/WorkspaceProperty.h
    )
 set( SRC_FILES 
    src/Algorithm.cpp
@@ -22,6 +23,7 @@ set( SRC_FILES
    src/Workspace.cpp
    src/WorkspaceFactory.cpp
    src/WorkspaceManager.cpp
+   src/WorkspaceProperty.cpp
   )
 add_library( API SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})

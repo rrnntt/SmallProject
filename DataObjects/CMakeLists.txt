@@ -12,6 +12,8 @@ set( INC_FILES
    inc/DataObjects/TableColumn.h
    inc/DataObjects/TableWorkspace.h
    inc/DataObjects/Unit.h
+# Algorithms
+   inc/DataObjects/CreateUniformRandomData.h
    )
 set( SRC_FILES 
    src/Column.cpp
@@ -21,6 +23,8 @@ set( SRC_FILES
    src/TableColumn.cpp
    src/TableWorkspace.cpp
    src/Unit.cpp
+# Algorithms
+   src/CreateUniformRandomData.cpp
   )
 add_library( DataObjects SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ${THIRD_PARTY_INCLUDE_DIR})

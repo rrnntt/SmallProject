@@ -30,7 +30,6 @@ protected:
   QAction* m_insertColumn;
   QAction* m_removeSelectedColumns;
   QAction* m_saveAscii;
-  bool event(QEvent* ev);
 };
 
 class TableModel: public QAbstractItemModel
