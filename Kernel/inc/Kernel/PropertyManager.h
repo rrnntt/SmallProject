@@ -8,6 +8,7 @@
 #include "Kernel/Property.h"
 
 #include <map>
+#include <set>
 
 namespace Kernel
 {
@@ -24,6 +25,7 @@ namespace Kernel
     ///Virtual Destructor
     virtual ~PropertyManager();
     Property& get(const std::string& name);
+    std::set<std::string> getPropertyNames() const;
   protected:
     void declare(const std::string& name, Property* prop);
 

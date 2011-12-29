@@ -42,4 +42,9 @@ namespace Kernel
     return *it->second.prop;
   }
 
+  std::set<std::string> PropertyManager::getPropertyNames() const
+  {
+
+  }
+
 } // namespace Kernel

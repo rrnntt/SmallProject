@@ -3,6 +3,8 @@
 
 #include <QtGUI/QMainWindow>
 
+class AlgorithmExplorer;
+
 class QMdiArea;
 class QMdiSubWindow;
 class QAction;
@@ -29,9 +31,12 @@ protected slots:
   void openOSGFile();
 private:
   QMdiArea* m_mdiArea;
+  AlgorithmExplorer* m_algorithmExplorer;
   /*---  Actions  ---*/
   QAction* m_openOSGWindow;
   QAction* m_openOSGFile;
+  friend class FileTask;
+  friend class ViewTask;
 };
 
 #endif /*MAINWINDOW_H*/

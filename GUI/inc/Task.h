@@ -25,7 +25,7 @@ public:
   virtual ~Task(){}
   /// Type of the task
   virtual Type type() const  = 0;
-  void setMainWindow(MainWindow* wnd){m_mainWindow = wnd;}
+  virtual void setMainWindow(MainWindow* wnd){m_mainWindow = wnd;}
   QMenu* menu() const {return m_menu;}
 protected:
   MainWindow* m_mainWindow;

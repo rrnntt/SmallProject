@@ -5,6 +5,8 @@ project(Plotter)
 
 set( INC_FILES 
    inc/AddTableColumnDialog.h
+   inc/AlgorithmExplorer.h
+   inc/AlgorithmDialog.h
    inc/Demo.h
    inc/MainWindow.h
    inc/OSGWidget.h
@@ -14,6 +16,7 @@ set( INC_FILES
    inc/PlotDialog.h
    inc/PlotDefaults.h
    inc/FileTask.h
+   inc/ViewTask.h
    inc/Task.h
    inc/Table.h
    inc/TableDialog.h
@@ -24,6 +27,8 @@ set( INC_FILES
    )
 set( SRC_FILES 
   src/AddTableColumnDialog.cpp
+  src/AlgorithmExplorer.cpp
+  src/AlgorithmDialog.cpp
   src/Demo.cpp
   src/main.cpp
   src/MainWindow.cpp
@@ -35,6 +40,7 @@ set( SRC_FILES
   src/PlotDefaults.cpp
   src/Task.cpp
   src/FileTask.cpp
+  src/ViewTask.cpp
   src/Table.cpp
   src/TableDialog.cpp
   src/TaskFactory.cpp
@@ -45,19 +51,23 @@ set( SRC_FILES
   
 set( MOC_HEADERS
    inc/AddTableColumnDialog.h
+   inc/AlgorithmExplorer.h
+   inc/AlgorithmDialog.h
    inc/MainWindow.h
    inc/OSGWidget.h
    inc/PlotDialog.h
    inc/Table.h
    inc/TableDialog.h
    inc/FileTask.h
+   inc/ViewTask.h
    inc/Task.h
    inc/SubWindow.h
 )
 
 set( UI_FILES
-   inc/PlotDialog.ui
    inc/AddTableColumnDialog.ui
+   inc/AlgorithmExplorer.ui
+   inc/PlotDialog.ui
    inc/TableDialog.ui
 )
 

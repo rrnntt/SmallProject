@@ -1,8 +1,10 @@
 #include "MainWindow.h"
 #include "OSGWidget.h"
 #include "FileTask.h"
+#include "ViewTask.h"
 #include "TaskManager.h"
 #include "SubWindow.h"
+#include "AlgorithmExplorer.h"
 
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
@@ -22,6 +24,12 @@ MainWindow::MainWindow()
   //setGeometry(900,900,300,200);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
+
+  // AlgorithmExplorer
+  m_algorithmExplorer = new AlgorithmExplorer(this);
+  m_algorithmExplorer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  this->addDockWidget(Qt::RightDockWidgetArea,m_algorithmExplorer);
+
   createMenus();
 }
 
@@ -54,6 +62,13 @@ void MainWindow::createMenus()
    TaskManager::instance().add("FileTask",fileTask);
    menuBar()->addMenu(fileTask->menu());
 
+   // View menu
+   ViewTask* viewTask = new ViewTask();
+   viewTask->setMainWindow(this);
+   TaskManager::instance().add("ViewTask",viewTask);
+   menuBar()->addMenu(viewTask->menu());
+
+   // ----------------- stuff to be delt with later --------------------------------
    QMenu* addMenu = menuBar()->addMenu(tr("&Open"));
 
    m_openOSGWindow = new QAction("OSG window", this);
@@ -63,6 +78,7 @@ void MainWindow::createMenus()
    m_openOSGFile = new QAction("OSG file", this);
    connect(m_openOSGFile,SIGNAL(triggered()),this,SLOT(openOSGFile()));
    addMenu->addAction(m_openOSGFile);
+   // -------------------------------------------------------------------------------
 }
 
 
