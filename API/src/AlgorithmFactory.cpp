@@ -23,4 +23,9 @@ AlgorithmFactory& AlgorithmFactory::instance()
   }
 }
 
+boost::shared_ptr<Algorithm> AlgorithmFactory::createAlgorithm(const std::string& name)
+{
+  return Algorithm_ptr(create(name));
+}
+
 } // API

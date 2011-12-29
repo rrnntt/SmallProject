@@ -4,6 +4,8 @@
 #include "API/DllExport.h"
 #include "Kernel/PropertyManager.h"
 
+#include <boost/shared_ptr.hpp>
+
 #include <string>
 
 namespace API
@@ -19,6 +21,8 @@ namespace API
   protected:
     virtual void exec() = 0;
   };
+
+  typedef boost::shared_ptr<Algorithm> Algorithm_ptr;
 
 } // API
 
