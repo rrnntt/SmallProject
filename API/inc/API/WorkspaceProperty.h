@@ -13,13 +13,15 @@ namespace API
   class API_EXPORT WorkspaceProperty: public Kernel::PropertyType<Workspace_ptr>
   {
   public:
-    WorkspaceProperty(){}
+    WorkspaceProperty(Kernel::Property::Direction dir = Kernel::Property::Input);
     virtual Kernel::Property& operator=(const std::string& str);
     virtual operator std::string() const;
     virtual operator Workspace_ptr() const;
     virtual Kernel::Property& operator=(const Workspace_ptr& value);
   protected:
     Workspace_ptr m_value;
+    std::string m_name;
+    Kernel::Property::Direction m_direction;
   };
 
 } // API

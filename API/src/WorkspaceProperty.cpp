@@ -6,13 +6,22 @@
 namespace API
 {
 
+  WorkspaceProperty::WorkspaceProperty(Kernel::Property::Direction dir):
+  m_direction(dir)
+  {
+  }
+
   /**
-    * Assign property form a string.
+    * Assign property from a string.
     * @param str :: Name of the workspace in WorkspaceManager.
     */
   Kernel::Property& WorkspaceProperty::operator=(const std::string& str)
   {
-    m_value = WorkspaceManager::instance().retrieve(str);
+    if (m_direction != Output)
+    {
+      m_value = WorkspaceManager::instance().retrieve(str);
+    }
+    m_name = str;
     return *this;
   }
 
@@ -25,7 +34,7 @@ namespace API
     {
       return m_value->name();
     }
-    return "";
+    return m_name;
   }
 
   /**
@@ -42,6 +51,10 @@ namespace API
   Kernel::Property& WorkspaceProperty::operator=(const Workspace_ptr& value)
   {
     m_value = value;
+    if (m_direction != Input && !m_name.empty())
+    {
+      WorkspaceManager::instance().addOrReplace(m_name,value);
+    }
     return *this;
   }
 

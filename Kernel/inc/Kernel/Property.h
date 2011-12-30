@@ -17,6 +17,8 @@ namespace Kernel
   class KERNEL_EXPORT Property
   {
   public:
+
+    enum Direction {Input, Output, InOut};
     ///Virtual Destructor
     virtual ~Property(){}
 

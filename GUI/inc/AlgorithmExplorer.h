@@ -3,18 +3,23 @@
 
 #include <QDockWidget>
 
+class QAction;
+
 namespace Ui {
-    class AlgorithmExplorer;
+  class AlgorithmExplorer;
 }
 
 class AlgorithmExplorer : public QDockWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    AlgorithmExplorer(QWidget *parent);
-    ~AlgorithmExplorer();
+  AlgorithmExplorer(QWidget *parent);
+  ~AlgorithmExplorer();
+protected slots:
+  void run();
 private:
-    Ui::AlgorithmExplorer *ui;
+  Ui::AlgorithmExplorer *ui;
+  QAction *m_run;
 };
 
 #endif // ALGORITHMEXPLORER_H

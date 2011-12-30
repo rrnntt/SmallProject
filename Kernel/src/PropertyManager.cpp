@@ -44,7 +44,12 @@ namespace Kernel
 
   std::set<std::string> PropertyManager::getPropertyNames() const
   {
-
+    std::set<std::string> out;
+    for(auto it = m_properties.begin(); it != m_properties.end();++it)
+    {
+      out.insert(it->first);
+    }
+    return out;
   }
 
 } // namespace Kernel
