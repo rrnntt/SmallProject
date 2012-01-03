@@ -4,6 +4,7 @@
 #include <QtGUI/QMainWindow>
 
 class AlgorithmExplorer;
+class WorkspaceExplorer;
 
 class QMdiArea;
 class QMdiSubWindow;
@@ -32,6 +33,7 @@ protected slots:
 private:
   QMdiArea* m_mdiArea;
   AlgorithmExplorer* m_algorithmExplorer;
+  WorkspaceExplorer* m_workspaceExplorer;
   /*---  Actions  ---*/
   QAction* m_openOSGWindow;
   QAction* m_openOSGFile;

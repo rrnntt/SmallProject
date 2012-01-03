@@ -5,6 +5,7 @@
 #include "TaskManager.h"
 #include "SubWindow.h"
 #include "AlgorithmExplorer.h"
+#include "WorkspaceExplorer.h"
 
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>
@@ -21,7 +22,7 @@ MainWindow::MainWindow()
   :QMainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
-  //setGeometry(900,900,300,200);
+  setGeometry(900,900,300,200);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
 
@@ -29,6 +30,11 @@ MainWindow::MainWindow()
   m_algorithmExplorer = new AlgorithmExplorer(this);
   m_algorithmExplorer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   this->addDockWidget(Qt::RightDockWidgetArea,m_algorithmExplorer);
+
+  // WorkspaceExplorer
+  m_workspaceExplorer = new WorkspaceExplorer(this);
+  m_workspaceExplorer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  this->addDockWidget(Qt::RightDockWidgetArea,m_workspaceExplorer);
 
   createMenus();
 }

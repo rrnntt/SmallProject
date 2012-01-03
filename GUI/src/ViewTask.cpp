@@ -5,6 +5,7 @@
 #include "TaskFactory.h"
 #include "MainWindow.h"
 #include "AlgorithmExplorer.h"
+#include "WorkspaceExplorer.h"
 
 //----------------------------
 //  Other project includes
@@ -31,4 +32,5 @@ void ViewTask::setMainWindow(MainWindow* wnd)
 {
   Task::setMainWindow(wnd);
   m_menu->addAction(m_mainWindow->m_algorithmExplorer->toggleViewAction());
+  m_menu->addAction(m_mainWindow->m_workspaceExplorer->toggleViewAction());
 }

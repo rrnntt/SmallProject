@@ -81,7 +81,6 @@ private:
   std::map<int,Record> m_map;
 };
 
-
 NotificationObserver::NotificationObserver()
 {
   ObserverRegister::get().registerObserver(this);

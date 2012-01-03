@@ -6,6 +6,7 @@
 #include <string>
 #include <set>
 #include <stdexcept>
+#include <iostream>
 #include <boost/shared_ptr.hpp>
 
 namespace Kernel
@@ -46,7 +47,9 @@ namespace Kernel
     {
     public:
       /// Constructor
-      AddNotification(const std::string& name,const boost::shared_ptr<T> obj):DataServiceNotification(name,obj){}
+      AddNotification(const std::string& name,const boost::shared_ptr<T> obj):DataServiceNotification(name,obj)
+      {/*std::cerr << "add not created\n";*/}
+      //~AddNotification(){std::cerr << "add not deleted\n";}
     };
 
 

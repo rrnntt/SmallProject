@@ -4,6 +4,7 @@
 #include "DllExport.h"
 #include <boost/shared_ptr.hpp>
 
+#include <string>
 #include <map>
 #include <vector>
 #include <typeinfo>
@@ -34,7 +35,7 @@ public:
       void setHandler(Observer* observer,void (Observer::*)(const NotificationClass&));
   virtual void callHandler(boost::shared_ptr<const Notification> nt)
   {
-    ObserverHandlerBase* h = m_handlers[&typeid(*nt)];
+    ObserverHandlerBase* h = m_handlers[std::string(typeid(*nt).name())];
     if (h)
     {
       h->call(*nt);
@@ -44,7 +45,8 @@ public:
 private:
   friend class ObserverRegister;
   int m_id;
-  typedef std::map<const std::type_info*, ObserverHandlerBase*> HandlerMap;
+  //typedef std::map<const std::type_info*, ObserverHandlerBase*> HandlerMap;
+  typedef std::map<std::string, ObserverHandlerBase*> HandlerMap;
   HandlerMap m_handlers;
 };
 
@@ -78,7 +80,7 @@ public:
 template <class Observer,class NotificationClass>
 void NotificationObserver::setHandler(Observer* observer,void (Observer::*handler)(const NotificationClass&))
 {
-  m_handlers[&typeid(NotificationClass)] = new ObserverHandler<Observer,NotificationClass>(observer,handler);
+  m_handlers[typeid(NotificationClass).name()] = new ObserverHandler<Observer,NotificationClass>(observer,handler);
 }
 
 } // Kernel

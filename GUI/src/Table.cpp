@@ -1,5 +1,6 @@
 #include "Table.h"
 #include "AddTableColumnDialog.h"
+#include "API/WorkspaceManager.h"
 
 #include <QtGui/QHeaderView>
 #include <QtGui/QContextMenuEvent>
@@ -169,6 +170,15 @@ TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):
 QAbstractItemModel(parent),
 m_workspace(ws)
 {
+}
+
+TableModel::~TableModel()
+{
+  std::cerr << "Table model deleted\n";
+  if (API::WorkspaceManager::instance().doesExist(m_workspace->name()))
+  {
+    API::WorkspaceManager::instance().remove(m_workspace->name());
+  }
 }
 
 int	TableModel::columnCount ( const QModelIndex & parent ) const

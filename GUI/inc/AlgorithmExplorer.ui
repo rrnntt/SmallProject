@@ -30,10 +30,13 @@
      </layout>
     </item>
     <item>
-     <widget class="QTableWidget" name="tableWidget">
+     <widget class="QTreeWidget" name="treeAlgorithms">
+      <attribute name="headerVisible">
+       <bool>false</bool>
+      </attribute>
       <column>
        <property name="text">
-        <string>Algorithms</string>
+        <string/>
        </property>
       </column>
      </widget>

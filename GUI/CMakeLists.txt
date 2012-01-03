@@ -24,6 +24,7 @@ set( INC_FILES
    inc/TaskManager.h
    inc/CurveManager.h
    inc/SubWindow.h
+   inc/WorkspaceExplorer.h
    )
 set( SRC_FILES 
   src/AddTableColumnDialog.cpp
@@ -47,6 +48,7 @@ set( SRC_FILES
   src/TaskManager.cpp
   src/CurveManager.cpp
   src/SubWindow.cpp
+  src/WorkspaceExplorer.cpp
   )
   
 set( MOC_HEADERS
@@ -62,6 +64,7 @@ set( MOC_HEADERS
    inc/ViewTask.h
    inc/Task.h
    inc/SubWindow.h
+   inc/WorkspaceExplorer.h
 )
 
 set( UI_FILES
@@ -69,6 +72,7 @@ set( UI_FILES
    inc/AlgorithmExplorer.ui
    inc/PlotDialog.ui
    inc/TableDialog.ui
+   inc/WorkspaceExplorer.ui
 )
 
 # OpenSceneGraph source directory

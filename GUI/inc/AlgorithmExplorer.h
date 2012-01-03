@@ -4,6 +4,7 @@
 #include <QDockWidget>
 
 class QAction;
+class QTreeWidgetItem;
 
 namespace Ui {
   class AlgorithmExplorer;
@@ -17,6 +18,8 @@ public:
   ~AlgorithmExplorer();
 protected slots:
   void run();
+  void treeItemDoubleClicked(QTreeWidgetItem *item, int column);
+  void treeItemClicked(QTreeWidgetItem *item, int column);
 private:
   Ui::AlgorithmExplorer *ui;
   QAction *m_run;
