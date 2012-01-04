@@ -5,15 +5,15 @@
 namespace Kernel
 {
 
-  DoubleProperty::DoubleProperty(const Property& p)
-  {
-    const DoubleProperty* q = dynamic_cast<const DoubleProperty*>(&p);
-    if (!q)
-    {
-      throw std::runtime_error("Property does not convert to DoubleProperty");
-    }
-    m_value = static_cast<double>(*q);
-  }
+//  DoubleProperty::DoubleProperty(const Property& p)
+//  {
+//    const DoubleProperty* q = dynamic_cast<const DoubleProperty*>(&p);
+//    if (!q)
+//    {
+//      throw std::runtime_error("Property does not convert to DoubleProperty");
+//    }
+//    m_value = static_cast<double>(*q);
+//  }
 
   DoubleProperty::operator std::string() const
   {

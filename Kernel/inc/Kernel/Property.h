@@ -37,8 +37,13 @@ namespace Kernel
       return *p;
     }
 
+    /// Return underlying value of type T
     template<typename T>
     T to();
+
+    /// Return underlying value of type T when T is a shared pointer
+    template<typename T>
+    T to_s();
 
   };
 
@@ -46,14 +51,25 @@ namespace Kernel
   class PropertyType: public Property
   {
   public:
+    PropertyType():m_value(){}
+    PropertyType(const T& value) : m_value(value) {}
+    PropertyType(const Property& p);
     virtual operator T() const  = 0;
     virtual Property& operator=(const T& value) = 0;
+  protected:
+    T m_value;
   };
 
   template<typename T>
   T Property::to()
   {
     return static_cast<T>(*dynamic_cast<PropertyType<T>* >(this));
+  }
+
+  template<typename T>
+  T Property::to_s()
+  {
+    return static_cast<T>(*this);
   }
 
 } // namespace Kernel

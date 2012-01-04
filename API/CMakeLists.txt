@@ -37,6 +37,7 @@ project(APITest)
 
 set( SRC_FILES 
   test/main.cpp
+  test/WorkspacePropertyTest.cpp
 )
 
 add_executable(APITest ${SRC_FILES})

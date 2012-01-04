@@ -34,6 +34,9 @@ TEST(PropertyTest, DoubleProperty)
   EXPECT_TRUE(pd != nullptr);
   EXPECT_EQ(double(*pd),1.23);
 
+  double d1 = p->to<double>();
+  EXPECT_EQ(d1,1.23);
+
 }
 
 TEST(PropertyTest, IntProperty) 
