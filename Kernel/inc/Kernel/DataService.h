@@ -93,6 +93,10 @@ namespace Kernel
     public:
       /// Constructor
       DeleteNotification(const std::string& name,const boost::shared_ptr<T> obj):DataServiceNotification(name,obj){}
+      ~DeleteNotification()
+      {
+        std::cerr << "DeleteNotification deleted\n";
+      }
     };
 
     /// Clear notification is sent when the service is cleared
@@ -102,6 +106,7 @@ namespace Kernel
       ///Constructor
       ClearNotification() :  DataServiceNotification("", boost::shared_ptr<T>()) {}
     };
+
     /// Rename notification is sent from Renameworkspaces algorithm after a workspace is renamed
     class RenameNotification: public DataServiceNotification
     {
@@ -113,6 +118,16 @@ namespace Kernel
       const std::string& new_objectname()const{return m_outwsname;}
     private:
       std::string m_outwsname; ///< output workspace name
+    };
+
+    /// ModifiedNotification can be sent after an new object has been modified.
+    /// name() and object() return name and pointer to the modified object.
+    class ModifiedNotification: public DataServiceNotification
+    {
+    public:
+      /// Constructor
+      ModifiedNotification(const std::string& name,const boost::shared_ptr<T> obj):DataServiceNotification(name,obj)
+      {}
     };
 
     /// Protected constructor (singleton)
@@ -243,10 +258,25 @@ namespace Kernel
       return names;
     }
 
+    /// Send ModifiedNotification for an object 
+    /// @param name :: name of the object sending the notification.
+    void modified(const std::string& name) const
+    {
+      try
+      {
+        boost::shared_ptr<T> obj = retrieve(name);
+        notificationCenter.send(new ModifiedNotification(name,obj));
+      }
+      catch(...)
+      {
+        // do nothing if object not found
+      }
+    }
+
     /// Sends notifications to observers. Observers can subscribe to notificationCenter
     /// using Poco::NotificationCenter::addObserver(...)
     ///@return nothing
-   NotificationCenter notificationCenter;
+   mutable NotificationCenter notificationCenter;
 
   protected:
 

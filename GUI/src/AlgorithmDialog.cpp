@@ -55,9 +55,15 @@ void AlgorithmDialog::accept()
 {
   QDialog::accept();
   if (!m_algorithm) return;
-  for(auto prop = m_propertyMap.begin(); prop != m_propertyMap.end(); ++prop)
+  try
   {
-    m_algorithm->get(prop.key()) = prop.value()->text().toStdString();
+    for(auto prop = m_propertyMap.begin(); prop != m_propertyMap.end(); ++prop)
+    {
+      m_algorithm->get(prop.key()) = prop.value()->text().toStdString();
+    }
   }
-  std::cerr << "Accepted\n";
+  catch(std::exception& e)
+  {
+    QMessageBox::critical((QWidget*)parent(),"Error","Error in setting properties:\n" + QString(e.what()));
+  }
 }

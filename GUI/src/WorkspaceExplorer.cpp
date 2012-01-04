@@ -18,7 +18,8 @@ WorkspaceExplorer::WorkspaceExplorer(QWidget *parent) :
 
 WorkspaceExplorer::~WorkspaceExplorer()
 {
-    delete ui;
+  delete ui;
+  API::WorkspaceManager::instance().notificationCenter.removeObserver(this);
 }
 
 void WorkspaceExplorer::handleAdd(const API::WorkspaceManager::AddNotification& nt)

@@ -37,6 +37,9 @@ namespace Kernel
       return *p;
     }
 
+    template<typename T>
+    T to();
+
   };
 
   template<typename T>
@@ -47,7 +50,11 @@ namespace Kernel
     virtual Property& operator=(const T& value) = 0;
   };
 
-
+  template<typename T>
+  T Property::to()
+  {
+    return static_cast<T>(*dynamic_cast<PropertyType<T>* >(this));
+  }
 
 } // namespace Kernel
 

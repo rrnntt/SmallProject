@@ -168,30 +168,57 @@ void Table::execMenu(QMenu* menu)
 
 TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):
 QAbstractItemModel(parent),
-m_workspace(ws)
+m_workspace(ws),
+m_rowCount(static_cast<int>(ws->rowCount())),
+m_columnCount(static_cast<int>(ws->columnCount())),
+m_invalid(false)
 {
+  setHandler(this,&TableModel::handleDelete);
+  setHandler(this,&TableModel::handleModified);
+  API::WorkspaceManager::instance().notificationCenter.addObserver(this);
 }
 
 TableModel::~TableModel()
 {
-  std::cerr << "Table model deleted\n";
   if (API::WorkspaceManager::instance().doesExist(m_workspace->name()))
   {
     API::WorkspaceManager::instance().remove(m_workspace->name());
   }
+  API::WorkspaceManager::instance().notificationCenter.removeObserver(this);
+}
+
+void TableModel::resetWorkspace()
+{
+  m_rowCount = static_cast<int>(m_workspace->rowCount());
+  m_columnCount = static_cast<int>(m_workspace->columnCount());
+  reset();
+}
+
+bool TableModel::isValid() const
+{
+  m_invalid = (m_workspace->columnCount() != m_columnCount) || 
+    (m_workspace->rowCount() != m_rowCount);
+  return ! m_invalid;
 }
 
 int	TableModel::columnCount ( const QModelIndex & parent ) const
 {
-  return static_cast<int>(m_workspace->columnCount());
+  return m_columnCount;
 }
 
 QVariant	TableModel::data ( const QModelIndex & index, int role ) const
 {
-  if (role == Qt::DisplayRole || role == Qt::EditRole)
+  if (isValid() && (role == Qt::DisplayRole || role == Qt::EditRole) )
   {
-    DataObjects::Column_ptr c = m_workspace->getColumn(index.column());
-    return QVariant::fromValue(QString::fromStdString(c->asString(index.row())));
+    try
+    {
+      DataObjects::Column_ptr c = m_workspace->getColumn(index.column());
+      return QVariant::fromValue(QString::fromStdString(c->asString(index.row())));
+    }
+    catch(...)
+    {
+      // do nothing?
+    }
   }
   return QVariant();
 }
@@ -206,10 +233,11 @@ QVariant TableModel::headerData( int section, Qt::Orientation orientation, int r
   {
     return section;
   }
-  else
+  else if (isValid())
   {
     return QString::fromStdString(m_workspace->getColumn(section)->name());
   }
+  return QVariant();
 }
 
 QModelIndex	TableModel::index ( int row, int column, const QModelIndex & parent ) const
@@ -224,7 +252,7 @@ QModelIndex	TableModel::parent ( const QModelIndex & index ) const
 
 int	TableModel::rowCount ( const QModelIndex & parent ) const
 {
-  return static_cast<int>(m_workspace->rowCount());
+  return m_rowCount;
 }
 
 Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
@@ -238,7 +266,7 @@ Qt::ItemFlags TableModel::flags(const QModelIndex &index) const
 bool TableModel::setData(const QModelIndex &index,
   const QVariant &value, int role)
 {
-  if (index.isValid() && role == Qt::EditRole) 
+  if (isValid() && index.isValid() && role == Qt::EditRole) 
   {
     m_workspace->getColumn(index.column())->fromString(value.toString().toStdString(),index.row());
     emit dataChanged(index, index);
@@ -253,6 +281,7 @@ bool TableModel::setData(const QModelIndex &index,
 
 bool	TableModel::insertRows ( int row, int count, const QModelIndex & parent )
 {
+  if (!isValid()) return false;
   beginInsertRows(parent,row,row+count-1);
   m_workspace->insertRow(row);
   endInsertRows();
@@ -265,6 +294,7 @@ bool	TableModel::insertRows ( int row, int count, const QModelIndex & parent )
 
 bool	TableModel::removeRows ( int row, int count, const QModelIndex & parent )
 {
+  if (!isValid()) return false;
   beginRemoveRows(parent,row,row+count-1);
   m_workspace->removeRows(row,count);
   endRemoveRows();
@@ -277,6 +307,7 @@ bool	TableModel::removeRows ( int row, int count, const QModelIndex & parent )
 
 bool TableModel::insertColumnBefore( int column, const std::string& type, const std::string& name )
 {
+  if (!isValid()) return false;
   if (name.empty() || type.empty()) return false;
   this->beginInsertColumns(QModelIndex(),column,column);
   m_workspace->addColumn(type,name);
@@ -287,6 +318,7 @@ bool TableModel::insertColumnBefore( int column, const std::string& type, const 
 
 bool TableModel::removeColumnNumbers(const QList<int>& columns)
 {
+  if (!isValid()) return false;
   std::vector<std::string> names = m_workspace->getColumnNames();
   foreach(int col,columns)
   {
@@ -307,5 +339,17 @@ void TableModel::saveAscii()
   if ( !fileName.isEmpty() )
   {
     m_workspace->saveAscii(fileName.toStdString());
+  }
+}
+
+void TableModel::handleDelete(const API::WorkspaceManager::DeleteNotification& nt)
+{
+}
+
+void TableModel::handleModified(const API::WorkspaceManager::ModifiedNotification& nt)
+{
+  if (nt.object() == m_workspace)
+  {
+    resetWorkspace();
   }
 }

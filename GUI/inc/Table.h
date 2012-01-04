@@ -2,6 +2,8 @@
 #define TABLE_H
 
 #include "DataObjects/TableWorkspace.h"
+#include "API/WorkspaceManager.h"
+
 #include <QtGui/QTableView>
 #include <QtCore/QAbstractItemModel>
 
@@ -32,7 +34,7 @@ protected:
   QAction* m_saveAscii;
 };
 
-class TableModel: public QAbstractItemModel
+class TableModel: public QAbstractItemModel, public Kernel::NotificationObserver
 {
   Q_OBJECT
 public:
@@ -55,7 +57,16 @@ public:
 public slots:
   void saveAscii();
 protected:
+  void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);
+  void handleModified(const API::WorkspaceManager::ModifiedNotification& nt);
+
+  void resetWorkspace();
+  bool isValid() const;
+
   DataObjects::TableWorkspace_ptr m_workspace;
+  mutable int m_rowCount;
+  mutable int m_columnCount;
+  mutable bool m_invalid;
 };
 
 #endif /*TABLE_H*/

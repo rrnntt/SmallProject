@@ -5,6 +5,7 @@
 #include "API/AlgorithmFactory.h"
 
 #include <QTreeWidget>
+#include <QMessageBox>
 
 #include <iostream>
 #include <stdexcept>
@@ -54,7 +55,14 @@ void AlgorithmExplorer::run()
   AlgorithmDialog dlg(this,algName);
   if (dlg.exec() == QDialog::Accepted)
   {
-    dlg.getAlgorithm()->execute();
+    try
+    {
+      dlg.getAlgorithm()->execute();
+    }
+    catch(std::exception& e)
+    {
+      QMessageBox::critical((QWidget*)parent(),"Error",e.what());
+    }
   }
 }
 

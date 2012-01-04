@@ -116,13 +116,14 @@ void NotificationCenter::removeObserverID(int id)
 
 void NotificationCenter::send(Notification *nt)
 {
+  boost::shared_ptr<Notification> snt(nt);
   std::vector<int>::iterator it = m_observers.begin();
   for(; it != m_observers.end(); ++it)
   {
     NotificationObserver* obs = ObserverRegister::get().getObserver(*it);
     if (obs)
     {
-      obs->callHandler(boost::shared_ptr<Notification>(nt));
+      obs->callHandler(snt);
     }
     else
     {

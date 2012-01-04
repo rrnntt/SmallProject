@@ -18,6 +18,7 @@ namespace API
     virtual operator std::string() const;
     virtual operator Workspace_ptr() const;
     virtual Kernel::Property& operator=(const Workspace_ptr& value);
+    void modified();
   protected:
     Workspace_ptr m_value;
     std::string m_name;

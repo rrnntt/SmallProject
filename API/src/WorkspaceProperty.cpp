@@ -19,6 +19,11 @@ namespace API
   {
     if (m_direction != Output)
     {
+      // Input or InOut properties cannot be re-assigned
+      if (m_value)
+      {
+        throw std::runtime_error("Input workspace property cannot be re-assigned");
+      }
       m_value = WorkspaceManager::instance().retrieve(str);
     }
     m_name = str;
@@ -50,12 +55,29 @@ namespace API
     */
   Kernel::Property& WorkspaceProperty::operator=(const Workspace_ptr& value)
   {
+    // Input properties cannot be re-assigned
+    if (m_direction == Input && m_value)
+    {
+      throw std::runtime_error("Input workspace property cannot be re-assigned");
+    }
     m_value = value;
-    if (m_direction != Input && !m_name.empty())
+    if (!m_name.empty() && (m_direction == Output || 
+      (m_direction == InOut && WorkspaceManager::instance().doesExist(m_name)) ))
     {
       WorkspaceManager::instance().addOrReplace(m_name,value);
     }
     return *this;
+  }
+
+  /**
+   * Send ModifiedNotification
+   */
+  void WorkspaceProperty::modified()
+  {
+    if (!m_name.empty() && WorkspaceManager::instance().doesExist(m_name))
+    {
+      WorkspaceManager::instance().modified(m_name);
+    }
   }
 
 } // API

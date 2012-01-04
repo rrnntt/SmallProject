@@ -11,7 +11,7 @@ namespace DataObjects
 
   CreateUniformRandomData::CreateUniformRandomData()
   {
-    declare("Workspace",new API::WorkspaceProperty(Kernel::Property::Output));
+    declare("Workspace",new API::WorkspaceProperty(Kernel::Property::InOut));
   }
 
   void CreateUniformRandomData::exec()
@@ -22,10 +22,16 @@ namespace DataObjects
     {
       throw std::runtime_error("Property Workspace was not set");
     }
-    TableWorkspace_ptr tws = TableWorkspace_ptr(static_cast<TableWorkspace*>(API::WorkspaceFactory::instance().create("TableWorkspace")));
-    std::cerr << "CreateUniformRandomData\n";
-    std::cerr << "Workspace " << static_cast<std::string>(wsProp) << std::endl;
-    wsProp = tws;
+    auto tws = wsProp.to<TableWorkspace_ptr>();
+
+    if (tws)
+    {
+      std::cerr << "Table " << tws->rowCount() << " x " << tws->columnCount() << std::endl;
+    }
+    else
+    {
+      std::cerr << "Table not set\n";
+    }
 
   }
 
