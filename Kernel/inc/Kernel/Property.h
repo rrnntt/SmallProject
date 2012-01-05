@@ -8,6 +8,8 @@
 
 #include <string>
 #include <iostream>
+#include <boost/type_traits.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace Kernel
 {
@@ -41,10 +43,6 @@ namespace Kernel
     template<typename T>
     T to();
 
-    /// Return underlying value of type T when T is a shared pointer
-    template<typename T>
-    T to_s();
-
   };
 
   template<typename T>
@@ -53,7 +51,6 @@ namespace Kernel
   public:
     PropertyType():m_value(){}
     PropertyType(const T& value) : m_value(value) {}
-    PropertyType(const Property& p);
     virtual operator T() const  = 0;
     virtual Property& operator=(const T& value) = 0;
   protected:
@@ -64,12 +61,6 @@ namespace Kernel
   T Property::to()
   {
     return static_cast<T>(*dynamic_cast<PropertyType<T>* >(this));
-  }
-
-  template<typename T>
-  T Property::to_s()
-  {
-    return static_cast<T>(*this);
   }
 
 } // namespace Kernel

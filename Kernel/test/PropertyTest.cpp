@@ -43,6 +43,11 @@ TEST(PropertyTest, IntProperty)
 {
   IntProperty p = 10;
   EXPECT_EQ(int(p),10);
+
+  Property* prop = &p;
+
+  int i = prop->to<int>();
+  EXPECT_EQ(i,10);
 }
 
 TEST(PropertyTest, Property) 

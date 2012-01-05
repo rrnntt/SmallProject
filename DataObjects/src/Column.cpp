@@ -1,4 +1,5 @@
 #include "DataObjects/Column.h"
+#include "DataObjects/NumericColumn.h"
 
 #include <sstream>
 
@@ -48,6 +49,12 @@ void Column::saveAsci(std::ostream& s, int index) const
 void Column::loadAsci(std::istream& s, int index)
 {
   this->read(s,index);
+}
+
+/// Is the data numeric (converts to double)?
+bool Column::isNumeric() const
+{
+  return dynamic_cast<const NumericColumn*>(this) != NULL;
 }
 
 } // DataObjects

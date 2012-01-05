@@ -19,11 +19,19 @@ namespace API
     virtual operator Workspace_ptr() const;
     virtual Kernel::Property& operator=(const Workspace_ptr& value);
     void modified();
+    template<typename T>
+    boost::shared_ptr<T> to();
   protected:
     Workspace_ptr m_value;
     std::string m_name;
     Kernel::Property::Direction m_direction;
   };
+
+  template<typename T>
+  boost::shared_ptr<T> WorkspaceProperty::to()
+  {
+    return boost::dynamic_pointer_cast<T>(m_value);
+  }
 
 } // API
 

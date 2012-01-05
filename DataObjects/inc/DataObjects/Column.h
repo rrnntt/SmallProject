@@ -79,6 +79,8 @@ public:
 
     /// Must return overall memory size taken by the column.
     virtual long int sizeOfData()const = 0;
+
+    bool isNumeric() const;
 protected:
     /// Sets the new column size.
     virtual void resize(int count) = 0;
