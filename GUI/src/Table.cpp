@@ -1,5 +1,6 @@
 #include "Table.h"
 #include "AddTableColumnDialog.h"
+#include "TableDialog.h"
 #include "API/WorkspaceManager.h"
 
 #include <QtGui/QHeaderView>
@@ -40,13 +41,16 @@ QTableView(parent)
   m_saveAscii = new QAction("Save ASCII",this);
   connect(m_saveAscii,SIGNAL(triggered()),model,SLOT(saveAscii()));
 
-  this->setEditTriggers(QAbstractItemView::AllEditTriggers);
+  m_showTableDialog = new QAction("Set values...",this);
+  connect(m_showTableDialog,SIGNAL(triggered()),model,SLOT(showTableDialog()));
+
+  this->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
 }
 
 void Table::contextMenuEvent( QContextMenuEvent* e )
 {
-  std::cerr << "Context\n";
   QMenu* context = new QMenu(this);
+  context->addAction(m_showTableDialog);
   context->addAction(m_saveAscii);
   emit showMenu(context);
 }
@@ -187,11 +191,13 @@ TableModel::~TableModel()
   API::WorkspaceManager::instance().notificationCenter.removeObserver(this);
 }
 
+/**
+ * Make sure the model is consistent with the workspace. reset() slot isn't called.
+ */
 void TableModel::resetWorkspace()
 {
   m_rowCount = static_cast<int>(m_workspace->rowCount());
   m_columnCount = static_cast<int>(m_workspace->columnCount());
-  reset();
 }
 
 bool TableModel::isValid() const
@@ -284,6 +290,7 @@ bool	TableModel::insertRows ( int row, int count, const QModelIndex & parent )
   if (!isValid()) return false;
   beginInsertRows(parent,row,row+count-1);
   m_workspace->insertRow(row);
+  resetWorkspace();
   endInsertRows();
   return true;
 }
@@ -297,6 +304,7 @@ bool	TableModel::removeRows ( int row, int count, const QModelIndex & parent )
   if (!isValid()) return false;
   beginRemoveRows(parent,row,row+count-1);
   m_workspace->removeRows(row,count);
+  resetWorkspace();
   endRemoveRows();
   if ( rowCount() == 0 )
   {
@@ -311,6 +319,7 @@ bool TableModel::insertColumnBefore( int column, const std::string& type, const 
   if (name.empty() || type.empty()) return false;
   this->beginInsertColumns(QModelIndex(),column,column);
   m_workspace->addColumn(type,name);
+  resetWorkspace();
   this->endInsertColumns();
   return true;
 }
@@ -324,6 +333,7 @@ bool TableModel::removeColumnNumbers(const QList<int>& columns)
   {
     this->beginRemoveColumns(QModelIndex(),col,col);
     m_workspace->removeColumn(names[col]);
+    resetWorkspace();
     this->endRemoveColumns();
   }
   if (columnCount() == 0)
@@ -342,6 +352,12 @@ void TableModel::saveAscii()
   }
 }
 
+void TableModel::showTableDialog()
+{
+  TableDialog dlg(NULL,m_workspace);
+  dlg.exec();
+}
+
 void TableModel::handleDelete(const API::WorkspaceManager::DeleteNotification& nt)
 {
 }
@@ -350,6 +366,8 @@ void TableModel::handleModified(const API::WorkspaceManager::ModifiedNotificatio
 {
   if (nt.object() == m_workspace)
   {
+    std::cerr << "Modified\n";
     resetWorkspace();
+    reset();
   }
 }

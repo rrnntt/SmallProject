@@ -8,18 +8,25 @@
 
 #include <string>
 
+namespace Kernel
+{
+  class Logger;
+}
+
 namespace API
 {
 
   class API_EXPORT Algorithm: public Kernel::PropertyManager
   {
   public:
-    Algorithm(){}
+    Algorithm();
     virtual ~Algorithm(){}
     virtual std::string name() const = 0;
     void execute();
   protected:
     virtual void exec() = 0;
+
+    Kernel::Logger& g_log;
   };
 
   typedef boost::shared_ptr<Algorithm> Algorithm_ptr;

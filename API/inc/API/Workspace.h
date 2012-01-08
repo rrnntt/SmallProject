@@ -17,6 +17,7 @@ public:
   virtual ~Workspace();
   std::string name() const {return m_name;}
   void setName(const std::string& nm)  {m_name = nm;}
+  void modified();
 protected:
   std::string m_name;
 };

@@ -10,9 +10,9 @@ namespace Kernel
   {
     for(auto it = m_properties.begin(); it != m_properties.end(); ++it)
     {
-      if(it->second.prop)
+      if(it->prop)
       {
-        delete it->second.prop;
+        delete it->prop;
       }
     }
     m_properties.clear();
@@ -20,34 +20,37 @@ namespace Kernel
 
   void PropertyManager::declare(const std::string& name, Property* prop)
   {
-    if (m_properties.find(name) != m_properties.end())
+    auto it = std::find_if(m_properties.begin(),m_properties.end(),[&name](const Storage& s){
+      return name == s.name;
+    });
+    if (it != m_properties.end())
     {
       throw std::runtime_error("Property " + name + " already defined");
     }
     Storage s;
+    s.name = name;
     s.prop = prop;
-    m_properties[name] = s;
-    //auto it = std::find_if(m_properties.begin(),m_properties.end(),[&name](Storage& s){
-    //  //if (s.
-    //});
+    m_properties.push_back(s);
   }
 
   Property& PropertyManager::get(const std::string& name)
   {
-    auto it = m_properties.find(name);
+    auto it = std::find_if(m_properties.begin(),m_properties.end(),[&name](const Storage& s){
+      return name == s.name;
+    });
     if (it == m_properties.end())
     {
       throw std::runtime_error("Property " + name + " is not defined");
     }
-    return *it->second.prop;
+    return *it->prop;
   }
 
-  std::set<std::string> PropertyManager::getPropertyNames() const
+  std::vector<std::string> PropertyManager::getPropertyNames() const
   {
-    std::set<std::string> out;
+    std::vector<std::string> out;
     for(auto it = m_properties.begin(); it != m_properties.end();++it)
     {
-      out.insert(it->first);
+      out.push_back(it->name);
     }
     return out;
   }

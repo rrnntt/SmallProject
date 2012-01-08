@@ -50,6 +50,8 @@ namespace DataObjects
       minValue = 0.0;
       maxValue = 1.0;
     }
+    std::cerr << "min=" << minValue << std::endl;
+    std::cerr << "max=" << maxValue << std::endl;
 
     std::string colName = get("Column");
 
