@@ -84,7 +84,7 @@ void TableDialog::initFormulaPage()
 void TableDialog::initDistributionPage()
 {
   QStringList dist;
-  dist << "Serial numbers" << "Uniform";
+  dist << "Serial numbers" << "Uniform" << "Poisson" << "Normal";
   ui->cbDistribution->addItems(dist);
   updateDistributionPage(0);
 }
@@ -103,6 +103,20 @@ void TableDialog::updateDistributionPage(int)
     ui->leMinimum->setText("1");
   }
   else if (distrName == "Uniform")
+  {
+    ui->leMinimum->setEnabled(true);
+    ui->leMaximum->setEnabled(true);
+    ui->leMinimum->setText("0");
+    ui->leMaximum->setText("1");
+  }
+  else if (distrName == "Poisson")
+  {
+    ui->leMinimum->setEnabled(true);
+    ui->leMaximum->setEnabled(false);
+    ui->leMinimum->setText("1");
+    ui->leMaximum->setText("1");
+  }
+  else if (distrName == "Normal")
   {
     ui->leMinimum->setEnabled(true);
     ui->leMaximum->setEnabled(true);
@@ -141,7 +155,6 @@ void TableDialog::accept()
 
 void TableDialog::apply()
 {
-  std::cerr << "Change applied\n";
   int tabIndex = ui->tabWidget->currentIndex();
   QString tabName = ui->tabWidget->tabText(tabIndex);
   if (tabName == "Distribution")
@@ -170,21 +183,42 @@ void TableDialog::applyDistribution()
     }
     m_workspace->modified();
   }
-  if (distrName == "Uniform")
+  try
   {
-    auto alg = API::AlgorithmFactory::instance().createAlgorithm("CreateUniformRandomData");
-    alg->get("Workspace") = m_workspace->name();
-    alg->get("MinValue") = ui->leMinimum->text().toStdString();
-    alg->get("MaxValue") = ui->leMaximum->text().toStdString();
-    alg->get("Column") = column->name();
-    try
+    API::Algorithm_ptr alg;
+    if (distrName == "Uniform")
     {
-      alg->execute();
+      alg = API::AlgorithmFactory::instance().createAlgorithm("CreateUniformRandomData");
+      alg->get("Workspace") = m_workspace->name();
+      alg->get("MinValue") = ui->leMinimum->text().toStdString();
+      alg->get("MaxValue") = ui->leMaximum->text().toStdString();
+      alg->get("Column") = column->name();
     }
-    catch(std::exception& e)
+    else if (distrName == "Poisson")
     {
-      QMessageBox::critical(parentWidget(),"Error",QString("Algorithm failed \n")+e.what());
-      return;
+      alg = API::AlgorithmFactory::instance().createAlgorithm("CreateDistribution");
+      alg->get("Workspace") = m_workspace->name();
+      alg->get("Column") = column->name();
+      alg->get("Distribution") = "poisson";
+      alg->get("Mean") = ui->leMinimum->text().toStdString();
+      alg->get("Sigma") = ui->leMaximum->text().toStdString();
     }
+    else if (distrName == "Normal")
+    {
+      alg = API::AlgorithmFactory::instance().createAlgorithm("CreateDistribution");
+      alg->get("Workspace") = m_workspace->name();
+      alg->get("Column") = column->name();
+      alg->get("Distribution") = "normal";
+      alg->get("Mean") = ui->leMinimum->text().toStdString();
+      alg->get("Sigma") = ui->leMaximum->text().toStdString();
+    }
+
+    if (!alg) return;
+    alg->execute();
+  }
+  catch(std::exception& e)
+  {
+    QMessageBox::critical(parentWidget(),"Error",QString("Algorithm failed \n")+e.what());
+    return;
   }
 }
