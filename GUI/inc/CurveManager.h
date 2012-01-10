@@ -1,18 +1,24 @@
-#ifndef CURVEMANAGER_H
-#define CURVEMANAGER_H
+#ifndef GUI_CURVEMANAGER_H
+#define GUI_CURVEMANAGER_H
 
-#include "qwt_plot_curve.h"
-#include "Kernel/DataService.h"
 #include "API/Singleton.h"
+#include "qwt_plot_curve.h"
 
-class CurveManager: public Kernel::DataService<QwtPlotCurve>, protected API::Singleton
+#include <QObject>
+#include <boost/shared_ptr.hpp>
+#include <map>
+
+class CurveManager: public QObject, protected API::Singleton
 {
+  Q_OBJECT
 public:
+  ~CurveManager(){}
   virtual std::string name() const {return "CurveManager";}
   static CurveManager& instance();
 protected:
-  CurveManager(const std::string& name);
+  CurveManager();
+  std::map<size_t,boost::shared_ptr<QwtPlotCurve> > m_map;
 
 };
 
-#endif /*CURVEMANAGER_H*/
+#endif // GUI_CURVEMANAGER_H

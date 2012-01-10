@@ -102,8 +102,11 @@ header += '#endif // ' + header_ifdef + '\n'
 source = '#include "'
 if has_namespace:
 	source += namespace_name + '/'
-source += class_name + '.h"\n\n'
+source += class_name + '.h"\n'
+if is_singleton:
+	source += '#include "API/Framework.h"\n'
 
+source += '\n'
 if has_namespace:
 	source += 'namespace ' + namespace_name + '\n{\n\n'
 
@@ -117,10 +120,10 @@ if is_algorithm:
 
 if is_singleton:
 	source += class_name + '& ' + class_name + '::' + 'instance()\n{\n'
-	source += tab + 'Singleton* s = Framework::instance().getSingleton("' + class_name + '");\n'
+	source += tab + 'Singleton* s = API::Framework::instance().getSingleton("' + class_name + '");\n'
 	source += tab + 'if (s == nullptr)\n'+tab+'{\n'
 	source += tab + tab + class_name + ' *f = new ' + class_name + '();\n'
-	source += tab + tab + 'Framework::instance().registerSingleton("' + class_name + '",f);\n'
+	source += tab + tab + 'API::Framework::instance().registerSingleton("' + class_name + '",f);\n'
 	source += tab + tab + 'return *f;\n'
 	source += tab + '}\n'
 	source += tab + 'else\n'

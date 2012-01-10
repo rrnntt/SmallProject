@@ -1,16 +1,14 @@
 #include "DataObjects/CreateDistribution.h"
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
+
+#include "Numeric/Distribution.h"
+
 #include "API/AlgorithmFactory.h"
 #include "API/WorkspaceProperty.h"
 #include "API/WorkspaceFactory.h"
-#include "Kernel/CommonProperties.h"
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/poisson_distribution.hpp>
+#include "Kernel/CommonProperties.h"
 
 #include <algorithm>
 
@@ -69,28 +67,28 @@ namespace DataObjects
     size_t n = column->size();
 
     // random number generator
-    //boost::mt19937 rand_gen;
-    boost::rand48 rand_gen;
+
+    Numeric::Distribution* distribution = nullptr;
 
     std::string distr = get("Distribution");
     std::transform(distr.begin(),distr.end(),distr.begin(),tolower);
 
     if (distr == "poisson")
     {
-      boost::poisson_distribution<> distribution(mean);
-      for(size_t i = 0; i < n; ++i)
-      {
-        numColumn->setDouble(i,distribution(rand_gen));
-      }
+      distribution = new Numeric::PoissonDistribution(mean);
     }
     else //if (distr == "normal")
     {
-      boost::normal_distribution<double> distribution(mean,sigma);
-      std::cerr << "normal " << distribution.mean() << ' ' << distribution.sigma() << std::endl;
+      distribution = new Numeric::NormalDistribution(mean,sigma);
+    }
+
+    if (distribution)
+    {
       for(size_t i = 0; i < n; ++i)
       {
-        numColumn->setDouble(i,distribution(rand_gen));
+        numColumn->setDouble(i,distribution->random());
       }
+      delete distribution;
     }
 
   }

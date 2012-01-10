@@ -29,9 +29,9 @@ set( SRC_FILES
    src/CreateDistribution.cpp
   )
 add_library( DataObjects SHARED ${SRC_FILES} ${INC_FILES} )
-include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ${THIRD_PARTY_INCLUDE_DIR})
+include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ../Numeric/inc ${THIRD_PARTY_INCLUDE_DIR})
 set_target_properties ( DataObjects PROPERTIES COMPILE_DEFINITIONS IN_DATAOBJECTS )
-target_link_libraries(DataObjects Kernel API Formula)
+target_link_libraries(DataObjects Kernel API Formula Numeric)
 
 #
 #  DataObjects Test project

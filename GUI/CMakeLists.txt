@@ -55,6 +55,7 @@ set( MOC_HEADERS
    inc/AddTableColumnDialog.h
    inc/AlgorithmExplorer.h
    inc/AlgorithmDialog.h
+   inc/CurveManager.h
    inc/MainWindow.h
    inc/OSGWidget.h
    inc/PlotDialog.h
