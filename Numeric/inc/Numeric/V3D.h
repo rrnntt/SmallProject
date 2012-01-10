@@ -1,14 +1,14 @@
 #ifndef NUMERIC_V3D_H
 #define NUMERIC_V3D_H
 
-#include "nu/DllExport.h"
+#include "Numeric/DllExport.h"
 
-namespace nu
+namespace Numeric
 {
   /**
    * A vector in 3D space
    */
-  class NUMERIC_DLL V3D
+  class NUMERIC_EXPORT V3D
   {
   public:
     V3D():m_x(),m_y(),m_z(){}
@@ -25,6 +25,6 @@ namespace nu
     double m_x,m_y,m_z;
   };
 
-} // namespace nu
+} // namespace Numeric
 
 #endif /*NUMERIC_V3D_H*/

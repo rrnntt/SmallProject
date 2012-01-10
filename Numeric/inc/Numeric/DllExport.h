@@ -2,9 +2,9 @@
 #define NUMERIC_DLLEXPORT_H
 
 #ifdef IN_NUMERIC
-#define NUMERIC_DLL __declspec( dllexport )
+#define NUMERIC_EXPORT __declspec( dllexport )
 #else
-#define NUMERIC_DLL __declspec( dllimport )
+#define NUMERIC_EXPORT __declspec( dllimport )
 #endif
 
 #endif /*NUMERIC_DLLEXPORT_H*/

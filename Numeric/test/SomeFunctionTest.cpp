@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "nu/SomeFunction.h"
+#include "Numeric/SomeFunction.h"
 
 TEST(FactorialTest, Negative) {
   int i = 3;

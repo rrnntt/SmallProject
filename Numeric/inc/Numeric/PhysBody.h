@@ -1,15 +1,15 @@
 #ifndef NUMERIC_PHYSBODY_H
 #define NUMERIC_PHYSBODY_H
 
-#include "nu/DllExport.h"
-#include "nu/V3D.h"
+#include "Numeric/DllExport.h"
+#include "Numeric/V3D.h"
 
-namespace nu
+namespace Numeric
 {
 /**
 * A physical body.
 */
-class NUMERIC_DLL PhysBody
+class NUMERIC_EXPORT PhysBody
 {
 public:
   PhysBody(double mass):m_mass(mass),m_pos(),m_velocity(),m_acceleration(){}
@@ -21,6 +21,6 @@ protected:
   V3D m_acceleration;
 };
 
-} // namespace nu
+} // namespace Numeric
 
 #endif /*NUMERIC_PHYSBODY_H*/

@@ -1,20 +1,20 @@
 #ifndef NUMERIC_PHYSMODEL_H
 #define NUMERIC_PHYSMODEL_H
 
-#include "nu/DllExport.h"
-#include "nu/PhysBody.h"
+#include "Numeric/DllExport.h"
+#include "Numeric/PhysBody.h"
 
-namespace nu
+namespace Numeric
 {
 /**
 * A physical model.
 */
-class NUMERIC_DLL PhysModel
+class NUMERIC_EXPORT PhysModel
 {
 public:
   //PhysModel();
 };
 
-} // namespace nu
+} // namespace Numeric
 
 #endif /*NUMERIC_PHYSMODEL_H*/

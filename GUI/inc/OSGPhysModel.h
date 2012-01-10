@@ -1,9 +1,9 @@
 #ifndef OSGPHYSMODEL_H
 #define OSGPHYSMODEL_H
 
-#include "nu/PhysModel.h"
+#include "Numeric/PhysModel.h"
 
-class OSGPhysModel: public nu::PhysModel
+class OSGPhysModel: public Numeric::PhysModel
 {
 public:
 };

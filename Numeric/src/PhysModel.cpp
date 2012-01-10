@@ -1,8 +1,8 @@
-#include "nu/PhysModel.h"
+#include "Numeric/PhysModel.h"
 
 #include <iostream>
 
-namespace nu
+namespace Numeric
 {
 
-} // namespace nu
+} // namespace Numeric

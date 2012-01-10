@@ -1,4 +1,4 @@
-#include "nu/SomeFunction.h"
+#include "Numeric/SomeFunction.h"
 
 #include <gsl/gsl_vector.h>
 

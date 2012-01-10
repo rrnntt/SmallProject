@@ -1,8 +1,8 @@
-#include "nu/Vector.h"
+#include "Numeric/Vector.h"
 
 #include <iostream>
 
-namespace nu
+namespace Numeric
 {
 
   /**
@@ -15,4 +15,4 @@ namespace nu
     std::cerr << v << ' ' << v->block << std::endl;
   }
 
-} // namespace nu
+} // namespace Numeric

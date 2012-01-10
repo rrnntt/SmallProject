@@ -1,9 +1,9 @@
-#include "nu/V3D.h"
+#include "Numeric/V3D.h"
 
 #include <iostream>
 
-namespace nu
+namespace Numeric
 {
 
 
-} // namespace nu
+} // namespace Numeric

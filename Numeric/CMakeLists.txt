@@ -4,14 +4,16 @@
 project(Numeric)
 
 set( INC_FILES 
-   inc/nu/SomeFunction.h
-   inc/nu/DllExport.h
-   inc/nu/Vector.h
-   inc/nu/V3D.h
-   inc/nu/PhysModel.h
-   inc/nu/PhysBody.h
+   inc/Numeric/DllExport.h
+   inc/Numeric/Distribution.h
+   inc/Numeric/SomeFunction.h
+   inc/Numeric/Vector.h
+   inc/Numeric/V3D.h
+   inc/Numeric/PhysModel.h
+   inc/Numeric/PhysBody.h
    )
 set( SRC_FILES 
+  src/Distribution.cpp
   src/SomeFunction.cpp
   src/Vector.cpp
   src/V3D.cpp
@@ -39,6 +41,7 @@ project(NumericTest)
 set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
+  test/DistributionTest.cpp
   test/SomeFunctionTest.cpp
   test/VectorTest.cpp
 )
