@@ -7,8 +7,7 @@
 #include "Kernel/DllExport.h"
 #include "Kernel/Property.h"
 
-#include <map>
-#include <set>
+#include <vector>
 
 namespace Kernel
 {
@@ -17,6 +16,7 @@ namespace Kernel
   {
     struct Storage
     {
+      std::string name;
       Property* prop;
     };
   public:
@@ -25,12 +25,12 @@ namespace Kernel
     ///Virtual Destructor
     virtual ~PropertyManager();
     Property& get(const std::string& name);
-    std::set<std::string> getPropertyNames() const;
+    std::vector<std::string> getPropertyNames() const;
   protected:
     void declare(const std::string& name, Property* prop);
 
   protected:
-    std::map<std::string,Storage> m_properties;
+    std::vector<Storage> m_properties;
 
   };
 

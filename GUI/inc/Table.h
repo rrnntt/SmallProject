@@ -32,6 +32,7 @@ protected:
   QAction* m_insertColumn;
   QAction* m_removeSelectedColumns;
   QAction* m_saveAscii;
+  QAction* m_showTableDialog;
 };
 
 class TableModel: public QAbstractItemModel, public Kernel::NotificationObserver
@@ -56,6 +57,7 @@ public:
   bool removeColumnNumbers(const QList<int>& names);
 public slots:
   void saveAscii();
+  void showTableDialog();
 protected:
   void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);
   void handleModified(const API::WorkspaceManager::ModifiedNotification& nt);

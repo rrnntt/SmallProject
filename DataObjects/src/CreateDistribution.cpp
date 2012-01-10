@@ -1,4 +1,4 @@
-#include "DataObjects/CreateUniformRandomData.h"
+#include "DataObjects/CreateDistribution.h"
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
 #include "API/AlgorithmFactory.h"
@@ -7,22 +7,28 @@
 #include "Kernel/CommonProperties.h"
 
 #include <boost/random/mersenne_twister.hpp>
+#include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
+#include <boost/random/normal_distribution.hpp>
+#include <boost/random/poisson_distribution.hpp>
+
+#include <algorithm>
 
 namespace DataObjects
 {
 
-  DECLARE_ALGORITHM(CreateUniformRandomData);
+  DECLARE_ALGORITHM(CreateDistribution);
 
-  CreateUniformRandomData::CreateUniformRandomData()
+  CreateDistribution::CreateDistribution()
   {
     declare("Workspace",new API::WorkspaceProperty(Kernel::Property::InOut));
-    declare("MinValue",new Kernel::DoubleProperty);
-    declare("MaxValue",new Kernel::DoubleProperty);
     declare("Column",new Kernel::StringProperty);
+    declare("Distribution",new Kernel::StringProperty);
+    declare("Mean",new Kernel::DoubleProperty);
+    declare("Sigma",new Kernel::DoubleProperty);
   }
 
-  void CreateUniformRandomData::exec()
+  void CreateDistribution::exec()
   {
     API::WorkspaceProperty wsProp = get("Workspace").as<API::WorkspaceProperty>();
     std::string wsName = static_cast<std::string>(wsProp);
@@ -42,16 +48,8 @@ namespace DataObjects
       throw std::runtime_error("Empty table found");
     }
 
-    double minValue = get("MinValue").to<double>();
-    double maxValue = get("MaxValue").to<double>();
-
-    if (minValue == maxValue)
-    {
-      minValue = 0.0;
-      maxValue = 1.0;
-    }
-    std::cerr << "min=" << minValue << std::endl;
-    std::cerr << "max=" << maxValue << std::endl;
+    double mean = get("Mean").to<double>();
+    double sigma = get("Sigma").to<double>();
 
     std::string colName = get("Column");
 
@@ -68,15 +66,31 @@ namespace DataObjects
     }
 
     auto numColumn = boost::dynamic_pointer_cast<NumericColumn>(column);
+    size_t n = column->size();
 
     // random number generator
-    boost::mt19937 rand_gen;
-    boost::uniform_real<> distribution(minValue,maxValue);
+    //boost::mt19937 rand_gen;
+    boost::rand48 rand_gen;
 
-    size_t n = column->size();
-    for(size_t i = 0; i < n; ++i)
+    std::string distr = get("Distribution");
+    std::transform(distr.begin(),distr.end(),distr.begin(),tolower);
+
+    if (distr == "poisson")
     {
-      numColumn->setDouble(i,distribution(rand_gen));
+      boost::poisson_distribution<> distribution(mean);
+      for(size_t i = 0; i < n; ++i)
+      {
+        numColumn->setDouble(i,distribution(rand_gen));
+      }
+    }
+    else //if (distr == "normal")
+    {
+      boost::normal_distribution<double> distribution(mean,sigma);
+      std::cerr << "normal " << distribution.mean() << ' ' << distribution.sigma() << std::endl;
+      for(size_t i = 0; i < n; ++i)
+      {
+        numColumn->setDouble(i,distribution(rand_gen));
+      }
     }
 
   }

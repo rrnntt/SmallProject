@@ -30,7 +30,7 @@ AlgorithmDialog::AlgorithmDialog(QWidget *parent,const std::string& algName) :
     return;
   }
   int row = 0;
-  std::set<std::string> propertyNames = m_algorithm->getPropertyNames();
+  std::vector<std::string> propertyNames = m_algorithm->getPropertyNames();
   for(auto name = propertyNames.begin(); name != propertyNames.end(); ++name,++row)
   {
     QLineEdit* le = new QLineEdit(this);
