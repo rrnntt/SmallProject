@@ -1,4 +1,4 @@
-#include "OSGWIdget.h"
+#include "Modeling/OSGWIdget.h"
 
 #include <QtGui/QPainter>
 

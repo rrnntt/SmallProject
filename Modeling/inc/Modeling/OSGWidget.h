@@ -1,7 +1,7 @@
 #ifndef OSGVIEWWIDGET_H
 #define OSGVIEWWIDGET_H
 
-#include "Model.h"
+#include "Modeling/Model.h"
 
 #include <QtCore/QTimer>
 #include <QtGui/QApplication>

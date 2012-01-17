@@ -6,7 +6,7 @@
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
-#include <map>
+#include <vector>
 
 class CurveManager: public QObject, protected API::Singleton
 {
@@ -17,7 +17,7 @@ public:
   static CurveManager& instance();
 protected:
   CurveManager();
-  std::map<size_t,boost::shared_ptr<QwtPlotCurve> > m_map;
+  std::vector< boost::shared_ptr<QwtPlotCurve> > m_map;
 
 };
 

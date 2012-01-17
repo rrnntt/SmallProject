@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-#include "OSGWidget.h"
+//#include "Modeling/OSGWidget.h"
 #include "FileTask.h"
 #include "ViewTask.h"
 #include "TaskManager.h"
@@ -75,43 +75,43 @@ void MainWindow::createMenus()
    menuBar()->addMenu(viewTask->menu());
 
    // ----------------- stuff to be delt with later --------------------------------
-   QMenu* addMenu = menuBar()->addMenu(tr("&Open"));
+   //QMenu* addMenu = menuBar()->addMenu(tr("&Open"));
 
-   m_openOSGWindow = new QAction("OSG window", this);
-   connect(m_openOSGWindow,SIGNAL(triggered()),this,SLOT(openOSGWindow()));
-   addMenu->addAction(m_openOSGWindow);
+   //m_openOSGWindow = new QAction("OSG window", this);
+   //connect(m_openOSGWindow,SIGNAL(triggered()),this,SLOT(openOSGWindow()));
+   //addMenu->addAction(m_openOSGWindow);
 
-   m_openOSGFile = new QAction("OSG file", this);
-   connect(m_openOSGFile,SIGNAL(triggered()),this,SLOT(openOSGFile()));
-   addMenu->addAction(m_openOSGFile);
+   //m_openOSGFile = new QAction("OSG file", this);
+   //connect(m_openOSGFile,SIGNAL(triggered()),this,SLOT(openOSGFile()));
+   //addMenu->addAction(m_openOSGFile);
    // -------------------------------------------------------------------------------
 }
 
 
 void MainWindow::openOSGWindow()
 {
-    OSGWidget* viewWidget = new OSGWidget();
-    viewWidget->setGeometry( 100, 100, 800, 600 );
-    Model* model = new Model;
-    model->load("cow.osg");
-    viewWidget->setModel( model );
-    newSubWindow(viewWidget);
+    //OSGWidget* viewWidget = new OSGWidget();
+    //viewWidget->setGeometry( 100, 100, 800, 600 );
+    //Model* model = new Model;
+    //model->load("cow.osg");
+    //viewWidget->setModel( model );
+    //newSubWindow(viewWidget);
 }
 
 void MainWindow::openOSGFile()
 {
 
-  QString fileName = QFileDialog::getOpenFileName(this,
-     "Open an OSG file", "", "OSG Files (*.osg *.osgt)");
-  if ( !fileName.isEmpty() )
-  {
-    QFileInfo finfo( fileName );
-    QDir::setCurrent( finfo.absoluteDir().absolutePath() );
-    OSGWidget* viewWidget = new OSGWidget();
-    viewWidget->setGeometry( 100, 100, 800, 600 );
-    Model* model = new Model;
-    model->load( fileName.toStdString() );
-    viewWidget->setModel( model );
-    newSubWindow(viewWidget);
-  }
+  //QString fileName = QFileDialog::getOpenFileName(this,
+  //   "Open an OSG file", "", "OSG Files (*.osg *.osgt)");
+  //if ( !fileName.isEmpty() )
+  //{
+  //  QFileInfo finfo( fileName );
+  //  QDir::setCurrent( finfo.absoluteDir().absolutePath() );
+  //  OSGWidget* viewWidget = new OSGWidget();
+  //  viewWidget->setGeometry( 100, 100, 800, 600 );
+  //  Model* model = new Model;
+  //  model->load( fileName.toStdString() );
+  //  viewWidget->setModel( model );
+  //  newSubWindow(viewWidget);
+  //}
 }

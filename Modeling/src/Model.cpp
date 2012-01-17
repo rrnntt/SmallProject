@@ -1,4 +1,4 @@
-#include "Model.h"
+#include "Modeling/Model.h"
 
 #include <osgDB/ReadFile>
 
