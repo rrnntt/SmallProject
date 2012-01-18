@@ -2,6 +2,8 @@
 #  SmallProject
 #
 
+project(SmallProject)
+
 cmake_minimum_required (VERSION 2.8)
 
 set( THIRD_PARTY_DIR "${PROJECT_SOURCE_DIR}/Third_Party" )
@@ -49,6 +51,9 @@ include(${QT_USE_FILE})
 
 include_directories( ${Boost_INCLUDE_DIR} "${PROJECT_SOURCE_DIR}/Kernel/inc")
 link_directories(${THIRD_PARTY_LIB_DIR})
+
+# Allow organizing stuff into folders in IDE
+set_property ( GLOBAL PROPERTY USE_FOLDERS ON )
 
 add_subdirectory(Kernel)
 add_subdirectory(API)

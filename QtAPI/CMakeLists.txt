@@ -1,7 +1,7 @@
 #
 #  QtAPI project
 #
-project(QtAPI)
+#project(QtAPI)
 
 set( INC_FILES 
    inc/QtAPI/DllExport.h

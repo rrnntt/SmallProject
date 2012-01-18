@@ -1,7 +1,7 @@
 #
 #  Teach project
 #
-project(Teach)
+#project(Teach)
 
 set( INC_FILES 
    inc/Teach/DllExport.h
@@ -27,7 +27,7 @@ Kernel API Formula
 #
 #  TeachTest project
 #
-project(TeachTest)
+#project(TeachTest)
 
 set( INC_FILES )
 set( SRC_FILES 
@@ -43,3 +43,5 @@ target_link_libraries(TeachTest
 ${GTEST_LIBS} Formula Teach
 )
 
+# Add to UnitTests folder in an IDE
+set_property ( TARGET TeachTest PROPERTY FOLDER "UnitTests" )

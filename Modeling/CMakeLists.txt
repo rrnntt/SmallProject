@@ -1,7 +1,7 @@
 #
 #  Modeling project
 #
-project(Modeling)
+#project(Modeling)
 
 set( INC_FILES 
    inc/Modeling/DllExport.h

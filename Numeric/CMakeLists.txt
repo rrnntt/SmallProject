@@ -1,7 +1,7 @@
 #
 #  Numeric project
 #
-project(Numeric)
+#project(Numeric)
 
 set( INC_FILES 
    inc/Numeric/DllExport.h
@@ -36,7 +36,7 @@ ${GSL_LIBS}
 #
 #  Numeric Test project
 #
-project(NumericTest)
+#project(NumericTest)
 
 set( INC_FILES )
 set( SRC_FILES 
@@ -54,3 +54,5 @@ target_link_libraries(NumericTest
 ${GTEST_LIBS} ${GSL_LIBS} Numeric
 )
 
+# Add to UnitTests folder in an IDE
+set_property ( TARGET NumericTest PROPERTY FOLDER "UnitTests" )

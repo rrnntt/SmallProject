@@ -1,7 +1,7 @@
 #
 #  DataObjects project
 #
-project(DataObjects)
+#project(DataObjects)
 
 set( INC_FILES 
    inc/DataObjects/DllExport.h
@@ -36,7 +36,7 @@ target_link_libraries(DataObjects Kernel API Formula Numeric)
 #
 #  DataObjects Test project
 #
-project(DataObjectsTest)
+#project(DataObjectsTest)
 
 set( SRC_FILES 
   test/main.cpp
@@ -50,4 +50,6 @@ find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
 target_link_libraries(DataObjectsTest 
 ${GTEST_LIBS} DataObjects 
 )
+# Add to UnitTests folder in an IDE
+set_property ( TARGET DataObjectsTest PROPERTY FOLDER "UnitTests" )
 

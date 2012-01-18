@@ -1,7 +1,7 @@
 #
 #  GUI project
 #
-project(Plotter)
+#project(Plotter)
 
 set( INC_FILES 
    inc/AddTableColumnDialog.h

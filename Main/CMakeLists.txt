@@ -1,7 +1,7 @@
 #
 #  Main project
 #
-project(Main)
+#project(Main)
 
 set( INC_FILES 
   test_spirit.h

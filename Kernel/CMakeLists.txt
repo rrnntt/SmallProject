@@ -2,7 +2,7 @@
 #
 #  Kernel project
 #
-project(Kernel)
+#project(Kernel)
 
 set( INC_FILES 
    inc/Kernel/Creator.h
@@ -47,7 +47,7 @@ set_target_properties ( Kernel PROPERTIES COMPILE_DEFINITIONS IN_KERNEL )
 #
 #  Kernel Test project
 #
-project(KernelTest)
+#project(KernelTest)
 
 set( INC_FILES )
 set( SRC_FILES 
@@ -62,3 +62,5 @@ find_library(GTEST_DEBUG_LIB gtest_d "${THIRD_PARTY_LIB_DIR}")
 find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
 target_link_libraries(KernelTest ${GTEST_LIBS} Kernel)
 
+# Add to UnitTests folder in an IDE
+set_property ( TARGET KernelTest PROPERTY FOLDER "UnitTests" )

@@ -1,7 +1,7 @@
 #
 #  Formula project
 #
-project(Formula)
+#project(Formula)
 
 set( INC_FILES 
    inc/Formula/DllExport.h
@@ -44,7 +44,7 @@ target_link_libraries(Formula API Kernel)
 #
 #  Formula Test project
 #
-project(FormulaTest)
+#project(FormulaTest)
 
 set( INC_FILES test/DummyVar.h )
 set( SRC_FILES 
@@ -65,3 +65,5 @@ target_link_libraries(FormulaTest
 ${GTEST_LIBS} Formula
 )
 
+# Add to UnitTests folder in an IDE
+set_property ( TARGET FormulaTest PROPERTY FOLDER "UnitTests" )

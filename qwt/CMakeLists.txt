@@ -1,7 +1,7 @@
 #
 #  qwt project
 #
-project(qwt)
+#project(qwt)
 
 set( INC_FILES 
 	src/qwt_text.h

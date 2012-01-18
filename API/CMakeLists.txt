@@ -1,7 +1,7 @@
 #
 #  API project
 #
-project(API)
+#project(API)
 
 set( INC_FILES 
    inc/API/Algorithm.h
@@ -33,7 +33,7 @@ target_link_libraries(API Kernel)
 #
 #  API Test project
 #
-project(APITest)
+#project(APITest)
 
 set( SRC_FILES 
   test/main.cpp
@@ -47,4 +47,5 @@ find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
 target_link_libraries(APITest 
 ${GTEST_LIBS} API
 )
-
+# Add to UnitTests folder in an IDE
+set_property ( TARGET APITest PROPERTY FOLDER "UnitTests" )
