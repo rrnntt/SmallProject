@@ -3,9 +3,10 @@
 #include "FileTask.h"
 #include "ViewTask.h"
 #include "TaskManager.h"
-#include "SubWindow.h"
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
+
+#include "QtAPI/SubWindow.h"
 
 #include <QtGui/QMdiArea>
 #include <QtGui/QMdiSubWindow>

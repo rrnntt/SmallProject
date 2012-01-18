@@ -1,6 +1,7 @@
 #ifndef OSGVIEWWIDGET_H
 #define OSGVIEWWIDGET_H
 
+#include "Modeling/DllExport.h"
 #include "Modeling/Model.h"
 
 #include <QtCore/QTimer>
@@ -16,7 +17,7 @@
 
 #include <osgQt/GraphicsWindowQt>
 
-class OSGWidget : public QWidget, public osgViewer::Viewer
+class MODELING_EXPORT OSGWidget : public QWidget, public osgViewer::Viewer
 {
 public:
     OSGWidget();

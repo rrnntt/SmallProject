@@ -1,5 +1,5 @@
-#include "Plot.h"
-#include "PlotDefaults.h"
+#include "QtAPI/Plot.h"
+#include "QtAPI/PlotDefaults.h"
 //#include "SimpleFormula/Expression.h"
 //#include "ExpressionCurve.h"
 
@@ -12,7 +12,10 @@
 #include <QPalette>
 #include <iostream>
 
-using namespace Formula;
+//using namespace Formula;
+
+namespace QtAPI
+{
 
 Plot::Plot(QWidget *parent)
 :QwtPlot(parent),
@@ -90,3 +93,5 @@ void Plot::init()
 //  ec->setTitle(QString::fromStdString(expr->str()));
 //
 //}
+
+} // QtAPI

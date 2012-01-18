@@ -1,13 +1,17 @@
-#ifndef PLOTDIALOG_H
-#define PLOTDIALOG_H
+#ifndef QTAPI_PLOTDIALOG_H
+#define QTAPI_PLOTDIALOG_H
 
+#include "DllExport.h"
 #include <QDialog>
 
 namespace Ui {
     class PlotDialog;
 }
 
-class Plot;
+namespace QtAPI
+{
+
+class QTAPI_EXPORT Plot;
 
 class PlotDialog : public QDialog {
     Q_OBJECT
@@ -30,4 +34,6 @@ private:
 
 };
 
-#endif // PLOTDIALOG_H
+} // QtAPI
+
+#endif // QTAPI_PLOTDIALOG_H

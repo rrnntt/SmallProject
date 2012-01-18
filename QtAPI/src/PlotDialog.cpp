@@ -1,7 +1,7 @@
-#include "PlotDialog.h"
+#include "QtAPI/PlotDialog.h"
 #include "ui_PlotDialog.h"
-#include "Plot.h"
-#include "PlotDefaults.h"
+#include "QtAPI/Plot.h"
+#include "QtAPI/PlotDefaults.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -10,6 +10,9 @@
 
 #include <iostream>
 #include <stdexcept>
+
+namespace QtAPI
+{
 
 PlotDialog::PlotDialog(QWidget *parent, Plot* plot) :
     QDialog(parent),
@@ -109,3 +112,5 @@ void PlotDialog::apply()
   m_plot->replot();
   m_plot->polish();
 }
+
+} // QtAPI

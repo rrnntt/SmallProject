@@ -1,10 +1,14 @@
-#ifndef GUI_PLOTCURVE_H
-#define GUI_PLOTCURVE_H
+#ifndef QTAPI_PLOTCURVE_H
+#define QTAPI_PLOTCURVE_H
 
+#include "DllExport.h"
 #include "qwt_plot_curve.h"
 #include <boost/shared_ptr.hpp>
 
-class PlotCurve: public QObject,  public QwtPlotCurve
+namespace QtAPI
+{
+
+class QTAPI_EXPORT PlotCurve: public QObject,  public QwtPlotCurve
 {
   Q_OBJECT
 public:
@@ -18,4 +22,6 @@ protected:
 
 typedef boost::shared_ptr<PlotCurve> PlotCurve_sptr;
 
-#endif // GUI_PLOTCURVE_H
+} // QtAPI
+
+#endif // QTAPI_PLOTCURVE_H

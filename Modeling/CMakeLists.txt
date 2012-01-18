@@ -4,6 +4,7 @@
 project(Modeling)
 
 set( INC_FILES 
+   inc/Modeling/DllExport.h
    inc/Modeling/OSGWidget.h
    inc/Modeling/OSGPhysModel.h
    inc/Modeling/Model.h
@@ -69,6 +70,7 @@ ${QT_QTOPENGL_INCLUDE_DIR}
 ${OSG_INCUDEDIR}
 ${OSG_BUILDINCLUDEDIR}
 )
+set_target_properties ( Modeling PROPERTIES COMPILE_DEFINITIONS IN_MODELING )
 
 target_link_libraries(Modeling
 API Numeric DataObjects

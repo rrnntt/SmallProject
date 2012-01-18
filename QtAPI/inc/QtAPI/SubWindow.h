@@ -1,11 +1,16 @@
-#ifndef SUBWINDOW_H
-#define SUBWINDOW_H
+#ifndef QTAPI_SUBWINDOW_H
+#define QTAPI_SUBWINDOW_H
+
+#include "DllExport.h"
 
 #include <QtGui/QWidget>
 
 class QMenu;
 
-class SubWindow: public QWidget
+namespace QtAPI
+{
+
+class QTAPI_EXPORT SubWindow: public QWidget
 {
   Q_OBJECT
 public:
@@ -19,4 +24,6 @@ protected:
   QString m_title;
 };
 
-#endif // SUBWINDOW_H
+} // QtAPI
+
+#endif // QTAPI_SUBWINDOW_H

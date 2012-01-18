@@ -1,9 +1,10 @@
 #ifndef OSGPHYSMODEL_H
 #define OSGPHYSMODEL_H
 
+#include "Modeling/DllExport.h"
 #include "Numeric/PhysModel.h"
 
-class OSGPhysModel: public Numeric::PhysModel
+class MODELING_EXPORT OSGPhysModel: public Numeric::PhysModel
 {
 public:
 };

@@ -1,10 +1,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include "Modeling/DllExport.h"
 #include <osg/Referenced>
 #include <osg/Node>
 
-class Model: public osg::Referenced
+class MODELING_EXPORT Model: public osg::Referenced
 {
 protected:
   class ModelNodeCallback : public osg::NodeCallback

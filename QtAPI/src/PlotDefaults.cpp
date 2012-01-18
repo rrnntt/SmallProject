@@ -1,6 +1,9 @@
-#include "PlotDefaults.h"
+#include "QtAPI/PlotDefaults.h"
 
 #include <QSettings>
+
+namespace QtAPI
+{
 
 PlotDefaults::PlotDefaults():
 m_axis_font("Sefir"),
@@ -57,3 +60,5 @@ QColor PlotDefaults::getCurveColor(int i)const
   int j = i % m_curve_colors.size();
   return m_curve_colors[j];
 }
+
+} // QtAPI

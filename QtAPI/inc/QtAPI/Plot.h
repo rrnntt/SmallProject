@@ -1,15 +1,14 @@
-#ifndef PLOT_H
-#define PLOT_H
+#ifndef QTAPI_PLOT_H
+#define QTAPI_PLOT_H
 
+#include "DllExport.h"
 #include "qwt_plot.h"
 #include <boost/shared_ptr.hpp>
 
-namespace Formula
+namespace QtAPI
 {
-  class Expression;
-}
 
-class Plot: public QwtPlot
+class QTAPI_EXPORT Plot: public QwtPlot
 {
 public:
   Plot(QWidget *parent = NULL);
@@ -21,4 +20,6 @@ private:
   int m_curve_count;
 };
 
-#endif // PLOT_H
+} // QtAPI
+
+#endif // QTAPI_PLOT_H

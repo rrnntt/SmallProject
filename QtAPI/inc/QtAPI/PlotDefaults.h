@@ -1,11 +1,15 @@
-#ifndef PLOTDEFAULTS_H
-#define PLOTDEFAULTS_H
+#ifndef QTAPI_PLOTDEFAULTS_H
+#define QTAPI_PLOTDEFAULTS_H
 
+#include "DllExport.h"
 #include <QFont>
 #include <QColor>
 #include <QList>
 
-class PlotDefaults
+namespace QtAPI
+{
+
+class QTAPI_EXPORT PlotDefaults
 {
 public:
   static PlotDefaults& instance();
@@ -29,4 +33,6 @@ private:
     QList<QColor> m_curve_colors;
 };
 
-#endif // PLOTDEFAULTS_H
+} // QtAPI
+
+#endif // QTAPI_PLOTDEFAULTS_H

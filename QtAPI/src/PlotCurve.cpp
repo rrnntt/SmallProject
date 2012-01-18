@@ -1,4 +1,7 @@
-#include "PlotCurve.h"
+#include "QtAPI/PlotCurve.h"
+
+namespace QtAPI
+{
 
 PlotCurve::PlotCurve():
 QwtPlotCurve()
@@ -19,3 +22,5 @@ boost::shared_ptr<PlotCurve> PlotCurve::create(const QString &title)
 {
   return boost::shared_ptr<PlotCurve>(new PlotCurve(title));
 }
+
+} // QtAPI
