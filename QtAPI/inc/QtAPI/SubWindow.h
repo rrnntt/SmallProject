@@ -3,25 +3,19 @@
 
 #include "DllExport.h"
 
-#include <QtGui/QWidget>
+#include <QtGui/QMdiSubWindow>
 
 class QMenu;
 
 namespace QtAPI
 {
 
-class QTAPI_EXPORT SubWindow: public QWidget
+class QTAPI_EXPORT SubWindow: public QMdiSubWindow
 {
   Q_OBJECT
 public:
-  SubWindow(QWidget *parent = NULL):QWidget(parent){}
-  void setTitle(const QString& title);
-  QString title() const {return m_title;}
+  SubWindow(QWidget *parent = NULL):QMdiSubWindow(parent){}
   virtual QMenu* makeContext() const {return nullptr;}
-signals:
-  void setMdiTitle(const QString&);
-protected:
-  QString m_title;
 };
 
 } // QtAPI

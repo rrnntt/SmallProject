@@ -58,6 +58,19 @@ void Framework::registerSingleton(const std::string& name, Singleton* singleton)
   }
 }
 
+void Framework::unRegisterSingleton(const std::string& name, bool del)
+{
+  auto s = m_singletons.find(name);
+  if (s != m_singletons.end())
+  {
+    if (del)
+    {
+      delete s->second;
+    }
+    m_singletons.erase(s);
+  }
+}
+
 Singleton* Framework::getSingleton(const std::string& name) 
 {
   if (m_singletons.empty())

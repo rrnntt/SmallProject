@@ -14,6 +14,7 @@ set( INC_FILES
    inc/QtAPI/Task.h
    inc/QtAPI/Table.h
    inc/QtAPI/TableDialog.h
+   inc/QtAPI/TableTask.h
    inc/QtAPI/TaskFactory.h
    inc/QtAPI/TaskManager.h
    inc/QtAPI/CurveManager.h
@@ -30,6 +31,7 @@ set( SRC_FILES
   src/FileTask.cpp
   src/Table.cpp
   src/TableDialog.cpp
+  src/TableTask.cpp
   src/TaskFactory.cpp
   src/TaskManager.cpp
   src/CurveManager.cpp
@@ -44,6 +46,7 @@ set( MOC_HEADERS
    inc/QtAPI/CurveManager.h
    inc/QtAPI/Table.h
    inc/QtAPI/TableDialog.h
+   inc/QtAPI/TableTask.h
    inc/QtAPI/FileTask.h
    inc/QtAPI/Task.h
 )

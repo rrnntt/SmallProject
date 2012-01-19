@@ -4,11 +4,15 @@
 #include "QtAPI/DllExport.h"
 #include "Kernel/DataService.h"
 #include <QtCore/QObject>
+#include <QtCore/QHash>
 
 class QMenu;
+class QAction;
 
 namespace QtAPI
 {
+
+class SubWindow;
 
 /**
  * Task performed by the application. Tasks define the actions that the application can do.
@@ -28,9 +32,12 @@ public:
   virtual ~Task(){}
   /// Type of the task
   virtual Type type() const  = 0;
-  QMenu* menu() const {return m_menu;}
+  virtual QMenu* menu(SubWindow* w = nullptr) const = 0;
+
+  QAction* getAction(const QString& name) const;
 protected:
-  QMenu *m_menu;
+  void addAction(const QString& name, QAction* action);
+  QHash<QString, QAction*> m_actions;
 };
 
 typedef boost::shared_ptr<Task> Task_ptr;

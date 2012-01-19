@@ -6,7 +6,7 @@ set( INC_FILES
 
    inc/AlgorithmExplorer.h
    inc/AlgorithmDialog.h
-   inc/Demo.h
+   #inc/Demo.h
    inc/MainWindow.h
    inc/ViewTask.h
    inc/WorkspaceExplorer.h
@@ -14,7 +14,7 @@ set( INC_FILES
 set( SRC_FILES 
   src/AlgorithmExplorer.cpp
   src/AlgorithmDialog.cpp
-  src/Demo.cpp
+  #src/Demo.cpp
   src/main.cpp
   src/MainWindow.cpp
   src/ViewTask.cpp

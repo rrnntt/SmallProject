@@ -1,5 +1,7 @@
 #include "QtAPI/TaskManager.h"
 #include "QtAPI/FileTask.h"
+#include "QtAPI/TableTask.h"
+
 #include "API/Framework.h"
 
 #include <iostream>
@@ -10,8 +12,8 @@ namespace QtAPI
 TaskManager::TaskManager(const std::string& name):Kernel::DataService<Task>(name)
 {
   // default tasks
-   FileTask* fileTask = new FileTask();
-   add("FileTask",fileTask);
+   add("FileTask",new FileTask());
+   add("TableTask",new TableTask());
 }
 
 TaskManager& TaskManager::instance()

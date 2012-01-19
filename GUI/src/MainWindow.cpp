@@ -4,6 +4,8 @@
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
 
+#include "API/Framework.h"
+
 #include "QtAPI/FileTask.h"
 #include "QtAPI/TaskManager.h"
 #include "QtAPI/SubWindow.h"
@@ -23,7 +25,7 @@ MainWindow::MainWindow()
   :QMainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
-  //setGeometry(900,900,300,200);
+  setGeometry(900,900,300,200);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
 
@@ -45,20 +47,19 @@ MainWindow::~MainWindow()
   std::cerr << "MainWindow destroyed\n";
 }
 
-QMdiSubWindow* MainWindow::newSubWindow(QWidget* widget)
+void MainWindow::closeEvent(QCloseEvent*)
 {
-    QMdiSubWindow* subwnd = m_mdiArea->addSubWindow(widget);
-    //if (dynamic_cast<SubWindow*>(widget))
-    //{
-    //  std::cerr << "SubWindow\n";
-    //  connect(widget,SIGNAL(setMdiTitle(const QString&)),subwnd,SLOT(setWindowTitle(const QString&)));
-    //  subwnd->setWindowTitle(dynamic_cast<SubWindow*>(widget)->title());
-    //}
-    //else
-    //  std::cerr << "Not SubWindow\n";
-    subwnd->resize(300,200);
-    subwnd->show();
-    return subwnd;
+  API::Framework::instance().unRegisterSingleton("WindowManager",false);
+}
+
+QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)
+{
+  QtAPI::SubWindow* subwnd = new QtAPI::SubWindow(this);
+  subwnd->setWidget(widget);
+  m_mdiArea->addSubWindow(subwnd);
+  subwnd->resize(300,200);
+  subwnd->show();
+  return subwnd;
 }
 
 void MainWindow::createMenus()

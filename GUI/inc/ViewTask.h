@@ -15,8 +15,10 @@ class ViewTask: public QtAPI::Task
 public:
   ViewTask();
   virtual Type type() const{return Background;}
+  virtual QMenu* menu(QtAPI::SubWindow* w = nullptr) const{return m_menu;}
   void setMainWindow(MainWindow* wnd);
 private:
+  QMenu* m_menu;
   MainWindow* m_mainWindow;
 };
 

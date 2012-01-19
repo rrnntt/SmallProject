@@ -17,10 +17,12 @@ class QTAPI_EXPORT FileTask: public Task
 public:
   FileTask();
   virtual Type type() const{return Background;}
+  virtual QMenu* menu(SubWindow* w = nullptr) const{return m_menu;}
 private slots:
   void newTable();
   void loadAsciiTable();
 private:
+  QMenu* m_menu;
   QAction *m_newTable;
   QAction *m_loadAsciiTable;
 };

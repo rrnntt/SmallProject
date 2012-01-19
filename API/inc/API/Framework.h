@@ -17,6 +17,7 @@ public:
   ~Framework();
   static Framework& instance();
   void registerSingleton(const std::string& name, Singleton* singleton);
+  void unRegisterSingleton(const std::string& name, bool del = true);
   Singleton* getSingleton(const std::string& name);
   void parseCommandLine(int argc, char** argv);
   const std::string binDirectory() const;

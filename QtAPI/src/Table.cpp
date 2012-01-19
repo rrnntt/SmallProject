@@ -171,6 +171,17 @@ void Table::execMenu(QMenu* menu)
   menu->exec(QCursor::pos());
 }
 
+void Table::saveAscii()
+{
+  qobject_cast<TableModel*>(model())->saveAscii();
+}
+
+void Table::showTableDialog()
+{
+  qobject_cast<TableModel*>(model())->showTableDialog();
+}
+
+
 /* --- TableModel --- */
 
 TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):

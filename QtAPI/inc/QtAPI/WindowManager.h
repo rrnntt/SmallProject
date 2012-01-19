@@ -5,6 +5,8 @@
 #include "QtAPI/SubWindow.h"
 #include "API/Singleton.h"
 
+class QMenuBar;
+
 namespace QtAPI
 {
 
@@ -17,6 +19,7 @@ public:
   static WindowManager& instance();
   static void createWindowManager(WindowManager* manager);
   virtual SubWindow* newSubWindow(QWidget* widget) = 0;
+  virtual void customMenuBar(QMenuBar*, SubWindow* wnd) const;
 };
 
 } // namespace QtAPI

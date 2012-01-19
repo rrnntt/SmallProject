@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "QtAPI/WindowManager.h"
 #include <QtGUI/QMainWindow>
 
 class AlgorithmExplorer;
@@ -18,15 +19,16 @@ namespace osg
 /**
 * The main application window
 */
-class MainWindow: public QMainWindow
+class MainWindow: public QMainWindow, public QtAPI::WindowManager
 {
   Q_OBJECT
 public:
   MainWindow();
   ~MainWindow();
-  QMdiSubWindow* newSubWindow(QWidget* widget);
+  QtAPI::SubWindow* newSubWindow(QWidget* widget);
 protected:
   void createMenus();
+  void closeEvent(QCloseEvent*);
 protected slots:
   void openOSGWindow();
   void openOSGFile();

@@ -21,12 +21,14 @@ public:
   Table(DataObjects::TableWorkspace_ptr ws,QWidget* parent = NULL);
 signals:
   void showMenu(QMenu*);
-protected slots:
+public slots:
   void insertRow();
   void removeRows();
   void insertColumn();
   void removeSelectedColumns();
   void execMenu(QMenu* menu);
+  void saveAscii();
+  void showTableDialog();
 protected:
   void	contextMenuEvent( QContextMenuEvent* e );
   bool eventFilter(QObject* watched, QEvent* e);
