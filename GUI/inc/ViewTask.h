@@ -1,19 +1,23 @@
-#ifndef VIEWTASK_H
-#define VIEWTASK_H
+#ifndef GUI_VIEWTASK_H
+#define GUI_VIEWTASK_H
 
-#include "Task.h"
+#include "QtAPI/Task.h"
+
 #include <QtCore/QObject>
 #include <QtGui/QMenu>
 #include <QtGui/QAction>
 
-class ViewTask: public Task
+class MainWindow;
+
+class ViewTask: public QtAPI::Task
 {
   Q_OBJECT
 public:
   ViewTask();
   virtual Type type() const{return Background;}
   void setMainWindow(MainWindow* wnd);
-private slots:
+private:
+  MainWindow* m_mainWindow;
 };
 
-#endif /*VIEWTASK_H*/
+#endif /*GUI_VIEWTASK_H*/

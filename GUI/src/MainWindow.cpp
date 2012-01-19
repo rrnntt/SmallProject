@@ -1,11 +1,11 @@
 #include "MainWindow.h"
 //#include "Modeling/OSGWidget.h"
-#include "FileTask.h"
 #include "ViewTask.h"
-#include "TaskManager.h"
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
 
+#include "QtAPI/FileTask.h"
+#include "QtAPI/TaskManager.h"
 #include "QtAPI/SubWindow.h"
 
 #include <QtGui/QMdiArea>
@@ -64,15 +64,13 @@ QMdiSubWindow* MainWindow::newSubWindow(QWidget* widget)
 void MainWindow::createMenus()
  {
    // File menu
-   FileTask* fileTask = new FileTask();
-   fileTask->setMainWindow(this);
-   TaskManager::instance().add("FileTask",fileTask);
+   QtAPI::Task_ptr fileTask = QtAPI::TaskManager::instance().retrieve("FileTask");
    menuBar()->addMenu(fileTask->menu());
 
    // View menu
    ViewTask* viewTask = new ViewTask();
    viewTask->setMainWindow(this);
-   TaskManager::instance().add("ViewTask",viewTask);
+   QtAPI::TaskManager::instance().add("ViewTask",viewTask);
    menuBar()->addMenu(viewTask->menu());
 
    // ----------------- stuff to be delt with later --------------------------------

@@ -2,10 +2,12 @@
 //  Local includes
 //----------------------------
 #include "ViewTask.h"
-#include "TaskFactory.h"
 #include "MainWindow.h"
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
+
+#include "QtAPI/TaskFactory.h"
+#include "QtAPI/WindowManager.h"
 
 //----------------------------
 //  Other project includes
@@ -30,7 +32,7 @@ ViewTask::ViewTask()
 
 void ViewTask::setMainWindow(MainWindow* wnd)
 {
-  Task::setMainWindow(wnd);
+  m_mainWindow = wnd;
   m_menu->addAction(m_mainWindow->m_algorithmExplorer->toggleViewAction());
   m_menu->addAction(m_mainWindow->m_workspaceExplorer->toggleViewAction());
 }

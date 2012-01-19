@@ -160,6 +160,9 @@ source_file.write(source)
 source_file.close()
 
 if has_namespace:
-	test_file = open(test_path,'w')
-	test_file.write(test)
-	test_file.close()
+	try:
+		test_file = open(test_path,'w')
+		test_file.write(test)
+		test_file.close()
+	except:
+		pass
