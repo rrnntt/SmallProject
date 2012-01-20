@@ -30,6 +30,7 @@ protected:
   void createMenus();
   void closeEvent(QCloseEvent*);
 protected slots:
+  void subWindowBecameActive(QtAPI::SubWindow*);
   void openOSGWindow();
   void openOSGFile();
 private:

@@ -55,6 +55,7 @@ void MainWindow::closeEvent(QCloseEvent*)
 QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)
 {
   QtAPI::SubWindow* subwnd = new QtAPI::SubWindow(this);
+  connect(subwnd,SIGNAL(subWindowBecameActive(QtAPI::SubWindow*)),this,SLOT(subWindowBecameActive(QtAPI::SubWindow*)));
   subwnd->setWidget(widget);
   m_mdiArea->addSubWindow(subwnd);
   subwnd->resize(300,200);
@@ -85,6 +86,11 @@ void MainWindow::createMenus()
    //connect(m_openOSGFile,SIGNAL(triggered()),this,SLOT(openOSGFile()));
    //addMenu->addAction(m_openOSGFile);
    // -------------------------------------------------------------------------------
+}
+
+void MainWindow::subWindowBecameActive(QtAPI::SubWindow* w)
+{
+  std::cerr << "Activated " << w->windowTitle().toStdString() << std::endl;
 }
 
 

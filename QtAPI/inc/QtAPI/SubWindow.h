@@ -16,6 +16,10 @@ class QTAPI_EXPORT SubWindow: public QMdiSubWindow
 public:
   SubWindow(QWidget *parent = NULL):QMdiSubWindow(parent){}
   virtual QMenu* makeContext() const {return nullptr;}
+signals:
+  void subWindowBecameActive(QtAPI::SubWindow* w);
+protected:
+  bool SubWindow::event(QEvent * e);
 };
 
 } // QtAPI
