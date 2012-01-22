@@ -2,36 +2,59 @@
 #define GOBLIN_OBJECT_H
 
 #include "Goblin/DllExport.h"
+#include "Goblin/cmd.h"
 
 namespace Goblin
 {
 
-  struct cmd_res
-  {
-    bool ok;
-    bool _repaint;
-    cmd_res(bool OK = false):ok(OK),_repaint(false){}
-    void repaint(bool yes){_repaint = yes;}
-  };
+#include <string>
+#include <map>
 
-  struct fun_res
-  {
-    bool ok;
-    fun_res(bool OK):ok(OK){}
-  };
+#ifdef GRAPHICS
+#include "graphics.h"
+#include "graph_stuff.h"
+#endif
 
-  struct rgb
-  {
-    char r,g,b;
-    rgb(char a1,char a2, char a3):r(a1),g(a2),b(a3){}
-  };
 
-class GOBLIN_EXPORT object
-{
+using namespace std;
+
+class gdata;
+
+class  object{
+  bool focused_;
 public:
-  object();
-  ~object(){}
+  gdata* owner;
+  string name;
+  string type;
+  map<string,bool> cnames;
+  string fname,ext;
+  bool wr_;
+  object():focused_(),owner(0),wr_(false){ext="txt";}
+  bool focused(){return focused_;}
+  void focused(bool c){focused_ = c;}
+  bool write(){return wr_;}
+  void write(bool wr){wr_ = wr;}
+  bool cname(string str){return cnames.find(str) != cnames.end();}
+  cmd_res send(string m,bool all=false);
+  bool save(){if (write()) return this->save(fname);}
+  virtual cmd_res cmd(string);
+  virtual fun_res fun(string){return fun_res();}
+  virtual bool load(string fn){return false;}
+  virtual bool save(string fn){return false;}
+  virtual cmd_res message(object* s,string m){return cmd_res(false);}
+
+#ifdef GRAPHICS
+  void show(string str);
+  void hide(string str);
+  virtual bool draw(canvas&){return true;}
+  virtual cmd_res mouseClick(canvas* c,int x,int y,int shft=0){return cmd_res(false);}
+  virtual cmd_res mouseDoubleClick(canvas* c,int x,int y,int shft=0){return cmd_res(false);}
+  virtual cmd_res keyPress(keyboard,int){return cmd_res(false);}
+#endif
 };
+
+bool operator<(const object& o1,const object& o2);
+
 
 } // namespace Goblin
 

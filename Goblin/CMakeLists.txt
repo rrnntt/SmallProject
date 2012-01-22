@@ -4,6 +4,7 @@
 
 set( INC_FILES 
    inc/Goblin/mio.h
+   inc/Goblin/cmd.h
    inc/Goblin/object.h
    inc/Goblin/DllExport.h
    inc/Goblin/comdiff.h
@@ -22,6 +23,7 @@ set( INC_FILES
    #inc/Goblin/spectrum.h
    inc/Goblin/splist.h
    #inc/Goblin/text.h
+   inc/Goblin/utils.h
    inc/Goblin/vjkg.h
    #inc/Goblin/voigt.h
    )
@@ -45,6 +47,7 @@ set( SRC_FILES
   src/splist.cpp
   #src/splist_gfit.cpp
   #src/text.cpp
+  src/utils.cpp
   src/vjkg.cpp
   #src/voigt.cpp
   )

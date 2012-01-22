@@ -14,7 +14,7 @@ class KERNEL_EXPORT Logger
 {
 public:
   static Logger& get(const std::string& name);
-  template<class T> std::ostream& operator<<(const T& out);
+  template<class T> Logger& operator<<(const T& out);
   void debug(const std::string&);
   void error(const std::string&);
   void information(const std::string&);
@@ -27,10 +27,10 @@ private:
 };
 
 template<class T>
-std::ostream& Logger::operator<<(const T& out)
+Logger& Logger::operator<<(const T& out)
 {
   std::cerr << id() << out;
-  return std::cerr;
+  return *this;
 }
 
 } // Kernel

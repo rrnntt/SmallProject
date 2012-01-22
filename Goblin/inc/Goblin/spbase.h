@@ -22,7 +22,7 @@ class filter;
 
 class GOBLIN_EXPORT spbase : public dbase,public object  {
 protected:
-  rgb color;
+  //rgb color;
   string out_type,in_type;
   string xfield,yfield;
   int line_style; //  0 - no lines, 1 - solid line

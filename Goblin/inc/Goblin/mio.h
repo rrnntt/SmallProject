@@ -3,22 +3,15 @@
 
 #include "Goblin/DllExport.h"
 
-#include <iostream>
+namespace Kernel
+{
+  class Logger;
+}
 
 namespace Goblin
 {
 
-class GOBLIN_EXPORT Mio
-{
-public:
-  template<typename T>
-  Mio& operator<<(const T& d)
-  {
-    std::cerr << d;
-  }
-};
-
-extern Mio mio;
+extern Kernel::Logger mio;
 
 } // namespace Goblin
 #endif // GOBLIN_MIO_H

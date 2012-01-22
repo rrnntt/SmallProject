@@ -1,9 +1,11 @@
 #include <sstream>
 #include <fstream>
 #include "Goblin/spbase.h"
-//#include "../Troll1/utils.h"
+#include "Goblin/utils.h"
 #include "Goblin/mio.h"
 //#include "../Troll1/gdata.h"
+
+#include <algorithm>
 
 namespace Goblin
 {
@@ -51,7 +53,8 @@ void assign_vjkg_member(void *q,const string mbr,const string val){
   };
 }
 
-spbase::spbase():object(),color(0,0,255){
+spbase::spbase():object()   //,color(0,0,255)
+{
   if (!created){
     db_field_type_register::register_type("vjkg",allocate_field<VJKG>,assign_vjkg_member,print_field<VJKG>);
     created = true;
@@ -542,7 +545,7 @@ void spbase::copy(spbase& sp,filter *flt){
     };
   };
   params = sp.params;
-  fname = owner->dir()+"copy_of_"+sp.name+'.'+sp.ext;
+  fname = /*owner->dir()+*/"copy_of_"+sp.name+'.'+sp.ext;
 
 }
 
