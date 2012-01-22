@@ -2,15 +2,14 @@
 #define SPECTRUM_H
 
 #include "Goblin/DllExport.h"
-#include "spline.h"
+#include "Goblin/spline.h"
 #include "Goblin/exp_cond.h"
 #include "Goblin/ifun.h"
 
 #include <valarray>
 #include <string>
-#include "../Troll1/object.h"
-#include "../Troll1/graphics.h"
-#include "../Troll1/utils.h"
+#include "Goblin/object.h"
+#include "Goblin/utils.h"
 
 namespace Goblin
 {
@@ -32,7 +31,7 @@ class GOBLIN_EXPORT spectrum:public object {
   float fft_rr0,fft_ir0;
   bool wr_dat;
 public:
-  rgb color_,im_color_;
+  //rgb color_,im_color_;
   double cp1_w,cp1_dw,cp2_w,cp2_dw;
   enum spectrum_type {unknown,absorbance,transmittance,emission};
   enum input_type {in_spectrum,in_bline};
@@ -90,13 +89,13 @@ public:
   fun_res fun(string str);
   bool loadGremlin(const string fn);
   bool loadASCII(const string fn);
-  bool draw(canvas& c);
-  void draw(graphics& g,rgb color = rgb(1,0,0),bool im=false);
-  void drawRes(graphics& g,spectrum& sp,rgb color = rgb(255,0,0));
-  void drawRes(graphics& g,rgb color = rgb(255,0,0));
-  cmd_res mouseClick(canvas* c,int x,int y,int shft=0);
-  void color(rgb col){color_=col;}
-  void icolor(rgb col){im_color_=col;}
+//  bool draw(canvas& c);
+//  void draw(graphics& g,rgb color = rgb(1,0,0),bool im=false);
+//  void drawRes(graphics& g,spectrum& sp,rgb color = rgb(255,0,0));
+//  void drawRes(graphics& g,rgb color = rgb(255,0,0));
+//  cmd_res mouseClick(canvas* c,int x,int y,int shft=0);
+//  void color(rgb col){color_=col;}
+//  void icolor(rgb col){im_color_=col;}
 
   float hmin(){return hminimum;}
   void set_hmin(float h){hminimum = h;}

@@ -4,32 +4,25 @@
 #include "Goblin/DllExport.h"
 #include "Goblin/cmd.h"
 
+#include <string>
+#include <map>
+#include <vector>
+
 namespace Goblin
 {
 
-#include <string>
-#include <map>
-
-#ifdef GRAPHICS
-#include "graphics.h"
-#include "graph_stuff.h"
-#endif
-
-
 using namespace std;
 
-class gdata;
-
-class  object{
+class GOBLIN_EXPORT object{
   bool focused_;
 public:
-  gdata* owner;
+  //gdata* owner;
   string name;
   string type;
   map<string,bool> cnames;
   string fname,ext;
   bool wr_;
-  object():focused_(),owner(0),wr_(false){ext="txt";}
+  object():focused_(),wr_(false){ext="txt";}
   bool focused(){return focused_;}
   void focused(bool c){focused_ = c;}
   bool write(){return wr_;}
@@ -43,17 +36,63 @@ public:
   virtual bool save(string fn){return false;}
   virtual cmd_res message(object* s,string m){return cmd_res(false);}
 
-#ifdef GRAPHICS
-  void show(string str);
-  void hide(string str);
-  virtual bool draw(canvas&){return true;}
-  virtual cmd_res mouseClick(canvas* c,int x,int y,int shft=0){return cmd_res(false);}
-  virtual cmd_res mouseDoubleClick(canvas* c,int x,int y,int shft=0){return cmd_res(false);}
-  virtual cmd_res keyPress(keyboard,int){return cmd_res(false);}
-#endif
+//#ifdef GRAPHICS
+//  void show(string str);
+//  void hide(string str);
+//  virtual bool draw(canvas&){return true;}
+//  virtual cmd_res mouseClick(canvas* c,int x,int y,int shft=0){return cmd_res(false);}
+//  virtual cmd_res mouseDoubleClick(canvas* c,int x,int y,int shft=0){return cmd_res(false);}
+//  virtual cmd_res keyPress(keyboard,int){return cmd_res(false);}
+//#endif
 };
 
 bool operator<(const object& o1,const object& o2);
+
+template <class T>
+class obj_list{
+public:
+  vector<T*> data;
+  object* o;
+  string type;
+  obj_list(gdata* gd,string ttype){
+    type = ttype;
+    for(size_t i=0;i<gd->obj.size();i++){
+      o = gd->obj[i];
+      if (o->type == type) data.push_back((T*)(o));
+    };
+  }
+  size_t size(){return data.size();}
+  T& operator[](size_t i){return *data[i];}
+  T* operator()(size_t i){return data[i];}
+  T* operator()(string nam){
+    size_t i = nam.find(':');
+    string nnam;
+    if (i == string::npos) nnam = nam;
+    else{
+      string typ = nam.substr(0,i);
+      nnam = nam.substr(i+1);
+//      mio<<typ<<' '<<nnam<<'\n';
+      if (typ != type) return 0;
+    };
+    for(size_t i=0;i<size();i++)
+    if (data[i]->name == nnam) return data[i];
+    return 0;
+  }
+  bool has(T* t){
+     for(size_t i=0;i<data.size();i++) if (data[i]==t) return true;
+     return false;
+  }
+};
+
+  template<class T>
+  T* newObject(string type,string name,string ext){
+    object* o = (object*) new T;
+    if (!o){
+      mio<<"Error creating "<<type<<'\n';
+      return 0;
+    };
+    o->ext = ext;
+  };
 
 
 } // namespace Goblin

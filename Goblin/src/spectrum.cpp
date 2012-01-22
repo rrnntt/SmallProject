@@ -1,14 +1,16 @@
-#include "spectrum.h"
+#include "Goblin/spectrum.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <stdio.h>
 #include <math.h>
-#include "lineparams.h"
-#include "ifun.h"
-#include "matrix.h"
-#include "../Troll1/gdata.h" 
-#include "../Troll1/mio.h" 
+#include "Goblin/lineparams.h"
+#include "Goblin/ifun.h"
+#include "Goblin/matrix.h"
+#include "Goblin/mio.h"
+
+namespace Goblin
+{
 
 spectrum::spectrum():object(){
   wstart_ = wstop_ = 0.;
@@ -129,19 +131,19 @@ cmd_res spectrum::cmd(string str){
     return ok;
   };
   
-  if (com=="new_plot"){
-    string nam;
-    istr>>nam;
-    owner->cmd("plot.new graph spec spec spec."+nam);
-    ostringstream ostr;
-    canvas* c = owner->plt.foc_canv();
-    if (!c || c->type != "graph") return bad;
-    graphics& g = *(graphics*)c;
-    ostr<<"plot."<<nam<<".uv "<<g.uMin()<<' '<<g.uMax()<<' '<<g.vMin()<<' '<<g.vMax();
-    owner->cmd(ostr.str());
-    owner->cmd("plot.focus "+nam);
-    return repaint;
-  };
+//  if (com=="new_plot"){
+//    string nam;
+//    istr>>nam;
+//    owner->cmd("plot.new graph spec spec spec."+nam);
+//    ostringstream ostr;
+//    canvas* c = owner->plt.foc_canv();
+//    if (!c || c->type != "graph") return bad;
+//    graphics& g = *(graphics*)c;
+//    ostr<<"plot."<<nam<<".uv "<<g.uMin()<<' '<<g.uMax()<<' '<<g.vMin()<<' '<<g.vMax();
+//    owner->cmd(ostr.str());
+//    owner->cmd("plot.focus "+nam);
+//    return repaint;
+//  };
 
   if (com=="color"){
     int r,g,b;
@@ -1097,126 +1099,127 @@ bool spectrum::loadGremlin(const string fn){
   return true;
 }
 
-bool spectrum::draw(canvas& c){ 
-  if (c.type == "graph" && c.out_type == "def"){
-    if (iscomplex()) draw(*(graphics*)(&c),im_color_,true);
-    draw(*(graphics*)(&c),color_);
-    if (bline.cname(c.name)) bline.draw(c);
-  };
-  return true;
-}
 
-void spectrum::draw(graphics& g,rgb color,bool im){
-  g.clip_clientRect();
-  size_t i0 = index(g.uMin());
-  size_t i1 = index(g.uMax());
+//bool spectrum::draw(canvas& c){
+//  if (c.type == "graph" && c.out_type == "def"){
+//    if (iscomplex()) draw(*(graphics*)(&c),im_color_,true);
+//    draw(*(graphics*)(&c),color_);
+//    if (bline.cname(c.name)) bline.draw(c);
+//  };
+//  return true;
+//}
 
-  if (i0 >= nop()-1) return;
-  if (i1 <= 0) return;
-  if (i0 < 0) i0 = 0;
-  if (i1 >= nop()) i1 = nop()-1;
-  if (i0 > 0) --i0;
-  if (i1 < nop()-1) ++i1;
-  valarray<float> *ar;
+//void spectrum::draw(graphics& g,rgb color,bool im){
+//  g.clip_clientRect();
+//  size_t i0 = index(g.uMin());
+//  size_t i1 = index(g.uMax());
 
-  if (im) ar = &ir_;
-  else
-    ar = &r;
+//  if (i0 >= nop()-1) return;
+//  if (i1 <= 0) return;
+//  if (i0 < 0) i0 = 0;
+//  if (i1 >= nop()) i1 = nop()-1;
+//  if (i0 > 0) --i0;
+//  if (i1 < nop()-1) ++i1;
+//  valarray<float> *ar;
 
-  size_t dn = (i1 - i0)/g.width();
-  if (  dn < 10 ) {
-     g.pen(color);
-     g.moveTo(g.X(w(i0)),g.Y(r[i0]));
-     for(size_t i=i0;i<=i1;i++) {
-       g.lineTo(g.X(w(i)),g.Y(double((*ar)[i])));
-     };
-  }else{
-     float hmin,hmax;
-     size_t i00;
-     int j0,j1;
-     j0 = (wstart() <= g.uMin())?0:int( (wstart()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
-     j1 = (wstop() >= g.uMax())?g.width():int( (wstop()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
-     if (j1 <= j0) return;
-     dn = (i1 - i0)/(j1-j0);
+//  if (im) ar = &ir_;
+//  else
+//    ar = &r;
 
-     int iy1,iy2;
-     g.pen(color);
-     for(int j=j0;j<j1;j++){
-       hmin=1e32; hmax=-1e32;
-       i00 =i0 + (i1 - i0)*(j-j0)/(j1-j0);
-       for(size_t i=i00;i<=i00+dn;i++) {
-         if ((*ar)[i] < hmin) hmin = (*ar)[i];
-         if ((*ar)[i] > hmax) hmax = (*ar)[i];
-       };
-       //mio<<hmin<<' '<<hmax<<'\n';
-       iy1 = g.Y(double(hmin));
-       iy2 = g.Y(double(hmax));
-       if (iy1 == iy2) iy2++;
-       g.moveTo(j,iy1);
-       g.lineTo(j,iy2);
-     };
-  };
+//  size_t dn = (i1 - i0)/g.width();
+//  if (  dn < 10 ) {
+//     g.pen(color);
+//     g.moveTo(g.X(w(i0)),g.Y(r[i0]));
+//     for(size_t i=i0;i<=i1;i++) {
+//       g.lineTo(g.X(w(i)),g.Y(double((*ar)[i])));
+//     };
+//  }else{
+//     float hmin,hmax;
+//     size_t i00;
+//     int j0,j1;
+//     j0 = (wstart() <= g.uMin())?0:int( (wstart()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
+//     j1 = (wstop() >= g.uMax())?g.width():int( (wstop()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
+//     if (j1 <= j0) return;
+//     dn = (i1 - i0)/(j1-j0);
 
-}
+//     int iy1,iy2;
+//     g.pen(color);
+//     for(int j=j0;j<j1;j++){
+//       hmin=1e32; hmax=-1e32;
+//       i00 =i0 + (i1 - i0)*(j-j0)/(j1-j0);
+//       for(size_t i=i00;i<=i00+dn;i++) {
+//         if ((*ar)[i] < hmin) hmin = (*ar)[i];
+//         if ((*ar)[i] > hmax) hmax = (*ar)[i];
+//       };
+//       //mio<<hmin<<' '<<hmax<<'\n';
+//       iy1 = g.Y(double(hmin));
+//       iy2 = g.Y(double(hmax));
+//       if (iy1 == iy2) iy2++;
+//       g.moveTo(j,iy1);
+//       g.lineTo(j,iy2);
+//     };
+//  };
 
-void spectrum::drawRes(graphics& g,spectrum& sp,rgb color){
-/*  if ( wstart() != sp.wstart() || wstop() != sp.wstop() || nop() != sp.nop() ) return;
-  size_t i0 = index(g.uMin());
-  size_t i1 = index(g.uMax());
-  if (i0 >= nop()-1) return;
-  if (i1 <= 0) return;
-  if (i0 < 0) i0 = 0;
-  if (i1 >= nop()) i1 = nop()-1;
-  if (i0 > 0) --i0;
-  if (i1 < nop()-1) ++i1;
+//}
 
-  float h,h0=0;
-  size_t dn = (i1 - i0)/g.width();
-  if (  dn < 10 ) {
-     shape& s = g.addShape(shape::MLINE);
-     s.color = color;
-     s.moveTo(g.X(w(i0)),g.Y(r[i0]));
-     for(size_t i=i0;i<=i1;i++) {
-//       h = sp.r[si0+i] - r[i0+i];
-       h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i))+(1.-exp(-sp.r[i]+r[i]))*exp(-r[i]));
-       //h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i)) + (sp.r[i] - r[i])/(exp(r[i])-1.));
-       if (fabs(h) > sp.hmax()) h /= sp.hmax();
-       h0 = h;
-       s.lineTo(g.X(w(i)),g.Y(double(h)));
-     };
-  }else{
-     float hhmin,hhmax;
-     size_t i00,si;
-     int j0,j1,sj0,sj1,sdn;
-     j0 = (wstart() <= g.uMin())?0:int( (wstart()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
-     j1 = (wstop() >= g.uMax())?g.width():int( (wstop()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
-     if (j1 <= j0) return;
-     dn = (i1 - i0)/(j1-j0);
+//void spectrum::drawRes(graphics& g,spectrum& sp,rgb color){
+///*  if ( wstart() != sp.wstart() || wstop() != sp.wstop() || nop() != sp.nop() ) return;
+//  size_t i0 = index(g.uMin());
+//  size_t i1 = index(g.uMax());
+//  if (i0 >= nop()-1) return;
+//  if (i1 <= 0) return;
+//  if (i0 < 0) i0 = 0;
+//  if (i1 >= nop()) i1 = nop()-1;
+//  if (i0 > 0) --i0;
+//  if (i1 < nop()-1) ++i1;
 
-     shape& s = g.addShape(shape::LINES);
-     s.color = color;
-     for(int j=j0;j<j1;j++){
-       hhmin=1e32; hhmax=-1e32;
-       i00 =i0+(i1 - i0)*(j-j0)/(j1-j0);
-       for(size_t i=i00;i<=i00+dn;i++) {
-         h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i))+(1.-exp(-sp.r[i]+r[i]))*exp(-r[i]));
-         //h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i)) + (sp.r[i] - r[i])/(exp(r[i])-1.));
-         if (fabs(h) > sp.hmax()) h /= sp.hmax();
-         h0 = h;
-         if (h < hhmin) hhmin = h;
-         if (h > hhmax) hhmax = h;
-       };
-       s.moveTo(j,g.Y(double(hhmin)));
-       s.lineTo(j,g.Y(double(hhmax)));
-     };
-  };
-*/
-}
+//  float h,h0=0;
+//  size_t dn = (i1 - i0)/g.width();
+//  if (  dn < 10 ) {
+//     shape& s = g.addShape(shape::MLINE);
+//     s.color = color;
+//     s.moveTo(g.X(w(i0)),g.Y(r[i0]));
+//     for(size_t i=i0;i<=i1;i++) {
+////       h = sp.r[si0+i] - r[i0+i];
+//       h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i))+(1.-exp(-sp.r[i]+r[i]))*exp(-r[i]));
+//       //h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i)) + (sp.r[i] - r[i])/(exp(r[i])-1.));
+//       if (fabs(h) > sp.hmax()) h /= sp.hmax();
+//       h0 = h;
+//       s.lineTo(g.X(w(i)),g.Y(double(h)));
+//     };
+//  }else{
+//     float hhmin,hhmax;
+//     size_t i00,si;
+//     int j0,j1,sj0,sj1,sdn;
+//     j0 = (wstart() <= g.uMin())?0:int( (wstart()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
+//     j1 = (wstop() >= g.uMax())?g.width():int( (wstop()-g.uMin())/(g.uMax()-g.uMin())*g.width() );
+//     if (j1 <= j0) return;
+//     dn = (i1 - i0)/(j1-j0);
+
+//     shape& s = g.addShape(shape::LINES);
+//     s.color = color;
+//     for(int j=j0;j<j1;j++){
+//       hhmin=1e32; hhmax=-1e32;
+//       i00 =i0+(i1 - i0)*(j-j0)/(j1-j0);
+//       for(size_t i=i00;i<=i00+dn;i++) {
+//         h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i))+(1.-exp(-sp.r[i]+r[i]))*exp(-r[i]));
+//         //h = (sp.r[i]<=sp.hmax())?(sp.bline(w(i)) + sp.r[i] - r[i]):(sp.bline(w(i)) + (sp.r[i] - r[i])/(exp(r[i])-1.));
+//         if (fabs(h) > sp.hmax()) h /= sp.hmax();
+//         h0 = h;
+//         if (h < hhmin) hhmin = h;
+//         if (h > hhmax) hhmax = h;
+//       };
+//       s.moveTo(j,g.Y(double(hhmin)));
+//       s.lineTo(j,g.Y(double(hhmax)));
+//     };
+//  };
+//*/
+//}
 
 
-void spectrum::drawRes(graphics& g,rgb color){
-  if (exp_sp) drawRes(g,*exp_sp,color);
-}
+//void spectrum::drawRes(graphics& g,rgb color){
+//  if (exp_sp) drawRes(g,*exp_sp,color);
+//}
 
 bool spectrum::save(){
   mio<<"Calling :save "<<fname<<' '<<write()<<'\n';
@@ -2183,18 +2186,18 @@ void spectrum::addMix(string c){
   };
 };
 
-cmd_res spectrum::mouseClick(canvas* c,int x,int y,int shft){
-  cmd_res ok,bad(false),repaint;
-  repaint.repaint(true);
-  if (c->type != "graph") return bad;
-  graphics& g = *(graphics*)c;
-  cmd_res res;
-  if (in_type() == in_bline) {
-    res = bline.mouseClick(c,x,y,shft);
-    if (res.repaint()) send("bl_ch",true);
-    return res;
-  };
-  return ok;
-}
+//cmd_res spectrum::mouseClick(canvas* c,int x,int y,int shft){
+//  cmd_res ok,bad(false),repaint;
+//  repaint.repaint(true);
+//  if (c->type != "graph") return bad;
+//  graphics& g = *(graphics*)c;
+//  cmd_res res;
+//  if (in_type() == in_bline) {
+//    res = bline.mouseClick(c,x,y,shft);
+//    if (res.repaint()) send("bl_ch",true);
+//    return res;
+//  };
+//  return ok;
+//}
 
-
+} // Goblin

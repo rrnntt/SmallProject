@@ -6,19 +6,19 @@
 #include <algorithm>
 #include <iomanip>
 
-#include "../Troll1/def.h"
-#ifdef GRAPHICS
-#include "lineparams.h"
-#endif
-#include "splist.h"
-#include "enlist.h"
-#include "matrix.h"
-#include "../Troll1/mio.h"
-#include "../Troll1/gdata.h"
+#include "Goblin/lineparams.h"
+#include "Goblin/splist.h"
+#include "Goblin/enlist.h"
+#include "Goblin/matrix.h"
+#include "Goblin//mio.h"
+//#include "../Troll1/gdata.h"
+
+namespace Goblin
+{
+
 using namespace std;
 
 splist::splist(){
-#ifdef GRAPHICS
   lp = new lineparams;
   style = FROM_ZERO;
   q_p = 0;
@@ -34,16 +34,10 @@ splist::splist(){
   noise_ = true;
   fit_vis = false;
   mouse_add_line = false;
-#else
-  line_ = 0;
-  height_ = 0;
-#endif
   cd.sp = this;
 }
 splist::~splist(){
-#ifdef GRAPHICS
   delete lp;
-#endif
 }
 
 bool splist::load(string fn){
@@ -58,11 +52,9 @@ bool splist::load(string fn){
     for(size_t i=1;i<lin->size();i++)
       if ((*lin)[i] == 0.) (*lin)[i] = (*lin)[i-1];
   };
-#ifndef GRAPHICS
   line_ = lin;
   height_ = getDouble("height");
   if (!height_) height_ = getDouble("intens");
-#endif
   return true;
 }
 
@@ -70,9 +62,7 @@ bool splist::load(string fn){
 string splist::print(size_t i){
   if (i>=size()) return "";
   ostringstream ostr;
-#ifdef GRAPHICS
   ostr << lparams().print(i);
-#endif
   if (q_p) ostr<<' '<<q(i);
   if (q0_p) ostr<<" - "<<q0(i);
   return ostr.str();
@@ -80,7 +70,6 @@ string splist::print(size_t i){
 
 void splist::apply_params(){
   string value;
-#ifdef GRAPHICS
   setParamType(params["par"]);
   exp_cond.T(atof(params["temper"].c_str()));
   exp_cond.L(atof(params["length"].c_str()));
@@ -120,7 +109,6 @@ void splist::apply_params(){
     for(size_t j=0;j<exp_cond.niso(i);j++)
       mio<<"Iso["<<j<<"]="<<exp_cond.Iso(i,j)<<'\n';
   };
-#endif
 }
 
 
@@ -130,14 +118,12 @@ bool splist::save(){
 }
 
 bool splist::save(string fn){
-#ifdef GRAPHICS
   switch(style){
     case FROM_ZERO: params["style"] = "zero"; break;
     case FROM_TOP: params["style"] = "top"; break;
     case WHOLE: params["style"] = "whole"; break;
     case NONE: params["style"] = "no"; break;
   };
-#endif
   vector<int> *f = 0;
   if (flt() && flt_enabled()) f = flt_;
   dbase::saveToFile(fn.c_str(),f);
@@ -698,7 +684,6 @@ cmd_res splist::cmd(string str){
     return ok;
   };
 
-#ifdef GRAPHICS
   if (com=="hitran"){
     string fn;
     istr >> fn;
@@ -856,8 +841,6 @@ cmd_res splist::cmd(string str){
     return repaint;
   };
   
-#endif
-
   if (com=="idist"){
     int is;
     string vv,fn;
@@ -1995,9 +1978,7 @@ cmd_res splist::cmd(string str){
 
   if (com == "sort") {
      sort();
-#ifdef GRAPHICS
      renew();
-#endif
      return repaint;
   };
 
@@ -2016,7 +1997,6 @@ cmd_res splist::cmd(string str){
      if (pcll && follow) pcll->setCurr(con());
      return repaint;
   };
-#ifdef GRAPHICS
   if (com == "add") {
      double w,h;
      size_t is;
@@ -2027,14 +2007,12 @@ cmd_res splist::cmd(string str){
      //llists[nl].renew();
      return 1;
   };
-#else
   if (com == "add") {
      double w,h;
      istr >> w >> h;
      addLine(w,h);
      return repaint;
   };
-#endif
   if (com == "delete") {
      size_t i;
      istr >> i;
@@ -2347,9 +2325,7 @@ cmd_res splist::message(object* s,string m){
 
 void splist::copy(splist& ll){
   spbase::copy(ll);
-#ifdef GRAPHICS
   setParamType(params["par"]);
-#endif
 }
 
 double splist::QS(double w, double h,double w1, double h1){
@@ -2629,27 +2605,15 @@ bool splist::connectedTo(splist& ll){
 }
 
 double splist::line(size_t i){
-#ifdef GRAPHICS
   return lparams().line(i);
-#else
-  return line_?(*line_)[i]:0.;
-#endif
 }
 
 double splist::height(size_t i){
-#ifdef GRAPHICS
   return lparams().height(i);
-#else
-  return height_?(*height_)[i]:0.;
-#endif
 }
 
 void splist::height(size_t i,double h){
-#ifdef GRAPHICS
   lparams().set_height(i,h);
-#else
-  if (height_) (*height_)[i] = h;
-#endif
 }
 
 bool splist::assignment(){
@@ -2859,11 +2823,7 @@ fun_res splist::fun(string str){
   return spbase::fun(str);			      
 }
 
-#ifdef GRAPHICS
 int splist::addLine(double w,double h,spectrum *sp){
-#else
-int splist::addLine(double w,double h){
-#endif
   size_t j = size();
   for(size_t i=0;i<size();i++)
      if (w < line(i)) {
@@ -2874,10 +2834,8 @@ int splist::addLine(double w,double h){
   else
     insertRow(j);
   setCurr(j);
-#ifdef GRAPHICS
   lparams().new_line(j,w,h,sp);
   renew(j,j);
-#endif
   return j;
 }
 
@@ -2888,9 +2846,7 @@ void splist::deleteLine(size_t i){
   if (j < size()){
     height(j,height(j) + height(i));
   };
-#ifdef GRAPHICS
   erase(i,i);
-#endif
   eraseRow(i);
 }
 
@@ -2898,7 +2854,6 @@ void splist::deleteLine(size_t i){
 
 //     --------------------------   GRAPHICS  --------------------------------
 
-#ifdef GRAPHICS
 
 splist* splist::getConnected(){
   string conn_name = params["connect"];
@@ -4013,5 +3968,5 @@ cmd_res splist::mouseDoubleClick(canvas* c,int x,int y,int shft){
   return repaint;
 }
 
+} // Goblin
 
-#endif

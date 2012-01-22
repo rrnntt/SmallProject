@@ -3,8 +3,4 @@
 namespace Goblin
 {
 
-object::object()
-{
-}
-
 } // namespace Goblin

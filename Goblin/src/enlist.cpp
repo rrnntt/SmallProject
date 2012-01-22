@@ -1,11 +1,11 @@
 #include "Goblin/enlist.h"
+#include "Goblin/mio.h"
 
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <algorithm>
 #include <map>
-//#include "../Troll1/mio.h"
 //#include "../Troll1/gdata.h"
 
 namespace Goblin
@@ -574,43 +574,43 @@ void enlist::cmp_q(enlist& en,int Jmax){
 }
 
 
-bool enlist::draw(canvas& c){
-  if (c.type == "graph" && c.out_type == "def"){
-   graphics& g = *(graphics*)(&c);
-   g.clip_clientRect();
-   g.pen(color);
-   if (out_type == "qk"){
-     if (!ener_p || !q_p) return false;
-     double x,y;
-     int xx,yy,p2=pnt_size/2;
-     for(size_t i=0;i<size();i++){
-        if (!allowed(i)) continue;
-        x = q(i).k;
-        y = ener(i);
-        xx = g.X(x);
-        yy = g.Y(y);
-        if (x > g.uMin() && x < g.uMax() && y > g.vMin() && y < g.vMax())
-          g.drawRect(rect(xx-p2,yy-p2,pnt_size,pnt_size));
-     };
-     return true;
-   };
-   if (out_type == "qj"){
-     if (!ener_p || !q_p) return false;
-     double x,y;
-     int xx,yy,p2=pnt_size/2;
-     for(size_t i=0;i<size();i++){
-        if (!allowed(i)) continue;
-        x = q(i).j;
-        y = ener(i);
-        xx = g.X(x);
-        yy = g.Y(y);
-        if (x > g.uMin() && x < g.uMax() && y > g.vMin() && y < g.vMax())
-          g.drawRect(rect(xx-p2,yy-p2,pnt_size,pnt_size));
-     };
-     return true;
-   };
-  };
-  return spbase::draw(c);
-}
+//bool enlist::draw(canvas& c){
+//  if (c.type == "graph" && c.out_type == "def"){
+//   graphics& g = *(graphics*)(&c);
+//   g.clip_clientRect();
+//   g.pen(color);
+//   if (out_type == "qk"){
+//     if (!ener_p || !q_p) return false;
+//     double x,y;
+//     int xx,yy,p2=pnt_size/2;
+//     for(size_t i=0;i<size();i++){
+//        if (!allowed(i)) continue;
+//        x = q(i).k;
+//        y = ener(i);
+//        xx = g.X(x);
+//        yy = g.Y(y);
+//        if (x > g.uMin() && x < g.uMax() && y > g.vMin() && y < g.vMax())
+//          g.drawRect(rect(xx-p2,yy-p2,pnt_size,pnt_size));
+//     };
+//     return true;
+//   };
+//   if (out_type == "qj"){
+//     if (!ener_p || !q_p) return false;
+//     double x,y;
+//     int xx,yy,p2=pnt_size/2;
+//     for(size_t i=0;i<size();i++){
+//        if (!allowed(i)) continue;
+//        x = q(i).j;
+//        y = ener(i);
+//        xx = g.X(x);
+//        yy = g.Y(y);
+//        if (x > g.uMin() && x < g.uMax() && y > g.vMin() && y < g.vMax())
+//          g.drawRect(rect(xx-p2,yy-p2,pnt_size,pnt_size));
+//     };
+//     return true;
+//   };
+//  };
+//  return spbase::draw(c);
+//}
 
 } // Goblin

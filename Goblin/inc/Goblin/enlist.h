@@ -34,7 +34,7 @@ public:
   void diff(enlist& en);
   void table(enlist& en,string fn_and_states);
   void cmp_q(enlist& en,int Jmax=100);
-  bool draw(canvas& c);
+//  bool draw(canvas& c);
 //  cmd_res mouseClick(canvas* c,int x,int y,int shft=0);
 //  cmd_res mouseDoubleClick(canvas* c,int x,int y,int shft=0);
 };

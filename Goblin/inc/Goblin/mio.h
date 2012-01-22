@@ -2,11 +2,7 @@
 #define GOBLIN_MIO_H
 
 #include "Goblin/DllExport.h"
-
-namespace Kernel
-{
-  class Logger;
-}
+#include "Kernel/Logger.h"
 
 namespace Goblin
 {

@@ -2,6 +2,7 @@
 #include "Goblin/splist.h"
 #include "Goblin/comdiff.h"
 #include "Goblin/mio.h"
+#include "Kernel/Logger.h"
 
 #include <iostream>
 #include <iomanip>
@@ -38,6 +39,7 @@ using namespace std;
 ostream& operator << (ostream& ostr,const comdiff& cd){
   size_t ie,il;
   mio <<cd.q<<' ';
+  //mio.operator<<(cd.q);
   mio <<cd.e0<<'\n';
   mio <<"---------"<<cd.found.size()<<"-----------"<<'\n';
   for(size_t i=0;i<cd.found.size();i++){

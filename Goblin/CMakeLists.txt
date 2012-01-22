@@ -15,12 +15,13 @@ set( INC_FILES
    #inc/Goblin/exp_cond.h
    #inc/Goblin/humlicek.h
    #inc/Goblin/ifun.h
-   #inc/Goblin/lineparams.h
+   inc/Goblin/lineparams.h
    #inc/Goblin/matrix.h
    #inc/Goblin/mLDs.h
    #inc/Goblin/ospline.h
+   inc/Goblin/spline.h
    inc/Goblin/spbase.h
-   #inc/Goblin/spectrum.h
+   inc/Goblin/spectrum.h
    inc/Goblin/splist.h
    #inc/Goblin/text.h
    inc/Goblin/utils.h
@@ -38,12 +39,13 @@ set( SRC_FILES
   #src/exp_cond.cpp
   #src/humlicek.cpp
   #src/ifun.cpp
-  #src/lineparams.cpp
+  src/lineparams.cpp
   #src/matrix.cpp
   #src/mLDs.cpp
   #src/ospline.cpp
+  src/spline.cpp
   src/spbase.cpp
-  #src/spectrum.cpp
+  src/spectrum.cpp
   src/splist.cpp
   #src/splist_gfit.cpp
   #src/text.cpp

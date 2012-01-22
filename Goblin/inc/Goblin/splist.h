@@ -3,25 +3,20 @@
 
 #include "Goblin/DllExport.h"
 
-#include "../Troll2/def.h"
+//#include "../Troll2/def.h"
 #include "Goblin/spbase.h"
 #include "Goblin/d_container.h"
 #include "Goblin/comdiff.h"
 #include "Goblin/exp_cond.h"
-
-#ifdef GRAPHICS
-#include "../Troll2/graphics.h"
-//#include "spectrum.h"
-#endif
+#include "Goblin/spectrum.h"
+#include "Goblin/spline.h"
 
 namespace Goblin
 {
 
 using namespace std;
 
-#ifdef GRAPHICS
 class lineparams;
-#endif
 class enlist;
 
 struct set4efit_data{
@@ -39,7 +34,6 @@ struct blend_struct{
 
 class GOBLIN_EXPORT splist : public spbase  {
   vector<string> names;
-#ifdef GRAPHICS
   vector<double*> p; // pointers to fitting parameters
   vector<double> p0; // parameter values before fit
   vector<double> dp;
@@ -53,7 +47,6 @@ class GOBLIN_EXPORT splist : public spbase  {
   int fit_i1,fit_i2;
   size_t ny,np,ns,npe,npi; // size of data vector
   bool noise_;
-#endif
 public:
   VJKG bad_q;
   vector<VJKG> *q_p;
@@ -69,16 +62,14 @@ public:
   //----------------//
   Exp_cond exp_cond;
   comdiff cd;
-#ifdef GRAPHICS
-  rgb cur_color;
+  lineparams *lp;
+  //rgb cur_color;
   typedef data_container<spectrum>::iterator s_iter;
   data_container<spectrum> spectra;
   enum STYLE {FROM_ZERO, FROM_TOP, WHOLE, NONE};
   STYLE style;
-  lineparams *lp;
   bool fit_vis;
   bool mouse_add_line;
-#endif
   splist();
   ~splist();
   bool load(string fn);
@@ -110,7 +101,7 @@ public:
   void connect_q0(splist& ll,string ll_hei);
   double QS(double w, double hh,double w1, double hh1);
   void disconnect();
-  bool connected(){return cnnct;}
+  bool connected(){return cnnct != nullptr;}
   bool connectedTo(splist& ll);
   splist* getConnected();
   int con(size_t i){return i<size()?(*cnnct)[i]:-1;}
@@ -149,7 +140,7 @@ public:
   double fit_reg(size_t i1,size_t i2,bool out=true);
   void unfit();
   bool noise_f(){return noise_;}
-  bool noise_f(bool nf){noise_ = nf;}
+  void noise_f(bool nf){noise_ = nf;}
   double fitq(double h1,double h2,enlist* pen=0);
   void efit(enlist& en,vector<int>& ind,bool int_fit=false,bool out=true);
   void set4efit(int jp,set4efit_data& dt);

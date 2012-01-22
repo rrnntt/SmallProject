@@ -53,12 +53,12 @@ public:
   virtual void init_line(size_t i,spectrum* sp=0){}
   virtual double value(size_t i,double ww){return 0;}
 
-  virtual double line(size_t i,spectrum *sp=0){return i*0.;};
-  virtual double height(size_t i,spectrum *sp=0){return i*0.;};
+  virtual double line(size_t i,spectrum *sp=0){return i*0.;}
+  virtual double height(size_t i,spectrum *sp=0){return i*0.;}
   virtual void new_line(size_t i,double xx,double yy,spectrum *sp=0){}
   virtual void set_line(size_t i,double xx,spectrum *sp=0){}
   virtual void set_height(size_t i,double xx,spectrum *sp=0){}
-  virtual string print(size_t i){return string("line");};
+  virtual string print(size_t i){return string("line");}
   virtual void set_default(string s,double val);
   virtual double& par(size_t i,size_t j){return bad_par;}
   virtual double dp(size_t i,size_t j){return 0.00001;}

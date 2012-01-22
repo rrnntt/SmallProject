@@ -2,10 +2,13 @@
 #include <math.h>
 #include <cctype>
 #include "lineparams.h"
-#include "humlicek.h"
-#include "mLDs.h"
-#include "../Troll1/mio.h"
+#include "Goblin/humlicek.h"
+#include "Goblin/mLDs.h"
+#include "Goblin/mio.h"
 //#include "ftlines.h"
+
+namespace Goblin
+{
 
 lineparams *new_lineparams(string s,splist& spl){
   string ss;
@@ -1270,3 +1273,4 @@ cmd_res lineparams_grau::cmd(string str){
   return false;
 }
 
+} // Goblin

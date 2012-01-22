@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include <ostream>
 #include <sstream>
 #include <valarray>
 #include <vector>
@@ -48,7 +49,6 @@ public:
   void deassign();
 };
 
-ostream& operator << (ostream& ostr,const VJKG& q);
 ostream& operator << (ostream& ostr,const vibq& v);
 //ostringstream& operator << (ostringstream& ostr,const VJKG& q);
 bool operator==(const VJKG& q1,const VJKG& q2);
@@ -97,6 +97,8 @@ public:
 bool operator<(const VJKG& q1,const VJKG& q2);
 
 } // Goblin
+
+std::ostream& operator << (std::ostream& ostr,const Goblin::VJKG& q);
 
 #endif // GOBLIN_VJKG_H
 
