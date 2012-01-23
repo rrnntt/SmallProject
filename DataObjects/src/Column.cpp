@@ -57,4 +57,10 @@ bool Column::isNumeric() const
   return dynamic_cast<const NumericColumn*>(this) != NULL;
 }
 
+/// If this column is numeric returs a cast pointer to NumericColumn, therwise nullptr
+NumericColumn* Column::asNumeric()
+{
+  return dynamic_cast<NumericColumn*>(this);
+}
+
 } // DataObjects

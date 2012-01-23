@@ -6,6 +6,7 @@
 set( INC_FILES 
    inc/DataObjects/DllExport.h
    inc/DataObjects/Column.h
+   inc/DataObjects/ColumnVector.h
    inc/DataObjects/NumericColumn.h
    inc/DataObjects/ColumnFactory.h
    inc/DataObjects/StringColumn.h
@@ -18,6 +19,7 @@ set( INC_FILES
    )
 set( SRC_FILES 
    src/Column.cpp
+   src/ColumnVector.cpp
    src/NumericColumn.cpp
    src/ColumnFactory.cpp
    src/StringColumn.cpp

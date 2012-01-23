@@ -4,15 +4,16 @@
 #include <algorithm>
 #include <map>
 
-#include "../Troll1/def.h"
-#ifdef GRAPHICS
-#include "lineparams.h"
-#endif
-#include "splist.h"
-#include "enlist.h"
-#include "matrix.h"
-#include "../Troll1/mio.h"
-#include "../Troll1/gdata.h"
+#include "Goblin/lineparams.h"
+#include "Goblin/splist.h"
+#include "Goblin/enlist.h"
+#include "Goblin/matrix.h"
+#include "Goblin/mio.h"
+#include "Goblin/gdata.h"
+
+namespace Goblin
+{
+
 using namespace std;
 
 double splist::fitq(double h1,double h2,enlist* pen){
@@ -57,12 +58,12 @@ void splist::efit(enlist& en,vector<int>& ind,bool int_fit,bool out){
     mio<<"There is no spectra to fit to\n";
     return;
   };
-  if (fit_vis){
-     for(size_t i=0;i<spectra.size();i++){
-         spectra[i].fit = spectra[i].cname(owner->plt.focname)?true:false;
-         if (out) mio<<owner->plt.focname<<' '<<spectra[i].cname(owner->plt.focname)<<'\n';
-     };
-  };
+  //if (fit_vis){
+  //   for(size_t i=0;i<spectra.size();i++){
+  //       spectra[i].fit = spectra[i].cname(owner->plt.focname)?true:false;
+  //       if (out) mio<<owner->plt.focname<<' '<<spectra[i].cname(owner->plt.focname)<<'\n';
+  //   };
+  //};
 
   if (out) {
     mio<<"eFitting"<<'\n';
@@ -774,3 +775,4 @@ void splist::prep_q4efit(enlist& en,VJKG& qq,bool info){
       mio<<"Cannot fit\n";
 }
 
+} // Goblin

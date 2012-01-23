@@ -1,17 +1,18 @@
 #include <malloc.h>
 
-#include <fstream>
-#include <valarray>
-#include <stdlib.h>
-#include <algorithm>
-#include <iomanip>
-
 #include "Goblin/lineparams.h"
 #include "Goblin/splist.h"
 #include "Goblin/enlist.h"
 #include "Goblin/matrix.h"
 #include "Goblin//mio.h"
-//#include "../Troll1/gdata.h"
+#include "Goblin/gdata.h"
+
+#include <fstream>
+#include <sstream>
+#include <valarray>
+#include <stdlib.h>
+#include <algorithm>
+#include <iomanip>
 
 namespace Goblin
 {
@@ -29,8 +30,8 @@ splist::splist(){
   find_max = 50;
   follow = true;
   fit_i1 = fit_i2 = 0;
-  color = rgb(0,0,255);
-  cur_color = rgb(255,0,0);
+  //color = rgb(0,0,255);
+  //cur_color = rgb(255,0,0);
   noise_ = true;
   fit_vis = false;
   mouse_add_line = false;
@@ -719,18 +720,18 @@ cmd_res splist::cmd(string str){
     };
     return ok;
   };
-  if (com=="color"){
-    int r,g,b;
-    istr>>r>>g>>b;
-    color = rgb(r,g,b);
-    return repaint;
-  };
-  if (com=="cur_color"){
-    int r,g,b;
-    istr>>r>>g>>b;
-    cur_color = rgb(r,g,b);
-    return repaint;
-  };
+  //if (com=="color"){
+  //  int r,g,b;
+  //  istr>>r>>g>>b;
+  //  color = rgb(r,g,b);
+  //  return repaint;
+  //};
+  //if (com=="cur_color"){
+  //  int r,g,b;
+  //  istr>>r>>g>>b;
+  //  cur_color = rgb(r,g,b);
+  //  return repaint;
+  //};
   if (com=="errors"){
     lparams().error(true);
     return ok;
@@ -756,90 +757,91 @@ cmd_res splist::cmd(string str){
     return repaint;
   };
   
-  if (com=="keypress"){
-    int key;
-    string in_type;
-    char sh;
-    istr>>key>>in_type>>sh;
-    string inp;
-    bool inp_ok;
-    double pp;
-    if (in_type == "def"){
-      switch (key){
-        case key_A: mouse_add_line = true; return repaint;
-        case key_C: return (sh!='s')?cmd("d ch"):cmd("c intf");
-        case key_F: fit(curr(),curr()); return repaint;
-        case key_E: return cmd("fit_vis");
-        case key_K: return cmd("nextl");
-        case key_J: return cmd("prevl");
-        case key_R: return cmd("renew");
-        case key_Q: return cmd("fq efit");
-        case key_I: return cmd("fq_info efit");
-        case key_T: return (sh == 's')?cmd("setue"):bad;
-        case key_Y: return (sh == 's')?cmd("setui"):bad;
-        case key_W: return (sh == 's')?cmd("tag"):cmd("tag w");
-        case key_D: return cmd("tag b");
-        case key_S: return cmd("tag s");
-        case key_Tab: return cmd("next");
-        case key_Slash: return cmd("center");
-        case key_Delete: if (mio.confirm("Do you really want to delete this line?")){
-                            deleteLine(curr()); return repaint;
-                         }else return ok;
-        case key_0:   
-        case key_1:   
-        case key_2:   
-        case key_3:   
-        case key_4:   
-        case key_5:   
-        case key_6:   
-        case key_7:   
-        case key_8:   
-        case key_9:   if (sh == 's'){
-                         ostringstream ostr;
-                         ostr<<"d goto "<<key-key_0;
-                         return cmd(ostr.str());
-                      }else return bad;
-        case key_F1:   
-        case key_F2:   
-        case key_F3:   
-        case key_F4:   
-        case key_F5:   
-        case key_F6:   
-        case key_F7:   
-        case key_F8:   
-        case key_F9:   if (sh == 's'){
-                          inp = mio.in(&inp_ok);
-                          if (inp_ok) {
-                             pp = atof(inp.c_str());
-                             lparams().par(curr(),key-key_F1) = pp;
-                             renew();
-                          };
-                       }else{
-                          lparams().fixed(curr(),key-key_F1)?          
-                          lparams().unfix(curr(),key-key_F1):
-                          lparams().fix(curr(),key-key_F1);
-                        };
-                         return repaint;
-      };
-      return bad;
-    };
-    return bad;
-  };
+  //if (com=="keypress"){
+  //  int key;
+  //  string in_type;
+  //  char sh;
+  //  istr>>key>>in_type>>sh;
+  //  string inp;
+  //  bool inp_ok;
+  //  double pp;
+  //  if (in_type == "def"){
+  //    switch (key){
+  //      case key_A: mouse_add_line = true; return repaint;
+  //      case key_C: return (sh!='s')?cmd("d ch"):cmd("c intf");
+  //      case key_F: fit(curr(),curr()); return repaint;
+  //      case key_E: return cmd("fit_vis");
+  //      case key_K: return cmd("nextl");
+  //      case key_J: return cmd("prevl");
+  //      case key_R: return cmd("renew");
+  //      case key_Q: return cmd("fq efit");
+  //      case key_I: return cmd("fq_info efit");
+  //      case key_T: return (sh == 's')?cmd("setue"):bad;
+  //      case key_Y: return (sh == 's')?cmd("setui"):bad;
+  //      case key_W: return (sh == 's')?cmd("tag"):cmd("tag w");
+  //      case key_D: return cmd("tag b");
+  //      case key_S: return cmd("tag s");
+  //      case key_Tab: return cmd("next");
+  //      case key_Slash: return cmd("center");
+  //      case key_Delete: if (mio.confirm("Do you really want to delete this line?")){
+  //                          deleteLine(curr()); return repaint;
+  //                       }else return ok;
+  //      case key_0:   
+  //      case key_1:   
+  //      case key_2:   
+  //      case key_3:   
+  //      case key_4:   
+  //      case key_5:   
+  //      case key_6:   
+  //      case key_7:   
+  //      case key_8:   
+  //      case key_9:   if (sh == 's'){
+  //                       ostringstream ostr;
+  //                       ostr<<"d goto "<<key-key_0;
+  //                       return cmd(ostr.str());
+  //                    }else return bad;
+  //      case key_F1:   
+  //      case key_F2:   
+  //      case key_F3:   
+  //      case key_F4:   
+  //      case key_F5:   
+  //      case key_F6:   
+  //      case key_F7:   
+  //      case key_F8:   
+  //      case key_F9:   if (sh == 's'){
+  //                        inp = mio.in(&inp_ok);
+  //                        if (inp_ok) {
+  //                           pp = atof(inp.c_str());
+  //                           lparams().par(curr(),key-key_F1) = pp;
+  //                           renew();
+  //                        };
+  //                     }else{
+  //                        lparams().fixed(curr(),key-key_F1)?          
+  //                        lparams().unfix(curr(),key-key_F1):
+  //                        lparams().fix(curr(),key-key_F1);
+  //                      };
+  //                       return repaint;
+  //    };
+  //    return bad;
+  //  };
+  //  return bad;
+  //};
+
   
-  if (com == "center"){
-    if (!cname(owner->plt.focname)) return bad;
-    double u0,u1,v0,v1,u;
-    canvas* c = owner->plt.cans[owner->plt.focname];
-    if (c->type != "graph") return bad;
-    graphics& g = *(graphics*)c;
-    u = line();
-    u0 = u - (g.uMax() - g.uMin())/2;
-    u1 = u + (g.uMax() - g.uMin())/2;
-    v0 = g.vMin();
-    v1 = g.vMax();
-    g.resize_uv(u0,u1,v0,v1);
-    return repaint;
-  };
+  //if (com == "center"){
+  //  if (!cname(owner->plt.focname)) return bad;
+  //  double u0,u1,v0,v1,u;
+  //  canvas* c = owner->plt.cans[owner->plt.focname];
+  //  if (c->type != "graph") return bad;
+  //  graphics& g = *(graphics*)c;
+  //  u = line();
+  //  u0 = u - (g.uMax() - g.uMin())/2;
+  //  u1 = u + (g.uMax() - g.uMin())/2;
+  //  v0 = g.vMin();
+  //  v1 = g.vMax();
+  //  g.resize_uv(u0,u1,v0,v1);
+  //  return repaint;
+  //};
   
   if (com=="idist"){
     int is;
@@ -2235,8 +2237,8 @@ cmd_res splist::cmd(string str){
        if (!setSpectrum(spname)) return bad;
      spectrum *s = &spectra[spectra.size()-1];
      if (!what.empty()) s->cmd("show "+what);
-     s->color(rgb(0,255,0));
-     s->icolor(rgb(255,0,255));
+     //s->color(rgb(0,255,0));
+     //s->icolor(rgb(255,0,255));
      return repaint;
   };
 
@@ -2863,106 +2865,106 @@ splist* splist::getConnected(){
   return 0;
 }
 
-bool splist::draw(canvas& c){
-  if (c.type == "graph"){
-   graphics& g = *(graphics*)(&c);
-   g.clip_clientRect();
-   double w,h;
-   size_t i0=0,i1=0;
-   for(size_t i=0;i<size();i++) {
-     w = line(i);
-     h = height(i);
-     ++i1;
-     if ( w < g.uMin() ) {
-       ++i0;
-       continue;
-     };
-     g.pen(color);
-     if ( w > g.uMax() ) break;
-     if (!allowed(i)) continue;
-     switch (style){
-       case FROM_ZERO: {
-               g.moveTo( g.X(w),g.Y(0.) );
-               g.lineTo( g.X(w),g.Y(h) );
-               break;
-             };
-       case FROM_TOP: {
-               if (h > g.vMax()) h = g.vMax()-(g.vMax()-g.vMin())/10;
-               g.moveTo( g.X(w),g.Y(g.vMax()) );
-               g.lineTo( g.X(w),g.Y(h) );
-               break;
-             };
-       case WHOLE: {
-               g.moveTo( g.X(w),g.Y(g.vMax()) );
-               g.lineTo( g.X(w),g.Y(g.vMin()) );
-               break;
-             };
-     };
-   };
-   i1 -= 2;
-
-   if ( g.has_focus() ){
-     if ( curr() < i0 ) setCurr(i0);
-     if ( curr() > i1 ) setCurr(i1);
-   };
-   w = lparams().line(curr());
-   h = lparams().height(curr());
-
-   g.pen(cur_color);
-     switch (style){
-       case FROM_ZERO: {
-               g.moveTo( g.X(w),g.Y(0.) );
-               g.lineTo( g.X(w),g.Y(h) );
-               g.moveTo( g.X(w),g.Y(g.vMax()) );
-               g.lineTo( g.X(w),g.Y(h)-5 );
-               break;
-             };
-       case NONE:
-       case FROM_TOP: {
-               if (h > g.vMax()) h = g.vMax()-(g.vMax()-g.vMin())/10;
-               g.moveTo( g.X(w),g.Y(g.vMax()) );
-               g.lineTo( g.X(w),g.Y(h) );
-               break;
-             };
-       case WHOLE: {
-               g.moveTo( g.X(w),g.Y(g.vMax()) );
-               g.lineTo( g.X(w),g.Y(g.vMin()) );
-               break;
-             };
-     };
-     for(size_t i=0;i<spectra.size();i++){
-        if (spectra[i].cname(g.name)){
-          spectra[i].draw(*(canvas*)&g);
-        };
-     };
-   if (focused()){// print line parameters and assignment
-     if (mouse_add_line){
-       g.pen(rgb(255,0,0));
-       g.text(5,0,"Add line");
-     };
-     g.clip(rect(0,g.client_height(),g.client_width(),g.client_height()+30));
-     ostringstream ostr;
-     ostr<<lparams().print(curr());
-     if (assigned()){
-        ostr<<' '<<q(curr())<<" - "<<q0(curr());
-     };
-     g.text(100,g.client_height(),ostr.str());
-     if (connected()){
-       splist* cll = getConnected();
-       if (cll && con()>=0) {
-         ostringstream ostr1;
-         ostr1<<cll->lparams().print(con());
-         if (cll->assigned()){
-            ostr1<<' '<<cll->q(con())<<" - "<<cll->q0(con());
-         };
-         g.text(100,g.client_height()+10,ostr1.str());
-       };
-     };
-   };
-   return true;
-  };
-  return spbase::draw(c);
-}
+//bool splist::draw(canvas& c){
+//  if (c.type == "graph"){
+//   graphics& g = *(graphics*)(&c);
+//   g.clip_clientRect();
+//   double w,h;
+//   size_t i0=0,i1=0;
+//   for(size_t i=0;i<size();i++) {
+//     w = line(i);
+//     h = height(i);
+//     ++i1;
+//     if ( w < g.uMin() ) {
+//       ++i0;
+//       continue;
+//     };
+//     g.pen(color);
+//     if ( w > g.uMax() ) break;
+//     if (!allowed(i)) continue;
+//     switch (style){
+//       case FROM_ZERO: {
+//               g.moveTo( g.X(w),g.Y(0.) );
+//               g.lineTo( g.X(w),g.Y(h) );
+//               break;
+//             };
+//       case FROM_TOP: {
+//               if (h > g.vMax()) h = g.vMax()-(g.vMax()-g.vMin())/10;
+//               g.moveTo( g.X(w),g.Y(g.vMax()) );
+//               g.lineTo( g.X(w),g.Y(h) );
+//               break;
+//             };
+//       case WHOLE: {
+//               g.moveTo( g.X(w),g.Y(g.vMax()) );
+//               g.lineTo( g.X(w),g.Y(g.vMin()) );
+//               break;
+//             };
+//     };
+//   };
+//   i1 -= 2;
+//
+//   if ( g.has_focus() ){
+//     if ( curr() < i0 ) setCurr(i0);
+//     if ( curr() > i1 ) setCurr(i1);
+//   };
+//   w = lparams().line(curr());
+//   h = lparams().height(curr());
+//
+//   g.pen(cur_color);
+//     switch (style){
+//       case FROM_ZERO: {
+//               g.moveTo( g.X(w),g.Y(0.) );
+//               g.lineTo( g.X(w),g.Y(h) );
+//               g.moveTo( g.X(w),g.Y(g.vMax()) );
+//               g.lineTo( g.X(w),g.Y(h)-5 );
+//               break;
+//             };
+//       case NONE:
+//       case FROM_TOP: {
+//               if (h > g.vMax()) h = g.vMax()-(g.vMax()-g.vMin())/10;
+//               g.moveTo( g.X(w),g.Y(g.vMax()) );
+//               g.lineTo( g.X(w),g.Y(h) );
+//               break;
+//             };
+//       case WHOLE: {
+//               g.moveTo( g.X(w),g.Y(g.vMax()) );
+//               g.lineTo( g.X(w),g.Y(g.vMin()) );
+//               break;
+//             };
+//     };
+//     for(size_t i=0;i<spectra.size();i++){
+//        if (spectra[i].cname(g.name)){
+//          spectra[i].draw(*(canvas*)&g);
+//        };
+//     };
+//   if (focused()){// print line parameters and assignment
+//     if (mouse_add_line){
+//       g.pen(rgb(255,0,0));
+//       g.text(5,0,"Add line");
+//     };
+//     g.clip(rect(0,g.client_height(),g.client_width(),g.client_height()+30));
+//     ostringstream ostr;
+//     ostr<<lparams().print(curr());
+//     if (assigned()){
+//        ostr<<' '<<q(curr())<<" - "<<q0(curr());
+//     };
+//     g.text(100,g.client_height(),ostr.str());
+//     if (connected()){
+//       splist* cll = getConnected();
+//       if (cll && con()>=0) {
+//         ostringstream ostr1;
+//         ostr1<<cll->lparams().print(con());
+//         if (cll->assigned()){
+//            ostr1<<' '<<cll->q(con())<<" - "<<cll->q0(con());
+//         };
+//         g.text(100,g.client_height()+10,ostr1.str());
+//       };
+//     };
+//   };
+//   return true;
+//  };
+//  return spbase::draw(c);
+//}
 void splist::setParamType(string s){
   lineparams *new_lp = new_lineparams(s,*this);
   if (new_lp) {
@@ -3026,7 +3028,7 @@ void splist::renew(){
       s = &spectra[is];
       if (!s->calcLines(lparams(),s->exp_sp)) continue;
       if (s->nop() != s->exp_sp->nop()){
-        mio.err("Error","Calculated and experimental("+s->exp_sp->name+
+        mio.error("Calculated and experimental("+s->exp_sp->name+
                 ") spectra have different sizes!");
       }else{
         s->complex();
@@ -3064,12 +3066,12 @@ double splist::fit(size_t i1,size_t i2,bool out){
   calc.clear();
   bl.clear();
   if (!spectra.size()) return 0.;
-  if (fit_vis){
-     for(size_t i=0;i<spectra.size();i++){
-         spectra[i].fit = spectra[i].cname(owner->plt.focname)?true:false;
-         mio<<owner->plt.focname<<' '<<spectra[i].cname(owner->plt.focname)<<'\n';
-     };
-  };
+  //if (fit_vis){
+  //   for(size_t i=0;i<spectra.size();i++){
+  //       spectra[i].fit = spectra[i].cname(owner->plt.focname)?true:false;
+  //       mio<<owner->plt.focname<<' '<<spectra[i].cname(owner->plt.focname)<<'\n';
+  //   };
+  //};
 
   if (out) {
     mio<<"Fitting lines "<<i1<<" - "<<i2<<'\n';
@@ -3928,45 +3930,45 @@ void splist::unfit(){
     renew();
 }
 
-cmd_res splist::mouseClick(canvas* c,int x,int y,int shft){
-  cmd_res bad(false),repaint,ok;
-  repaint.repaint(true);
-  if (c->type != "graph") return bad;
-  graphics& g = *(graphics*)c;
-  double w = g.U(x);
-  double h = g.V(y);
-  if (mouse_add_line){
-    mouse_add_line = false;
-    for(size_t i=0;i<spectra.size();i++)
-      if (spectra[i].cname(owner->plt.focname)) {
-        ostringstream ostr;
-        ostr<<"add ";
-        ostr.precision(12);
-        ostr<<w<<' '<<h<<' '<<i;
-        return cmd(ostr.str());
-      };
-    addLine(w,h);
-    return repaint;
-  };
-  return ok;
-}
-
-cmd_res splist::mouseDoubleClick(canvas* c,int x,int y,int shft){
-  cmd_res bad(false),repaint;
-  repaint.repaint(true);
-  if (c->type != "graph") return bad;
-  graphics& g = *(graphics*)c;
-  double w = g.U(x);
-  size_t j = curr();
-  for(size_t i=0;i<size();i++){
-    if (line(i) < w) continue;
-    j = i;
-    if (j && fabs(line(j-1)-w) < fabs(line(j)-w)) j--;
-    setCurr(j);
-    break;
-  };
-  return repaint;
-}
+//cmd_res splist::mouseClick(canvas* c,int x,int y,int shft){
+//  cmd_res bad(false),repaint,ok;
+//  repaint.repaint(true);
+//  if (c->type != "graph") return bad;
+//  graphics& g = *(graphics*)c;
+//  double w = g.U(x);
+//  double h = g.V(y);
+//  if (mouse_add_line){
+//    mouse_add_line = false;
+//    for(size_t i=0;i<spectra.size();i++)
+//      if (spectra[i].cname(owner->plt.focname)) {
+//        ostringstream ostr;
+//        ostr<<"add ";
+//        ostr.precision(12);
+//        ostr<<w<<' '<<h<<' '<<i;
+//        return cmd(ostr.str());
+//      };
+//    addLine(w,h);
+//    return repaint;
+//  };
+//  return ok;
+//}
+//
+//cmd_res splist::mouseDoubleClick(canvas* c,int x,int y,int shft){
+//  cmd_res bad(false),repaint;
+//  repaint.repaint(true);
+//  if (c->type != "graph") return bad;
+//  graphics& g = *(graphics*)c;
+//  double w = g.U(x);
+//  size_t j = curr();
+//  for(size_t i=0;i<size();i++){
+//    if (line(i) < w) continue;
+//    j = i;
+//    if (j && fabs(line(j-1)-w) < fabs(line(j)-w)) j--;
+//    setCurr(j);
+//    break;
+//  };
+//  return repaint;
+//}
 
 } // Goblin
 

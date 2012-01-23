@@ -51,9 +51,7 @@ public:
   VJKG bad_q;
   vector<VJKG> *q_p;
   vector<VJKG> *q0_p;
-#ifndef GRAPHICS
   vector<double> *line_, *height_;
-#endif
   //--- connect ----//
   vector<int> *cnnct;
   double find_dw,find_eh;
@@ -116,11 +114,7 @@ public:
   void assign(size_t i,string str);
   bool isblend(size_t i,double h=1.,blend_struct *b=0);
   void line_error(string e0f,double h=1.);
-#ifdef GRAPHICS
   int addLine(double w,double h,spectrum *sp=0);
-#else
-  int addLine(double w,double h);
-#endif
   void deleteLine(size_t i);
 #ifdef GRAPHICS
   bool draw(canvas& c);

@@ -1,5 +1,9 @@
 #include <math.h>
-#include "matrix.h"
+#include "Goblin/matrix.h"
+
+namespace Goblin
+{
+
 using namespace std;
 
 ostream& operator << (ostream& ostr,const matrix& m){
@@ -741,3 +745,4 @@ ostream& operator << (ostream& ostr,const matr_show& m){
   return ostr;
 };
 
+} // Goblin

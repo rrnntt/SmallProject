@@ -349,7 +349,7 @@ void dbase::apply_params(){
 void dbase::clear(){
   for(size_t j=0;j<fields.size();j++) fields[j]->clear();
 }
-/** devides typnam into type and name of a field */
+/** divides typnam into type and name of a field */
 void dbase::type_name(const string typnam,string& typ,string& nam){
   string str = typnam;
   if (str[0] == '%') str.erase(0,1);

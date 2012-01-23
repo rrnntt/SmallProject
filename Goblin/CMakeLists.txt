@@ -12,12 +12,13 @@ set( INC_FILES
    inc/Goblin/d_container.h
    #inc/Goblin/effham.h
    inc/Goblin/enlist.h
-   #inc/Goblin/exp_cond.h
-   #inc/Goblin/humlicek.h
-   #inc/Goblin/ifun.h
+   inc/Goblin/exp_cond.h
+   inc/Goblin/gdata.h
+   inc/Goblin/humlicek.h
+   inc/Goblin/ifun.h
    inc/Goblin/lineparams.h
-   #inc/Goblin/matrix.h
-   #inc/Goblin/mLDs.h
+   inc/Goblin/matrix.h
+   inc/Goblin/mLDs.h
    #inc/Goblin/ospline.h
    inc/Goblin/spline.h
    inc/Goblin/spbase.h
@@ -26,7 +27,7 @@ set( INC_FILES
    #inc/Goblin/text.h
    inc/Goblin/utils.h
    inc/Goblin/vjkg.h
-   #inc/Goblin/voigt.h
+   inc/Goblin/voigt.h
    )
 set( SRC_FILES 
   src/mio.cpp
@@ -36,34 +37,35 @@ set( SRC_FILES
   src/dbase.cpp
   #src/effham.cpp
   src/enlist.cpp
-  #src/exp_cond.cpp
-  #src/humlicek.cpp
-  #src/ifun.cpp
+  src/exp_cond.cpp
+  src/gdata.cpp
+  src/humlicek.cpp
+  src/ifun.cpp
   src/lineparams.cpp
-  #src/matrix.cpp
-  #src/mLDs.cpp
+  src/matrix.cpp
+  src/mLDs.cpp
   #src/ospline.cpp
   src/spline.cpp
   src/spbase.cpp
   src/spectrum.cpp
   src/splist.cpp
-  #src/splist_gfit.cpp
+  src/splist_gfit.cpp
   #src/text.cpp
   src/utils.cpp
   src/vjkg.cpp
-  #src/voigt.cpp
+  src/voigt.cpp
   )
 add_library( Goblin SHARED ${SRC_FILES} ${INC_FILES} )
-include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})
+include_directories(inc ${THIRD_PARTY_INCLUDE_DIR} ../API/inc ../DataObjects/inc)
 set_target_properties ( Goblin PROPERTIES COMPILE_DEFINITIONS IN_GOBLIN )
 
 #set( GSL_DEBUG_LIB "${THIRD_PARTY_LIB_DIR}/gsl_d.lib")
 #set( GSL_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gsl.lib")
 #set( GSL_LIBS "optimized;${GSL_RELEASE_LIB};debug;${GSL_DEBUG_LIB};")
 
-#target_link_libraries(Goblin
+target_link_libraries(Goblin Kernel DataObjects
 #${GSL_LIBS}
-#)
+)
 
 #
 #  GoblinTest
@@ -84,3 +86,14 @@ ${GTEST_LIBS} ${GSL_LIBS} Goblin
 
 # Add to UnitTests folder in an IDE
 set_property ( TARGET GoblinTest PROPERTY FOLDER "UnitTests" )
+
+set( SRC_FILES 
+  src/main.cpp
+)
+add_executable(GoblinComDif ${SRC_FILES} ${INC_FILES})
+include_directories(inc ${THIRD_PARTY_INCLUDE_DIR} )
+target_link_libraries(GoblinComDif Goblin)
+
+# Add to UnitTests folder in an IDE
+set_property ( TARGET GoblinComDif PROPERTY FOLDER "UnitTests" )
+

@@ -3,7 +3,8 @@
 #include "Goblin/spbase.h"
 #include "Goblin/utils.h"
 #include "Goblin/mio.h"
-//#include "../Troll1/gdata.h"
+#include "Goblin/gdata.h"
+#include "DataObjects/NumericColumn.h"
 
 #include <algorithm>
 
@@ -70,48 +71,168 @@ spbase::spbase():object()   //,color(0,0,255)
 spbase::~spbase(){
 }
 
-vector<double>* spbase::getDouble(const string nam){
-  db_field<double>* f = getField<double>("d",nam);
-  return f?&(f->data):0;
+/**
+ * Return pointer to a vector of doubles in column nam.
+ * If column with this name dosn't exist or it is not of type double
+ * returns nullptr.
+ * @param nam :: The name of the column.
+ */
+vector<double>* spbase::getDouble(const string nam)
+{
+  try
+  {
+    DataObjects::Column_ptr column = getColumn(nam);
+    DataObjects::NumericColumn* num = column->asNumeric();
+    if (num)
+    {
+      return num->getDoubleVector();
+    }
+    return nullptr;
+  }
+  catch(...)
+  {}
+  return nullptr;
 }
 
-vector<double>* spbase::getDoubleNew(const string nam){
-  db_field<double>* f = getFieldNew<double>("d",nam);
-  return f?&(f->data):0;
+/**
+ * Return pointer to a vector of doubles in column nam.
+ * If column with this name dosn't exist there will be an attemt to create it.
+ * If a column with this name already exists but has a different type
+ * returns nullptr.
+ * @param nam :: The name of the column.
+ */
+vector<double>* spbase::getDoubleNew(const string nam)
+{
+  DataObjects::Column_ptr column;
+  try
+  {
+    column = getColumn(nam);
+  }
+  catch(ColumnNotFound& e)
+  {
+    addColumn("double",nam);
+    try
+    {
+      column = getColumn(nam);
+    }
+    catch(...)
+    {
+      return nullptr;
+    }
+  }
+  DataObjects::NumericColumn* num = column->asNumeric();
+  if (num)
+  {
+    return num->getDoubleVector();
+  }
+  return nullptr;
 }
 
 vector<float>* spbase::getFloat(const string nam){
-  db_field<float>* f = getField<float>("f",nam);
-  return f?&(f->data):0;
+  try
+  {
+    DataObjects::Column_ptr column = getColumn(nam);
+    DataObjects::NumericColumn* num = column->asNumeric();
+    if (num)
+    {
+      return num->getFloatVector();
+    }
+    return nullptr;
+  }
+  catch(...)
+  {}
+  return nullptr;
+  //db_field<float>* f = getField<float>("f",nam);
+  //return f?&(f->data):0;
 }
 
 vector<float>* spbase::getFloatNew(const string nam){
-  db_field<float>* f = getFieldNew<float>("f",nam);
-  return f?&(f->data):0;
+  DataObjects::Column_ptr column;
+  try
+  {
+    column = getColumn(nam);
+  }
+  catch(ColumnNotFound& e)
+  {
+    addColumn("double",nam);
+    try
+    {
+      column = getColumn(nam);
+    }
+    catch(...)
+    {
+      return nullptr;
+    }
+  }
+  DataObjects::NumericColumn* num = column->asNumeric();
+  if (num)
+  {
+    return num->getFloatVector();
+  }
+  return nullptr;
+  //db_field<float>* f = getFieldNew<float>("f",nam);
+  //return f?&(f->data):0;
 }
 
 vector<int>* spbase::getInt(const string nam){
-  db_field<int>* f = getField<int>("i",nam);
-  return f?&(f->data):0;
+  try
+  {
+    DataObjects::Column_ptr column = getColumn(nam);
+    DataObjects::NumericColumn* num = column->asNumeric();
+    if (num)
+    {
+      return num->getIntVector();
+    }
+    return nullptr;
+  }
+  catch(...)
+  {}
+  return nullptr;
+  //db_field<int>* f = getField<int>("i",nam);
+  //return f?&(f->data):0;
 }
 
 vector<int>* spbase::getIntNew(const string nam){
-  db_field<int>* f = getFieldNew<int>("i",nam);
-  return f?&(f->data):0;
+  DataObjects::Column_ptr column;
+  try
+  {
+    column = getColumn(nam);
+  }
+  catch(ColumnNotFound& e)
+  {
+    addColumn("double",nam);
+    try
+    {
+      column = getColumn(nam);
+    }
+    catch(...)
+    {
+      return nullptr;
+    }
+  }
+  DataObjects::NumericColumn* num = column->asNumeric();
+  if (num)
+  {
+    return num->getIntVector();
+  }
+  return nullptr;
+  //db_field<int>* f = getFieldNew<int>("i",nam);
+  //return f?&(f->data):0;
 }
 
-vector<string>* spbase::getString(const string nam){
-  db_field<string>* f = getField<string>("s",nam);
-  return f?&(f->data):0;
-}
-
-vector<string>* spbase::getStringNew(const string nam){
-  db_field<string>* f = getFieldNew<string>("s",nam);
-  return f?&(f->data):0;
-}
+//vector<string>* spbase::getString(const string nam){
+//  db_field<string>* f = getField<string>("s",nam);
+//  return f?&(f->data):0;
+//}
+//
+//vector<string>* spbase::getStringNew(const string nam){
+//  db_field<string>* f = getFieldNew<string>("s",nam);
+//  return f?&(f->data):0;
+//}
 
 bool spbase::load(string fn){
-  dbase::loadFromFile(fn);
+  //dbase::loadFromFile(fn);
+  loadAscii(fn);
   return true;
 }
 
@@ -177,7 +298,8 @@ cmd_res spbase::cmd(string str){
     string typnam,typ,nam;
     istr >> typnam;
     type_name(typnam,typ,nam);
-    newField(typ,nam);
+    //newField(typ,nam);
+    addColumn(typ,nam);
     ok.repaint(true);
     return ok;
   };
@@ -186,14 +308,15 @@ cmd_res spbase::cmd(string str){
     string typnam,typ,nam;
     istr >> typnam;
     type_name(typnam,typ,nam);
-    newField("d",nam);
+    //newField("d",nam);
+    addColumn("double",nam);
     vector<double>* d = getDouble(nam);
     if (!d) return 0;
-    if (typ == "f"){
+    if (typ == "float"){
       vector<float>* f = getFloat(nam);
       if (!f) return 0;
       for(size_t i=0;i<size();i++) (*d)[i] = double((*f)[i]);
-    }else if (typ == "i"){
+    }else if (typ == "int"){
       vector<int>* f = getInt(nam);
       if (!f) return 0;
       for(size_t i=0;i<size();i++) (*d)[i] = double((*f)[i]);
@@ -345,12 +468,12 @@ cmd_res spbase::cmd(string str){
     return ok;
   };
 
-  if (cmd_name == "mvf"){ // move field form position i to j
-    size_t i,j;
-    istr>> i >> j;
-    moveField(i,j);
-    return ok;
-  };
+  //if (cmd_name == "mvf"){ // move field form position i to j
+  //  size_t i,j;
+  //  istr>> i >> j;
+  //  moveField(i,j);
+  //  return ok;
+  //};
 
   if (cmd_name == "defiso"){
     int i;
@@ -427,7 +550,7 @@ fun_res spbase::fun(string str){
   if (nam.empty()) return fun_res();
 
   if (nam == "nfields"){
-    ostr << fields_size();
+    ostr << columnCount();
     return ostr.str();
   };
 
@@ -483,71 +606,71 @@ fun_res spbase::fun(string str){
 }
 
 
-void spbase::copy(spbase& sp,filter *flt){
-  deleteFields();
-  vector<db_basic_field*>::iterator iif;
-  db_basic_field* f;
-  string typ,nam;
-  vector<bool> ok;
-  if (flt){
-    ok.resize(sp.size());
-    for(size_t i=0;i<sp.size();i++)
-      ok[i] = flt->allowed(i);
-  };
-  for(iif=sp.fields.begin();iif!=sp.fields.end();iif++){
-    typ = (*iif)->type;
-    nam = (*iif)->name;
-    newField(typ,nam);
-    f = fields.back();
-    if (typ=="d"){
-      vector<double>& d = ((db_field<double>*)(f))->data;
-      vector<double>& d1 = ((db_field<double>*)(*iif))->data;
-      if (!flt){
-        d.resize(d1.size());
-        d = d1;
-      }else{
-        for(size_t i=0;i<sp.size();i++)
-          if (ok[i]) d.push_back(d1[i]);
-      };
-    };
-    if (typ=="f"){
-      vector<float>& d = ((db_field<float>*)(f))->data;
-      vector<float>& d1 = ((db_field<float>*)(*iif))->data;
-      if (!flt){
-        d.resize(d1.size());
-        d = d1;
-      }else{
-        for(size_t i=0;i<sp.size();i++)
-          if (ok[i]) d.push_back(d1[i]);
-      };
-    };
-    if (typ=="i"){
-      vector<int>& d = ((db_field<int>*)(f))->data;
-      vector<int>& d1 = ((db_field<int>*)(*iif))->data;
-      if (!flt){
-        d.resize(d1.size());
-        d = d1;
-      }else{
-        for(size_t i=0;i<sp.size();i++)
-          if (ok[i]) d.push_back(d1[i]);
-      };
-    };
-    if (typ=="vjkg"){
-      vector<VJKG>& d = ((db_field<VJKG>*)(f))->data;
-      vector<VJKG>& d1 = ((db_field<VJKG>*)(*iif))->data;
-      if (!flt){
-        d.resize(d1.size());
-        d = d1;
-      }else{
-        for(size_t i=0;i<sp.size();i++)
-          if (ok[i]) d.push_back(d1[i]);
-      };
-    };
-  };
-  params = sp.params;
-  fname = /*owner->dir()+*/"copy_of_"+sp.name+'.'+sp.ext;
-
-}
+//void spbase::copy(spbase& sp,filter *flt){
+//  deleteFields();
+//  vector<db_basic_field*>::iterator iif;
+//  db_basic_field* f;
+//  string typ,nam;
+//  vector<bool> ok;
+//  if (flt){
+//    ok.resize(sp.size());
+//    for(size_t i=0;i<sp.size();i++)
+//      ok[i] = flt->allowed(i);
+//  };
+//  for(iif=sp.fields.begin();iif!=sp.fields.end();iif++){
+//    typ = (*iif)->type;
+//    nam = (*iif)->name;
+//    newField(typ,nam);
+//    f = fields.back();
+//    if (typ=="d"){
+//      vector<double>& d = ((db_field<double>*)(f))->data;
+//      vector<double>& d1 = ((db_field<double>*)(*iif))->data;
+//      if (!flt){
+//        d.resize(d1.size());
+//        d = d1;
+//      }else{
+//        for(size_t i=0;i<sp.size();i++)
+//          if (ok[i]) d.push_back(d1[i]);
+//      };
+//    };
+//    if (typ=="f"){
+//      vector<float>& d = ((db_field<float>*)(f))->data;
+//      vector<float>& d1 = ((db_field<float>*)(*iif))->data;
+//      if (!flt){
+//        d.resize(d1.size());
+//        d = d1;
+//      }else{
+//        for(size_t i=0;i<sp.size();i++)
+//          if (ok[i]) d.push_back(d1[i]);
+//      };
+//    };
+//    if (typ=="i"){
+//      vector<int>& d = ((db_field<int>*)(f))->data;
+//      vector<int>& d1 = ((db_field<int>*)(*iif))->data;
+//      if (!flt){
+//        d.resize(d1.size());
+//        d = d1;
+//      }else{
+//        for(size_t i=0;i<sp.size();i++)
+//          if (ok[i]) d.push_back(d1[i]);
+//      };
+//    };
+//    if (typ=="vjkg"){
+//      vector<VJKG>& d = ((db_field<VJKG>*)(f))->data;
+//      vector<VJKG>& d1 = ((db_field<VJKG>*)(*iif))->data;
+//      if (!flt){
+//        d.resize(d1.size());
+//        d = d1;
+//      }else{
+//        for(size_t i=0;i<sp.size();i++)
+//          if (ok[i]) d.push_back(d1[i]);
+//      };
+//    };
+//  };
+//  params = sp.params;
+//  fname = owner->dir()+"copy_of_"+sp.name+'.'+sp.ext;
+//
+//}
 
 void spbase::savePlot(string fn){
   ofstream fil(fn.c_str());
@@ -565,7 +688,7 @@ void spbase::flt_make(){
 }
 
 void spbase::flt_delete(){
-  deleteField("i","flt");
+  removeColumn("flt");
   flt_ = 0;
 }
 
@@ -624,13 +747,14 @@ void spbase::flt_addInt(string nam,string cmp,int val,char op){
 }
 
 void spbase::flt_addString(string nam,string cmp,string val,char op){
-  vector<string> *d_= getString(nam);
-  if (!d_) return;
-  vector<string> &d = *d_;
+  //vector<string> *d_= getString(nam);
+  DataObjects::Column_ptr d = getColumn(nam);
+  if (!d) return;
+  //vector<string> &d = *d_;
   bool ok;
   for(size_t i=0;i<size();i++){
-    if (cmp=="=") ok = (d[i] == val);
-    else if (cmp=="has") ok = (d[i].find(val) != string::npos);
+    if (cmp=="=") ok = (d->asString(i) == val);
+    else if (cmp=="has") ok = (d->asString(i).find(val) != string::npos);
     if (op == '&') ok = ok && allowed1(i);
     else if (op == '|') ok = ok || allowed1(i);
     else if (op == '^') ok = ok && (!allowed1(i));
@@ -646,15 +770,15 @@ void spbase::flt_not(){
       flt_add(i);
 }
 
-void spbase::flt_erase(){
-  if (!flt_) return;
-  if (!flt_enabled()) return;
-  vector<int> indx(size());
-  for(size_t i=0;i<size();i++)
-    indx[i] = (*flt_)[i];
-  eraseRows(indx);
-//  flt_delete();
-}
+//void spbase::flt_erase(){
+//  if (!flt_) return;
+//  if (!flt_enabled()) return;
+//  vector<int> indx(size());
+//  for(size_t i=0;i<size();i++)
+//    indx[i] = (*flt_)[i];
+//  eraseRows(indx);
+////  flt_delete();
+//}
 
 bool spbase::save(){
   if (write()){
@@ -664,12 +788,12 @@ bool spbase::save(){
   return false;
 }
 
-bool spbase::save(string fn){
-  vector<int> *f = 0;
-  if (flt() && flt_enabled()) f = flt_;
-  dbase::saveToFile(fn.c_str(),f);
-  return true;
-}
+//bool spbase::save(string fn){
+//  vector<int> *f = 0;
+//  if (flt() && flt_enabled()) f = flt_;
+//  dbase::saveToFile(fn.c_str(),f);
+//  return true;
+//}
 
 void spbase::flt_add(size_t i,bool v,char op){
  if (!flt_ || i>=size()) return;
@@ -735,16 +859,16 @@ public:
   }
 };
 
-void spbase::sort_double(string fn,bool des){
-  vector<size_t> ind;
-  ind.resize(size());
-  for(size_t i=0;i<ind.size();i++)
-    ind[i] = i;
-  sort(ind.begin(),ind.end(),comp_double(*this,fn,des));
-  for(size_t i=0;i<fields.size();i++) {
-    fields[i]->sort(ind);
-  };
-}
+//void spbase::sort_double(string fn,bool des){
+//  vector<size_t> ind;
+//  ind.resize(size());
+//  for(size_t i=0;i<ind.size();i++)
+//    ind[i] = i;
+//  sort(ind.begin(),ind.end(),comp_double(*this,fn,des));
+//  for(size_t i=0;i<fields.size();i++) {
+//    fields[i]->sort(ind);
+//  };
+//}
 
 struct fmt_rec{
   string type;
@@ -754,141 +878,159 @@ struct fmt_rec{
   fmt_rec():data(){}
 };
 
-void spbase::save_txt(string fn,string fmt){
-  istringstream istr(fmt);
-  string f,typnam,typ,nam;
-  size_t prec,wdt,i;
-  fmt_rec fld;
-  vector<fmt_rec> flds;
-  vector<double>* dp;
-  vector<float>* fp;
-  vector<int>* ip;
-  VJKG* qq;
-  while(istr>>f){
-    fld.sizes.clear();
-    dp = 0; fp = 0; ip = 0;
-    i = f.find('{');
-    if (i != string::npos){
-      typnam = f.substr(0,i);
-      f.erase(0,i+1);
-      i = f.find('}');
-      if (i != string::npos) f[i] = ' ';
-      for(size_t j=0;j<f.size();j++)
-        if (!isdigit(f[j])) f[j] = ' ';
-      istringstream is(f);
-      while(is>>i)  fld.sizes.push_back(i);
-    }else{
-      typnam = f;
-    };
-    type_name(typnam,typ,nam);
-    if (typ.empty()) typ = typnam;
-    if (typ == "d") {
-      dp = getDouble(nam);
-      if (!dp) {
-        mio<<"No field d:"<<nam<<'\n';
-	       continue;
-      };
-      fld.data = (void*) dp;
-      switch (fld.sizes.size()){
-        case 0: fld.sizes.push_back(6);  // precision
-	       case 1: fld.sizes.push_back(12); // width
-       	case 2: fld.sizes.push_back(0);  // 0 - fixed, 1 - scientific
-      };
-    }else if (typ == "f"){
-      fp = getFloat(nam);
-      if (!fp) {
-        mio<<"No field f:"<<nam<<'\n';
-	continue;
-      };
-      fld.data = (void*) fp;
-      switch (fld.sizes.size()){
-        case 0: fld.sizes.push_back(6);  // precision
-	       case 1: fld.sizes.push_back(12); // width
-       	case 2: fld.sizes.push_back(0);  // 0 - fixed, 1 - scientific
-      };
-    }else if (typ == "i"){
-      ip = getInt(nam);
-      if (!ip) {
-        mio<<"No field i:"<<nam<<'\n';
-        continue;
-      };
-      fld.data = (void*) ip;
-      if (!fld.sizes.size()) fld.sizes.push_back(5);  //  width
-    }else if (typ == "vjkg"){
-      db_field<VJKG>* qf = getField<VJKG>(typ,nam);
-      if (!qf) {
-        mio<<"No field vjkg:"<<nam<<'\n';
-       	continue;
-      };
-      fld.data = (void*) (&qf->data);
-      switch (fld.sizes.size()){
-        case 0: fld.sizes.push_back(2);  // vib quanta format
-	       case 1: fld.sizes.push_back(2);  // separation between vib and rot quanta
-        case 2: fld.sizes.push_back(3);  // rot quanta format
-        case 3: fld.sizes.push_back(0);  // print iso, if nonzero - separation between iso and vib
-                      //  by default iso is not printed
-      };
-      fld.fill = string(fld.sizes[1],' ');
-      fld.fill1 = string(fld.sizes[3],' ');
-    }else if (typ == "x"){
-      fld.data = 0;
-      switch (fld.sizes.size()){
-        case 0: fld.sizes.push_back(1);  // left width
-	       case 1: fld.sizes.push_back(0);  // right width
-      };
-      if (nam.empty()){
-        fld.fill = string(fld.sizes[0],' ');
-        mio<<fld.fill.size()<<'\n';
-      }else{
-        fld.fill = string(fld.sizes[0],' ') + nam + string(fld.sizes[1],' ');
-      };
-    }else {
-      mio<<"Unknown type "<<typ<<'\n';
-      continue;
-    };
-    fld.type = typ;
-    flds.push_back(fld);
-  };
-//  for(vector<fmt_rec>::iterator ff=flds.begin();ff!=flds.end();ff++){
-//    mio<<ff->type<<' '<<ff->data<<' '<<ff->sizes.size()<<'\n';
+//void spbase::save_txt(string fn,string fmt){
+//  istringstream istr(fmt);
+//  string f,typnam,typ,nam;
+//  size_t prec,wdt,i;
+//  fmt_rec fld;
+//  vector<fmt_rec> flds;
+//  vector<double>* dp;
+//  vector<float>* fp;
+//  vector<int>* ip;
+//  VJKG* qq;
+//  while(istr>>f){
+//    fld.sizes.clear();
+//    dp = 0; fp = 0; ip = 0;
+//    i = f.find('{');
+//    if (i != string::npos){
+//      typnam = f.substr(0,i);
+//      f.erase(0,i+1);
+//      i = f.find('}');
+//      if (i != string::npos) f[i] = ' ';
+//      for(size_t j=0;j<f.size();j++)
+//        if (!isdigit(f[j])) f[j] = ' ';
+//      istringstream is(f);
+//      while(is>>i)  fld.sizes.push_back(i);
+//    }else{
+//      typnam = f;
+//    };
+//    type_name(typnam,typ,nam);
+//    if (typ.empty()) typ = typnam;
+//    if (typ == "d") {
+//      dp = getDouble(nam);
+//      if (!dp) {
+//        mio<<"No field d:"<<nam<<'\n';
+//	       continue;
+//      };
+//      fld.data = (void*) dp;
+//      switch (fld.sizes.size()){
+//        case 0: fld.sizes.push_back(6);  // precision
+//	       case 1: fld.sizes.push_back(12); // width
+//       	case 2: fld.sizes.push_back(0);  // 0 - fixed, 1 - scientific
+//      };
+//    }else if (typ == "f"){
+//      fp = getFloat(nam);
+//      if (!fp) {
+//        mio<<"No field f:"<<nam<<'\n';
+//	continue;
+//      };
+//      fld.data = (void*) fp;
+//      switch (fld.sizes.size()){
+//        case 0: fld.sizes.push_back(6);  // precision
+//	       case 1: fld.sizes.push_back(12); // width
+//       	case 2: fld.sizes.push_back(0);  // 0 - fixed, 1 - scientific
+//      };
+//    }else if (typ == "i"){
+//      ip = getInt(nam);
+//      if (!ip) {
+//        mio<<"No field i:"<<nam<<'\n';
+//        continue;
+//      };
+//      fld.data = (void*) ip;
+//      if (!fld.sizes.size()) fld.sizes.push_back(5);  //  width
+//    }else if (typ == "vjkg"){
+//      //db_field<VJKG>* qf = getField<VJKG>(typ,nam);
+//      DataObjects::ColumnVector<VJKG> qf = getColumn(nam);
+//      if (!qf) {
+//        mio<<"No field vjkg:"<<nam<<'\n';
+//       	continue;
+//      };
+//      fld.data = (void*) (&qf->data);
+//      switch (fld.sizes.size()){
+//        case 0: fld.sizes.push_back(2);  // vib quanta format
+//	       case 1: fld.sizes.push_back(2);  // separation between vib and rot quanta
+//        case 2: fld.sizes.push_back(3);  // rot quanta format
+//        case 3: fld.sizes.push_back(0);  // print iso, if nonzero - separation between iso and vib
+//                      //  by default iso is not printed
+//      };
+//      fld.fill = string(fld.sizes[1],' ');
+//      fld.fill1 = string(fld.sizes[3],' ');
+//    }else if (typ == "x"){
+//      fld.data = 0;
+//      switch (fld.sizes.size()){
+//        case 0: fld.sizes.push_back(1);  // left width
+//	       case 1: fld.sizes.push_back(0);  // right width
+//      };
+//      if (nam.empty()){
+//        fld.fill = string(fld.sizes[0],' ');
+//        mio<<fld.fill.size()<<'\n';
+//      }else{
+//        fld.fill = string(fld.sizes[0],' ') + nam + string(fld.sizes[1],' ');
+//      };
+//    }else {
+//      mio<<"Unknown type "<<typ<<'\n';
+//      continue;
+//    };
+//    fld.type = typ;
+//    flds.push_back(fld);
 //  };
-  
-  ofstream fil(fn.c_str());
-  if (!fil){
-    mio<<"Cannot open file "<<fn<<'\n';
+////  for(vector<fmt_rec>::iterator ff=flds.begin();ff!=flds.end();ff++){
+////    mio<<ff->type<<' '<<ff->data<<' '<<ff->sizes.size()<<'\n';
+////  };
+//  
+//  ofstream fil(fn.c_str());
+//  if (!fil){
+//    mio<<"Cannot open file "<<fn<<'\n';
+//    return;
+//  };
+//  for(i=0;i<size();i++){
+//    if (!allowed(i)) continue;
+//    for(vector<fmt_rec>::iterator ff=flds.begin();ff!=flds.end();ff++){
+//      if (ff->type == "d") {
+//        if (ff->sizes[2])  fil<<strDoubleE( (* (vector<double>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
+//	else
+//	  fil<<strDouble( (* (vector<double>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
+//      }else if (ff->type == "f"){
+//        if (ff->sizes[2])  fil<<strDoubleE( (double)(* (vector<float>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
+//	else
+//	  fil<<strDouble( (double)(* (vector<float>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
+//      }else if (ff->type == "i"){
+//        fil<<strInt( (* (vector<int>*)ff->data)[i],ff->sizes[0]);
+//      }else if (ff->type == "vjkg"){
+//        qq = &(* (vector<VJKG>*)ff->data)[i];
+//        if (ff->sizes[3]) fil<<qq->iso()<<ff->fill1;
+//	for(size_t j=0;j<qq->v.n();j++) fil<<strInt(qq->v(j),ff->sizes[0]);
+//	fil<<ff->fill<<strInt(qq->j,ff->sizes[2])<<strInt(qq->k,ff->sizes[2])<<strInt(qq->g,ff->sizes[2]);
+//      }else {//  ff->type == "x"
+//         fil<<ff->fill;
+//      };
+//    };
+//    fil<<endl;
+//  };
+//}
+
+/** divides typnam into type and name of a field */
+void spbase::type_name(const string typnam,string& typ,string& nam){
+  string str = typnam;
+  if (str[0] == '%') str.erase(0,1);
+  size_t i;
+  i = str.find(':');
+  if (i == string::npos || i == 0){
+    typ = "";
+    nam = "";
     return;
   };
-  for(i=0;i<size();i++){
-    if (!allowed(i)) continue;
-    for(vector<fmt_rec>::iterator ff=flds.begin();ff!=flds.end();ff++){
-      if (ff->type == "d") {
-        if (ff->sizes[2])  fil<<strDoubleE( (* (vector<double>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
-	else
-	  fil<<strDouble( (* (vector<double>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
-      }else if (ff->type == "f"){
-        if (ff->sizes[2])  fil<<strDoubleE( (double)(* (vector<float>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
-	else
-	  fil<<strDouble( (double)(* (vector<float>*)ff->data)[i],ff->sizes[0],ff->sizes[1]);
-      }else if (ff->type == "i"){
-        fil<<strInt( (* (vector<int>*)ff->data)[i],ff->sizes[0]);
-      }else if (ff->type == "vjkg"){
-        qq = &(* (vector<VJKG>*)ff->data)[i];
-        if (ff->sizes[3]) fil<<qq->iso()<<ff->fill1;
-	for(size_t j=0;j<qq->v.n();j++) fil<<strInt(qq->v(j),ff->sizes[0]);
-	fil<<ff->fill<<strInt(qq->j,ff->sizes[2])<<strInt(qq->k,ff->sizes[2])<<strInt(qq->g,ff->sizes[2]);
-      }else {//  ff->type == "x"
-         fil<<ff->fill;
-      };
-    };
-    fil<<endl;
-  };
+  typ = str.substr(0,i);
+  nam = str.substr(i+1);
 }
+
+
 
 //--------------------------------------------------------------------------------
 //       filters
 
 bool doubleFilter::set(spbase& sp,string nam,double lo,double up){
-    data = sp.getDouble(nam);
+    data = sp.getColumn(nam);
     if (!data) return false;
     lower = lo;
     upper = up;
@@ -896,7 +1038,7 @@ bool doubleFilter::set(spbase& sp,string nam,double lo,double up){
 }
 
 bool intFilter::set(spbase& sp,string nam,int lo,int up){
-    data = sp.getInt(nam);
+    data = sp.getColumn(nam);
     if (!data) return false;
     lower = lo;
     upper = up;
@@ -904,9 +1046,8 @@ bool intFilter::set(spbase& sp,string nam,int lo,int up){
 }
 
 bool qFilter::set(spbase& sp,string nam,string value){
-  db_field<VJKG> *fld = sp.getField<VJKG>("vjkg",nam);
-  if (!fld) return false;
-  data = &(fld->data);
+  data = sp.getColumn(nam);
+  if (!data) return false;
   string str = value;
   string vvv = brakets(str,"()");
   if (!vvv.empty()){
@@ -918,28 +1059,28 @@ bool qFilter::set(spbase& sp,string nam,string value){
 
 bool qFilter::allowed(size_t i){
   if (!data) return false;
-  vector<VJKG> &q = *data;
   bool ok;
-  ok = match_vib?(q[i].v == qq.v):true;
-  ok = ok && (qq.iso()!=-100)?(q[i].iso()==qq.iso()):true;
-  ok = ok && (qq.j!=-100)?(q[i].j==qq.j):true;
-  ok = ok && (qq.k!=-100)?(q[i].k==qq.k):true;
-  ok = ok && (qq.g!=-100)?(q[i].g==qq.g):true;
+  VJKG &q = data[i];
+  ok = match_vib?(q.v == qq.v):true;
+  ok = ok && (qq.iso()!=-100)?(q.iso()==qq.iso()):true;
+  ok = ok && (qq.j!=-100)?(q.j==qq.j):true;
+  ok = ok && (qq.k!=-100)?(q.k==qq.k):true;
+  ok = ok && (qq.g!=-100)?(q.g==qq.g):true;
   return ok;
 }
 
 //-----------------------------------------------------------
-ostream& operator << (ostream& ostr,const spbase& sp){
-  vector<db_basic_field*>::const_iterator f;
-  void* d;
-  size_t i;
-  i = sp.curr();
-  for(f=sp.fields.begin();f!=sp.fields.end();f++){
-    d = (**f).data_addr(i);
-    if ((**f).print && d) (**f).print(ostr,d);
-  };
-  return ostr;
-}
+//ostream& operator << (ostream& ostr,const spbase& sp){
+//  vector<db_basic_field*>::const_iterator f;
+//  void* d;
+//  size_t i;
+//  i = sp.curr();
+//  for(f=sp.fields.begin();f!=sp.fields.end();f++){
+//    d = (**f).data_addr(i);
+//    if ((**f).print && d) (**f).print(ostr,d);
+//  };
+//  return ostr;
+//}
 
 //------------------------------------------------------------
 

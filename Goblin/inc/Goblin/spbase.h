@@ -4,6 +4,8 @@
 #include "Goblin/dbase.h"
 #include "Goblin/vjkg.h"
 #include "Goblin/object.h"
+#include "DataObjects/TableWorkspace.h"
+#include "DataObjects/ColumnVector.h"
 
 #include <iostream>
 #include <vector>
@@ -20,13 +22,15 @@ using namespace std;
 
 class filter;
 
-class GOBLIN_EXPORT spbase : public dbase,public object  {
+class GOBLIN_EXPORT spbase : public DataObjects::TableWorkspace,public object  {
 protected:
   //rgb color;
   string out_type,in_type;
   string xfield,yfield;
   int line_style; //  0 - no lines, 1 - solid line
   int pnt_size;
+  size_t m_currentRow;
+  map<string,string> params;
 public:
   static bool created;
   static double bad_double;
@@ -46,11 +50,15 @@ public:
   vector<float>* getFloatNew(const string nam);
   vector<int>* getInt(const string nam);
   vector<int>* getIntNew(const string nam);
-  vector<string>* getString(const string nam);
-  vector<string>* getStringNew(const string nam);
+  //vector<string>* getString(const string nam);
+  //vector<string>* getStringNew(const string nam);
   cmd_res cmd(string str);
   fun_res fun(string str);
-  void copy(spbase& spb,filter *flt=0);
+  size_t size() const {return rowCount();}
+  size_t curr() const {return m_currentRow;}
+  void setCurr(size_t i) {if (i < rowCount()) m_currentRow = i;}
+  void type_name(const string typnam,string& typ,string& nam);
+  //void copy(spbase& spb,filter *flt=0);
   bool load(string fn);
   void apply_params();
   bool save();
@@ -60,11 +68,11 @@ public:
   bool flt_enabled(){return flt_en_;}
   void flt_enable(){flt_en_=true;}
   void flt_disable(){flt_en_=false;}
-  bool allowed(size_t i){return (!flt_ || !flt_enabled() || (i< size() && (*flt_)[i]))?true:false;}
+  bool allowed(size_t i){return (!flt_ || !flt_enabled() || (i< rowCount() && (*flt_)[i]))?true:false;}
   bool allowed(){return allowed(curr());}
   bool allowed1(size_t i){return ((*flt_)[i])?true:false; }
-  void flt_add(size_t i){if (flt_ && i<size()) (*flt_)[i] = 1;}
-  void flt_rm(size_t i){if (flt_ && i<size()) (*flt_)[i] = 0;}
+  void flt_add(size_t i){if (flt_ && i<rowCount()) (*flt_)[i] = 1;}
+  void flt_rm(size_t i){if (flt_ && i<rowCount()) (*flt_)[i] = 0;}
   void flt_make();
   void flt_delete();
   void flt_addDouble(string nam,string cmp,double val,char op=' ');
@@ -101,24 +109,24 @@ public:
 
 class GOBLIN_EXPORT doubleFilter:public type_filter{
   double lower,upper;
-  vector<double> *data;
+  DataObjects::ColumnVector<double> data;
 public:
-  doubleFilter():data(0){}
+  doubleFilter():data(){}
   bool set(spbase& sp,string nam,double lo,double up);
-  bool allowed(size_t i){return data?((*data)[i]>lower && (*data)[i]<upper):false;}
+  bool allowed(size_t i){return data?(data[i]>lower && data[i]<upper):false;}
 };
 
 class GOBLIN_EXPORT intFilter:public type_filter{
   int lower,upper;
-  vector<int> *data;
+  DataObjects::ColumnVector<int> data;
 public:
-  intFilter():data(0){}
+  intFilter():data(){}
   bool set(spbase& sp,string nam,int lo,int up);
-  bool allowed(size_t i){return data?((*data)[i]>lower && (*data)[i]<upper):false;}
+  bool allowed(size_t i){return data?(data[i]>lower && data[i]<upper):false;}
 };
 
 class GOBLIN_EXPORT qFilter:public type_filter{
-  vector<VJKG> *data;
+  DataObjects::ColumnVector<VJKG> data;
   VJKG qq;
   bool match_vib;
 public:

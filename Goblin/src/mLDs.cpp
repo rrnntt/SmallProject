@@ -1,6 +1,8 @@
+#include "Goblin/mLDs.h"
+#include "Goblin/humlicek.h"
 
-#include "mLDs.h"
-#include "humlicek.h"
+namespace Goblin
+{
 
 multiparams_LDs::multiparams_LDs(splist& s):lineparams_iso(s){
   psize = 6;
@@ -323,4 +325,4 @@ double multiparams_LDs::value(size_t i,double wx){
 }
 
 
-
+} // Goblin

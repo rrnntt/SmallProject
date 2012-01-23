@@ -34,7 +34,7 @@ public:
   float val(double x){return abs(x)<=wdt_?1./wdt_:0.;}
   float tr(double x);
   float operator()(double x){return val(x);}
-  string input();
+  std::string input();
 };
 
 typedef  boxcar ifun;
@@ -54,7 +54,7 @@ public:
   string input();
 };
 */
-ifun *new_ifun(string str);
+ifun *new_ifun(std::string str);
 
 } // Goblin
 

@@ -11,12 +11,14 @@
 namespace Goblin
 {
 
+class gdata;
+
 using namespace std;
 
 class GOBLIN_EXPORT object{
   bool focused_;
 public:
-  //gdata* owner;
+  gdata* owner;
   string name;
   string type;
   map<string,bool> cnames;
@@ -29,7 +31,7 @@ public:
   void write(bool wr){wr_ = wr;}
   bool cname(string str){return cnames.find(str) != cnames.end();}
   cmd_res send(string m,bool all=false);
-  bool save(){if (write()) return this->save(fname);}
+  bool save(){if (write()) return this->save(fname);return false;}
   virtual cmd_res cmd(string);
   virtual fun_res fun(string){return fun_res();}
   virtual bool load(string fn){return false;}
@@ -48,51 +50,6 @@ public:
 
 bool operator<(const object& o1,const object& o2);
 
-template <class T>
-class obj_list{
-public:
-  vector<T*> data;
-  object* o;
-  string type;
-  obj_list(gdata* gd,string ttype){
-    type = ttype;
-    for(size_t i=0;i<gd->obj.size();i++){
-      o = gd->obj[i];
-      if (o->type == type) data.push_back((T*)(o));
-    };
-  }
-  size_t size(){return data.size();}
-  T& operator[](size_t i){return *data[i];}
-  T* operator()(size_t i){return data[i];}
-  T* operator()(string nam){
-    size_t i = nam.find(':');
-    string nnam;
-    if (i == string::npos) nnam = nam;
-    else{
-      string typ = nam.substr(0,i);
-      nnam = nam.substr(i+1);
-//      mio<<typ<<' '<<nnam<<'\n';
-      if (typ != type) return 0;
-    };
-    for(size_t i=0;i<size();i++)
-    if (data[i]->name == nnam) return data[i];
-    return 0;
-  }
-  bool has(T* t){
-     for(size_t i=0;i<data.size();i++) if (data[i]==t) return true;
-     return false;
-  }
-};
-
-  template<class T>
-  T* newObject(string type,string name,string ext){
-    object* o = (object*) new T;
-    if (!o){
-      mio<<"Error creating "<<type<<'\n';
-      return 0;
-    };
-    o->ext = ext;
-  };
 
 
 } // namespace Goblin

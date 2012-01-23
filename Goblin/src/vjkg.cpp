@@ -40,6 +40,11 @@ ostream& operator << (ostream& ostr,const vibq& v){
   return ostr;
 }
 
+istream& operator >> (istream& istr,vibq& v)
+{
+  return istr;
+}
+
 bool operator<(const vibq& v1,const vibq& v2){
   if (v1.n() < v2.n()) return true;
   if (v1.n() > v2.n()) return false;
@@ -82,6 +87,10 @@ ostream& operator << (ostream& ostr,const VJKG& q){
   return ostr;
 }
 
+std::istream& operator >> (std::istream& istr,Goblin::VJKG& q)
+{
+  return istr;
+}
 
 bool operator<(const VJKG& q1,const VJKG& q2){
   if (q1.iso() != q2.iso()) return  q1.iso() < q2.iso();
@@ -349,5 +358,52 @@ size_t molecule::tsymm(VJKG& q){
     default: return 0;
   };
 }
+
+//------------------ VJKGColumn ----------------------//
+  DECLARE_COLUMN(VJKGColumn,vjkg);
+
+  void VJKGColumn::read(std::istream& s, int index)
+  {
+    std::string str;// = m_data[index];
+    s >> str;
+    if (str.empty()) return;
+    if (str[0] == '"')
+    {
+      if (str == "\"\"") 
+      {
+        str.clear();
+        return;
+      }
+      str.erase(0,1);
+      char c;
+      while(s.good())
+      {
+        s.get(c);
+        if (c == '"' && (str.empty() || str.back() != '\\')) return;
+        str.push_back(c);
+      }
+    }
+    m_data[index].assign(str);
+  }
+
+/// Save into a file
+void VJKGColumn::saveAsci(std::ostream& s, int index) const
+{
+  s << '"';
+  this->print(s,index);
+  s << '"';
+}
+
+/// Read from a file
+void VJKGColumn::loadAsci(std::istream& s, int index)
+{
+  this->read(s,index);
+}
+
+void VJKGColumn::fromString(const std::string& str,size_t i)
+{
+  m_data[i].assign(str);
+}
+
 
 } // Goblin

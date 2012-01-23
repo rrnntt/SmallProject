@@ -1,12 +1,13 @@
 #include "Goblin/enlist.h"
 #include "Goblin/mio.h"
+#include "Goblin/gdata.h"
+#include "Goblin/utils.h"
 
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <algorithm>
 #include <map>
-//#include "../Troll1/gdata.h"
 
 namespace Goblin
 {

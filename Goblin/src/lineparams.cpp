@@ -1,7 +1,7 @@
 
 #include <math.h>
 #include <cctype>
-#include "lineparams.h"
+#include "Goblin/lineparams.h"
 #include "Goblin/humlicek.h"
 #include "Goblin/mLDs.h"
 #include "Goblin/mio.h"
@@ -153,6 +153,7 @@ void lineparams_dmp::limit(size_t i){
 }
 
 cmd_res lineparams_dmp::cmd(string str){
+  return cmd_res();
 }
 
 //-------------------------------------------------------------------------
@@ -263,6 +264,7 @@ void lineparams_LD::limit(size_t i){
 }
 
 cmd_res lineparams_LD::cmd(string str){
+  return cmd_res();
 }
 
 //-------------------------------------------------------------------------

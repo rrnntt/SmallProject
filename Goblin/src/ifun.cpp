@@ -1,6 +1,11 @@
 #include <sstream>
-#include "ifun.h"
+#include "Goblin/ifun.h"
+#include "Goblin/mio.h"
 
+namespace Goblin
+{
+
+using namespace std;
 
 ifun *new_ifun(string str){
   ifun *iff = 0;
@@ -63,3 +68,5 @@ string cub_filter::input(){
 }
 
 */
+
+} // Goblin

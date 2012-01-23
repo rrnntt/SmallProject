@@ -1,5 +1,8 @@
-#include "exp_cond.h"
-#include "vjkg.h"
+#include "Goblin/exp_cond.h"
+#include "Goblin/vjkg.h"
+
+namespace Goblin
+{
 using namespace std;
 
 void mixture::add(int IIso){
@@ -88,3 +91,5 @@ void Exp_cond::copy(Exp_cond& e){
     mix[i].copy(e.mix[i]);
   p_tot = e.p_tot;
 }
+
+} // Goblin

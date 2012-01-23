@@ -1,9 +1,15 @@
 #include <stdlib.h>
 #include <math.h>
 #include <complex>
-#include "../Troll1/mio.h"
 
-typedef complex<double> double_complex;
+#include "Goblin/mio.h"
+
+#include <complex>
+
+namespace Goblin
+{
+
+typedef std::complex<double> double_complex;
 
 inline double_complex  APPROX1(double_complex T){
   return (T * 0.5641896) / (0.5 + (T * T));
@@ -236,3 +242,5 @@ double galatryH(double x,double y,double z,double s){
   h/=zz;
   return h.real()/pi;
 }
+
+} // Goblin

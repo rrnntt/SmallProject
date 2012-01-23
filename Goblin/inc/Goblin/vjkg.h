@@ -2,6 +2,7 @@
 #define GOBLIN_VJKG_H
 
 #include "Goblin/DllExport.h"
+#include "DataObjects/TableColumn.h"
 
 #include <string>
 #include <iostream>
@@ -50,6 +51,7 @@ public:
 };
 
 ostream& operator << (ostream& ostr,const vibq& v);
+istream& operator >> (istream& ostr,vibq& v);
 //ostringstream& operator << (ostringstream& ostr,const VJKG& q);
 bool operator==(const VJKG& q1,const VJKG& q2);
 bool operator!=(const VJKG& q1,const VJKG& q2);
@@ -95,10 +97,26 @@ public:
 };
 
 bool operator<(const VJKG& q1,const VJKG& q2);
+std::ostream& operator << (std::ostream& ostr,const Goblin::VJKG& q);
+std::istream& operator >> (std::istream& istr,Goblin::VJKG& q);
+
+  class VJKGColumn: public DataObjects::TableColumn<VJKG>
+  {
+  public:
+    VJKGColumn():DataObjects::TableColumn<VJKG>(){}
+    void read(std::istream& s, int index);
+    /// Save into a file
+    virtual void saveAsci(std::ostream& s, int index) const;
+
+    /// Read from a file
+    virtual void loadAsci(std::istream& s, int index);
+
+    /// Read value from a string
+    virtual void fromString(const std::string& str,size_t i);
+
+  };
 
 } // Goblin
-
-std::ostream& operator << (std::ostream& ostr,const Goblin::VJKG& q);
 
 #endif // GOBLIN_VJKG_H
 

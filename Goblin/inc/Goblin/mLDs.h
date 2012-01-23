@@ -2,9 +2,9 @@
 #define MLDS_H
 
 #include "Goblin/DllExport.h"
-//#include "../Troll1/cmd.h"
+#include "Goblin/cmd.h"
 #include "Goblin/lineparams.h"
-//#include "splist.h"
+#include "Goblin/splist.h"
 
 namespace Goblin
 {

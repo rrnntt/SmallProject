@@ -78,6 +78,7 @@ namespace DataObjects
     /// Column data
     std::vector<Type> m_data;
     friend class TableWorkspace;
+    template <typename T> friend class ColumnVector;
   };
 
   /// Shared pointer to a column with aoutomatic type cast and data type check.
@@ -137,7 +138,32 @@ namespace DataObjects
     {
       TableColumn<Type>::data()[index] = value;
     }
+  virtual std::vector<double>* getDoubleVector() {return nullptr;}
+  virtual std::vector<float>* getFloatVector() {return nullptr;}
+  virtual std::vector<int>* getIntVector() {return nullptr;}
+  virtual const std::vector<double>* getDoubleVector() const {return nullptr;}
+  virtual const std::vector<float>* getFloatVector() const {return nullptr;}
+  virtual const std::vector<int>* getIntVector() const {return nullptr;}
   };
+
+  template<>
+  const std::vector<double>* NumericTableColumn<double>::getDoubleVector() const {return &m_data;}
+
+  template<>
+  const std::vector<float>* NumericTableColumn<float>::getFloatVector() const {return &m_data;}
+
+  template<>
+  const std::vector<int>* NumericTableColumn<int>::getIntVector() const {return &m_data;}
+
+  template<>
+  std::vector<double>* NumericTableColumn<double>::getDoubleVector() {return &m_data;}
+
+  template<>
+  std::vector<float>* NumericTableColumn<float>::getFloatVector() {return &m_data;}
+
+  template<>
+  std::vector<int>* NumericTableColumn<int>::getIntVector() {return &m_data;}
+
 } // DataObjects
 
 /*

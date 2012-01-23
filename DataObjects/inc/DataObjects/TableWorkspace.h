@@ -9,6 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 namespace DataObjects
 {
@@ -16,6 +17,12 @@ namespace DataObjects
   class DATAOBJECTS_EXPORT TableWorkspace: public API::Workspace
   {
   public:
+
+    class ColumnNotFound: public std::runtime_error
+    {
+    public:
+      ColumnNotFound(const std::string mess):std::runtime_error(mess){}
+    };
 
     TableWorkspace();
     bool addColumn(const std::string& type, const std::string& name);

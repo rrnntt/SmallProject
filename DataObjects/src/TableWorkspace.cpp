@@ -12,6 +12,7 @@
 
 DECLARE_NUMERICTABLECOLUMN(int,int);
 DECLARE_NUMERICTABLECOLUMN(double,double);
+DECLARE_NUMERICTABLECOLUMN(float,float);
 
 namespace DataObjects
 {
@@ -85,7 +86,7 @@ Column_ptr TableWorkspace::getColumn(const std::string& name)
     {
         std::string str = "Column " + name + " does not exist.\n";
         g_log.error(str);
-        throw std::runtime_error(str);
+        throw ColumnNotFound(str);
     }
     return *ci;
 }
@@ -98,7 +99,7 @@ Column_ptr TableWorkspace::getColumn(const std::string& name)const
     {
         std::string str = "Column " + name + " does not exist.\n";
         g_log.error(str);
-        throw std::runtime_error(str);
+        throw ColumnNotFound(str);
     }
     return *ci;
 }

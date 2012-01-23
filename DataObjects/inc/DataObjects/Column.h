@@ -11,6 +11,8 @@
 namespace DataObjects
 {
 
+class NumericColumn;
+
 class DATAOBJECTS_EXPORT Column
 {
 public:
@@ -81,6 +83,9 @@ public:
     virtual long int sizeOfData()const = 0;
 
     bool isNumeric() const;
+
+    NumericColumn* asNumeric();
+
 protected:
     /// Sets the new column size.
     virtual void resize(int count) = 0;

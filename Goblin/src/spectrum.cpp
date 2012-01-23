@@ -1,13 +1,16 @@
 #include "Goblin/spectrum.h"
+#include "Goblin/lineparams.h"
+#include "Goblin/ifun.h"
+#include "Goblin/matrix.h"
+#include "Goblin/mio.h"
+#include "Goblin/gdata.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <stdio.h>
 #include <math.h>
-#include "Goblin/lineparams.h"
-#include "Goblin/ifun.h"
-#include "Goblin/matrix.h"
-#include "Goblin/mio.h"
+#include <ctime>
 
 namespace Goblin
 {
@@ -27,8 +30,8 @@ spectrum::spectrum():object(){
   fft_ir0 = 0.;
   center_ = 0.;
   lwidth_ = 0.1;
-  color_ = rgb(0,0,255);
-  im_color_ = rgb(255,0,255);
+  //color_ = rgb(0,0,255);
+  //im_color_ = rgb(255,0,255);
   in_type(in_spectrum);
   wr_dat = false;
 }
@@ -145,19 +148,19 @@ cmd_res spectrum::cmd(string str){
 //    return repaint;
 //  };
 
-  if (com=="color"){
-    int r,g,b;
-    istr>>r>>g>>b;
-    color(rgb(r,g,b));
-    return repaint;
-  };
+  //if (com=="color"){
+  //  int r,g,b;
+  //  istr>>r>>g>>b;
+  //  color(rgb(r,g,b));
+  //  return repaint;
+  //};
 
-  if (com=="icolor"){
-    int r,g,b;
-    istr>>r>>g>>b;
-    icolor(rgb(r,g,b));
-    return repaint;
-  };
+  //if (com=="icolor"){
+  //  int r,g,b;
+  //  istr>>r>>g>>b;
+  //  icolor(rgb(r,g,b));
+  //  return repaint;
+  //};
 
   if (com=="hweight"){
     weight_.resize(0);
@@ -1652,7 +1655,7 @@ bool spectrum::loadASCII(const string fn){
   istr >> w1 >> w2 >> n >> nc;
   mio<<w1<<' '<<w2<<' '<<nc<<'\n';
   if (w2 <= w1 || nc > 3 || !nc) {
-    mio.err("Spectrum input","Wrong file format");
+    mio.error("Spectrum input: Wrong file format");
     return false;
   };
 
@@ -1662,7 +1665,7 @@ bool spectrum::loadASCII(const string fn){
     make(w1,w2,n);
     while(getline(fil,str)){
       if (i >= n) {
-        mio.err("Spectrum input","Inconsistent data 1");
+        mio.error("Spectrum input: Inconsistent data 1");
         return false;
       };
       r[i++] = atof(str.c_str());
@@ -1672,7 +1675,7 @@ bool spectrum::loadASCII(const string fn){
 //    while(getline(fil,str)){
     while(fil>> w >> b){
       if (i >= n) {
-        mio.err("Spectrum input","Inconsistent data 2");
+        mio.error("Spectrum input: Inconsistent data 2");
         return false;
       };
 //      istr.str(str);
@@ -1686,7 +1689,7 @@ bool spectrum::loadASCII(const string fn){
     complex();
     while(fil>> w >> b >> bb){
       if (i >= n) {
-        mio.err("Spectrum input","Inconsistent data 3");
+        mio.error("Spectrum input: Inconsistent data 3");
         mio<<i<<' '<<n<<'\n';
         return false;
       };
@@ -1695,7 +1698,7 @@ bool spectrum::loadASCII(const string fn){
     };
   };
   if (i < n) {
-     mio.err("Spectrum input","Inconsistent data");
+     mio.error("Spectrum input: Inconsistent data");
      return false;
   };
   return true;
