@@ -155,6 +155,11 @@ int TableWorkspace::insertRow(int index)
     return index;
 }
 
+int TableWorkspace::appendRow()
+{
+  return insertRow(rowCount() - 1);
+}
+
 /** @param index Row to delete.
 */
 void TableWorkspace::removeRow(int index)

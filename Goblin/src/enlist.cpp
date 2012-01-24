@@ -42,14 +42,16 @@ public:
 };
 
 enlist::enlist(){
-  ener_p = &(getFieldNew<double>("d","ener")->data);
-  q_p = &(getFieldNew<VJKG>("vjkg","q")->data);
+  //ener_p = &(getFieldNew<double>("d","ener")->data);
+  ener_p = getDouble("ener");
+  //q_p = &(getFieldNew<VJKG>("vjkg","q")->data);
+  q_p = getColumn("q");
 }
 enlist::~enlist(){
 }
 
 size_t enlist::add(VJKG& qq,double ee){
-  size_t i = addRow();
+  size_t i = appendRow();
   ener(i) = ee;
   q(i) = qq;
   return i;
@@ -79,12 +81,10 @@ size_t enlist::index(const VJKG& qq){
 bool enlist::load(string fn){
 cerr<<fn<<'\n';
 //  deleteFields();
-  dbase::loadFromFile(fn);
+  spbase::load(fn);
 //  apply_params();
-  db_field<VJKG>* qf = getFieldNew<VJKG>("vjkg","q");
-  q_p = qf?&qf->data:0;
-  db_field<double>* ef = getFieldNew<double>("d","ener");
-  ener_p = ef?&ef->data:0;
+  q_p = getColumn("q");
+  ener_p = getDoubleNew("ener");
   return true;
 }
 
@@ -105,7 +105,7 @@ cmd_res enlist::cmd(string str){
       mio<<"Must specify the filename for the table\n";
       return bad;
     };
-    if (en_name == name){
+    if (en_name == object::name){
       mio<<"Comparing the same list\n";
       return bad;
     };
@@ -210,7 +210,7 @@ cmd_res enlist::cmd(string str){
       n++;
       nn[q(i).v]++;
     };
-    mio<<"Energy list "<<name<<", iso="<<iso<<", N="<<n<<'\n';
+    mio<<"Energy list "<<object::name<<", iso="<<iso<<", N="<<n<<'\n';
     for(map<vibq,int>::iterator m=nn.begin();m!=nn.end();m++)
       if (fn.empty())
         mio<<m->first<<' '<<m->second<<'\n';
@@ -340,7 +340,7 @@ cmd_res enlist::cmd(string str){
   if (com == "diff"){
     string en_name;
     istr>>en_name;
-    if (en_name == name){
+    if (en_name == object::name){
       mio<<"Comparing the same list\n";
       return bad;
     };
@@ -357,7 +357,7 @@ cmd_res enlist::cmd(string str){
     string en_name;
     int Jmax;
     istr>>en_name>>Jmax;
-    if (en_name == name){
+    if (en_name == object::name){
       mio<<"Comparing the same list\n";
       return bad;
     };
@@ -388,27 +388,27 @@ void enlist::swapq(VJKG& q1,VJKG& q2){
   q(i2) = q1;
 }
 
-void enlist::sort_symm(){
-  vector<size_t> ind;
-  ind.resize(size());
-  for(size_t i=0;i<ind.size();i++)
-    ind[i] = i;
-  sort(ind.begin(),ind.end(),comp_symm(*this));
-  for(size_t i=0;i<fields.size();i++) {
-    fields[i]->sort(ind);
-  };
-}
-
-void enlist::sort_q(){
-  vector<size_t> ind;
-  ind.resize(size());
-  for(size_t i=0;i<ind.size();i++)
-    ind[i] = i;
-  sort(ind.begin(),ind.end(),comp_q(*this));
-  for(size_t i=0;i<fields.size();i++) {
-    fields[i]->sort(ind);
-  };
-}
+//void enlist::sort_symm(){
+//  vector<size_t> ind;
+//  ind.resize(size());
+//  for(size_t i=0;i<ind.size();i++)
+//    ind[i] = i;
+//  sort(ind.begin(),ind.end(),comp_symm(*this));
+//  for(size_t i=0;i<fields.size();i++) {
+//    fields[i]->sort(ind);
+//  };
+//}
+//
+//void enlist::sort_q(){
+//  vector<size_t> ind;
+//  ind.resize(size());
+//  for(size_t i=0;i<ind.size();i++)
+//    ind[i] = i;
+//  sort(ind.begin(),ind.end(),comp_q(*this));
+//  for(size_t i=0;i<fields.size();i++) {
+//    fields[i]->sort(ind);
+//  };
+//}
 
 void enlist::diff(enlist& en){
   vector<double> *dep = getDoubleNew("de");
@@ -547,27 +547,26 @@ void enlist::cmp_q(enlist& en,int Jmax){
   VJKG qq,qq1;
   size_t sym;
   double dmin,e,de;
-  db_field<VJKG>* fp = getFieldNew<VJKG>("vjkg","q1");
-  if (!fp){
+  DataObjects::ColumnVector<VJKG> qp = getColumn("q1");
+  if (!qp){
     mio<<"Error in enlist::cmp_q\n";
     return;
   };
-  vector<VJKG>* qp = &(fp->data);
   vector<double>* dde = getDoubleNew("de");
   for(size_t i=0;i<size();i++){
     qq = q(i);
     sym = qq.symm();
     e = ener(i);
     dmin = 1e30;
-    (*qp)[i] = qq;
+    (qp)[i] = qq;
     (*dde)[i] = 0.;
     for(size_t j=0;j<en.size();j++){
       qq1 = en.q(j);
       de = e - en.ener(j);
-      if (qq.j > Jmax) (*qp)[i] = qq;
+      if (qq.j > Jmax) (qp)[i] = qq;
       else if (qq.iso() == qq1.iso() && qq.j == qq1.j && sym == qq1.symm() && fabs(de) < dmin){
         dmin = fabs(de);
-	    (*qp)[i] = qq1;
+	    (qp)[i] = qq1;
 	    (*dde)[i] = de;
       };
     };

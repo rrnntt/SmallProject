@@ -57,6 +57,8 @@ public:
   size_t size() const {return rowCount();}
   size_t curr() const {return m_currentRow;}
   void setCurr(size_t i) {if (i < rowCount()) m_currentRow = i;}
+	size_t next(){return m_currentRow<size()-1?++m_currentRow:m_currentRow;}
+	size_t prev(){return m_currentRow>0?--m_currentRow:m_currentRow;}
   void type_name(const string typnam,string& typ,string& nam);
   //void copy(spbase& spb,filter *flt=0);
   bool load(string fn);

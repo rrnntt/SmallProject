@@ -3,7 +3,7 @@
 
 #include "Goblin/spbase.h"
 #include "Goblin/vjkg.h"
-//#include "../Troll1/def.h"
+#include "DataObjects/ColumnVector.h"
 
 #include <string>
 #include <vector>
@@ -16,7 +16,8 @@ using namespace std;
 class enlist:public spbase {
 public:
   vector<double> *ener_p;
-  vector<VJKG> *q_p;
+  //vector<VJKG> *q_p;
+  DataObjects::ColumnVector<VJKG> q_p;
   enlist();
   ~enlist();
   size_t add(VJKG& q,double ee);
@@ -24,7 +25,7 @@ public:
   double& ener(VJKG& q);
   size_t index(VJKG& q);
   size_t index(const VJKG& q);
-  VJKG& q(size_t i){return (*q_p)[i];}
+  VJKG& q(size_t i){return q_p[i];}
   bool load(string fn);
   void sort_symm();
   void sort_q();

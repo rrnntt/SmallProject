@@ -44,6 +44,8 @@ namespace DataObjects
     void setRowCount(int count);
     /// Inserts a row before row pointed to by index and fills it with default vales.
     int insertRow(int index);
+    /// Appends a row and fills it with default vales.
+    int appendRow();
     /// Delets a row if it exists.
     void removeRow(int index);
     /// Delets several rows if they exist.
