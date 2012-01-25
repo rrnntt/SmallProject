@@ -32,7 +32,7 @@ public:
   vector< vector<double>* > errs;
   lineparams():spl(0),psize(0),default_fix(50,false),der_(true),error_(false),fit_t_(DER){}
   lineparams(splist& s):spl(&s),psize(0),default_fix(50,false),der_(true),error_(false),fit_t_(DER)
-     {fixp_ = &(s.getFieldNew<int>("i",cfix)->data);}
+     {fixp_ = (s.getInt(cfix));}
   virtual ~lineparams(){}
   bool fixed(size_t i,size_t j){return i<nol()?((*fixp_)[i] & (1<<j)):true;}
   void fix(size_t i,size_t j){if (i<nol()) (*fixp_)[i] |= (1<<j);}
@@ -124,12 +124,12 @@ public:
     names[3] = "damping";
     names[4] = "hi1";
     names[5] = "wdt1";
-      w_ = &(s.getFieldNew<double>("d",names[0])->data);
-     hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-    wdt_ = &(s.getFieldNew<double>("d",names[2])->data);
-    dmp_ = &(s.getFieldNew<double>("d",names[3])->data);
-    hi1_ = &(s.getFieldNew<double>("d",names[4])->data);
-    wdt1_= &(s.getFieldNew<double>("d",names[5])->data);
+      w_ = s.getDoubleNew(names[0]);
+     hi_ = s.getDoubleNew(names[1]);
+    wdt_ = s.getDoubleNew(names[2]);
+    dmp_ = s.getDoubleNew(names[3]);
+    hi1_ = s.getDoubleNew(names[4]);
+    wdt1_= s.getDoubleNew(names[5]);
     height_ = hi_;
     set_default("wdt",0.04);
     set_default("dmp",0.01);
@@ -167,7 +167,7 @@ public:
 //  static char clorentz[];
 //  static char cdoppler[];
   vector<double> *w_,*hi_,*lor_,*dop_,*height_;
-  vector<VJKG> *q_p,*q0_p;
+  DataObjects::ColumnVector<VJKG> q_p,q0_p;
   Exp_cond *exp_cond;
   double def_lor,def_dop;
   lineparams_LD(splist& s);
@@ -187,8 +187,8 @@ public:
   void new_line(size_t i,double xx,double yy,spectrum *sp=0);
   void set_default(string s,double val);
   double& par(size_t i,size_t j);
-  VJKG& q(size_t i){return  (q_p && i<w_->size())? (*q_p)[i] :VJKG::bad_q; }
-  VJKG& q0(size_t i){return  (q0_p && i<w_->size())? (*q0_p)[i] :VJKG::bad_q; }
+  VJKG& q(size_t i){return  (q_p && i<w_->size())? (q_p)[i] :VJKG::bad_q; }
+  VJKG& q0(size_t i){return  (q0_p && i<w_->size())? (q0_p)[i] :VJKG::bad_q; }
   string print(size_t i);
   void limit(size_t i);
   cmd_res cmd(string str);
@@ -200,13 +200,13 @@ public:
 class GOBLIN_EXPORT lineparams_iso:public lineparams{
 protected:
   static string ciso;
-  vector<VJKG> *q_p,*q0_p;
+  DataObjects::ColumnVector<VJKG> q_p,q0_p;
   vector<int> *iso_;
   int def_iso;
 public:
   lineparams_iso(splist& s);
-  VJKG& q(size_t i){return (*q_p)[i];}
-  VJKG& q0(size_t i){return (*q0_p)[i];}
+  VJKG& q(size_t i){return (q_p)[i];}
+  VJKG& q0(size_t i){return (q0_p)[i];}
   int iso(size_t i){return (iso_)?((*iso_)[i]):q(i).Iso();}
   double mass(size_t i){return (iso_)?(molecule::mass((*iso_)[i])):q(i).mass();}
   bool assigned(){return q_p != 0;}

@@ -6,6 +6,7 @@
 #include "Goblin/mLDs.h"
 #include "Goblin/mio.h"
 //#include "ftlines.h"
+#include "DataObjects/ColumnVector.h"
 
 namespace Goblin
 {
@@ -56,7 +57,7 @@ void lineparams::error(bool boo){
   errs.resize(size());
   for(size_t i=0;i<size();i++){
      err_names[i] = names[i] + "_err";
-     errs[i] = &(spl->getFieldNew<double>("d",err_names[i])->data);
+     errs[i] = spl->getDoubleNew(err_names[i]);
      if (errs[i] == 0)  return;
   };
   error_ = true;
@@ -84,10 +85,10 @@ lineparams_dmp::lineparams_dmp(splist& s):lineparams(s){
   names[1] = "height";
   names[2] = "width";
   names[3] = "damping";
-    w_ = &(s.getFieldNew<double>("d",names[0])->data);
-   hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-  wdt_ = &(s.getFieldNew<double>("d",names[2])->data);
-  dmp_ = &(s.getFieldNew<double>("d",names[3])->data);
+    w_ = s.getDoubleNew(names[0]);
+   hi_ = s.getDoubleNew(names[1]);
+  wdt_ = s.getDoubleNew(names[2]);
+  dmp_ = s.getDoubleNew(names[3]);
   height_ = hi_;
   set_default("wdt",0.04);
   set_default("dmp",0.01);
@@ -170,17 +171,17 @@ lineparams_LD::lineparams_LD(splist& s):lineparams(s){
   names[1] = "height";
   names[2] = "lorentz";
   names[3] = "doppler";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-  lor_ = &(s.getFieldNew<double>("d",names[2])->data);
-  dop_ = &(s.getFieldNew<double>("d",names[3])->data);
+  w_ = s.getDoubleNew(names[0]);
+  hi_ = s.getDoubleNew(names[1]);
+  lor_ = s.getDoubleNew(names[2]);
+  dop_ = s.getDoubleNew(names[3]);
   height_ = hi_;
   set_default("lor",0.01);
   set_default("dop",0.01);
-  db_field<VJKG>* qf = s.getField<VJKG>("vjkg","q");
-  q_p = qf?&qf->data:0;
-  qf = s.getField<VJKG>("vjkg","q0");
-  q0_p = qf?&qf->data:0;
+  //db_field<VJKG>* qf = s.getField<VJKG>("vjkg","q");
+  q_p = s.getColumn("q");
+  //qf = s.getField<VJKG>("vjkg","q0");
+  q0_p = s.getColumn("q0");
   exp_cond = &s.exp_cond;
 }
 
@@ -283,11 +284,11 @@ lineparams_gal::lineparams_gal(splist& s):lineparams_iso(s){
   names[2] = "lorentz";
   names[3] = "doppler";
   names[4] = "narrow";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-  lor_ = &(s.getFieldNew<double>("d",names[2])->data);
-  dop_ = &(s.getFieldNew<double>("d",names[3])->data);
-  nar_ = &(s.getFieldNew<double>("d",names[4])->data);
+  w_ = s.getDoubleNew(names[0]);
+  hi_ = s.getDoubleNew(names[1]);
+  lor_ = s.getDoubleNew(names[2]);
+  dop_ = s.getDoubleNew(names[3]);
+  nar_ = s.getDoubleNew(names[4]);
   height_ = hi_;
   set_default("lor",0.01);
   set_default("dop",0.01);
@@ -410,12 +411,12 @@ lineparams_galh::lineparams_galh(splist& s):lineparams_iso(s){
   names[3] = "doppler";
   names[4] = "narrow";
   names[5] = "cshift";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-  lor_ = &(s.getFieldNew<double>("d",names[2])->data);
-  dop_ = &(s.getFieldNew<double>("d",names[3])->data);
-  nar_ = &(s.getFieldNew<double>("d",names[4])->data);
-  cshift_ = &(s.getFieldNew<double>("d",names[5])->data);
+  w_ = s.getDoubleNew(names[0]);
+  hi_ = s.getDoubleNew(names[1]);
+  lor_ = s.getDoubleNew(names[2]);
+  dop_ = s.getDoubleNew(names[3]);
+  nar_ = s.getDoubleNew(names[4]);
+  cshift_ = s.getDoubleNew(names[5]);
   height_ = hi_;
   set_default("lor",0.01);
   set_default("dop",0.01);
@@ -547,13 +548,13 @@ multiparams_LD::multiparams_LD(splist& s):lineparams_iso(s){
   names[4] = "air";
   names[5] = "n_t";
   names[6] = "e0";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  intens_ = &(s.getFieldNew<double>("d",names[1])->data);
-  self_ = &(s.getFieldNew<double>("d",names[2])->data);
-  shift_ = &(s.getFieldNew<double>("d",names[3])->data);
-  air_ = &(s.getFieldNew<double>("d",names[4])->data);
-  nt_ = &(s.getFieldNew<double>("d",names[5])->data);
-  e0_ = &(s.getFieldNew<double>("d",names[6])->data);
+  w_ = s.getDoubleNew(names[0]);
+  intens_ = s.getDoubleNew(names[1]);
+  self_ = s.getDoubleNew(names[2]);
+  shift_ = s.getDoubleNew(names[3]);
+  air_ = s.getDoubleNew(names[4]);
+  nt_ = s.getDoubleNew(names[5]);
+  e0_ = s.getDoubleNew(names[6]);
   set_default("shift",0.01);
   set_default("air",0.01);
   set_default("self",0.01);
@@ -971,17 +972,13 @@ string lineparams_iso::ciso = "iso";
 
 lineparams_iso::lineparams_iso(splist& s):lineparams(s){
   iso_ = 0;
-  q_p = q0_p = 0;
 
-  db_field<VJKG>* qf = s.getField<VJKG>("vjkg","q");
-  if (qf){
-     q_p = &qf->data;
-     qf = s.getField<VJKG>("vjkg","q0");
-     q0_p = qf?&qf->data:0;
+  q_p = s.getColumn("q");
+  if (q_p){
+    q0_p = s.getColumn("q0");
   };
   if (!q_p || !q0_p){
-    q_p = q0_p = 0;
-    iso_ = &(s.getFieldNew<int>("i",ciso)->data);
+    iso_ = s.getIntNew(ciso);
   };
   def_iso = 11;
 }
@@ -1017,11 +1014,11 @@ lineparams_rau::lineparams_rau(splist& s):lineparams_iso(s){
   names[2] = "lorentz";
   names[3] = "doppler";
   names[4] = "narrow";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-  lor_ = &(s.getFieldNew<double>("d",names[2])->data);
-  dop_ = &(s.getFieldNew<double>("d",names[3])->data);
-  nar_ = &(s.getFieldNew<double>("d",names[4])->data);
+  w_ = s.getDoubleNew(names[0]);
+  hi_ = s.getDoubleNew(names[1]);
+  lor_ = s.getDoubleNew(names[2]);
+  dop_ = s.getDoubleNew(names[3]);
+  nar_ = s.getDoubleNew(names[4]);
   height_ = hi_;
   set_default("lor",0.01);
   set_default("dop",0.01);
@@ -1152,12 +1149,12 @@ lineparams_grau::lineparams_grau(splist& s):lineparams_iso(s){
   names[3] = "doppler";
   names[4] = "narrow";
   names[5] = "xi";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  hi_ = &(s.getFieldNew<double>("d",names[1])->data);
-  lor_ = &(s.getFieldNew<double>("d",names[2])->data);
-  dop_ = &(s.getFieldNew<double>("d",names[3])->data);
-  nar_ = &(s.getFieldNew<double>("d",names[4])->data);
-  xi_ = &(s.getFieldNew<double>("d",names[5])->data);
+  w_ = s.getDoubleNew(names[0]);
+  hi_ = s.getDoubleNew(names[1]);
+  lor_ = s.getDoubleNew(names[2]);
+  dop_ = s.getDoubleNew(names[3]);
+  nar_ = s.getDoubleNew(names[4]);
+  xi_ = s.getDoubleNew(names[5]);
   height_ = hi_;
   set_default("lor",0.01);
   set_default("dop",0.03);

@@ -36,6 +36,7 @@ public:
   operator bool() const {return isValid();}
   const T& operator[](size_t i) const {return m_data->at(i);}
   T& operator[](size_t i) {return m_data->at(i);}
+  std::vector<T> * getStdVector() {return m_data;}
 protected:
   std::vector<T> *m_data;
   Column_ptr m_column;

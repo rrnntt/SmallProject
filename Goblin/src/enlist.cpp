@@ -305,15 +305,15 @@ cmd_res enlist::cmd(string str){
     return ok;
   };
 
-  if (com=="sorts"){
-    sort_symm();
-    return ok;
-  };
+  //if (com=="sorts"){
+  //  sort_symm();
+  //  return ok;
+  //};
 
-  if (com=="sortq"){
-    sort_q();
-    return ok;
-  };
+  //if (com=="sortq"){
+  //  sort_q();
+  //  return ok;
+  //};
 
   if (com=="curr"){
     VJKG qq;

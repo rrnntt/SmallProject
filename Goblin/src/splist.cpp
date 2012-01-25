@@ -22,8 +22,8 @@ using namespace std;
 splist::splist(){
   lp = new lineparams;
   style = FROM_ZERO;
-  q_p = 0;
-  q0_p = 0;
+  //q_p = 0;
+  //q0_p = 0;
   cnnct = 0;
   find_dw = 0.1;
   find_eh = 4.;
@@ -42,12 +42,10 @@ splist::~splist(){
 }
 
 bool splist::load(string fn){
-  dbase::loadFromFile(fn);
+  spbase::load(fn);
 //  apply_params();
-  db_field<VJKG>* qf = getField<VJKG>("vjkg","q");
-  q_p = qf?&qf->data:0;
-  qf = getField<VJKG>("vjkg","q0");
-  q0_p = qf?&qf->data:0;
+  q_p = getColumn("q");
+  q0_p = getColumn("q0");
   vector<double>* lin = getDouble("line");
   if (lin){
     for(size_t i=1;i<lin->size();i++)
@@ -102,7 +100,7 @@ void splist::apply_params(){
       exp_cond.addIso(i,atoi(value.c_str()));
     };
   };
-  mio<<"----- exp -----"<<name<<'\n';
+  mio<<"----- exp -----"<<object::name<<'\n';
   mio<<"T="<<exp_cond.T()<<'\n';
   mio<<"L="<<exp_cond.L()<<'\n';
   for(size_t i=0;i<exp_cond.nmix();i++){
@@ -119,27 +117,25 @@ bool splist::save(){
 }
 
 bool splist::save(string fn){
-  switch(style){
-    case FROM_ZERO: params["style"] = "zero"; break;
-    case FROM_TOP: params["style"] = "top"; break;
-    case WHOLE: params["style"] = "whole"; break;
-    case NONE: params["style"] = "no"; break;
-  };
-  vector<int> *f = 0;
-  if (flt() && flt_enabled()) f = flt_;
-  dbase::saveToFile(fn.c_str(),f);
+  //switch(style){
+  //  case FROM_ZERO: params["style"] = "zero"; break;
+  //  case FROM_TOP: params["style"] = "top"; break;
+  //  case WHOLE: params["style"] = "whole"; break;
+  //  case NONE: params["style"] = "no"; break;
+  //};
+  //vector<int> *f = 0;
+  //if (flt() && flt_enabled()) f = flt_;
+  //spbase::saveToFile(fn.c_str(),f);
   return true;
 }
 
 void splist::sort(){
-  sort_rows<double>(string("d"),string("line"));
+  //sort_rows<double>(string("d"),string("line"));
 }
 
 void splist::make_quanta(){
-  db_field<VJKG>* qf = getFieldNew<VJKG>("vjkg","q");
-  q_p = qf?&qf->data:0;
-  qf = getFieldNew<VJKG>("vjkg","q0");
-  q0_p = qf?&qf->data:0;
+  q_p = getColumn("q");
+  q0_p = getColumn("q0");
 };
 
 // Calculates upper state energies and stores them in an existing
@@ -155,9 +151,9 @@ void splist::make_ener(enlist& en,const string e0f){
     return;
   };
   vector<double>& e0 = *e0p;
-  vector<double>& err = (en.getFieldNew<double>("d","err")->data);
-  vector<int>& nl = (en.getFieldNew<int>("i","n")->data);
-  vector<double>& wl = (en.getFieldNew<double>("d","wl")->data);;
+  vector<double>& err = *(en.getDoubleNew("err"));
+  vector<int>& nl = *(en.getIntNew("n"));
+  vector<double>& wl = *(en.getDoubleNew("wl"));
   size_t j;
   double ee,de,c=1.;
   for(size_t i=0;i<size();i++){
@@ -200,7 +196,7 @@ void splist::make_ener(enlist& en,const string e0f){
       err[j] = sqrt(c*err[j]/nl[j]);
     };
   };
-  en.sort_q();
+  //en.sort_q();
 }
 
 // Calculates upper state energies and stores them in an existing
@@ -219,7 +215,7 @@ void splist::make_ener_tag(enlist& en,const string e0f){
   };
   vector<double>& e0 = *e0p;
 //  vector<double>& err = (en.getFieldNew<double>("d","err")->data);
-  vector<int>& nl = (en.getFieldNew<int>("i","n")->data);
+  vector<int>& nl = *(en.getIntNew("n"));
   map< size_t,vector<size_t> > indx;
   vector<size_t>* indxj;
   map<size_t,bool> del_tagged;
@@ -268,7 +264,7 @@ void splist::make_ener_tag(enlist& en,const string e0f){
     };
     ferr<<endl;
   };
-  en.sort_q();
+  //en.sort_q();
 }
 
 template<class T>
@@ -416,7 +412,7 @@ cmd_res splist::cmd(string str){
         break;
       };
     if (!c) cmd("spectrum "+sn);
-    s->cmd("lines "+name);
+    s->cmd("lines "+object::name);
     float ii;
     for(int i=0;i<n;i++){
       renew();
@@ -591,11 +587,11 @@ cmd_res splist::cmd(string str){
       return bad;
     };
     if (!connected()){
-      mio<<"Linelist "<<name<<" is not connected\n";
+      mio<<"Linelist "<<object::name<<" is not connected\n";
       return bad;
     };
     if (!pcll){
-      mio<<"Linelist "<<name<<" is not connected\n";
+      mio<<"Linelist "<<object::name<<" is not connected\n";
       return bad;
     };
     splist& cll = *pcll;
@@ -695,8 +691,8 @@ cmd_res splist::cmd(string str){
     vector<double> *e0 = getDoubleNew("e0");
     vector<double> *n_t = getDoubleNew("n_t");
     vector<double> *shift = getDoubleNew("shift");
-    db_field<string>* f = getField<string>("s","txt");
-    vector<string> *txt = f?&(f->data):0;
+    //db_field<string>* f = getField<string>("s","txt");
+    vector<string> *txt = getString("txt");
     ofstream fil(fn.c_str());
     for(size_t i=0;i<size();i++){
        if (!allowed(i)) continue;
@@ -1042,7 +1038,7 @@ cmd_res splist::cmd(string str){
     size_t na=0,n=0;
     map<int,int> iso_a, iso;
     int is;
-    mio<<"Linelist "<<name<<'\n';
+    mio<<"Linelist "<<object::name<<'\n';
     if (assigned()){
       for(size_t i=0;i<size();i++){
         if (!allowed(i)) continue;
@@ -1260,11 +1256,11 @@ cmd_res splist::cmd(string str){
 
     if (par=="cfc"){ // find for current line upper state
       if (!connected()){
-        mio<<"Linelist "<<name<<" is not connected\n";
+        mio<<"Linelist "<<object::name<<" is not connected\n";
         return bad;
       };
       if (!pcll){
-        mio<<"Linelist "<<name<<" is not connected\n";
+        mio<<"Linelist "<<object::name<<" is not connected\n";
         return bad;
       };
       splist& cll = *pcll;
@@ -1406,7 +1402,7 @@ cmd_res splist::cmd(string str){
     string hei,hei1;
     istr>>ll_name>>hei>>hei1;
     object* o = owner->Obj(ll_name);
-    if (!o || ll_name==name) return bad;
+    if (!o || ll_name==object::name) return bad;
     connect(*(splist*)o,hei,hei1);
     return repaint;
   };
@@ -1415,7 +1411,7 @@ cmd_res splist::cmd(string str){
     string ll_name;
     istr>>ll_name;
     object* o = owner->Obj(ll_name);
-    if (!o || ll_name==name) return bad;
+    if (!o || ll_name==object::name) return bad;
     reconnect(*(splist*)o);
     return repaint;
   };
@@ -1424,7 +1420,7 @@ cmd_res splist::cmd(string str){
     string ll_name;
     istr>>ll_name;
     object* o = owner->Obj(ll_name);
-    if (!o || ll_name==name) return bad;
+    if (!o || ll_name==object::name) return bad;
     connect_q(*(splist*)o);
     return repaint;
   };
@@ -1433,7 +1429,7 @@ cmd_res splist::cmd(string str){
     string ll_name,ll_hei;
     istr>>ll_name>>ll_hei;
     object* o = owner->Obj(ll_name);
-    if (!o || ll_name==name) return bad;
+    if (!o || ll_name==object::name) return bad;
     if (ll_hei.empty()) ll_hei = "intens";
     connect_q0(*(splist*)o,ll_hei);
     return repaint;
@@ -1441,11 +1437,11 @@ cmd_res splist::cmd(string str){
 
   if (com == "c"){
     if (!connected()){
-      mio<<"Linelist "<<name<<" is not connected\n";
+      mio<<"Linelist "<<object::name<<" is not connected\n";
       return bad;
     };
     if (!pcll){
-      mio<<"Linelist "<<name<<" is not connected\n";
+      mio<<"Linelist "<<object::name<<" is not connected\n";
       return bad;
     };
     splist& cll = *pcll;
@@ -1611,7 +1607,7 @@ cmd_res splist::cmd(string str){
           if (cll.q(j).assigned()) nda++;
         };
       };
-      mio<<"Linelist "<<name<<'\n';
+      mio<<"Linelist "<<object::name<<'\n';
       mio<<"Total number of lines "<<size()<<'\n';
       mio<<"Number of lines compared " <<size()-nnc<<'\n';
       mio<<"Assigned lines       "<<na<<'\n';
@@ -1634,10 +1630,10 @@ cmd_res splist::cmd(string str){
        int jc = con(j);
        if (!cll.assigned()) return bad;
        if (!assigned()){
-         db_field<VJKG>* qf = getFieldNew<VJKG>("vjkg","q");
-         q_p = qf?&qf->data:0;
-         qf = getFieldNew<VJKG>("vjkg","q0");
-         q0_p = qf?&qf->data:0;
+         //db_field<VJKG>* qf = getFieldNew<VJKG>("vjkg","q");
+         q_p = getColumn("q");
+         //qf = getFieldNew<VJKG>("vjkg","q0");
+         q0_p = getColumn("q0");
        };
        q(j) = cll.q(jc);
        q0(j) = cll.q0(jc);
@@ -1648,10 +1644,10 @@ cmd_res splist::cmd(string str){
        int j,jc;
        if (!cll.assigned()) return bad;
        if (!assigned()){
-         db_field<VJKG>* qf = getFieldNew<VJKG>("vjkg","q");
-         q_p = qf?&qf->data:0;
-         qf = getFieldNew<VJKG>("vjkg","q0");
-         q0_p = qf?&qf->data:0;
+         //db_field<VJKG>* qf = getFieldNew<VJKG>("vjkg","q");
+         q_p = getColumn("q");
+         //qf = getFieldNew<VJKG>("vjkg","q0");
+         q0_p = getColumn("q0");
        };
        for (j=0;j<size();j++){
          if (!allowed(j)) continue;
@@ -2062,18 +2058,17 @@ cmd_res splist::cmd(string str){
       return bad;
     };
     enlist& en = *(enlist*)o;
-    db_field<VJKG>* fp = en.getField<VJKG>("vjkg","q1");
-    if (!fp){
+    DataObjects::ColumnVector<VJKG> qp = en.getColumn("q1");
+    if (!qp){
       mio<<"No q1 in "<<en_name<<'\n';
       return bad;
     };
-    vector<VJKG>* qp = &(fp->data);
     size_t j;
     for (size_t i=0;i<size();i++){
       if (!q(i).assigned()) continue;
       j = en.index(q(i));
       if (j >= en.size()) continue;
-      q(i) = (*qp)[j];
+      q(i) = (qp)[j];
       ;
     };
     return ok;
@@ -2325,10 +2320,10 @@ cmd_res splist::message(object* s,string m){
   return object::message(s,m);
 }
 
-void splist::copy(splist& ll){
-  spbase::copy(ll);
-  setParamType(params["par"]);
-}
+//void splist::copy(splist& ll){
+//  spbase::copy(ll);
+//  setParamType(params["par"]);
+//}
 
 double splist::QS(double w, double h,double w1, double h1){
   double dW,eH;
@@ -2357,24 +2352,24 @@ void splist::connect(splist& ll,string height,string height1){
   };
   vector<double> *pline = getDouble("line");
   if (!pline){
-    mio<<"Cannot connect. No frequencies in list "<<name<<'\n';
+    mio<<"Cannot connect. No frequencies in list "<<object::name<<'\n';
     return;
   };
   vector<double> *pline1 = ll.getDouble("line");
   if (!pline1){
-    mio<<"Cannot connect. No frequencies in list "<<ll.name<<'\n';
+    mio<<"Cannot connect. No frequencies in list "<<ll.object::name<<'\n';
     return;
   };
   vector<double> *phei = getDouble(height);
   if (!phei){
-    mio<<"Cannot connect. No field d:"<<height<<" in list "<<name<<'\n';
+    mio<<"Cannot connect. No field d:"<<height<<" in list "<<object::name<<'\n';
     return;
   };
   vector<double> *phei1;
   string height2 = (height1.empty())?height:height1;
   phei1 = ll.getDouble(height2);
   if (!phei1){
-    mio<<"Cannot connect. No field d:"<<height2<<" in list "<<ll.name<<'\n';
+    mio<<"Cannot connect. No field d:"<<height2<<" in list "<<ll.object::name<<'\n';
     return;
   };
   vector<double>& line = *pline;
@@ -2457,7 +2452,7 @@ void splist::connect(splist& ll,string height,string height1){
       //mio<<i+i0<<'-'<<c[i+i0]<<' '<<find_max<<'\n';
     }; // ---- i ----
   };
-  params["connect"] = ll.name;
+  params["connect"] = ll.object::name;
   ostringstream ostr;
   ostr<<ll.size();
   params["consize"] = ostr.str();
@@ -2479,20 +2474,20 @@ void splist::connect_q(splist& ll){
   };
   vector<double> *pline = getDouble("line");
   if (!pline){
-    mio<<"Cannot connect. No frequencies in list "<<name<<'\n';
+    mio<<"Cannot connect. No frequencies in list "<<object::name<<'\n';
     return;
   };
   vector<double> *pline1 = ll.getDouble("line");
   if (!pline1){
-    mio<<"Cannot connect. No frequencies in list "<<ll.name<<'\n';
+    mio<<"Cannot connect. No frequencies in list "<<ll.object::name<<'\n';
     return;
   };
   if (!assigned()) {
-    mio<<"Linelist "<<name<<" is not assigned\n";
+    mio<<"Linelist "<<object::name<<" is not assigned\n";
     return;
   };
   if (!ll.assigned()) {
-    mio<<"Linelist "<<ll.name<<" is not assigned\n";
+    mio<<"Linelist "<<ll.object::name<<" is not assigned\n";
     return;
   };
   vector<double>& line = *pline;
@@ -2518,7 +2513,7 @@ void splist::connect_q(splist& ll){
       };
     };
   };
-  params["connect"] = ll.name;
+  params["connect"] = ll.object::name;
   ostringstream ostr;
   ostr<<ll.size();
   params["consize"] = ostr.str();
@@ -2534,7 +2529,7 @@ void splist::connect_q0(splist& ll,string ll_hei){
   vector<double> *pline = getDouble("line");
   vector<double> *pheight = getDouble(ll_hei);
   if (!pline || !pheight){
-    mio<<"Cannot connect "<<name<<'\n';
+    mio<<"Cannot connect "<<object::name<<'\n';
     if (!pline) mio<<"No lines\n";
     if (!pheight) mio<<"No intensities\n";
     return;
@@ -2542,17 +2537,17 @@ void splist::connect_q0(splist& ll,string ll_hei){
   vector<double> *pline1 = ll.getDouble("line");
   vector<double> *pheight1 = ll.getDouble(ll_hei);
   if (!pline1 || !pheight1){
-    mio<<"Cannot connect to "<<ll.name<<'\n';
+    mio<<"Cannot connect to "<<ll.object::name<<'\n';
     if (!pline1) mio<<"No lines\n";
     if (!pheight1) mio<<"No intensities\n";
     return;
   };
   if (!assigned()) {
-    mio<<"Linelist "<<name<<" is not assigned\n";
+    mio<<"Linelist "<<object::name<<" is not assigned\n";
     return;
   };
   if (!ll.assigned()) {
-    mio<<"Linelist "<<ll.name<<" is not assigned\n";
+    mio<<"Linelist "<<ll.object::name<<" is not assigned\n";
     return;
   };
   
@@ -2587,7 +2582,7 @@ void splist::connect_q0(splist& ll,string ll_hei){
     };
     c[i] = jj;
   };
-  params["connect"] = ll.name;
+  params["connect"] = ll.object::name;
   ostringstream ostr;
   ostr<<ll.size();
   params["consize"] = ostr.str();
@@ -2595,14 +2590,14 @@ void splist::connect_q0(splist& ll,string ll_hei){
 
 
 void splist::disconnect(){
-  deleteField("i","cnnct");
+  //deleteField("i","cnnct");
   cnnct = 0;
   params["connect"] = "";
   params["consize"] = "";
 }
 
 bool splist::connectedTo(splist& ll){
-  return cnnct && params["connect"]==ll.name &&
+  return cnnct && params["connect"]==ll.object::name &&
     atoi(params["consize"].c_str())==ll.size();
 }
 
@@ -2620,10 +2615,10 @@ void splist::height(size_t i,double h){
 
 bool splist::assignment(){
   if (assigned()) return true;
-  db_field<VJKG>* qf = getField<VJKG>("vjkg","q");
-  q_p = qf?&qf->data:0;
-  qf = getField<VJKG>("vjkg","q0");
-  q0_p = qf?&qf->data:0;
+  //db_field<VJKG>* qf = getField<VJKG>("vjkg","q");
+  q_p = getColumn("q");
+  //qf = getField<VJKG>("vjkg","q0");
+  q0_p = getColumn("q0");
   if (q_p == 0 || q0_p == 0) return false;
   return true;
 }
@@ -2695,7 +2690,7 @@ void splist::line_error(string e0f,double h){
     return;
   };
   vector<double>& e0 = *e0p;
-  vector<double>& err = (getFieldNew<double>("d","lerr")->data);
+  vector<double>& err = *(getDouble("lerr"));
   map<VJKG,vector<line_error_struct> > en;
   map<VJKG,vector<line_error_struct> >::iterator e;
   vector<line_error_struct>::iterator v;
@@ -2832,7 +2827,7 @@ int splist::addLine(double w,double h,spectrum *sp){
         j = i;
         break;
      };
-  if (j == size()) addRow();
+  if (j == size()) appendRow();
   else
     insertRow(j);
   setCurr(j);
@@ -2849,7 +2844,7 @@ void splist::deleteLine(size_t i){
     height(j,height(j) + height(i));
   };
   erase(i,i);
-  eraseRow(i);
+  removeRow(i);
 }
 
 
@@ -2861,7 +2856,7 @@ splist* splist::getConnected(){
   string conn_name = params["connect"];
   obj_list<splist> llist(owner,"splist");
   for(size_t i=0;i<llist.size();i++)
-    if (llist[i].name == conn_name) return llist(i);
+    if (llist[i].object::name == conn_name) return llist(i);
   return 0;
 }
 

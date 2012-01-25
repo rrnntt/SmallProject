@@ -27,8 +27,8 @@ public:
   size_t index(const VJKG& q);
   VJKG& q(size_t i){return q_p[i];}
   bool load(string fn);
-  void sort_symm();
-  void sort_q();
+  //void sort_symm();
+  //void sort_q();
   cmd_res cmd(string str);
   fun_res fun(string str);
   void swapq(VJKG& q1,VJKG& q2);

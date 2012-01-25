@@ -220,15 +220,43 @@ vector<int>* spbase::getIntNew(const string nam){
   //return f?&(f->data):0;
 }
 
-//vector<string>* spbase::getString(const string nam){
-//  db_field<string>* f = getField<string>("s",nam);
-//  return f?&(f->data):0;
-//}
-//
-//vector<string>* spbase::getStringNew(const string nam){
-//  db_field<string>* f = getFieldNew<string>("s",nam);
-//  return f?&(f->data):0;
-//}
+vector<string>* spbase::getString(const string nam){
+  try
+  {
+    DataObjects::ColumnVector<std::string> vec = getColumn(nam);
+    if (vec)
+    {
+      return vec.getStdVector();
+    }
+    return nullptr;
+  }
+  catch(...)
+  {}
+  return nullptr;
+  //db_field<string>* f = getField<string>("s",nam);
+  //return f?&(f->data):0;
+}
+
+vector<string>* spbase::getStringNew(const string nam){
+  try
+  {
+    DataObjects::ColumnVector<std::string> vec = getColumn(nam);
+    if (vec)
+    {
+      return vec.getStdVector();
+    }
+    return nullptr;
+  }
+  catch(...)
+  {
+    addColumn("string",nam);
+    DataObjects::ColumnVector<std::string> vec = getColumn(nam);
+    return vec.getStdVector();
+  }
+  return nullptr;
+  //db_field<string>* f = getFieldNew<string>("s",nam);
+  //return f?&(f->data):0;
+}
 
 bool spbase::load(string fn){
   //dbase::loadFromFile(fn);
@@ -788,12 +816,13 @@ bool spbase::save(){
   return false;
 }
 
-//bool spbase::save(string fn){
+bool spbase::save(string fn){
 //  vector<int> *f = 0;
 //  if (flt() && flt_enabled()) f = flt_;
 //  dbase::saveToFile(fn.c_str(),f);
 //  return true;
-//}
+  return false;
+}
 
 void spbase::flt_add(size_t i,bool v,char op){
  if (!flt_ || i>=size()) return;

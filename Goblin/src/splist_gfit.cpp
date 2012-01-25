@@ -188,7 +188,7 @@ void splist::efit(enlist& en,vector<int>& ind,bool int_fit,bool out){
     };
     vector<double>* cintens = cll->getDouble("intens");
     if (!cintens){
-      mio<<"No field d:intens in line-list "<<cll->name<<'\n';
+      mio<<"No field d:intens in line-list "<<cll->object::name<<'\n';
       return;
     };
     for(size_t i=0;i<ind.size();i++)
@@ -556,7 +556,7 @@ void splist::prep4efit(){
   float hh;
   string fn = owner->dir()+"efit_cmd.txt";
   ofstream fil(fn.c_str());
-  fil<<"com "<<name<<'\n';
+  fil<<"com "<<object::name<<'\n';
   fil<<".fixall 0011111111111\n";
   for(size_t is=0;is<spectra.size();is++)
     for(i=0;i<spectra[is].nop();i++) spectra[is].exp_sp->weight(i,1.);
@@ -688,7 +688,7 @@ void splist::prep_q4efit(enlist& en,VJKG& qq,bool info){
       };
     if (j>=en.size()){
       if (!ind.size()){
-        mio<<"Cannot find state "<<qq<<" in the line-list "<<name<<'\n';
+        mio<<"Cannot find state "<<qq<<" in the line-list "<<object::name<<'\n';
         return;
       };
       vector<double> *e0 = getDouble("e0");
@@ -704,7 +704,7 @@ void splist::prep_q4efit(enlist& en,VJKG& qq,bool info){
           hi = height(*i);
         };
       en.add(qq,ee);
-      en.sort_q();
+      //en.sort_q();
       j = en.index(qq);
     };
     
@@ -767,7 +767,7 @@ void splist::prep_q4efit(enlist& en,VJKG& qq,bool info){
       mio<<'\n';
     }else if (doit){    
       ostringstream fil;
-      fil<<"efitl "<<en.name<<" int ";
+      fil<<"efitl "<<en.object::name<<" int ";
       for(vector<int>::iterator k=ind.begin();k!=ind.end();k++)
          fil<<*k<<' ';
       cmd(fil.str());

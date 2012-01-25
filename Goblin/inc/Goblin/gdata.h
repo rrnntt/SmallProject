@@ -76,7 +76,7 @@ public:
       if (typ != type) return 0;
     };
     for(size_t i=0;i<size();i++)
-    if (data[i]->name == nnam) return data[i];
+    if (data[i]->object::name == nnam) return data[i];
     return 0;
   }
   bool has(T* t){

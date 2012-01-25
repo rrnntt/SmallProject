@@ -13,12 +13,12 @@ multiparams_LDs::multiparams_LDs(splist& s):lineparams_iso(s){
   names[3] = "shift";
   names[4] = "n_t";
   names[5] = "e0";
-  w_ = &(s.getFieldNew<double>("d",names[0])->data);
-  intens_ = &(s.getFieldNew<double>("d",names[1])->data);
-  self_ = &(s.getFieldNew<double>("d",names[2])->data);
-  shift_ = &(s.getFieldNew<double>("d",names[3])->data);
-  nt_ = &(s.getFieldNew<double>("d",names[4])->data);
-  e0_ = &(s.getFieldNew<double>("d",names[5])->data);
+  w_ = s.getDoubleNew(names[0]);
+  intens_ = s.getDoubleNew(names[1]);
+  self_ = s.getDoubleNew(names[2]);
+  shift_ = s.getDoubleNew(names[3]);
+  nt_ = s.getDoubleNew(names[4]);
+  e0_ = s.getDoubleNew(names[5]);
   set_default("shift",0.);
   set_default("self",0.4);
   set_default("nt",0.);

@@ -30,8 +30,8 @@ protected:
   int line_style; //  0 - no lines, 1 - solid line
   int pnt_size;
   size_t m_currentRow;
-  map<string,string> params;
 public:
+  map<string,string> params;
   static bool created;
   static double bad_double;
   static double bad_float;
@@ -50,8 +50,8 @@ public:
   vector<float>* getFloatNew(const string nam);
   vector<int>* getInt(const string nam);
   vector<int>* getIntNew(const string nam);
-  //vector<string>* getString(const string nam);
-  //vector<string>* getStringNew(const string nam);
+  vector<string>* getString(const string nam);
+  vector<string>* getStringNew(const string nam);
   cmd_res cmd(string str);
   fun_res fun(string str);
   size_t size() const {return rowCount();}

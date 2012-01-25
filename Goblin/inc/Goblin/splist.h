@@ -2,14 +2,13 @@
 #define SPLIST_H
 
 #include "Goblin/DllExport.h"
-
-//#include "../Troll2/def.h"
 #include "Goblin/spbase.h"
 #include "Goblin/d_container.h"
 #include "Goblin/comdiff.h"
 #include "Goblin/exp_cond.h"
 #include "Goblin/spectrum.h"
 #include "Goblin/spline.h"
+#include "DataObjects/ColumnVector.h"
 
 namespace Goblin
 {
@@ -49,8 +48,8 @@ class GOBLIN_EXPORT splist : public spbase  {
   bool noise_;
 public:
   VJKG bad_q;
-  vector<VJKG> *q_p;
-  vector<VJKG> *q0_p;
+  DataObjects::ColumnVector<VJKG> q_p;
+  DataObjects::ColumnVector<VJKG> q0_p;
   vector<double> *line_, *height_;
   //--- connect ----//
   vector<int> *cnnct;
@@ -80,8 +79,8 @@ public:
   void erase(size_t i1,size_t i2);
   void renew(size_t i1,size_t i2);
   void sort();
-  VJKG& q(size_t i){return (q_p&&i<size())?(*q_p)[i]:bad_q; }
-  VJKG& q0(size_t i){return (q0_p&&i<size())?(*q0_p)[i]:bad_q; }
+  VJKG& q(size_t i){return (q_p&&i<size())?(q_p)[i]:bad_q; }
+  VJKG& q0(size_t i){return (q0_p&&i<size())?(q0_p)[i]:bad_q; }
   VJKG& q(){return q(curr());}
   VJKG& q0(){return q0(curr());}
   void make_ener(enlist& en,const string e0f);
