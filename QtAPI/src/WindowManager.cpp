@@ -33,11 +33,17 @@ WindowManager& WindowManager::instance()
   }
 }
 
+/**
+ * Custimize a menubar for an active window.
+ * @param menubar :: The menubar to customize.
+ * @param wnd :: A Pointer to current sub-window
+ */
 void WindowManager::customMenuBar(QMenuBar* menubar, SubWindow* wnd) const
 {
   TaskManager& manager = TaskManager::instance();
   auto taskNames = manager.getObjectNames();
   menubar->clear();
+  // loop the tasks and add their menus to the menubar
   for(auto name = taskNames.begin(); name != taskNames.end();++name)
   {
     menubar->addMenu(manager.retrieve(*name)->menu(wnd));
