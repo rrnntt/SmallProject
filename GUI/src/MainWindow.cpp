@@ -79,6 +79,7 @@ void MainWindow::createMenus()
 
 void MainWindow::subWindowBecameActive(QtAPI::SubWindow* w)
 {
+  this->customMenuBar(menuBar(),w);
   std::cerr << "Activated " << w->windowTitle().toStdString() << std::endl;
 
 }

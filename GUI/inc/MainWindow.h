@@ -31,15 +31,10 @@ protected:
   void closeEvent(QCloseEvent*);
 protected slots:
   void subWindowBecameActive(QtAPI::SubWindow*);
-  void openOSGWindow();
-  void openOSGFile();
 private:
   QMdiArea* m_mdiArea;
   AlgorithmExplorer* m_algorithmExplorer;
   WorkspaceExplorer* m_workspaceExplorer;
-  /*---  Actions  ---*/
-  QAction* m_openOSGWindow;
-  QAction* m_openOSGFile;
   friend class FileTask;
   friend class ViewTask;
 };

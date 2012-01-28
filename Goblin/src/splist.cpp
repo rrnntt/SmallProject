@@ -1186,6 +1186,7 @@ cmd_res splist::cmd(string str){
     return ok;
   };
 
+  // Combination differences commands
   if (com == "d"){
     string par;
     istr>>par;
@@ -1200,24 +1201,28 @@ cmd_res splist::cmd(string str){
       };
       return ok;
     };
+    // Set the search interval in wavenumbers around predicted line position
     if (par=="dW"){
       double d;
       istr>>d;
       cd.dW = d;
       return ok;
     };
+    // set the accuracy in wavenumbers
     if (par=="dw"){
       double d;
       istr>>d;
       cd.dw = d;
       return ok;
     };
+    // set maximum Delta K
     if (par=="dk"){
       int dk;
       istr>>dk;
       cd.dk_max = dk;
       return ok;
     };
+    // set an upper level to search for
     if (par=="set"){  //  d set 12345.6 (110) 1 0 1
       double e;
       VJKG qq;
@@ -1228,7 +1233,7 @@ cmd_res splist::cmd(string str){
       };
       return ok;
     };
-    
+    // do search for a level defined by upper state of current line
     if (par=="fc"){ // find for current line upper state
       double e;
       VJKG qq = q();
@@ -1254,6 +1259,8 @@ cmd_res splist::cmd(string str){
       return ok;
     };
 
+    // do search for a level defined by upper state of current line
+    // in the connected splist
     if (par=="cfc"){ // find for current line upper state
       if (!connected()){
         mio<<"Linelist "<<object::name<<" is not connected\n";
@@ -1298,13 +1305,14 @@ cmd_res splist::cmd(string str){
       mio<<cd;
       return ok;
     };
-    
+    // assign curent line to result of cd
     if (par == "a" || par == "ass"){
       cd.assign();
       mio<<cd;
       return repaint;
     };
     
+    // ?
     if (par == "at"){
       VJKG qq;
       qq.assign(rest);
@@ -1312,7 +1320,7 @@ cmd_res splist::cmd(string str){
       mio<<cd;
       return repaint;
     };
-    
+    // set enlist with lower energies: e0 <enlist_name>
     if (par=="e0"){
       string ener_name;
       istr >> ener_name;
@@ -1341,6 +1349,7 @@ cmd_res splist::cmd(string str){
       mio<<cd;
       return ok;
     };
+    // check cd for upper state of current line
     if (par=="check" || par == "ch"){
       string iso,vvv,j,k,g;
       istr >> iso>>vvv>>j>>k>>g;
