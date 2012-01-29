@@ -28,4 +28,10 @@ bool SubWindow::event(QEvent * e)
   }
   return QMdiSubWindow::event(e);
 }
+
+void SubWindow::closeEvent(QCloseEvent * e)
+{
+  emit subWindowClosed(this);
+}
+
 } // QtAPI

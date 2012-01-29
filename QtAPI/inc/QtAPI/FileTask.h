@@ -18,6 +18,7 @@ public:
   FileTask();
   virtual Type type() const{return Background;}
   virtual QMenu* menu(SubWindow* w = nullptr) const{return m_menu;}
+  virtual int menuOrder() const {return 1;} ///< File menu is always first
 private slots:
   void newTable();
   void loadAsciiTable();

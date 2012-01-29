@@ -14,6 +14,9 @@ namespace QtAPI
 
 class SubWindow;
 
+/// The order
+const int customMenuOder = 10;
+
 /**
  * Task performed by the application. Tasks define the actions that the application can do.
  * Application can have several background tasks (eg user account check) and a single
@@ -33,11 +36,17 @@ public:
   /// Type of the task
   virtual Type type() const  = 0;
   virtual QMenu* menu(SubWindow* w = nullptr) const = 0;
+  /// Returns order of the task in the menubar, doesn't have to be unique.
+  /// Tasks are sorted in their menuOrder before adding to the menubar.
+  /// Tasks with smaller order go first in the menubar.
+  /// Tasks of subwindows should return customMenuOder constant.
+  virtual int menuOrder() const = 0;
 
   QAction* getAction(const QString& name) const;
 protected:
   void addAction(const QString& name, QAction* action);
   QHash<QString, QAction*> m_actions;
+  int m_menuOrder;
 };
 
 typedef boost::shared_ptr<Task> Task_ptr;

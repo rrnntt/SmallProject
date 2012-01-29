@@ -22,6 +22,7 @@ public:
   TableTask();
   virtual Type type() const {return Background;}
   virtual QMenu* menu(SubWindow* w = nullptr) const;
+  virtual int menuOrder() const {return customMenuOder;}
 public slots:
   void showTableDialog();
 protected:

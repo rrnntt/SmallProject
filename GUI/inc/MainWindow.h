@@ -31,6 +31,7 @@ protected:
   void closeEvent(QCloseEvent*);
 protected slots:
   void subWindowBecameActive(QtAPI::SubWindow*);
+  void subWindowClosed(QtAPI::SubWindow*);
 private:
   QMdiArea* m_mdiArea;
   AlgorithmExplorer* m_algorithmExplorer;

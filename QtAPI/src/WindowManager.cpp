@@ -3,6 +3,7 @@
 #include "API/Framework.h"
 
 #include <QtGui/QMenuBar>
+#include <QtCore/QMap>
 
 namespace QtAPI
 {
@@ -43,11 +44,24 @@ void WindowManager::customMenuBar(QMenuBar* menubar, SubWindow* wnd) const
   TaskManager& manager = TaskManager::instance();
   auto taskNames = manager.getObjectNames();
   menubar->clear();
+  QMultiMap<int,Task_ptr> orderedTasks;
   // loop the tasks and add their menus to the menubar
   for(auto name = taskNames.begin(); name != taskNames.end();++name)
   {
-    menubar->addMenu(manager.retrieve(*name)->menu(wnd));
+    Task_ptr task = manager.retrieve(*name);
+    if (task)
+    {
+      orderedTasks.insert(task->menuOrder(), task);
+    }
   };
+  for(auto task = orderedTasks.begin(); task != orderedTasks.end(); ++task)
+  {
+    QMenu* menu = task.value()->menu(wnd);
+    if (menu)
+    {
+      menubar->addMenu(menu);
+    }
+  }
 }
 
 } // namespace QtAPI

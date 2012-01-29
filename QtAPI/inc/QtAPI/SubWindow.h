@@ -18,10 +18,12 @@ public:
   virtual QMenu* makeContext() const {return nullptr;}
 signals:
   void subWindowBecameActive(QtAPI::SubWindow* w);
+  void subWindowClosed(QtAPI::SubWindow* w);
 protected slots:
   void processStateChanged(Qt::WindowStates oldState, Qt::WindowStates newSTate);
 protected:
-  bool SubWindow::event(QEvent * e);
+  bool event(QEvent * e);
+  void closeEvent(QCloseEvent * e);
 };
 
 } // QtAPI
