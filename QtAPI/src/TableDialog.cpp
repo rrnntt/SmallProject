@@ -1,4 +1,5 @@
 #include "QtAPI/TableDialog.h"
+#include "QtAPI/AddTableColumnDialog.h"
 #include "ui_TableDialog.h"
 
 #include "DataObjects/TableWorkspace.h"
@@ -54,13 +55,24 @@ void TableDialog::changeEvent(QEvent *e)
  */
 void TableDialog::init()
 {
+  initColumns();
+  selectedColumn();
+  initFormulaPage();
+  initDistributionPage();
+  connect(ui->cbDistribution,SIGNAL(currentIndexChanged(int)),this,SLOT(updateDistributionPage(int)));
+  connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton*)),this,SLOT(applyButton(QAbstractButton*)));
+  connect(ui->btnAddColumn,SIGNAL(clicked()),this,SLOT(addColumn()));
+  connect(ui->btnRemoveColumn,SIGNAL(clicked()),this,SLOT(removeColumn()));
+}
+
+void TableDialog::initColumns()
+{
   ui->sbRowCount->setValue(m_workspace->rowCount());
   ui->sbColumnCount->setValue(m_workspace->columnCount());
-  //ui->sbRowCount->setEnabled(false);
   ui->sbColumnCount->setEnabled(false);
 
   // fill in the table of column info
-  ui->tableColumns->clear();
+  ui->tableColumns->setRowCount(0);
   std::vector<std::string> colNames = m_workspace->getColumnNames();
   for(auto name = colNames.begin(); name != colNames.end(); ++name)
   {
@@ -70,11 +82,6 @@ void TableDialog::init()
     ui->tableColumns->model()->setData(ui->tableColumns->model()->index(row,0),QString::fromStdString(*name));
     ui->tableColumns->model()->setData(ui->tableColumns->model()->index(row,1),QString::fromStdString(column->type()));
   }
-  selectedColumn();
-  initFormulaPage();
-  initDistributionPage();
-  connect(ui->cbDistribution,SIGNAL(currentIndexChanged(int)),this,SLOT(updateDistributionPage(int)));
-  connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton*)),this,SLOT(applyButton(QAbstractButton*)));
 }
 
 /**
@@ -82,6 +89,17 @@ void TableDialog::init()
  */
 void TableDialog::initFormulaPage()
 {
+  int n = 0;
+  std::vector<std::string> colNames = m_workspace->getColumnNames();
+  for(auto name = colNames.begin(); name != colNames.end(); ++name)
+  {
+    auto column = m_workspace->getColumn(*name);
+    if (column->type() == "double")
+    {
+
+      ui->tableWidget->insertRow(n);
+    }
+  }
 }
 
 /**
@@ -178,6 +196,7 @@ void TableDialog::applyButton(QAbstractButton* button)
   if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Apply)
   {
     apply();
+    m_workspace->modified();
   }
 }
 
@@ -198,7 +217,6 @@ void TableDialog::applyRowCount()
   }
   if (nRows > veryBigRowCount)
   {
-    QMessageBox::critical(this,"Error","Number of rows is very large");
     if (QMessageBox::question(this,"Confirmation","Number of rows is very large, are you sure it is correct?","Yes","No")
       != QMessageBox::Accepted)
     {
@@ -284,6 +302,34 @@ void TableDialog::applyDistribution()
     QMessageBox::critical(parentWidget(),"Error",QString("Algorithm failed \n")+e.what());
     return;
   }
+}
+
+void TableDialog::addColumn()
+{
+  AddTableColumnDialog dlg(this);
+  if (dlg.exec() == QDialog::Accepted)
+  {
+    m_workspace->addColumn(dlg.getType(),dlg.getName());
+    m_workspace->modified();
+    initColumns();
+  }
+}
+
+void TableDialog::removeColumn()
+{
+    int col = selectedColumn();
+    std::vector<std::string> names = m_workspace->getColumnNames();
+    if (col >= static_cast<int>(names.size())) return;
+    std::string columnName = names[col];
+    int ans =  QMessageBox::question(this,"Confirmation","Do you really want to remove column "+QString::fromStdString(columnName)+"?","Yes","No");
+    if (ans != 0)
+    {
+      std::cerr << "Answer " << ans <<std::endl;
+      return;
+    }
+    m_workspace->removeColumn(columnName);
+    m_workspace->modified();
+    initColumns();
 }
 
 } // QtAPI

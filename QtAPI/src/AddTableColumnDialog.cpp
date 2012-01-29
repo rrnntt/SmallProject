@@ -10,10 +10,9 @@
 namespace QtAPI
 {
 
-AddTableColumnDialog::AddTableColumnDialog(Table* table) :
-    QDialog(table),
-    ui(new Ui::AddTableColumnDialog),
-    m_table(table)
+AddTableColumnDialog::AddTableColumnDialog(QWidget* parent) :
+    QDialog(parent),
+    ui(new Ui::AddTableColumnDialog)
 {
   ui->setupUi(this);
   init();

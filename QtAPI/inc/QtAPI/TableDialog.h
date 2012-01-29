@@ -28,6 +28,7 @@ public:
 protected:
     void changeEvent(QEvent *e);
     void init();
+    void initColumns();
     void initFormulaPage();
     void initDistributionPage();
     int selectedColumn();
@@ -39,6 +40,8 @@ protected slots:
     void updateDistributionPage(int);
     void applyRowCount();
     void applyButton(QAbstractButton*);
+    void addColumn();
+    void removeColumn();
 
 private:
   Ui::TableDialog *ui;

@@ -16,7 +16,7 @@ class Table;
 class QTAPI_EXPORT AddTableColumnDialog : public QDialog {
     Q_OBJECT
 public:
-    AddTableColumnDialog(Table* table);
+    AddTableColumnDialog(QWidget* parent);
     ~AddTableColumnDialog();
     std::string getType() const;
     std::string getName() const;
@@ -31,7 +31,6 @@ private slots:
 
 private:
   Ui::AddTableColumnDialog *ui;
-  Table* m_table;
 };
 
 } // QtAPI
