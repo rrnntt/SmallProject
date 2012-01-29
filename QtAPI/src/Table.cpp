@@ -386,4 +386,14 @@ void TableModel::handleModified(const API::WorkspaceManager::ModifiedNotificatio
   }
 }
 
+void TableModel::setRowCount(int n)
+{
+  if (n != m_rowCount)
+  {
+    m_workspace->setRowCount(n);
+    resetWorkspace();
+    reset();
+  }
+}
+
 } // QtAPI

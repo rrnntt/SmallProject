@@ -20,6 +20,8 @@
 namespace QtAPI
 {
 
+const int veryBigRowCount = 100000;
+
 TableDialog::TableDialog(QWidget *parent,boost::shared_ptr<DataObjects::TableWorkspace> ws) :
     QDialog(parent),
     ui(new Ui::TableDialog),
@@ -54,7 +56,7 @@ void TableDialog::init()
 {
   ui->sbRowCount->setValue(m_workspace->rowCount());
   ui->sbColumnCount->setValue(m_workspace->columnCount());
-  ui->sbRowCount->setEnabled(false);
+  //ui->sbRowCount->setEnabled(false);
   ui->sbColumnCount->setEnabled(false);
 
   // fill in the table of column info
@@ -72,6 +74,7 @@ void TableDialog::init()
   initFormulaPage();
   initDistributionPage();
   connect(ui->cbDistribution,SIGNAL(currentIndexChanged(int)),this,SLOT(updateDistributionPage(int)));
+  connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton*)),this,SLOT(applyButton(QAbstractButton*)));
 }
 
 /**
@@ -87,7 +90,7 @@ void TableDialog::initFormulaPage()
 void TableDialog::initDistributionPage()
 {
   QStringList dist;
-  dist << "Serial numbers" << "Uniform" << "Poisson" << "Normal";
+  dist << "" << "Serial numbers" << "Uniform" << "Poisson" << "Normal";
   ui->cbDistribution->addItems(dist);
   updateDistributionPage(0);
 }
@@ -99,32 +102,51 @@ void TableDialog::initDistributionPage()
 void TableDialog::updateDistributionPage(int)
 {
   QString distrName = ui->cbDistribution->currentText();
+
   if (distrName == "Serial numbers")
   {
-    ui->leMinimum->setEnabled(true);
-    ui->leMaximum->setEnabled(false);
-    ui->leMinimum->setText("1");
+    ui->leDistrParam1->setEnabled(true);
+    ui->leDistrParam2->setEnabled(false);
+    ui->leDistrParam1->setText("1");
+    ui->lblDistrParam1->setText("Start");
+    ui->lblDistrParam1->show(); ui->leDistrParam1->show();
+    ui->lblDistrParam2->hide(); ui->leDistrParam2->hide();
   }
   else if (distrName == "Uniform")
   {
-    ui->leMinimum->setEnabled(true);
-    ui->leMaximum->setEnabled(true);
-    ui->leMinimum->setText("0");
-    ui->leMaximum->setText("1");
+    ui->leDistrParam1->setEnabled(true);
+    ui->leDistrParam2->setEnabled(true);
+    ui->leDistrParam1->setText("0");
+    ui->leDistrParam2->setText("1");
+    ui->lblDistrParam1->setText("Minimum");
+    ui->lblDistrParam2->setText("Maximum");
+    ui->lblDistrParam1->show(); ui->leDistrParam1->show();
+    ui->lblDistrParam2->show(); ui->leDistrParam2->show();
   }
   else if (distrName == "Poisson")
   {
-    ui->leMinimum->setEnabled(true);
-    ui->leMaximum->setEnabled(false);
-    ui->leMinimum->setText("1");
-    ui->leMaximum->setText("1");
+    ui->leDistrParam1->setEnabled(true);
+    ui->leDistrParam2->setEnabled(false);
+    ui->leDistrParam1->setText("1");
+    ui->lblDistrParam1->setText("Mean");
+    ui->lblDistrParam1->show(); ui->leDistrParam1->show();
+    ui->lblDistrParam2->hide(); ui->leDistrParam2->hide();
   }
   else if (distrName == "Normal")
   {
-    ui->leMinimum->setEnabled(true);
-    ui->leMaximum->setEnabled(true);
-    ui->leMinimum->setText("0");
-    ui->leMaximum->setText("1");
+    ui->leDistrParam1->setEnabled(true);
+    ui->leDistrParam2->setEnabled(true);
+    ui->leDistrParam1->setText("0");
+    ui->leDistrParam2->setText("1");
+    ui->lblDistrParam1->setText("Mean");
+    ui->lblDistrParam2->setText("Variance");
+    ui->lblDistrParam1->show(); ui->leDistrParam1->show();
+    ui->lblDistrParam2->show(); ui->leDistrParam2->show();
+  }
+  else
+  {
+    ui->lblDistrParam1->hide(); ui->leDistrParam1->hide();
+    ui->lblDistrParam2->hide(); ui->leDistrParam2->hide();
   }
 }
 
@@ -148,7 +170,44 @@ int TableDialog::selectedColumn()
   return items[0]->row();
 }
 
+/**
+ * Apply a button from the button box.
+ */
+void TableDialog::applyButton(QAbstractButton* button)
+{
+  if (ui->buttonBox->standardButton(button) == QDialogButtonBox::Apply)
+  {
+    apply();
+  }
+}
 
+/**
+ * Set the number of rows in the table to the number in the sbRowColumn 
+ */
+void TableDialog::applyRowCount()
+{
+  int nRows = ui->sbRowCount->value();
+  if (nRows == m_workspace->rowCount())
+  {
+    return;
+  }
+  if (nRows <= 0)
+  {
+    QMessageBox::critical(this,"Error","Number of rows must be positive.");
+    return;
+  }
+  if (nRows > veryBigRowCount)
+  {
+    QMessageBox::critical(this,"Error","Number of rows is very large");
+    if (QMessageBox::question(this,"Confirmation","Number of rows is very large, are you sure it is correct?","Yes","No")
+      != QMessageBox::Accepted)
+    {
+      return;
+    }
+  }
+  m_workspace->setRowCount(nRows);
+  m_workspace->modified();
+}
 
 void TableDialog::accept()
 {
@@ -158,6 +217,7 @@ void TableDialog::accept()
 
 void TableDialog::apply()
 {
+  applyRowCount();
   int tabIndex = ui->tabWidget->currentIndex();
   QString tabName = ui->tabWidget->tabText(tabIndex);
   if (tabName == "Distribution")
@@ -179,7 +239,7 @@ void TableDialog::applyDistribution()
   QString distrName = ui->cbDistribution->currentText();
   if (distrName == "Serial numbers")
   {
-    int start = ui->leMinimum->text().toInt();
+    int start = ui->leDistrParam1->text().toInt();
     for(size_t i = 0; i < n; ++i)
     {
       numeric->setDouble(i,static_cast<double>(start + i));
@@ -193,8 +253,8 @@ void TableDialog::applyDistribution()
     {
       alg = API::AlgorithmFactory::instance().createAlgorithm("CreateUniformRandomData");
       alg->get("Workspace") = m_workspace->name();
-      alg->get("MinValue") = ui->leMinimum->text().toStdString();
-      alg->get("MaxValue") = ui->leMaximum->text().toStdString();
+      alg->get("MinValue") = ui->leDistrParam1->text().toStdString();
+      alg->get("MaxValue") = ui->leDistrParam2->text().toStdString();
       alg->get("Column") = column->name();
     }
     else if (distrName == "Poisson")
@@ -203,8 +263,8 @@ void TableDialog::applyDistribution()
       alg->get("Workspace") = m_workspace->name();
       alg->get("Column") = column->name();
       alg->get("Distribution") = "poisson";
-      alg->get("Mean") = ui->leMinimum->text().toStdString();
-      alg->get("Sigma") = ui->leMaximum->text().toStdString();
+      alg->get("Mean") = ui->leDistrParam1->text().toStdString();
+      alg->get("Sigma") = ui->leDistrParam2->text().toStdString();
     }
     else if (distrName == "Normal")
     {
@@ -212,8 +272,8 @@ void TableDialog::applyDistribution()
       alg->get("Workspace") = m_workspace->name();
       alg->get("Column") = column->name();
       alg->get("Distribution") = "normal";
-      alg->get("Mean") = ui->leMinimum->text().toStdString();
-      alg->get("Sigma") = ui->leMaximum->text().toStdString();
+      alg->get("Mean") = ui->leDistrParam1->text().toStdString();
+      alg->get("Sigma") = ui->leDistrParam2->text().toStdString();
     }
 
     if (!alg) return;

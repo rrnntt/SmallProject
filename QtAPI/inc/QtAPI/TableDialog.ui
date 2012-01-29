@@ -96,24 +96,24 @@
             <widget class="QComboBox" name="cbDistribution"/>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_4">
+            <widget class="QLabel" name="lblDistrParam1">
              <property name="text">
               <string>Minimum</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="leMinimum"/>
+            <widget class="QLineEdit" name="leDistrParam1"/>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="lblDistrParam2">
              <property name="text">
               <string>Maximum</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="leMaximum"/>
+            <widget class="QLineEdit" name="leDistrParam2"/>
            </item>
           </layout>
          </item>
@@ -142,7 +142,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

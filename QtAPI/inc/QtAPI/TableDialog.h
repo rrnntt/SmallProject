@@ -5,6 +5,8 @@
 #include <boost/shared_ptr.hpp>
 #include <QDialog>
 
+class QAbstractButton;
+
 namespace Ui {
     class TableDialog;
 }
@@ -35,6 +37,8 @@ protected:
 
 protected slots:
     void updateDistributionPage(int);
+    void applyRowCount();
+    void applyButton(QAbstractButton*);
 
 private:
   Ui::TableDialog *ui;

@@ -61,6 +61,7 @@ public:
   virtual bool	removeRows ( int row, int count, const QModelIndex & parent = QModelIndex() );
   bool insertColumnBefore( int column, const std::string& type, const std::string& name );
   bool removeColumnNumbers(const QList<int>& names);
+  void setRowCount(int n);
 public slots:
   void saveAscii();
   void showTableDialog();
