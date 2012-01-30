@@ -5,6 +5,9 @@
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
 #include "API/AlgorithmFactory.h"
+#include "Formula/Namespace.h"
+#include "Formula/Expression.h"
+#include "Formula/Scalar.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -89,6 +92,7 @@ void TableDialog::initColumns()
  */
 void TableDialog::initFormulaPage()
 {
+  m_namespace.reset(new Formula::Namespace);
   int n = 0;
   std::vector<std::string> colNames = m_workspace->getColumnNames();
   for(auto name = colNames.begin(); name != colNames.end(); ++name)
@@ -96,8 +100,8 @@ void TableDialog::initFormulaPage()
     auto column = m_workspace->getColumn(*name);
     if (column->type() == "double")
     {
-
-      ui->tableWidget->insertRow(n);
+      m_namespace->addVariable("Scalar",*name);
+      ui->tableVariables->insertRow(n);
     }
   }
 }
@@ -242,6 +246,10 @@ void TableDialog::apply()
   {
     applyDistribution();
   }
+  else if (tabName == "Formula")
+  {
+    applyFormula();
+  }
 }
 
 void TableDialog::applyDistribution()
@@ -301,6 +309,38 @@ void TableDialog::applyDistribution()
   {
     QMessageBox::critical(parentWidget(),"Error",QString("Algorithm failed \n")+e.what());
     return;
+  }
+}
+
+/**
+ * TODO: Make it an algorithm
+ */
+void TableDialog::applyFormula()
+{
+  auto column = m_workspace->getColumn(selectedColumn());
+  if (!column->isNumeric())
+  {
+    QMessageBox::critical(parentWidget(),"Error","Column " + QString::fromStdString(column->name()) + " is not numeric");
+    return;
+  }
+
+  auto numeric = boost::dynamic_pointer_cast<DataObjects::NumericColumn>(column);
+  size_t n = column->size();
+  std::string expStr = ui->textEdit->toPlainText().toStdString();
+  if (expStr.empty()) return;
+  try
+  {
+    Formula::Expression expression(m_namespace,expStr);
+    for(size_t i = 0; i < n; ++i)
+    {
+
+      numeric->setDouble(i,static_cast<double>(expression.eval().as<Formula::Scalar>()));
+    }
+    m_workspace->modified();
+  }
+  catch(...)
+  {
+    QMessageBox::critical(this,"Error","Failed to evaluate the formula");
   }
 }
 

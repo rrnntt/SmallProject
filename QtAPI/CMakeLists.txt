@@ -61,7 +61,7 @@ qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
 qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_library( QtAPI SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
-include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc 
+include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc ../Formula/inc 
 "${CMAKE_BINARY_DIR}/QtAPI"
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."
@@ -72,7 +72,7 @@ ${QT_QTOPENGL_INCLUDE_DIR}
 set_target_properties ( QtAPI PROPERTIES COMPILE_DEFINITIONS IN_QTAPI )
 
 target_link_libraries(QtAPI
-Kernel API DataObjects qwt
+Kernel API DataObjects Formula qwt
 )
 
 target_link_libraries(QtAPI
