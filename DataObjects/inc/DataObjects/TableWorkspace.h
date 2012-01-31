@@ -56,6 +56,8 @@ namespace DataObjects
     void loadAscii(const std::string& fileName);
     /// Fill numeric column with data using Formula::Expression
     void fillColumn(const std::string& colName,const std::string& expr);
+    /// Check if a column exists
+    bool hasColumn(const std::string& colName) const;
 
   private:
 

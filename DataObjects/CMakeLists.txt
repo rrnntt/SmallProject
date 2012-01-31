@@ -14,6 +14,7 @@ set( INC_FILES
    inc/DataObjects/TableWorkspace.h
    inc/DataObjects/Unit.h
 # Algorithms
+   inc/DataObjects/CalculateColumnValues.h
    inc/DataObjects/CreateUniformRandomData.h
    inc/DataObjects/CreateDistribution.h
    )
@@ -27,6 +28,7 @@ set( SRC_FILES
    src/TableWorkspace.cpp
    src/Unit.cpp
 # Algorithms
+   src/CalculateColumnValues.cpp
    src/CreateUniformRandomData.cpp
    src/CreateDistribution.cpp
   )
@@ -42,6 +44,7 @@ target_link_libraries(DataObjects Kernel API Formula Numeric)
 
 set( SRC_FILES 
   test/main.cpp
+  test/CalculateColumnValuesTest.cpp
   test/TableTest.cpp
 )
 

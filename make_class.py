@@ -105,6 +105,8 @@ if has_namespace:
 source += class_name + '.h"\n'
 if is_singleton:
 	source += '#include "API/Framework.h"\n'
+if is_algorithm:
+	source += '#include "API/AlgorithmFactory.h"\n'
 
 source += '\n'
 if has_namespace:

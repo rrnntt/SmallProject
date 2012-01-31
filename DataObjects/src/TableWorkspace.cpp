@@ -322,18 +322,31 @@ void TableWorkspace::loadAscii(const std::string& fileName)
  */
 void TableWorkspace::fillColumn(const std::string& colName,const std::string& expr)
 {
-  Formula::Namespace_ptr ns(new Formula::Namespace);
-  double row = 0.0;
-  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"row");
-  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"i");
-
+  // exception is thrown if the column doesn't exist
   boost::shared_ptr<NumericColumn> numColumn = boost::dynamic_pointer_cast<NumericColumn>(
     getColumn(colName)
     );
   if ( !numColumn)
   {
-    std::cerr << "Cannot fill non-numeric column using Expression" << std::endl;
-    return;
+    throw std::runtime_error("Cannot fill non-numeric column using Expression");
+  }
+
+  Formula::Namespace_ptr ns(new Formula::Namespace);
+  double row = 0.0;
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"row");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"i");
+  
+  // define vars referencing values in all num columns
+  std::vector<double> columnVars(columnCount());
+  for(auto col = m_columns.begin(); col != m_columns.end(); ++col)
+  {
+    boost::shared_ptr<NumericColumn> nc = boost::dynamic_pointer_cast<NumericColumn>(*col);
+    if (nc)
+    {
+      size_t i = static_cast<size_t>(col - m_columns.begin());
+      
+      columnVars[i];
+    }
   }
 
   try
@@ -349,8 +362,14 @@ void TableWorkspace::fillColumn(const std::string& colName,const std::string& ex
   }
   catch(std::exception& ex)
   {
-    std::cerr << "Expression failed: " << ex.what() << std::endl;
+    throw std::runtime_error(std::string("fillColumn failed: ") + ex.what() );
   }
+}
+
+bool TableWorkspace::hasColumn(const std::string& colName) const
+{
+    column_const_it ci = std::find_if(m_columns.begin(),m_columns.end(),FindName(colName));
+    return ci != m_columns.end();
 }
 
 } // DataObjects
