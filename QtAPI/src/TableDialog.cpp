@@ -5,9 +5,6 @@
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
 #include "API/AlgorithmFactory.h"
-#include "Formula/Namespace.h"
-#include "Formula/Expression.h"
-#include "Formula/Scalar.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -87,24 +84,35 @@ void TableDialog::initColumns()
   }
 }
 
+#define __add_to_tableVariables(type,name) \
+  ui->tableVariables->insertRow(row); \
+  ui->tableVariables->model()->setData(ui->tableVariables->model()->index(row,0),type); \
+  ui->tableVariables->model()->setData(ui->tableVariables->model()->index(row,1),name); \
+  ++row;
+
+
 /**
  * Initial setup of the formula page.
  */
 void TableDialog::initFormulaPage()
 {
-  m_namespace.reset(new Formula::Namespace);
-  int n = 0;
-  std::vector<std::string> colNames = m_workspace->getColumnNames();
-  for(auto name = colNames.begin(); name != colNames.end(); ++name)
-  {
-    auto column = m_workspace->getColumn(*name);
-    if (column->type() == "double")
-    {
-      m_namespace->addVariable("Scalar",*name);
-      ui->tableVariables->insertRow(n);
-    }
-  }
+  int row = 0;
+  //std::vector<std::string> colNames = m_workspace->getColumnNames();
+  //for(auto name = colNames.begin(); name != colNames.end(); ++name)
+  //{
+  //  auto column = m_workspace->getColumn(*name);
+  //  if (column->type() == "double")
+  //  {
+  //    ui->tableVariables->insertRow(n);
+  //  }
+  //}
+  __add_to_tableVariables("Scalar","row");
+  __add_to_tableVariables("Scalar","i");
+  __add_to_tableVariables("Scalar","pi");
+  __add_to_tableVariables("Scalar","e");
 }
+
+#undef __add_to_tableVariables
 
 /**
  * Initial setup of the distribution page.
@@ -313,7 +321,7 @@ void TableDialog::applyDistribution()
 }
 
 /**
- * TODO: Make it an algorithm
+ * 
  */
 void TableDialog::applyFormula()
 {
@@ -324,23 +332,15 @@ void TableDialog::applyFormula()
     return;
   }
 
-  auto numeric = boost::dynamic_pointer_cast<DataObjects::NumericColumn>(column);
-  size_t n = column->size();
   std::string expStr = ui->textEdit->toPlainText().toStdString();
   if (expStr.empty()) return;
   try
   {
-    Formula::Expression expression(m_namespace,expStr);
-    for(size_t i = 0; i < n; ++i)
-    {
-
-      numeric->setDouble(i,static_cast<double>(expression.eval().as<Formula::Scalar>()));
-    }
-    m_workspace->modified();
+    m_workspace->fillColumn(column->name(),expStr);
   }
-  catch(...)
+  catch(std::exception& e)
   {
-    QMessageBox::critical(this,"Error","Failed to evaluate the formula");
+    QMessageBox::critical(parentWidget(),"Error",QString("Formula failed \n")+e.what());
   }
 }
 

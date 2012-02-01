@@ -49,6 +49,8 @@ void CalculateColumnValues::exec()
 {
   TableWorkspace_ptr tws = getTableWorkspace();
   std::string columnName = get("Column");
+  std::string formula = get("Formula");
+  tws->fillColumn(columnName,formula);
 }
 
 } // namespace DataObjects

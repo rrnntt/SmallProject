@@ -16,11 +16,6 @@ namespace DataObjects
   class TableWorkspace;
 }
 
-namespace Formula
-{
-  class Namespace;
-}
-
 namespace QtAPI
 {
 
@@ -52,7 +47,6 @@ protected slots:
 private:
   Ui::TableDialog *ui;
   boost::shared_ptr<DataObjects::TableWorkspace> m_workspace;
-  boost::shared_ptr<Formula::Namespace> m_namespace;
 };
 
 } // QtAPI

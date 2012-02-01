@@ -335,17 +335,20 @@ void TableWorkspace::fillColumn(const std::string& colName,const std::string& ex
   double row = 0.0;
   ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"row");
   ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"i");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(2*acos(0.0))),"pi");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(exp(1.0))),"e");
   
   // define vars referencing values in all num columns
   std::vector<double> columnVars(columnCount());
+  std::vector<size_t> columnIndex;
   for(auto col = m_columns.begin(); col != m_columns.end(); ++col)
   {
     boost::shared_ptr<NumericColumn> nc = boost::dynamic_pointer_cast<NumericColumn>(*col);
     if (nc)
     {
       size_t i = static_cast<size_t>(col - m_columns.begin());
-      
-      columnVars[i];
+      ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&columnVars[i])),(**col).name());
+      columnIndex.push_back(i);
     }
   }
 
@@ -356,6 +359,11 @@ void TableWorkspace::fillColumn(const std::string& colName,const std::string& ex
     for(size_t i = 0; i < n; ++i)
     {
       row = static_cast<double>(i);
+      // update the variables
+      for(auto col = columnIndex.begin(); col != columnIndex.end(); ++col)
+      {
+        columnVars[*col] = getColumn(*col)->asNumeric()->getDouble(row);
+      }
       double value = e.eval().as<Formula::Scalar>();
       numColumn->setDouble(i,value);
     }

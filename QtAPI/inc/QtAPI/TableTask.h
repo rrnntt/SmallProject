@@ -23,6 +23,9 @@ public:
   virtual Type type() const {return Background;}
   virtual QMenu* menu(SubWindow* w = nullptr) const;
   virtual int menuOrder() const {return customMenuOder;}
+
+  QPointer<Table> newTable() const;
+  void loadAsciiTable() const;
 public slots:
   void showTableDialog();
 protected:
