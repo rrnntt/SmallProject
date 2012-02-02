@@ -4,8 +4,15 @@
 #project(Numeric)
 
 set( INC_FILES 
+   inc/Numeric/CostFunction.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
+   inc/Numeric/FunctionDomain.h
+   inc/Numeric/FunctionDomain1D.h
+   inc/Numeric/IFunction.h
+   inc/Numeric/Jacobian.h
+   inc/Numeric/Minimizer.h
+   inc/Numeric/SimplexMinimizer.h
    inc/Numeric/SomeFunction.h
    inc/Numeric/Vector.h
    inc/Numeric/V3D.h
@@ -13,7 +20,13 @@ set( INC_FILES
    inc/Numeric/PhysBody.h
    )
 set( SRC_FILES 
+  src/CostFunction.cpp
   src/Distribution.cpp
+  src/FunctionDomain.cpp
+  src/FunctionDomain1D.cpp
+  src/IFunction.cpp
+  src/Minimizer.cpp
+  src/SimplexMinimizer.cpp
   src/SomeFunction.cpp
   src/Vector.cpp
   src/V3D.cpp
@@ -42,6 +55,7 @@ set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/DistributionTest.cpp
+  test/SimplexMinimizerTest.cpp
   test/SomeFunctionTest.cpp
   test/VectorTest.cpp
 )
