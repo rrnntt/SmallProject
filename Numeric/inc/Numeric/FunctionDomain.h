@@ -3,6 +3,7 @@
 
 #include "Numeric/DllExport.h"
 
+#include <boost/shared_ptr.hpp>
 #include <vector>
 
 namespace Numeric
@@ -37,12 +38,16 @@ public:
   virtual void setFitWeights(const std::vector<double>& values);
   /// get a fitting weight
   virtual double getFitWeight(size_t i) const;
+
+  bool isFitDataSet() const;
 protected:
   void setDataSize();
   std::vector<double> m_calculated; ///< buffer for calculated values
   std::vector<double> m_data;    ///< buffer for fit data
   std::vector<double> m_weights; ///< buffer for fitting weights (reciprocal errors)
 };
+
+typedef boost::shared_ptr<FunctionDomain> FunctionDomain_ptr;
 
 } // namespace Numeric
 #endif // NUMERIC_FUNCTIONDOMAIN_H

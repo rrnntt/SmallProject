@@ -1,15 +1,15 @@
 #include "gtest/gtest.h"
-#include "Numeric/SimplexMinimizer.h"
+#include "Numeric/ConjugateFRMinimizer.h"
+#include "Numeric/CostFunction.h"
 
 #include <iostream>
-#include <vector>
 
 using namespace Numeric;
 
-class DummyCostFunction: public CostFunction
+class ConjugateFRMinimizerTestCostFunction: public CostFunction
 {
 public:
-  DummyCostFunction():A(0),B(0){}
+  ConjugateFRMinimizerTestCostFunction():A(),B(){}
   /// Get i-th parameter
   virtual double getParameter(size_t i)const
   {
@@ -36,20 +36,35 @@ public:
     return 3.0 + x*x + y*y;
   }
   /// Evaluate the derivatives
-  virtual void deriv(std::vector<double>&) const {}
+  virtual void deriv(std::vector<double>& der) const 
+  {
+    size_t np = this->nParams();
+    if (der.size() != np)
+    {
+      der.resize(np);
+    }
+    double x = A - 1.0;
+    double y = B - 2.1;
+    der[0] = 2*x;
+    der[1] = 2*y;
+  }
   /// Evaluate the function and the derivatives
-  virtual double evalAndDeriv(std::vector<double>& der) const {return 0.0;}
+  virtual double evalAndDeriv(std::vector<double>& der) const 
+  {
+    deriv(der);
+    return eval();
+  }
 private:
   double A,B;
 };
 
-TEST(SimplexMinimizerTest, Test)
+TEST(ConjugateFRMinimizerTest, Test)
 {
-  CostFunction_ptr fun(new DummyCostFunction);
-  SimplexMinimizer simplex;
-  simplex.setCostFunction(fun);
-  simplex.minimize();
-  std::cerr << "SimplexMinimizer " << fun->eval() << std::endl;
+  CostFunction_ptr fun(new ConjugateFRMinimizerTestCostFunction);
+  ConjugateFRMinimizer mzr;
+  mzr.setCostFunction(fun);
+  mzr.minimize();
+  std::cerr << "ConjugateFRMinimizer " << fun->eval() << std::endl;
   std::cerr << "A=" << fun->getParameter(0) << std::endl;
   std::cerr << "B=" << fun->getParameter(1) << std::endl;
 }

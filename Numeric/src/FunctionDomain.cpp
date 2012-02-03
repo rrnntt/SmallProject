@@ -40,6 +40,10 @@ namespace Numeric
     {
       throw std::invalid_argument("Setting data of a wrong size");
     }
+    if (m_weights.size() != m_calculated.size())
+    {
+      setDataSize();
+    }
     m_data.assign(values.begin(),values.end());
   }
 
@@ -102,7 +106,12 @@ namespace Numeric
   void FunctionDomain::setDataSize()
   {
     m_data.resize(m_calculated.size());
-    m_weights.resize(m_calculated.size());
+    m_weights.resize(m_calculated.size(),1.0);
+  }
+
+  bool FunctionDomain::isFitDataSet() const
+  {
+    return m_data.size() == m_calculated.size();
   }
 
 } // namespace Numeric

@@ -56,7 +56,7 @@ Minimizer::Result SimplexMinimizer::minimize()
     iter++;
     status = gsl_multimin_fminimizer_iterate(s);
 
-    std::cerr << "iter " << iter << ' ' << m_costFunction->eval() << std::endl;
+    //std::cerr << "iter " << iter << ' ' << m_costFunction->eval() << std::endl;
 
     if (status) 
       break;

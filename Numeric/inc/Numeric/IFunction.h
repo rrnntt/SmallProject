@@ -192,5 +192,7 @@ protected:
 
 };
 
+typedef boost::shared_ptr<IFunction> IFunction_ptr;
+
 } // namespace Numeric
 #endif // NUMERIC_IFUNCTION_H

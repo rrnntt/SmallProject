@@ -24,6 +24,8 @@ public:
   virtual double eval() const = 0;
   /// Evaluate the derivatives
   virtual void deriv(std::vector<double>&) const = 0;
+  /// Evaluate the function and the derivatives
+  virtual double evalAndDeriv(std::vector<double>&) const = 0;
 };
 
 typedef boost::shared_ptr<CostFunction> CostFunction_ptr;

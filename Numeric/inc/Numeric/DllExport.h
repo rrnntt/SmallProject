@@ -2,6 +2,7 @@
 #define NUMERIC_DLLEXPORT_H
 
 #pragma warning( disable: 4251 )
+#pragma warning( disable: 4250 )
 
 #ifdef IN_NUMERIC
 #define NUMERIC_EXPORT __declspec( dllexport )
