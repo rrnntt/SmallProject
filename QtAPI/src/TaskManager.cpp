@@ -1,6 +1,7 @@
 #include "QtAPI/TaskManager.h"
 #include "QtAPI/FileTask.h"
 #include "QtAPI/TableTask.h"
+#include "QtAPI/PlotTask.h"
 
 #include "API/Framework.h"
 
@@ -14,6 +15,7 @@ TaskManager::TaskManager(const std::string& name):Kernel::DataService<Task>(name
   // default tasks
    add("FileTask",new FileTask());
    add("TableTask",new TableTask());
+   add("PlotTask",new PlotTask());
 }
 
 TaskManager& TaskManager::instance()

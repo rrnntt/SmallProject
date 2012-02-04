@@ -8,6 +8,7 @@ Creates a class template for SmallProject
 '''
 
 if len(sys.argv) < 3:
+	print sys.argv
 	print 'usage: ',os.path.basename(sys.argv[0]),'<namespace name>','<class name>', '[singleton|factory <type>|algorithm]'
 	exit(1)
 

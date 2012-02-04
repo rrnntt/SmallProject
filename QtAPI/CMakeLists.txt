@@ -8,6 +8,7 @@ set( INC_FILES
    inc/QtAPI/PlotCurve.h
    inc/QtAPI/PlotDefaults.h
    inc/QtAPI/PlotDialog.h
+   inc/QtAPI/PlotTask.h
    inc/QtAPI/SubWindow.h
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/FileTask.h
@@ -25,6 +26,7 @@ set( SRC_FILES
   src/PlotCurve.cpp
   src/PlotDefaults.cpp
   src/PlotDialog.cpp
+  src/PlotTask.cpp
   src/SubWindow.cpp
   src/AddTableColumnDialog.cpp
   src/Task.cpp
