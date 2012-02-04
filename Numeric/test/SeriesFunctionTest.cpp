@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+using namespace Numeric;
+
 TEST(SeriesFunctionTest, Test)
 {
 }
