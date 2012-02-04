@@ -303,5 +303,23 @@ void IFunction::Attribute::fromString(const std::string& str)
   apply(tmp);
 }
 
+/**
+ * Check if a parameter index is valid. If not - throw range_error.
+ * @param i :: An index to check.
+ */
+void IFunction::validateParameterIndex(size_t i) const
+{
+  if (i >= nParams()) throw std::range_error("Parameter index out of range");
+}
+
+/**
+ * Check if an active parameter index is valid. If not - throw range_error.
+ * @param i :: An index to check.
+ */
+void IFunction::validateActiveParameterIndex(size_t i) const
+{
+  if (i >= nActive()) throw std::range_error("Active parameter index out of range");
+}
+
 
 } // namespace Numeric

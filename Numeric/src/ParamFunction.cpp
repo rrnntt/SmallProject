@@ -152,22 +152,4 @@ bool ParamFunction::hasParameter(const std::string& pname) const
   }) != m_parameters.end();
 }
 
-/**
- * Check if a parameter index is valid. If not - throw range_error.
- * @param i :: An index to check.
- */
-void ParamFunction::validateParameterIndex(size_t i) const
-{
-  if (i >= nParams()) throw std::range_error("Parameter index out of range");
-}
-
-/**
- * Check if an active parameter index is valid. If not - throw range_error.
- * @param i :: An index to check.
- */
-void ParamFunction::validateActiveParameterIndex(size_t i) const
-{
-  if (i >= nActive()) throw std::range_error("Active parameter index out of range");
-}
-
 } // namespace Numeric

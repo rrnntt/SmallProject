@@ -12,8 +12,6 @@ class NUMERIC_EXPORT SeriesFunction: public virtual IFunction
 public:
   SeriesFunction();
   ~SeriesFunction(){}
-  ParamFunction();
-  ~ParamFunction(){}
   /// Get i-th parameter
   virtual double getParameter(size_t i)const;
   /// Get parameter by name.

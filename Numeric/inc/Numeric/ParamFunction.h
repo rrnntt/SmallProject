@@ -53,8 +53,6 @@ protected:
   virtual void declareParameter(const std::string& name, double initValue = 0) ;
 
   bool hasParameter(const std::string& pname) const;
-  void validateParameterIndex(size_t i) const;
-  void validateActiveParameterIndex(size_t i) const;
 
   std::vector<ParamStorageType> m_parameters;
   std::vector<size_t> m_activeIndex;

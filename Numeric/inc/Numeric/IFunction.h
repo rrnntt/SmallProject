@@ -189,6 +189,8 @@ protected:
 
   /// Declare a new parameter
   virtual void declareParameter(const std::string& name, double initValue = 0) = 0;
+  void validateParameterIndex(size_t i) const;
+  void validateActiveParameterIndex(size_t i) const;
 
 };
 

@@ -85,8 +85,6 @@ Minimizer::Result ConjugateFRMinimizer::minimize()
     iter++;
     status = gsl_multimin_fdfminimizer_iterate(s);
 
-    std::cerr << "iter " << iter << ' ' << m_costFunction->eval() << ' ' << status << std::endl;
-
     if (status) 
       break;
 

@@ -1,4 +1,5 @@
 #include "Numeric/SeriesFunction.h"
+#include "Kernel/EParser.h"
 
 namespace Numeric
 {
@@ -9,11 +10,16 @@ SeriesFunction::SeriesFunction()
 
 double SeriesFunction::getParameter(size_t i)const
 {
+  validateParameterIndex(i);
+  return m_parameters[i];
 }
 
 /// Get parameter by name.
 double SeriesFunction::getParameter(const std::string& name)const
 {
+  Kernel::SeqParser seq;
+  seq.addParser(new Kernel::CharParser('P'));
+  seq.addParser(new Kernel::NumberParser);
 }
 
 /// Set i-th parameter
