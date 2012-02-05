@@ -24,4 +24,9 @@ CurveManager& CurveManager::instance()
   }
 }
 
+void CurveManager::addCurve(PlotCurve_ptr curve)
+{
+  m_map.push_back(curve);
+}
+
 } // QtAPI

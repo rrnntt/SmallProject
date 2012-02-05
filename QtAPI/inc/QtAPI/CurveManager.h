@@ -3,7 +3,7 @@
 
 #include "QtAPI/DllExport.h"
 #include "API/Singleton.h"
-#include "qwt_plot_curve.h"
+#include "QtAPI/PlotCurve.h"
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
@@ -19,9 +19,10 @@ public:
   ~CurveManager(){}
   virtual std::string name() const {return "CurveManager";}
   static CurveManager& instance();
+  void addCurve(PlotCurve_ptr curve);
 protected:
   CurveManager();
-  std::vector< boost::shared_ptr<QwtPlotCurve> > m_map;
+  std::vector< PlotCurve_ptr > m_map;
 
 };
 

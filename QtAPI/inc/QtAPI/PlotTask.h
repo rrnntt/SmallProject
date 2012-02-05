@@ -6,13 +6,13 @@
 
 #include <QtCore/QPointer>
 
-namespace QtAPI
-{
-
 namespace DataObjects
 {
   class TableWorkspace;
 }
+
+namespace QtAPI
+{
 
 class Table;
 class Plot;
@@ -31,12 +31,16 @@ public:
     const std::string& columnY,
     const std::string& columnE = "") const;
 
-  QPointer<Plot> showPlot(boost::shared_ptr<TableWorkspace> tws,
+  QPointer<Plot> showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
     const std::string& columnX,
     const std::string& columnY,
     const std::string& columnE = "") const;
+protected slots:
+  void showTablePlot();
 protected:
   QMenu* tableMenu(const Table* table) const;
+
+  QAction *m_showTablePlot;
 };
 
 } // namespace QtAPI

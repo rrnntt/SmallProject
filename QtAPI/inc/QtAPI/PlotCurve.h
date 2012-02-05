@@ -20,7 +20,7 @@ protected:
   PlotCurve(const QString &title);
 };
 
-typedef boost::shared_ptr<PlotCurve> PlotCurve_sptr;
+typedef boost::shared_ptr<PlotCurve> PlotCurve_ptr;
 
 } // QtAPI
 

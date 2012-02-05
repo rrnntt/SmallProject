@@ -136,7 +136,7 @@ namespace DataObjects
     }
     void setDouble(int index, double value)
     {
-      TableColumn<Type>::data()[index] = value;
+      TableColumn<Type>::data()[index] = static_cast<Type>(value);
     }
   virtual std::vector<double>* getDoubleVector() {return nullptr;}
   virtual std::vector<float>* getFloatVector() {return nullptr;}

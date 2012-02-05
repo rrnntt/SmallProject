@@ -5,6 +5,7 @@
 #include "DataObjects/Column.h"
 
 #include <vector>
+#include <algorithm>
 
 namespace DataObjects
 {
@@ -21,7 +22,32 @@ public:
   virtual const std::vector<double>* getDoubleVector() const {return nullptr;}
   virtual const std::vector<float>* getFloatVector() const {return nullptr;}
   virtual const std::vector<int>* getIntVector() const {return nullptr;}
+  template<typename T>
+  void fill(std::vector<T>& vec)const;
 };
+
+template<typename T>
+void NumericColumn::fill(std::vector<T>& vec)const
+{
+  const std::vector<double>* vd = getDoubleVector();
+  if (vd)
+  {
+    vec.assign(vd->begin(),vd->end());
+    return;
+  }
+  const std::vector<float>* fv = getFloatVector();
+  if (fv)
+  {
+    vec.assign(fv->begin(),fv->end());
+    return;
+  }
+  const std::vector<int>* iv = getIntVector();
+  if (iv)
+  {
+    vec.assign(iv->begin(),iv->end());
+    return;
+  }
+}
 
 } // DataObjects
 
