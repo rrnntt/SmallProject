@@ -46,7 +46,7 @@ FileTask::FileTask()
 
 void FileTask::newTable()
 {
-  boost::shared_ptr<TableTask> task = boost::dynamic_pointer_cast<TableTask>(TaskManager::instance().retrieve("Table"));
+  boost::shared_ptr<TableTask> task = boost::dynamic_pointer_cast<TableTask>(TaskManager::instance().retrieve("TableTask"));
   if (!task) return;
   task->newTable();
 }
@@ -56,7 +56,7 @@ void FileTask::newTable()
  */
 void FileTask::loadAsciiTable()
 {
-  boost::shared_ptr<TableTask> task = boost::dynamic_pointer_cast<TableTask>(TaskManager::instance().retrieve("Table"));
+  boost::shared_ptr<TableTask> task = boost::dynamic_pointer_cast<TableTask>(TaskManager::instance().retrieve("TableTask"));
   if (!task) return;
   task->loadAsciiTable();
 }

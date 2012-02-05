@@ -10,6 +10,7 @@ namespace QtAPI
 {
 
 class Table;
+class Plot;
 
 class QTAPI_EXPORT PlotTask: public Task
 {
@@ -20,7 +21,7 @@ public:
   virtual QMenu* menu(SubWindow* w = nullptr) const;
   virtual int menuOrder() const {return customMenuOder;}
 
-  QPointer<Table> showPlot(const Table* table, 
+  QPointer<Plot> showPlot(const Table* table, 
     const std::string& columnX, 
     const std::string& columnY, 
     const std::string& columnE) const;

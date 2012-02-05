@@ -1,5 +1,6 @@
 #include "QtAPI/PlotTask.h"
 #include "QtAPI/Table.h"
+#include "QtAPI/Plot.h"
 
 namespace QtAPI
 {
@@ -18,6 +19,7 @@ QPointer<Plot> PlotTask::showPlot(const Table* table,
   const std::string& columnY, 
   const std::string& columnE) const
 {
+  return nullptr;
 }
 
 } // namespace QtAPI
