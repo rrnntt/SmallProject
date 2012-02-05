@@ -181,6 +181,10 @@ void Table::showTableDialog()
   qobject_cast<TableModel*>(model())->showTableDialog();
 }
 
+DataObjects::TableWorkspace_ptr Table::getWorkspace() const
+{
+  return static_cast<TableModel*>(model())->getWorkspace();
+}
 
 /* --- TableModel --- */
 

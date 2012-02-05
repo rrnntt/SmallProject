@@ -19,6 +19,7 @@ class QTAPI_EXPORT Table: public QTableView
   Q_OBJECT
 public:
   Table(DataObjects::TableWorkspace_ptr ws,QWidget* parent = NULL);
+  DataObjects::TableWorkspace_ptr getWorkspace() const;
 signals:
   void showMenu(QMenu*);
 public slots:
@@ -62,6 +63,7 @@ public:
   bool insertColumnBefore( int column, const std::string& type, const std::string& name );
   bool removeColumnNumbers(const QList<int>& names);
   void setRowCount(int n);
+  DataObjects::TableWorkspace_ptr getWorkspace() const{return m_workspace;}
 public slots:
   void saveAscii();
   void showTableDialog();

@@ -9,6 +9,11 @@
 namespace QtAPI
 {
 
+namespace DataObjects
+{
+  class TableWorkspace;
+}
+
 class Table;
 class Plot;
 
@@ -21,10 +26,15 @@ public:
   virtual QMenu* menu(SubWindow* w = nullptr) const;
   virtual int menuOrder() const {return customMenuOder;}
 
-  QPointer<Plot> showPlot(const Table* table, 
-    const std::string& columnX, 
-    const std::string& columnY, 
-    const std::string& columnE) const;
+  QPointer<Plot> showPlot(const Table* table,
+    const std::string& columnX,
+    const std::string& columnY,
+    const std::string& columnE = "") const;
+
+  QPointer<Plot> showPlot(boost::shared_ptr<TableWorkspace> tws,
+    const std::string& columnX,
+    const std::string& columnY,
+    const std::string& columnE = "") const;
 protected:
   QMenu* tableMenu(const Table* table) const;
 };
