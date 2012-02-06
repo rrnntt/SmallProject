@@ -6,6 +6,8 @@
 
 #include <QtCore/QPointer>
 
+class QActionGroup;
+
 namespace DataObjects
 {
   class TableWorkspace;
@@ -19,6 +21,7 @@ class Plot;
 
 class QTAPI_EXPORT PlotTask: public Task
 {
+  Q_OBJECT
 public:
   PlotTask();
   ~PlotTask(){}
@@ -37,10 +40,19 @@ public:
     const std::string& columnE = "") const;
 protected slots:
   void showTablePlot();
+  void setZoomer();
+  void setMagnifier();
+  void showPlotDialog();
 protected:
   QMenu* tableMenu(const Table* table) const;
 
+  mutable QPointer<Table> m_table; ///< table in current sub-window
+  mutable QPointer<Plot> m_plot; ///< plot in current sub-window
   QAction *m_showTablePlot;
+  QActionGroup* m_pickerGroup; ///< group for selecting a picker
+  QAction *m_setZoomer;    ///< select zoomer
+  QAction *m_setMagnifier; ///< select magnifier
+  QAction *m_showPlotDialog; ///< show plot settings dialog
 };
 
 } // namespace QtAPI

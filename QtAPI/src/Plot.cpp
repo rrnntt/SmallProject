@@ -1,16 +1,20 @@
 #include "QtAPI/Plot.h"
 #include "QtAPI/PlotDefaults.h"
-//#include "SimpleFormula/Expression.h"
-//#include "ExpressionCurve.h"
+#include "QtAPI/PlotCurve.h"
+#include "QtAPI/CurveManager.h"
 
 #include "qwt_plot_canvas.h"
 #include "qwt_plot_layout.h"
 #include "qwt_scale_draw.h"
 #include "qwt_text.h"
 #include "qwt_legend.h"
+#include "qwt_plot_zoomer.h"
+#include "qwt_plot_panner.h"
+#include "qwt_plot_magnifier.h"
 
 #include <QPalette>
 #include <iostream>
+#include <algorithm>
 
 //using namespace Formula;
 
@@ -24,37 +28,9 @@ m_curve_count()
   init();
 }
 
-//Plot::Plot(boost::shared_ptr<const Expression> expr,QWidget *parent)
-//{
-//  int i = 0;
-//  bool isList = expr->isFunction() && (expr->name() == "List" || expr->name().empty() || expr->name() == ",");
-//  Expression_cptr e = isList ? expr->terms()[0] : expr;
-//  bool axesSet = false;
-//  do
-//  {
-//    if (i > 0)
-//    {
-//      e = expr->terms()[i];
-//    }
-//    if (!e->isEquation()) continue;
-//    if (!(*e)[0].isVariable()) continue;
-//    if (!axesSet)
-//    {
-//      setAxisTitle(yLeft,QString::fromStdString((*e)[0].name()));
-//      std::set<std::string> freeVars = (*e)[1].getFreeVarNames();
-//      if (freeVars.size() != 1) continue;
-//      setAxisTitle(xBottom,QString::fromStdString(*freeVars.begin()));
-//      axesSet = true;
-//    }
-//    ExpressionCurve* ec = new ExpressionCurve(e);
-//    ec->attach(this);
-//  }
-//  while(isList && ++i < expr->size());
-//  init();
-//}
-
 void Plot::init()
 {
+  setAutoDelete(false);
   //canvas()->setFrameShadow(QFrame::Plain);
   canvas()->setFrameShape(QFrame::NoFrame);
   setAutoFillBackground(true);
@@ -76,22 +52,112 @@ void Plot::init()
   titleText.setColor(PlotDefaults::instance().titleColor());
   setTitle(titleText);
 
+  // zoomer
+  m_zoomer = new QwtPlotZoomer(QwtPlot::xBottom, QwtPlot::yLeft,
+      QwtPicker::DragSelection | QwtPicker::CornerToCorner, QwtPicker::AlwaysOff, canvas());
+  m_zoomer->setRubberBandPen(QPen(Qt::black));
+
+  // panner and magnifier
+  m_magnifier = new QwtPlotMagnifier(canvas());
+  m_magnifier->setAxisEnabled(QwtPlot::yRight,false);
+  m_magnifier->setZoomInKey(Qt::Key_Plus, Qt::ShiftModifier);
+  m_panner = new QwtPlotPanner(canvas());
+  m_panner->setAxisEnabled(QwtPlot::yRight,false);
+
+  // set default picker
+  enableMagnifier();
+
   //insertLegend(new QwtLegend(),QwtPlot::RightLegend); // to create legend
   //insertLegend(NULL,QwtPlot::RightLegend); // to delete legend
 }
 
+void Plot::addCurve(PlotCurve* curve)
+{
+  curve->attach(this);
+  CurveManager::instance().addCurve(curve);
+}
+
+QList<PlotCurve*> Plot::getCurves() const
+{
+  QList<PlotCurve*> out;
+  QwtPlotItemList items = itemList();
+  foreach(QwtPlotItem* item,items)
+  {
+    auto curve = dynamic_cast<PlotCurve*>(item);
+    out.append(curve);
+  }
+  return out;
+}
+
+QStringList Plot::getCurveNames() const
+{
+  QList<PlotCurve*> curves = getCurves();
+  QStringList names;
+  foreach(const PlotCurve* curve,curves)
+  {
+    QString title = curve->title().text();
+    if (title.isEmpty())
+    {
+      title = "Unknown";
+    }
+    names << title;
+  }
+  return names;
+}
+
+PlotCurve* Plot::getCurve(QString name)const
+{
+  auto curves = getCurves();
+  foreach(PlotCurve* curve,curves)
+  {
+    if (curve->title() == name)
+    {
+      return curve;
+    }
+  }
+  return nullptr;
+}
+
 /**
-  * Adds a curve defined by an expression. Expression must retrun a Scalar (or in future Vector for parametric curves)
-  * and have 1 and only 1 free variable.
-  * @param expr Expression to plot
-  */
-//void Plot::addExpression(boost::shared_ptr<const Formula::Expression> expr)
-//{
-//  ExpressionCurve* ec = new ExpressionCurve(expr);
-//  ec->attach(this);
-//  ec->setPen(QPen(PlotDefaults::instance().getCurveColor(m_curve_count++)));
-//  ec->setTitle(QString::fromStdString(expr->str()));
-//
-//}
+ * Set current scale to be zoomer's base
+ */
+void Plot::setZoomBase()
+{
+  m_zoomer->setZoomBase();
+}
+
+bool Plot::isZoomerEnabled() const
+{
+  return m_zoomer->isEnabled();
+}
+
+void Plot::enableZoomer()
+{
+  m_zoomer->setEnabled(true);
+  m_magnifier->setEnabled(false);
+  m_panner->setEnabled(false);
+  canvas()->setCursor(Qt::CrossCursor);
+}
+
+bool Plot::isMagnifierEnabled() const
+{
+  return m_magnifier->isEnabled();
+}
+
+void Plot::enableMagnifier()
+{
+  m_zoomer->setEnabled(false);
+  m_magnifier->setEnabled(true);
+  m_panner->setEnabled(true);
+  canvas()->setCursor(Qt::OpenHandCursor);
+}
+
+void Plot::disablePickers()
+{
+  m_zoomer->setEnabled(false);
+  m_magnifier->setEnabled(false);
+  m_panner->setEnabled(false);
+}
+
 
 } // QtAPI

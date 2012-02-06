@@ -14,6 +14,8 @@ class QMenu;
 namespace QtAPI
 {
 
+class TableModel;
+
 class QTAPI_EXPORT Table: public QTableView
 {
   Q_OBJECT
@@ -30,7 +32,17 @@ public slots:
   void execMenu(QMenu* menu);
   void saveAscii();
   void showTableDialog();
+protected slots:
+  void setRoleUnset();
+  void setRoleX();
+  void setRoleY();
+  void setRoleZ();
+  void setRoleXError();
+  void setRoleYError();
+  void setRole(int role);
 protected:
+  TableModel* tableModel();
+  const TableModel* tableModel()const;
   void	contextMenuEvent( QContextMenuEvent* e );
   bool eventFilter(QObject* watched, QEvent* e);
 
@@ -40,6 +52,12 @@ protected:
   QAction* m_removeSelectedColumns;
   QAction* m_saveAscii;
   QAction* m_showTableDialog;
+  QAction* m_setRoleUnset;
+  QAction* m_setRoleX;
+  QAction* m_setRoleY;
+  QAction* m_setRoleZ;
+  QAction* m_setRoleXError;
+  QAction* m_setRoleYError;
 };
 
 class TableModel: public QAbstractItemModel, public Kernel::NotificationObserver
@@ -64,6 +82,7 @@ public:
   bool removeColumnNumbers(const QList<int>& names);
   void setRowCount(int n);
   DataObjects::TableWorkspace_ptr getWorkspace() const{return m_workspace;}
+  void setPlotRole(int col,int role);
 public slots:
   void saveAscii();
   void showTableDialog();

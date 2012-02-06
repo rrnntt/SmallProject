@@ -24,7 +24,7 @@ CurveManager& CurveManager::instance()
   }
 }
 
-void CurveManager::addCurve(PlotCurve_ptr curve)
+void CurveManager::addCurve(PlotCurve* curve)
 {
   m_map.push_back(curve);
 }

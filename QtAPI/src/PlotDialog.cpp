@@ -2,6 +2,7 @@
 #include "ui_PlotDialog.h"
 #include "QtAPI/Plot.h"
 #include "QtAPI/PlotDefaults.h"
+#include "QtAPI/PlotCurve.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -14,10 +15,10 @@
 namespace QtAPI
 {
 
-PlotDialog::PlotDialog(QWidget *parent, Plot* plot) :
-    QDialog(parent),
-    ui(new Ui::PlotDialog),
-    m_plot(plot)
+PlotDialog::PlotDialog(Plot* plot) :
+QDialog(plot),
+ui(new Ui::PlotDialog),
+m_plot(plot)
 {
     if (!plot)
     {
@@ -67,6 +68,26 @@ void PlotDialog::init()
   ui->leYMax->setText(QString::number(yscale->upperBound()));
 
   ui->cbShowLegend->setChecked(m_plot->legend() != NULL);
+  
+  initCurvePage();
+}
+
+void PlotDialog::initCurvePage()
+{
+  ui->cbCurve->addItems(m_plot->getCurveNames());
+  QStringList styles;
+  styles << "Lines" << "Sticks" << "Steps" << "Dots";
+  ui->cbStyle->addItems(styles);
+  auto name = ui->cbCurve->currentText();
+  auto curve = m_plot->getCurve(name);
+  if (curve)
+  {
+    ui->cbStyle->setCurrentIndex(curve->style()-1);
+    QPen pen = curve->pen();
+    ui->cbLineColor->setColor(pen.color());
+    ui->cbPenStyle->setStyle(pen.style());
+    ui->sbLineWidth->setValue(pen.width());
+  }
 }
 
 void PlotDialog::accept()
@@ -76,6 +97,42 @@ void PlotDialog::accept()
 }
 
 void PlotDialog::apply()
+{
+  switch(ui->tabWidget->currentIndex())
+  {
+  case 0:
+    applyPlot();
+    break;
+  case 1:
+    applyCurve();
+    break;
+  };
+  m_plot->replot();
+  m_plot->polish();
+}
+
+void PlotDialog::applyCurve()
+{
+  auto name = ui->cbCurve->currentText();
+  auto curve = m_plot->getCurve(name);
+  if (!curve) return;
+  if (PlotCurve::NoCurve != 0)
+  {
+    throw std::runtime_error("Definition of plot styles has changed!");
+  }
+  auto style = static_cast<PlotCurve::CurveStyle>(ui->cbStyle->currentIndex() + 1);
+  if (style != curve->style())
+  {
+    curve->setStyle(style);
+  }
+  QPen pen = curve->pen();
+  pen.setColor(ui->cbLineColor->color());
+  pen.setStyle(ui->cbPenStyle->style());
+  pen.setWidth(ui->sbLineWidth->value());
+  curve->setPen(pen);
+}
+
+void PlotDialog::applyPlot()
 {
   // Set new title
   QwtText Title(ui->leCaption->text());
@@ -109,8 +166,6 @@ void PlotDialog::apply()
     }
   }
 
-  m_plot->replot();
-  m_plot->polish();
 }
 
 } // QtAPI

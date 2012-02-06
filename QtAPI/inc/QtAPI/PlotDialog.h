@@ -3,6 +3,7 @@
 
 #include "DllExport.h"
 #include <QDialog>
+#include <QPointer>
 
 namespace Ui {
     class PlotDialog;
@@ -13,16 +14,20 @@ namespace QtAPI
 
 class QTAPI_EXPORT Plot;
 
-class PlotDialog : public QDialog {
+class QTAPI_EXPORT PlotDialog : public QDialog 
+{
     Q_OBJECT
 public:
-    PlotDialog(QWidget *parent, Plot* plot);
+    PlotDialog(Plot* plot);
     ~PlotDialog();
 
 protected:
     void changeEvent(QEvent *e);
     void init();
+    void initCurvePage();
     void apply();
+    void applyPlot();
+    void applyCurve();
 
 private slots:
 
@@ -30,7 +35,7 @@ private slots:
 
 private:
     Ui::PlotDialog *ui;
-    Plot* m_plot;
+    QPointer<Plot> m_plot;
 
 };
 

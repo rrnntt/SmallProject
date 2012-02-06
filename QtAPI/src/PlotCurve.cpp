@@ -1,5 +1,7 @@
 #include "QtAPI/PlotCurve.h"
 
+#include <iostream>
+
 namespace QtAPI
 {
 
@@ -13,14 +15,19 @@ QwtPlotCurve(title)
 {
 }
 
-boost::shared_ptr<PlotCurve> PlotCurve::create()
+PlotCurve::~PlotCurve()
 {
-  return boost::shared_ptr<PlotCurve>(new PlotCurve());
+  //std::cerr << "Curve deleted\n";
 }
 
-boost::shared_ptr<PlotCurve> PlotCurve::create(const QString &title)
+QPointer<PlotCurve> PlotCurve::create()
 {
-  return boost::shared_ptr<PlotCurve>(new PlotCurve(title));
+  return QPointer<PlotCurve>(new PlotCurve());
+}
+
+QPointer<PlotCurve> PlotCurve::create(const QString &title)
+{
+  return QPointer<PlotCurve>(new PlotCurve(title));
 }
 
 } // QtAPI

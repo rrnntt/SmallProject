@@ -1,7 +1,9 @@
 #include "QtAPI/Table.h"
 #include "QtAPI/AddTableColumnDialog.h"
 #include "QtAPI/TableDialog.h"
+
 #include "API/WorkspaceManager.h"
+#include "DataObjects/NumericColumn.h"
 
 #include <QtGui/QHeaderView>
 #include <QtGui/QContextMenuEvent>
@@ -47,6 +49,24 @@ QTableView(parent)
   m_showTableDialog = new QAction("Set values...",this);
   connect(m_showTableDialog,SIGNAL(triggered()),model,SLOT(showTableDialog()));
 
+  m_setRoleUnset = new QAction("Unset",this);
+  connect(m_setRoleUnset,SIGNAL(triggered()),this,SLOT( setRoleUnset()));
+
+  m_setRoleX = new QAction("X",this);
+  connect(m_setRoleX,SIGNAL(triggered()),this,SLOT( setRoleX()));
+
+  m_setRoleY = new QAction("Y",this);
+  connect(m_setRoleY,SIGNAL(triggered()),this,SLOT( setRoleY()));
+
+  m_setRoleZ = new QAction("Z",this);
+  connect(m_setRoleZ,SIGNAL(triggered()),this,SLOT( setRoleZ()));
+
+  m_setRoleXError = new QAction("xError",this);
+  connect(m_setRoleXError,SIGNAL(triggered()),this,SLOT( setRoleXError()));
+
+  m_setRoleYError = new QAction("yError",this);
+  connect(m_setRoleYError,SIGNAL(triggered()),this,SLOT( setRoleYError()));
+
   this->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::AnyKeyPressed);
 }
 
@@ -72,6 +92,14 @@ bool Table::eventFilter(QObject* watched, QEvent* e)
       QMenu* context = new QMenu(this);
       context->addAction(m_insertColumn);
       context->addAction(m_removeSelectedColumns);
+      QMenu* plotRole = new QMenu("Set plot role",this);
+      plotRole->addAction(m_setRoleUnset);
+      plotRole->addAction(m_setRoleX);
+      plotRole->addAction(m_setRoleY);
+      plotRole->addAction(m_setRoleZ);
+      plotRole->addAction(m_setRoleXError);
+      plotRole->addAction(m_setRoleYError);
+      context->addMenu(plotRole);
       emit showMenu(context);
       return true;
     }
@@ -183,7 +211,60 @@ void Table::showTableDialog()
 
 DataObjects::TableWorkspace_ptr Table::getWorkspace() const
 {
-  return static_cast<TableModel*>(model())->getWorkspace();
+  return tableModel()->getWorkspace();
+}
+
+TableModel* Table::tableModel()
+{
+  return static_cast<TableModel*>(model());
+}
+
+const TableModel* Table::tableModel()const
+{
+  return static_cast<const TableModel*>(model());
+}
+
+void Table::setRole(int role)
+{
+  QItemSelectionModel* sel = selectionModel();
+  if (!sel->hasSelection()) return;
+  QModelIndexList	selList = sel->selectedColumns();
+  if (selList.isEmpty()) return;
+  foreach(const QModelIndex& index,selList)
+  {
+    tableModel()->setPlotRole(index.column(),role);
+  }
+  repaint();
+}
+
+void Table::setRoleUnset()
+{
+  setRole(DataObjects::NumericColumn::Unset);
+}
+
+void Table::setRoleX()
+{
+  setRole(DataObjects::NumericColumn::X);
+}
+
+void Table::setRoleY()
+{
+  setRole(DataObjects::NumericColumn::Y);
+}
+
+void Table::setRoleZ()
+{
+  setRole(DataObjects::NumericColumn::Z);
+}
+
+void Table::setRoleXError()
+{
+  setRole(DataObjects::NumericColumn::xError);
+}
+
+void Table::setRoleYError()
+{
+  setRole(DataObjects::NumericColumn::yError);
 }
 
 /* --- TableModel --- */
@@ -259,7 +340,34 @@ QVariant TableModel::headerData( int section, Qt::Orientation orientation, int r
   }
   else if (isValid())
   {
-    return QString::fromStdString(m_workspace->getColumn(section)->name());
+    auto column = m_workspace->getColumn(section);
+    QString columnLabel = QString::fromStdString(column->name());
+    auto colNum = column->asNumeric();
+    DataObjects::NumericColumn::PlotRole role = colNum->getPlotRole();
+    if (colNum && role != DataObjects::NumericColumn::Unset)
+    {
+      columnLabel += "[";
+      switch(role)
+      {
+      case DataObjects::NumericColumn::X:
+        columnLabel += "X";
+        break;
+      case DataObjects::NumericColumn::Y:
+        columnLabel += "Y";
+        break;
+      case DataObjects::NumericColumn::Z:
+        columnLabel += "Z";
+        break;
+      case DataObjects::NumericColumn::xError:
+        columnLabel += "xErr";
+        break;
+      case DataObjects::NumericColumn::yError:
+        columnLabel += "yErr";
+        break;
+      }
+      columnLabel += "]";
+    }
+    return columnLabel;
   }
   return QVariant();
 }
@@ -384,7 +492,6 @@ void TableModel::handleModified(const API::WorkspaceManager::ModifiedNotificatio
 {
   if (nt.object() == m_workspace)
   {
-    std::cerr << "Modified\n";
     resetWorkspace();
     reset();
   }
@@ -399,5 +506,24 @@ void TableModel::setRowCount(int n)
     reset();
   }
 }
+
+void TableModel::setPlotRole(int col,int role)
+{
+  try
+  {
+    auto column = m_workspace->getColumn(col);
+    if (column)
+    {
+      auto colNum = column->asNumeric();
+      if (colNum)
+      {
+        colNum->setPlotRole(static_cast<DataObjects::NumericColumn::PlotRole>(role));
+      }
+    }
+  }
+  catch(...)
+  {}
+}
+
 
 } // QtAPI

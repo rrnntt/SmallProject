@@ -4,14 +4,18 @@
 
 set( INC_FILES 
    inc/QtAPI/DllExport.h
+   inc/QtAPI/ColorBox.h
    inc/QtAPI/Plot.h
    inc/QtAPI/PlotCurve.h
    inc/QtAPI/PlotDefaults.h
    inc/QtAPI/PlotDialog.h
    inc/QtAPI/PlotTask.h
+   inc/QtAPI/PatternBox.h
+   inc/QtAPI/PenStyleBox.h
    inc/QtAPI/SubWindow.h
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/FileTask.h
+   inc/QtAPI/SymbolBox.h
    inc/QtAPI/Task.h
    inc/QtAPI/Table.h
    inc/QtAPI/TableDialog.h
@@ -22,13 +26,17 @@ set( INC_FILES
    inc/QtAPI/WindowManager.h
    )
 set( SRC_FILES 
+  src/ColorBox.cpp
   src/Plot.cpp
   src/PlotCurve.cpp
   src/PlotDefaults.cpp
   src/PlotDialog.cpp
   src/PlotTask.cpp
+  src/PatternBox.cpp
+  src/PenStyleBox.cpp
   src/SubWindow.cpp
   src/AddTableColumnDialog.cpp
+  src/SymbolBox.cpp
   src/Task.cpp
   src/FileTask.cpp
   src/Table.cpp
@@ -41,11 +49,17 @@ set( SRC_FILES
   )
   
 set( MOC_HEADERS
+   inc/QtAPI/ColorBox.h
    inc/QtAPI/PlotCurve.h
    inc/QtAPI/PlotDialog.h
+   inc/QtAPI/PatternBox.h
+   inc/QtAPI/PenStyleBox.h
    inc/QtAPI/SubWindow.h
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/CurveManager.h
+   inc/QtAPI/Plot.h
+   inc/QtAPI/PlotTask.h
+   inc/QtAPI/SymbolBox.h
    inc/QtAPI/Table.h
    inc/QtAPI/TableDialog.h
    inc/QtAPI/TableTask.h

@@ -6,8 +6,8 @@
 #include "QtAPI/PlotCurve.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
-#include <vector>
+#include <QPointer>
+#include <QList>
 
 namespace QtAPI
 {
@@ -19,10 +19,10 @@ public:
   ~CurveManager(){}
   virtual std::string name() const {return "CurveManager";}
   static CurveManager& instance();
-  void addCurve(PlotCurve_ptr curve);
+  void addCurve(PlotCurve* curve);
 protected:
   CurveManager();
-  std::vector< PlotCurve_ptr > m_map;
+  QList< QPointer<PlotCurve> > m_map;
 
 };
 

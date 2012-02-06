@@ -45,7 +45,7 @@ QPointer<Table> TableTask::newTable() const
   API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
   ws->addColumn("double","X");
   ws->addColumn("double","Y");
-  ws->setRowCount(10);
+  ws->setRowCount(30);
   Table* table = new Table(ws);
   SubWindow* wnd = WindowManager::instance().newSubWindow(table);
   wnd->setWindowTitle(name);

@@ -13,6 +13,8 @@ namespace DataObjects
 class DATAOBJECTS_EXPORT NumericColumn
 {
 public:
+  NumericColumn():m_plotRole(Unset){}
+  enum PlotRole {Unset,X,Y,Z,xError,yError};
   virtual double getDouble(int index)const = 0;
   virtual void setDouble(int index, double value) = 0;
 //protected:
@@ -24,6 +26,10 @@ public:
   virtual const std::vector<int>* getIntVector() const {return nullptr;}
   template<typename T>
   void fill(std::vector<T>& vec)const;
+  PlotRole getPlotRole() const {return m_plotRole;}
+  void setPlotRole(PlotRole role) {m_plotRole = role;}
+protected:
+  PlotRole m_plotRole; ///< Role of the column in a plot
 };
 
 template<typename T>
