@@ -45,6 +45,8 @@ public:
   QAction* getAction(const QString& name) const;
 protected:
   void addAction(const QString& name, QAction* action);
+  void errorMessage(const std::string& mess) const;
+  std::string getInput(const std::string& mess)const;
   QHash<QString, QAction*> m_actions;
   int m_menuOrder;
 };

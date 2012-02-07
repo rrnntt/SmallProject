@@ -25,7 +25,7 @@ MainWindow::MainWindow()
   :QMainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
-  //setGeometry(900,900,300,200);
+  setGeometry(900,900,300,200);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
 
@@ -39,7 +39,7 @@ MainWindow::MainWindow()
   m_workspaceExplorer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   this->addDockWidget(Qt::RightDockWidgetArea,m_workspaceExplorer);
 
-  createMenus();
+  //createMenus();
 }
 
 MainWindow::~MainWindow()
@@ -66,16 +66,16 @@ QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)
 
 void MainWindow::createMenus()
  {
-   // File menu
-   QtAPI::Task_ptr fileTask = QtAPI::TaskManager::instance().retrieve("FileTask");
-   menuBar()->addMenu(fileTask->menu());
+   //// File menu
+   //QtAPI::Task_ptr fileTask = QtAPI::TaskManager::instance().retrieve("FileTask");
+   //menuBar()->addMenu(fileTask->menu());
 
    // View menu
    ViewTask* viewTask = new ViewTask();
    viewTask->setMainWindow(this);
    QtAPI::TaskManager::instance().add("ViewTask",viewTask);
-   menuBar()->addMenu(viewTask->menu());
-
+   //menuBar()->addMenu(viewTask->menu());
+  this->customMenuBar(menuBar(),nullptr);
 }
 
 void MainWindow::subWindowBecameActive(QtAPI::SubWindow* w)

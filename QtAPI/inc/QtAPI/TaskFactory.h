@@ -3,6 +3,7 @@
 
 #include "QtAPI/DllExport.h"
 #include "QtAPI/Task.h"
+#include "QtAPI/TaskManager.h"
 #include "Kernel/DynamicFactory.h"
 #include "API/Singleton.h"
 
@@ -21,6 +22,9 @@ protected:
 } // QtAPI
 
 #define DECLARE_TASK(type) \
-int declare_task_##type( (QtAPI::TaskFactory::instance().subscribe<type>(#type),0));
+int declare_task_##type( (\
+  QtAPI::TaskFactory::instance().subscribe<type>(#type),\
+  QtAPI::TaskManager::delayedRegister(#type),\
+  0));
 
 #endif /*QtAPI_TASKFACTORY_H*/

@@ -13,6 +13,7 @@ class DummyWorkspace: public Workspace
 public:
   double value;
   DummyWorkspace():value(0){}
+  virtual std::string id()const {return "DummyWorkspace";}
 };
 
 TEST(WorkspacePropertyTest, Property)

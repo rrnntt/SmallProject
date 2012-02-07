@@ -38,7 +38,7 @@ qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
 qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_executable( Plotter ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
-include_directories(inc ../QtAPI/inc ../Numeric/inc ../API/inc ../DataObjects/inc ../qwt/src ../Modeling/inc
+include_directories(inc  ../API/inc ../QtAPI/inc ../Numeric/inc ../DataObjects/inc ../qwt/src ../Modeling/inc
 "${CMAKE_BINARY_DIR}/GUI"
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."

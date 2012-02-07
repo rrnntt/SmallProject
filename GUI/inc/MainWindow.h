@@ -26,8 +26,8 @@ public:
   MainWindow();
   ~MainWindow();
   QtAPI::SubWindow* newSubWindow(QWidget* widget);
-protected:
   void createMenus();
+protected:
   void closeEvent(QCloseEvent*);
 protected slots:
   void subWindowBecameActive(QtAPI::SubWindow*);

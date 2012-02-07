@@ -22,7 +22,8 @@ DECLARE_WORKSPACE(TableWorkspace);
 Kernel::Logger& TableWorkspace::g_log(Kernel::Logger::get("TableWorkspace"));
 
 TableWorkspace::TableWorkspace():
-m_rowCount(0)
+m_rowCount(0),
+m_defaultSeparator(",")
 {
   std::cerr<<"TableWorkspace\n";
 }
@@ -130,6 +131,26 @@ Column_ptr TableWorkspace::getColumn(int index)const
     return m_columns[index];
 }
 
+/**
+ * Get a column of given type and name. Ensure it exists.
+ * If column exists but type is wrong throws runtime_error.
+ */
+Column_ptr TableWorkspace::getOrAddColumn(const std::string& type, const std::string& name)
+{
+  if (hasColumn(name))
+  {
+    if (getColumn(name)->type() != type)
+    {
+      throw std::runtime_error("Wrong type for the "+name+" column in "+id());
+    }
+  }
+  else
+  {
+    addColumn(type,name); 
+  }
+  return getColumn(name);
+}
+
 void TableWorkspace::removeColumn( const std::string& name)
 {
     column_it ci = std::find_if(m_columns.begin(),m_columns.end(),FindName(name));
@@ -194,6 +215,13 @@ void TableWorkspace::removeRows(int index, size_t count)
   }
 }
 
+void TableWorkspace::removeAllColumns()
+{
+  m_columns.clear();
+  m_rowCount = 0;
+}
+
+
 std::vector<std::string> TableWorkspace::getColumnNames()
 {
     std::vector<std::string> nameList;
@@ -210,8 +238,9 @@ std::vector<std::string> TableWorkspace::getColumnNames()
  */
 void TableWorkspace::saveAscii(const std::string& fileName, const std::string& sep) const
 {
+  std::string separator = sep.empty() ? m_defaultSeparator : sep;
   std::ofstream fil(fileName.c_str());
-  fil << "#sep=" << sep << std::endl;
+  fil << "#sep=" << separator << std::endl;
   for(int j = 0; j < columnCount(); ++j)
   {
     // save column type and name
@@ -222,8 +251,8 @@ void TableWorkspace::saveAscii(const std::string& fileName, const std::string& s
   {
     for(int j = 0; j < columnCount(); ++j)
     {
-      if (j > 0) fil << sep;
-      m_columns[j]->saveAsci(fil,i);
+      if (j > 0) fil << separator;
+      fil << m_columns[j]->asString(i);
     }
     fil << std::endl;
   }
@@ -235,6 +264,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
   std::ifstream fil(fileName.c_str());
   if (!fil) return;
 
+  removeAllColumns();
   std::string sep; // column separator
   bool doneHeader = false; // done reading the header
   size_t row = 0; // current row index
@@ -295,10 +325,10 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         if (n == 0) throw std::runtime_error("No columns created");
         for(size_t col = 0; col < n - 1; ++col)
         {
-          dataParser.addParser( new Kernel::NotStringParser(sep));// TODO: replace with custom parser
+          dataParser.addParser( new Kernel::NotStringParser(sep),'*');// TODO: replace with custom parser
           dataParser.addParser( new Kernel::StringParser(sep));
         }
-        dataParser.addParser( new Kernel::AllParser);
+        dataParser.addParser( new Kernel::AllParser,'*');
       }
       dataParser.match(str);
       if (dataParser.hasMatch())
@@ -306,13 +336,15 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         insertRow(row);
         for(size_t col = 0; col < n; ++col)
         {
-          std::istringstream istr(dataParser.getParser(col*2)->match());
-          m_columns[col]->read(istr,row);
+          //std::cerr << col<< '>' << dataParser.getParser(col*2)->match() << std::endl;
+          m_columns[col]->fromString(dataParser.getParser(col*2)->match(),row);
         }
         ++row;
       }
     }// end column data
   }// end getline
+  // file's separator becomes default for this workspace
+  m_defaultSeparator = sep;
 }
 
 /**

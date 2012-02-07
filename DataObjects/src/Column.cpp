@@ -26,30 +26,30 @@ std::istream& operator>>(std::istream& s,Boolean& b)
   return s;
 }
 
-std::string Column::asString(size_t i) const
-{
-  std::stringstream ostr;
-  this->print(ostr,i);
-  return ostr.str();
-}
+//std::string Column::asString(size_t i) const
+//{
+//  std::stringstream ostr;
+//  this->print(ostr,i);
+//  return ostr.str();
+//}
+//
+//void Column::fromString(const std::string& str,size_t i) 
+//{
+//  std::istringstream istr(str);
+//  this->read(istr,i);
+//}
 
-void Column::fromString(const std::string& str,size_t i) 
-{
-  std::istringstream istr(str);
-  this->read(istr,i);
-}
-
-/// Save into a file
-void Column::saveAsci(std::ostream& s, int index) const
-{
-  this->print(s,index);
-}
-
-/// Read from a file
-void Column::loadAsci(std::istream& s, int index)
-{
-  this->read(s,index);
-}
+///// Save into a file
+//void Column::saveAscii(std::ostream& s, int index) const
+//{
+//  this->print(s,index);
+//}
+//
+///// Read from a file
+//void Column::loadAscii(std::istream& s, int index)
+//{
+//  this->read(s,index);
+//}
 
 /// Is the data numeric (converts to double)?
 bool Column::isNumeric() const

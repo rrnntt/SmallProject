@@ -343,29 +343,32 @@ QVariant TableModel::headerData( int section, Qt::Orientation orientation, int r
     auto column = m_workspace->getColumn(section);
     QString columnLabel = QString::fromStdString(column->name());
     auto colNum = column->asNumeric();
-    DataObjects::NumericColumn::PlotRole role = colNum->getPlotRole();
-    if (colNum && role != DataObjects::NumericColumn::Unset)
+    if (colNum)
     {
-      columnLabel += "[";
-      switch(role)
+      DataObjects::NumericColumn::PlotRole role = colNum->getPlotRole();
+      if (colNum && role != DataObjects::NumericColumn::Unset)
       {
-      case DataObjects::NumericColumn::X:
-        columnLabel += "X";
-        break;
-      case DataObjects::NumericColumn::Y:
-        columnLabel += "Y";
-        break;
-      case DataObjects::NumericColumn::Z:
-        columnLabel += "Z";
-        break;
-      case DataObjects::NumericColumn::xError:
-        columnLabel += "xErr";
-        break;
-      case DataObjects::NumericColumn::yError:
-        columnLabel += "yErr";
-        break;
+        columnLabel += "[";
+        switch(role)
+        {
+        case DataObjects::NumericColumn::X:
+          columnLabel += "X";
+          break;
+        case DataObjects::NumericColumn::Y:
+          columnLabel += "Y";
+          break;
+        case DataObjects::NumericColumn::Z:
+          columnLabel += "Z";
+          break;
+        case DataObjects::NumericColumn::xError:
+          columnLabel += "xErr";
+          break;
+        case DataObjects::NumericColumn::yError:
+          columnLabel += "yErr";
+          break;
+        }
+        columnLabel += "]";
       }
-      columnLabel += "]";
     }
     return columnLabel;
   }

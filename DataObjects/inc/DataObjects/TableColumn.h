@@ -7,6 +7,8 @@
 #include "DataObjects/ColumnFactory.h"
 #include "Kernel/Logger.h"
 
+#include <boost/lexical_cast.hpp>
+
 #include <vector>
 #include <typeinfo>
 #include <stdexcept>
@@ -49,9 +51,20 @@ namespace DataObjects
     const std::type_info& get_type_info()const{return typeid(Type);}
     /// Type id of the pointer to data in the column
     const std::type_info& get_pointer_type_info()const{return typeid(Type*);}
-    /// Output to an ostream.
-    void print(std::ostream& s, int index)const{s << m_data[index];}
-    void read(std::istream& s, int index) {s >> m_data[index];}
+    /// Return value of a cell as a string
+    virtual std::string asString(size_t i) const
+    {
+      return boost::lexical_cast<std::string>(m_data[i]);
+    }
+    /// Read value from a string
+    virtual void fromString(const std::string& str,size_t i)
+    {
+      m_data[i] = boost::lexical_cast<Type>(str);
+    }
+
+    ///// Output to an ostream.
+    //void print(std::ostream& s, int index)const{s << m_data[index];}
+    //void read(std::istream& s, int index) {s >> m_data[index];}
     /// Type check
     bool isBool()const{return typeid(Type) == typeid(Boolean);}
     /// Memory used by the column

@@ -3,6 +3,8 @@
 
 #include "Goblin/DllExport.h"
 #include "Goblin/vjkg.h"
+#include "Goblin/EnergyList.h"
+#include "Goblin/LineList.h"
 
 #include <vector>
 #include <string>
@@ -33,20 +35,17 @@ struct elevel{
   double err; // exper. error
 };
 
-class splist;
-class enlist;
-
 class comdiff {
 public: 
   comdiff();
   ~comdiff();
   double found_e(int i)const;
-  bool set(splist&,enlist& low_en,string vstr,double up_ener, VJKG& up_q);
+  bool set(LineList_ptr,EnergyList_ptr low_en,string vstr,double up_ener, VJKG& up_q);
   bool set(double up_ener, VJKG& up_q);
   bool selRules(VJKG& q1,VJKG& q,int dj,int dk);
   void find();
   void check();
-  void setUpper(enlist& up_en){up_ener = &up_en;}
+  void setUpper(EnergyList_ptr up_en){up_ener = up_en;}
   void assign(VJKG qq);
   void assign(){assign(q);}
   void get(size_t i);
@@ -57,9 +56,9 @@ public:
   VJKG q;
   vector<level> lower;
   vector< vector<foundItem> > found;
-  splist *sp;
-  enlist *low_ener;
-  enlist *up_ener;
+  LineList_ptr sp;
+  EnergyList_ptr low_ener;
+  EnergyList_ptr up_ener;
   VJKG q1;
 };
 

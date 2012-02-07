@@ -32,7 +32,7 @@ public:
   double mass(){return mass_;}
   size_t symm(VJKG& q);  //  symmetry of state q
   size_t tsymm(VJKG& q); // transition symmetry 
-  size_t nsymm(VJKG& q);//  nomber of symmetries
+  size_t nsymm(VJKG& q);//  number of symmetries
 };
 
 class GOBLIN_EXPORT vibq{
@@ -104,13 +104,8 @@ std::istream& operator >> (std::istream& istr,Goblin::VJKG& q);
   {
   public:
     VJKGColumn():DataObjects::TableColumn<VJKG>(){}
-    void read(std::istream& s, int index);
-    /// Save into a file
-    virtual void saveAsci(std::ostream& s, int index) const;
-
-    /// Read from a file
-    virtual void loadAsci(std::istream& s, int index);
-
+    /// Return value of a cell as a string
+    virtual std::string asString(size_t i) const;
     /// Read value from a string
     virtual void fromString(const std::string& str,size_t i);
 

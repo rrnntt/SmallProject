@@ -37,23 +37,23 @@ public:
     /// Returns typeid for the pointer type to the data element in the column
     virtual const std::type_info& get_pointer_type_info()const = 0;
 
-    /// Prints
-    virtual void print(std::ostream& s, int index) const = 0;
+    ///// Prints
+    //virtual void print(std::ostream& s, int index) const = 0;
 
-    /// Reads
-    virtual void read(std::istream& s, int index) = 0;
+    ///// Reads
+    //virtual void read(std::istream& s, int index) = 0;
 
-    /// Save into a file
-    virtual void saveAsci(std::ostream& s, int index) const;
+    ///// Save into a file
+    //virtual void saveAscii(std::ostream& s, int index) const;
 
-    /// Read from a file
-    virtual void loadAsci(std::istream& s, int index);
+    ///// Read from a file
+    //virtual void loadAscii(std::istream& s, int index);
 
     /// Return value of a cell as a string
-    virtual std::string asString(size_t i) const;
+    virtual std::string asString(size_t i) const = 0;
 
     /// Read value from a string
-    virtual void fromString(const std::string& str,size_t i);
+    virtual void fromString(const std::string& str,size_t i) = 0;
 
     /// Templated method for returning a value. No type checks are done.
     template<class T>

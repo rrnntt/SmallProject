@@ -360,46 +360,15 @@ size_t molecule::tsymm(VJKG& q){
 }
 
 //------------------ VJKGColumn ----------------------//
-  DECLARE_COLUMN(VJKGColumn,vjkg);
+DECLARE_COLUMN(VJKGColumn,VJKG);
 
-  void VJKGColumn::read(std::istream& s, int index)
-  {
-    std::string str;// = m_data[index];
-    s >> str;
-    if (str.empty()) return;
-    if (str[0] == '"')
-    {
-      if (str == "\"\"") 
-      {
-        str.clear();
-        return;
-      }
-      str.erase(0,1);
-      char c;
-      while(s.good())
-      {
-        s.get(c);
-        if (c == '"' && (str.empty() || str.back() != '\\')) return;
-        str.push_back(c);
-      }
-    }
-    m_data[index].assign(str);
-  }
-
-/// Save into a file
-void VJKGColumn::saveAsci(std::ostream& s, int index) const
+std::string VJKGColumn::asString(size_t i) const
 {
-  s << '"';
-  this->print(s,index);
-  s << '"';
+  std::ostringstream ostr;
+  ostr << m_data[i];
+  return ostr.str();
 }
-
-/// Read from a file
-void VJKGColumn::loadAsci(std::istream& s, int index)
-{
-  this->read(s,index);
-}
-
+  
 void VJKGColumn::fromString(const std::string& str,size_t i)
 {
   m_data[i].assign(str);

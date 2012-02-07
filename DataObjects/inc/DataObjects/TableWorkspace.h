@@ -25,6 +25,7 @@ namespace DataObjects
     };
 
     TableWorkspace();
+    virtual std::string id()const {return "TableWorkspace";}
     bool addColumn(const std::string& type, const std::string& name);
     /// Removes a column.
     void removeColumn( const std::string& name);
@@ -36,6 +37,7 @@ namespace DataObjects
     /// Gets the shared pointer to a column.
     Column_ptr getColumn(int index);
     Column_ptr getColumn(int index)const;
+    Column_ptr getOrAddColumn(const std::string& type, const std::string& name);
     /// Returns a vector of all column names.
     std::vector<std::string> getColumnNames();
     /// Number of rows in the workspace.
@@ -51,13 +53,15 @@ namespace DataObjects
     /// Delets several rows if they exist.
     void removeRows(int index, size_t count);
     /// Save into an asci file
-    void saveAscii(const std::string& fileName, const std::string& sep = ",") const;
+    virtual void saveAscii(const std::string& fileName, const std::string& sep = "") const;
     /// Load from an asci file
-    void loadAscii(const std::string& fileName);
+    virtual void loadAscii(const std::string& fileName);
     /// Fill numeric column with data using Formula::Expression
     void fillColumn(const std::string& colName,const std::string& expr);
     /// Check if a column exists
     bool hasColumn(const std::string& colName) const;
+    /// Remove all columns
+    void removeAllColumns();
 
   private:
 
@@ -109,6 +113,8 @@ namespace DataObjects
     std::vector< boost::shared_ptr<Column> > m_columns;
     /// row count
     int m_rowCount;
+    std::string m_defaultSeparator; ///< default separator for saving in ascii files
+
     /// Logger
     static Kernel::Logger& g_log;
   };

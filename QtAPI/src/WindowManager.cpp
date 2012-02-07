@@ -18,6 +18,7 @@ WindowManager::WindowManager()
 void WindowManager::createWindowManager(WindowManager* manager)
 {
   API::Framework::instance().registerSingleton("WindowManager",manager);
+  API::Framework::instance().openAllLibraries();// it needs a better place to be called from
 }
 
 WindowManager& WindowManager::instance()

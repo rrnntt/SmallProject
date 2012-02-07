@@ -87,6 +87,7 @@ namespace Kernel
     NotStringParser(const std::string& str):IParser(),m_string(str){}
     NotStringParser(const NotStringParser& p):IParser(),m_string(p.m_string){}
     IParser* clone() const{return new NotStringParser(*this);}
+    //bool matchEmpty()const{return true;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     std::string m_string; ///< doesn't match this string

@@ -60,14 +60,21 @@ void TableTask::loadAsciiTable()const
   QString fileName = QFileDialog::getOpenFileName(nullptr,"Open a table");
   if (!fileName.isEmpty())
   {
-    QFileInfo file(fileName);
-    QString name = file.baseName();
-    DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
-      API::WorkspaceFactory::instance().create("TableWorkspace")  ));
-    ws->loadAscii(fileName.toStdString());
-    API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
-    SubWindow* wnd = WindowManager::instance().newSubWindow(new Table(ws));
-    wnd->setWindowTitle(name);
+    try
+    {
+      QFileInfo file(fileName);
+      QString name = file.baseName();
+      DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+        API::WorkspaceFactory::instance().create("TableWorkspace")  ));
+      ws->loadAscii(fileName.toStdString());
+      API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
+      SubWindow* wnd = WindowManager::instance().newSubWindow(new Table(ws));
+      wnd->setWindowTitle(name);
+    }
+    catch(std::exception& e)
+    {
+      errorMessage(std::string("Loading failed:\n")+e.what());
+    }
   }
 }
 

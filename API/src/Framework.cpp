@@ -23,9 +23,9 @@ Framework& Framework::instance()
   return framework;
 }
 
-Framework::Framework()
+Framework::Framework():
+m_binDirectory(".")
 {
-  m_libraryManager.OpenAllLibraries(".");
 }
 
 /**
@@ -39,6 +39,11 @@ Framework::~Framework()
   }
   m_singletons.clear();
   std::cerr << "Framework deleted\n";
+}
+
+void Framework::openAllLibraries()
+{
+  m_libraryManager.OpenAllLibraries(m_binDirectory);
 }
 
 void Framework::registerSingleton(const std::string& name, Singleton* singleton)
@@ -92,6 +97,7 @@ void Framework::parseCommandLine(int argc, char** argv)
 {
   path binPath(argv[0]);
   m_binDirectory = binPath.parent_path().string()+"/";
+  std::cerr << "bin directory: " << m_binDirectory << std::endl;
 }
 
 const std::string Framework::binDirectory() const

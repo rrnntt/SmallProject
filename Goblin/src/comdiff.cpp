@@ -1,20 +1,16 @@
-#include "Goblin/enlist.h"
-#include "Goblin/splist.h"
+#include "Goblin/EnergyList.h"
+#include "Goblin/LineList.h"
 #include "Goblin/comdiff.h"
-#include "Goblin/mio.h"
-#include "Kernel/Logger.h"
 
 #include <iostream>
 #include <iomanip>
-
-//#include "../Troll1/mio.h"
 
 namespace Goblin
 {
 
 using namespace std;
 
-/*ostream& operator << (ostream& ostr,const comdiff& cd){
+ostream& operator << (ostream& ostr,const comdiff& cd){
   size_t ie,il;
   ostr<<cd.q<<' ';
   ostr.precision(11);
@@ -34,31 +30,9 @@ using namespace std;
   };
   return ostr;
 }
-*/
 
-ostream& operator << (ostream& ostr,const comdiff& cd){
-  size_t ie,il;
-  mio <<cd.q<<' ';
-  //mio.operator<<(cd.q);
-  mio <<cd.e0<<'\n';
-  mio <<"---------"<<cd.found.size()<<"-----------"<<'\n';
-  for(size_t i=0;i<cd.found.size();i++){
-    mio <<i<<' '
-        <<setprecision(11)<<cd.found_e(i)<<'\n';
-    for(int j=0;j<cd.found[i].size();j++){
-      ie = cd.found[i][j].low;
-      il = cd.found[i][j].line;
-      mio <<j<<") "<<cd.lower[ie].q<<' '<<cd.sp->line(il)<<' '
-      <<cd.sp->height(il)<<' ';
-      mio <<cd.sp->line(il)+cd.lower[ie].e<<' '<<cd.sp->q(il)<<'\n';
-    };
-    mio <<'\n';
-  };
-  return ostr;
-}
 
 comdiff::comdiff(){
-  sp = 0;
   dw = 0.01; // accuracy
   dW = 1.;   // interval
   dk_max = 5;
@@ -87,8 +61,8 @@ bool comdiff::set(double up_ener, VJKG& up_q){
   found.clear();
   if (!low_ener || !sp) return false;
 
-  enlist& en = *low_ener;
-  splist& ll = *sp;
+  EnergyList& en = *low_ener;
+  LineList& ll = *sp;
 
   size_t symm = q.tsymm();
   VJKG q0;
@@ -137,7 +111,7 @@ void comdiff::find(){
   vector<foundItem> f1;
   double lin1,lin2,e1,e2;
   if (!sp) return;
-  splist& ll = *sp;
+  LineList& ll = *sp;
 
   foundItem fi;
   found.clear();
@@ -191,31 +165,29 @@ void comdiff::find(){
 }
 
 
-bool comdiff::set(splist& spd,enlist& low_en,string vstr,double up_ener, VJKG& up_q){
-  sp = &spd;
+bool comdiff::set(LineList_ptr spd, EnergyList_ptr low_en,string vstr,double up_ener, VJKG& up_q){
+  sp = spd;
   q1.setV(vstr);
-  low_ener = &low_en;
+  low_ener = low_en;
   return set(up_ener,up_q);
 }
 
 void comdiff::check(){
   vector<foundItem> f1;
   if (!sp) {
-     mio <<"Linelist is not set\n";
-     return;
+    throw std::runtime_error("Linelist is not set");
   };
   if (!low_ener) {
-    mio <<"Ground state energies are not set\n";
-    return;
+    throw std::runtime_error("Ground state energies are not set");
   };
-  splist& ll = *sp;
-  enlist& en = *low_ener;
+  LineList& ll = *sp;
+  EnergyList& en = *low_ener;
 
   foundItem fi;
   level lvl;
   found.clear();
   lower.clear();
-  if (!ll.assigned()) return;
+  if (!ll.isAssigned()) return;
   size_t j;
   for(size_t i=0;i<ll.size();i++)
     if (ll.q(i) == q){
@@ -233,11 +205,12 @@ void comdiff::check(){
 
 void comdiff::assign(VJKG qq){
   if (!found.size()) return;
-  if (!sp->assigned()) sp->make_quanta();
+  //if (!sp->assigned()) sp->make_quanta();
   vector<foundItem>::iterator f;
   for(f=found[0].begin();f!=found[0].end();f++){
-    sp->q(f->line) = qq;
-    sp->q0(f->line) = lower[f->low].q;
+    sp->assign(f->line,qq,lower[f->low].q);
+    //sp->q(f->line) = qq;
+    //sp->q0(f->line) = lower[f->low].q;
   };
 }
 

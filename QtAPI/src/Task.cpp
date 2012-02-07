@@ -1,5 +1,8 @@
 #include "QtAPI/Task.h"
 
+#include <QtGui/QMessageBox>
+#include <QtGui/QInputDialog>
+
 #include <iostream>
 
 namespace QtAPI
@@ -21,6 +24,23 @@ namespace QtAPI
       return m_actions[name];
     }
     return nullptr;
+  }
+
+  void Task::errorMessage(const std::string& mess) const
+  {
+    QMessageBox::critical(nullptr,"Error",QString::fromStdString(mess));
+  }
+
+  std::string Task::getInput(const std::string& mess)const
+  {
+    bool ok;
+    QString text = QInputDialog::getText(NULL, "Input",
+      QString::fromStdString(mess), QLineEdit::Normal,"", &ok);
+    if (ok && !text.isEmpty())
+    {
+      return text.toStdString();
+    }
+    return "";
   }
 
 } // QtAPI

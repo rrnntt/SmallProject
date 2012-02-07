@@ -21,6 +21,7 @@ public:
   Singleton* getSingleton(const std::string& name);
   void parseCommandLine(int argc, char** argv);
   const std::string binDirectory() const;
+  void openAllLibraries();
 protected:
   Framework();
   std::map<std::string,Singleton*> m_singletons;
