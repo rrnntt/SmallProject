@@ -236,6 +236,7 @@ namespace Kernel
     std::string::const_iterator getInnerStart()const{return m_start + m_bra.size();}
     //std::string::const_iterator getInnerEnd()const{return m_end - m_ket.size();}
     std::string::const_iterator getInnerEnd()const{return m_start + m_n - m_ket.size();}
+    bool isInnerEmpty() const {return isEmpty() || m_n <= m_bra.size() + m_ket.size();}
   protected:
     enum Part{Bra,Ket,Other};
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;

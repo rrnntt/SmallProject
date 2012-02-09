@@ -413,24 +413,26 @@ std::string::const_iterator BracketParser::test(std::string::const_iterator star
   size_t level = 1;
   for(; it != end; )
   {
-    auto it1 = isBraKet(m_bra,it,end);
+    // try for the closing bracket
+    auto it1 = isBraKet(m_ket,it,end);
     if (it1 != it)
-    {
-      it = it1;
-      ++level;
+    {// if closing bracket found
+      it = it1; // jump to the end of that bracket
+      --level;  // decrease the depth level
+      if (level == 0) break;
     }
-    else
+    else // if closing bracket not found try for the opening one
     {
-      it1 = isBraKet(m_ket,it,end);
+      // if opening bracket found
+      it1 = isBraKet(m_bra,it,end);
       if (it1 != it)
       {
-        it = it1;
-        --level;
-        if (level == 0) break;
+        it = it1; // jump to the end of that bracket
+        ++level;  // decrease the depth level
       }
-      else
+      else // neither bracket found: just some inner stuff
       {
-        ++it;
+        ++it; // go to the next character
       }
     }
   }

@@ -146,6 +146,26 @@ TEST(EParserTest, Bracket)
 
 }
 
+TEST(EParserTest, BracketSame) 
+{
+  std::string str = "|1+2+3|";
+  SeqParser* p = new SeqParser;
+  p->addParser(new NumberParser);
+  p->addParser(new CharParser('+'));
+  p->addParser(new NumberParser);
+  p->addParser(new CharParser('+'));
+  p->addParser(new NumberParser);
+  BracketParser par("|","|",p);
+
+  par.match(str);
+
+  EXPECT_TRUE(par.hasMatch());
+  EXPECT_EQ(p->getParser(0)->match(),"1");
+  EXPECT_EQ(p->getParser(2)->match(),"2");
+  EXPECT_EQ(p->getParser(4)->match(),"3");
+
+}
+
 TEST(EParserTest, NameBracket) 
 {
   std::string str = "fun ( x + y )";

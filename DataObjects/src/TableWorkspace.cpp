@@ -259,6 +259,16 @@ void TableWorkspace::saveAscii(const std::string& fileName, const std::string& s
   fil.close();
 }
 
+/**
+ * Loads a TableWorkspace from an ASCII file. The data must be in columns.
+ * The file structure:
+ *  - header: lines start with '#' followed by one of these:
+ *     <column type>:<column name>
+ *     sep=<sparator>
+ *   separator is a string that divides the columns. Data in the column must not contain <separator>.
+ *  - the data in columns
+ *  - any line starting with '#' is ignored.
+ */
 void TableWorkspace::loadAscii(const std::string& fileName)
 {
   std::ifstream fil(fileName.c_str());
@@ -270,7 +280,10 @@ void TableWorkspace::loadAscii(const std::string& fileName)
   size_t row = 0; // current row index
   size_t n; // number of columns
 
+  // parser for a line of data
   Kernel::SeqParser dataParser;
+  // parsers for individual cells, size == columnCount
+  std::vector<Kernel::IParser*> cellParser; 
 
   std::string str;
   while(std::getline(fil,str))
@@ -282,9 +295,10 @@ void TableWorkspace::loadAscii(const std::string& fileName)
 
       // parse column structure descriptor
       Kernel::SeqParser* columnParser = new Kernel::SeqParser();
-      columnParser->addParser(new Kernel::WordParser(":"));
-      columnParser->addParser(new Kernel::CharParser(':'));
-      columnParser->addParser(new Kernel::WordParser);
+      columnParser->addParser(new Kernel::WordParser(":"));// 0
+      columnParser->addParser(new Kernel::CharParser(':'));// 1
+      columnParser->addParser(new Kernel::WordParser("["));// 2
+      columnParser->addParser(new Kernel::BracketParser("[","]"),'*');// 3,0
 
       // separator parser
       Kernel::SeqParser* sepParser = new Kernel::SeqParser();
@@ -296,6 +310,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
       infoParser.addParser(sepParser);
       infoParser.addParser(columnParser);
       
+      // start parsing from the second character.
       infoParser.match(str,1);
 
       if (!infoParser.hasMatch()) continue;
@@ -313,6 +328,19 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         std::string type = seq->getParser(0)->match();
         std::string name = seq->getParser(2)->match();
         this->addColumn(type,name);
+        Kernel::BracketParser* fmtParser = seq->get<Kernel::BracketParser>(3,0);
+        if (fmtParser)
+        {
+          if (fmtParser->hasMatch() && !fmtParser->isInnerEmpty())
+          {
+            std::string formatter = fmtParser->getParser(0)->match(); // return string from the inner parser
+            std::cerr << "fmt: " << formatter <<  std::endl;
+          }
+        }
+        else
+        {
+          std::cerr << "Oops...\n";
+        }
       }
 
     }
