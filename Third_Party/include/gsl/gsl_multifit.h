@@ -1,10 +1,10 @@
 /* multifit/gsl_multifit.h
  * 
- * Copyright (C) 2000 Brian Gough
+ * Copyright (C) 2000, 2007, 2010 Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -76,6 +76,16 @@ gsl_multifit_linear_svd (const gsl_matrix * X,
                          gsl_multifit_linear_workspace * work);
 
 int
+gsl_multifit_linear_usvd (const gsl_matrix * X,
+                          const gsl_vector * y,
+                          double tol,
+                          size_t * rank,
+                          gsl_vector * c,
+                          gsl_matrix * cov,
+                          double *chisq, 
+                          gsl_multifit_linear_workspace * work);
+
+int
 gsl_multifit_wlinear (const gsl_matrix * X,
                       const gsl_vector * w,
                       const gsl_vector * y,
@@ -96,10 +106,24 @@ gsl_multifit_wlinear_svd (const gsl_matrix * X,
                           gsl_multifit_linear_workspace * work);
 
 int
+gsl_multifit_wlinear_usvd (const gsl_matrix * X,
+                           const gsl_vector * w,
+                           const gsl_vector * y,
+                           double tol,
+                           size_t * rank,
+                           gsl_vector * c,
+                           gsl_matrix * cov,
+                           double *chisq, 
+                           gsl_multifit_linear_workspace * work);
+
+int
 gsl_multifit_linear_est (const gsl_vector * x,
                          const gsl_vector * c,
                          const gsl_matrix * cov, double *y, double *y_err);
 
+int
+gsl_multifit_linear_residuals (const gsl_matrix *X, const gsl_vector *y,
+                               const gsl_vector *c, gsl_vector *r);
 
 __END_DECLS
 

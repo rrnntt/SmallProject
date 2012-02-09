@@ -1,10 +1,10 @@
 /* min/gsl_min.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007, 2009 Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -91,6 +91,7 @@ gsl_min_test_interval (double x_lower, double x_upper, double epsabs, double eps
 
 GSL_VAR const gsl_min_fminimizer_type  * gsl_min_fminimizer_goldensection;
 GSL_VAR const gsl_min_fminimizer_type  * gsl_min_fminimizer_brent;
+GSL_VAR const gsl_min_fminimizer_type  * gsl_min_fminimizer_quad_golden;
 
 typedef
 int (*gsl_min_bracketing_function)(gsl_function *f,

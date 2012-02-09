@@ -1,10 +1,10 @@
 /* statistics/gsl_statistics_double.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Jim Davies, Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Jim Davies, Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -39,12 +39,16 @@ double gsl_stats_variance (const double data[], const size_t stride, const size_
 double gsl_stats_sd (const double data[], const size_t stride, const size_t n);
 double gsl_stats_variance_with_fixed_mean (const double data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_sd_with_fixed_mean (const double data[], const size_t stride, const size_t n, const double mean);
+double gsl_stats_tss (const double data[], const size_t stride, const size_t n);
+double gsl_stats_tss_m (const double data[], const size_t stride, const size_t n, const double mean);
+
 double gsl_stats_absdev (const double data[], const size_t stride, const size_t n);
 double gsl_stats_skew (const double data[], const size_t stride, const size_t n);
 double gsl_stats_kurtosis (const double data[], const size_t stride, const size_t n);
 double gsl_stats_lag1_autocorrelation (const double data[], const size_t stride, const size_t n);
 
 double gsl_stats_covariance (const double data1[], const size_t stride1,const double data2[], const size_t stride2, const size_t n);
+double gsl_stats_correlation (const double data1[], const size_t stride1,const double data2[], const size_t stride2, const size_t n);
 
 double gsl_stats_variance_m (const double data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_sd_m (const double data[], const size_t stride, const size_t n, const double mean);
@@ -62,6 +66,8 @@ double gsl_stats_wvariance (const double w[], const size_t wstride, const double
 double gsl_stats_wsd (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n);
 double gsl_stats_wvariance_with_fixed_mean (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_wsd_with_fixed_mean (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n, const double mean);
+double gsl_stats_wtss (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n);
+double gsl_stats_wtss_m (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n, const double wmean);
 double gsl_stats_wabsdev (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n);
 double gsl_stats_wskew (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n);
 double gsl_stats_wkurtosis (const double w[], const size_t wstride, const double data[], const size_t stride, const size_t n);

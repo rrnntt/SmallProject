@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -82,6 +82,10 @@ void gsl_cheb_free(gsl_cheb_series * cs);
 int gsl_cheb_init(gsl_cheb_series * cs, const gsl_function * func,
                   const double a, const double b);
 
+/* Return the order, size of coefficient array and coefficient array ptr */
+size_t gsl_cheb_order (const gsl_cheb_series * cs);
+size_t gsl_cheb_size (const gsl_cheb_series * cs);
+double *gsl_cheb_coeffs (const gsl_cheb_series * cs);
 
 /* Evaluate a Chebyshev series at a given point.
  * No errors can occur for a struct obtained from gsl_cheb_new().

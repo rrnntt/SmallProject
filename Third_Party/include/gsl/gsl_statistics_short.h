@@ -1,10 +1,10 @@
 /* statistics/gsl_statistics_short.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Jim Davies, Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Jim Davies, Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -39,12 +39,16 @@ double gsl_stats_short_variance (const short data[], const size_t stride, const 
 double gsl_stats_short_sd (const short data[], const size_t stride, const size_t n);
 double gsl_stats_short_variance_with_fixed_mean (const short data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_short_sd_with_fixed_mean (const short data[], const size_t stride, const size_t n, const double mean);
+double gsl_stats_short_tss (const short data[], const size_t stride, const size_t n);
+double gsl_stats_short_tss_m (const short data[], const size_t stride, const size_t n, const double mean);
+
 double gsl_stats_short_absdev (const short data[], const size_t stride, const size_t n);
 double gsl_stats_short_skew (const short data[], const size_t stride, const size_t n);
 double gsl_stats_short_kurtosis (const short data[], const size_t stride, const size_t n);
 double gsl_stats_short_lag1_autocorrelation (const short data[], const size_t stride, const size_t n);
 
 double gsl_stats_short_covariance (const short data1[], const size_t stride1,const short data2[], const size_t stride2, const size_t n);
+double gsl_stats_short_correlation (const short data1[], const size_t stride1,const short data2[], const size_t stride2, const size_t n);
 
 double gsl_stats_short_variance_m (const short data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_short_sd_m (const short data[], const size_t stride, const size_t n, const double mean);

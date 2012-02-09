@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -140,10 +140,10 @@ gsl_multimin_fminimizer_size (const gsl_multimin_fminimizer * s);
 /* Convergence test functions */
 
 int
-gsl_multimin_test_gradient(const gsl_vector * g,double epsabs);
+gsl_multimin_test_gradient(const gsl_vector * g, double epsabs);
 
 int
-gsl_multimin_test_size(const double size ,double epsabs);
+gsl_multimin_test_size(const double size, double epsabs);
 
 /* minimisation of differentiable functions */
 
@@ -201,16 +201,16 @@ int
 gsl_multimin_fdfminimizer_restart(gsl_multimin_fdfminimizer *s);
 
 gsl_vector * 
-gsl_multimin_fdfminimizer_x (gsl_multimin_fdfminimizer * s);
+gsl_multimin_fdfminimizer_x (const gsl_multimin_fdfminimizer * s);
 
 gsl_vector * 
-gsl_multimin_fdfminimizer_dx (gsl_multimin_fdfminimizer * s);
+gsl_multimin_fdfminimizer_dx (const gsl_multimin_fdfminimizer * s);
 
 gsl_vector * 
-gsl_multimin_fdfminimizer_gradient (gsl_multimin_fdfminimizer * s);
+gsl_multimin_fdfminimizer_gradient (const gsl_multimin_fdfminimizer * s);
 
 double 
-gsl_multimin_fdfminimizer_minimum (gsl_multimin_fdfminimizer * s);
+gsl_multimin_fdfminimizer_minimum (const gsl_multimin_fdfminimizer * s);
 
 GSL_VAR const gsl_multimin_fdfminimizer_type *gsl_multimin_fdfminimizer_steepest_descent;
 GSL_VAR const gsl_multimin_fdfminimizer_type *gsl_multimin_fdfminimizer_conjugate_pr;
@@ -218,7 +218,8 @@ GSL_VAR const gsl_multimin_fdfminimizer_type *gsl_multimin_fdfminimizer_conjugat
 GSL_VAR const gsl_multimin_fdfminimizer_type *gsl_multimin_fdfminimizer_vector_bfgs;
 GSL_VAR const gsl_multimin_fdfminimizer_type *gsl_multimin_fdfminimizer_vector_bfgs2;
 GSL_VAR const gsl_multimin_fminimizer_type *gsl_multimin_fminimizer_nmsimplex;
-
+GSL_VAR const gsl_multimin_fminimizer_type *gsl_multimin_fminimizer_nmsimplex2;
+GSL_VAR const gsl_multimin_fminimizer_type *gsl_multimin_fminimizer_nmsimplex2rand;
 
 __END_DECLS
 

@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -193,7 +193,6 @@ int gsl_sf_legendre_sphPlm_deriv_array(
  */
 int gsl_sf_legendre_array_size(const int lmax, const int m);
 
-
 /* Irregular Spherical Conical Function
  * P^{1/2}_{-1/2 + I lambda}(x)
  *
@@ -309,16 +308,6 @@ double gsl_sf_legendre_H3d(const int l, const double lambda, const double eta);
 /* Array of H3d(ell),  0 <= ell <= lmax
  */
 int gsl_sf_legendre_H3d_array(const int lmax, const double lambda, const double eta, double * result_array);
-
-
-#ifdef HAVE_INLINE
-extern inline
-int
-gsl_sf_legendre_array_size(const int lmax, const int m)
-{
-  return lmax-m+1;
-}
-#endif /* HAVE_INLINE */
 
 
 __END_DECLS

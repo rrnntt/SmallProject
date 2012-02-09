@@ -1,10 +1,10 @@
 /* statistics/gsl_statistics_long.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Jim Davies, Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Jim Davies, Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -39,12 +39,16 @@ double gsl_stats_long_variance (const long data[], const size_t stride, const si
 double gsl_stats_long_sd (const long data[], const size_t stride, const size_t n);
 double gsl_stats_long_variance_with_fixed_mean (const long data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_long_sd_with_fixed_mean (const long data[], const size_t stride, const size_t n, const double mean);
+double gsl_stats_long_tss (const long data[], const size_t stride, const size_t n);
+double gsl_stats_long_tss_m (const long data[], const size_t stride, const size_t n, const double mean);
+
 double gsl_stats_long_absdev (const long data[], const size_t stride, const size_t n);
 double gsl_stats_long_skew (const long data[], const size_t stride, const size_t n);
 double gsl_stats_long_kurtosis (const long data[], const size_t stride, const size_t n);
 double gsl_stats_long_lag1_autocorrelation (const long data[], const size_t stride, const size_t n);
 
 double gsl_stats_long_covariance (const long data1[], const size_t stride1,const long data2[], const size_t stride2, const size_t n);
+double gsl_stats_long_correlation (const long data1[], const size_t stride1,const long data2[], const size_t stride2, const size_t n);
 
 double gsl_stats_long_variance_m (const long data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_long_sd_m (const long data[], const size_t stride, const size_t n, const double mean);

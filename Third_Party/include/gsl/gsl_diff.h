@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -33,6 +33,7 @@
 
 __BEGIN_DECLS
 
+#ifndef GSL_DISABLE_DEPRECATED
 int gsl_diff_central (const gsl_function *f,
                       double x,
                       double *result, double *abserr);
@@ -44,6 +45,7 @@ int gsl_diff_backward (const gsl_function *f,
 int gsl_diff_forward (const gsl_function *f,
                       double x,
                       double *result, double *abserr);
+#endif
 
 __END_DECLS
 

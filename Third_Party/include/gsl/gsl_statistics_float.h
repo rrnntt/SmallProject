@@ -1,10 +1,10 @@
 /* statistics/gsl_statistics_float.h
  * 
- * Copyright (C) 1996, 1997, 1998, 1999, 2000 Jim Davies, Brian Gough
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007 Jim Davies, Brian Gough
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -39,12 +39,16 @@ double gsl_stats_float_variance (const float data[], const size_t stride, const 
 double gsl_stats_float_sd (const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_variance_with_fixed_mean (const float data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_float_sd_with_fixed_mean (const float data[], const size_t stride, const size_t n, const double mean);
+double gsl_stats_float_tss (const float data[], const size_t stride, const size_t n);
+double gsl_stats_float_tss_m (const float data[], const size_t stride, const size_t n, const double mean);
+
 double gsl_stats_float_absdev (const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_skew (const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_kurtosis (const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_lag1_autocorrelation (const float data[], const size_t stride, const size_t n);
 
 double gsl_stats_float_covariance (const float data1[], const size_t stride1,const float data2[], const size_t stride2, const size_t n);
+double gsl_stats_float_correlation (const float data1[], const size_t stride1,const float data2[], const size_t stride2, const size_t n);
 
 double gsl_stats_float_variance_m (const float data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_float_sd_m (const float data[], const size_t stride, const size_t n, const double mean);
@@ -62,6 +66,8 @@ double gsl_stats_float_wvariance (const float w[], const size_t wstride, const f
 double gsl_stats_float_wsd (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_wvariance_with_fixed_mean (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n, const double mean);
 double gsl_stats_float_wsd_with_fixed_mean (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n, const double mean);
+double gsl_stats_float_wtss (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n);
+double gsl_stats_float_wtss_m (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n, const double wmean);
 double gsl_stats_float_wabsdev (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_wskew (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n);
 double gsl_stats_float_wkurtosis (const float w[], const size_t wstride, const float data[], const size_t stride, const size_t n);

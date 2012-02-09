@@ -4,7 +4,7 @@
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * the Free Software Foundation; either version 3 of the License, or (at
  * your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but
@@ -129,10 +129,10 @@ void gsl_odeiv_step_free(gsl_odeiv_step * s);
 
 /* General stepper object methods.
  */
-const char * gsl_odeiv_step_name(const gsl_odeiv_step *);
+const char * gsl_odeiv_step_name(const gsl_odeiv_step * s);
 unsigned int gsl_odeiv_step_order(const gsl_odeiv_step * s);
 
-int  gsl_odeiv_step_apply(gsl_odeiv_step *, double t, double h, double y[], double yerr[], const double dydt_in[], double dydt_out[], const gsl_odeiv_system * dydt);
+int  gsl_odeiv_step_apply(gsl_odeiv_step * s, double t, double h, double y[], double yerr[], const double dydt_in[], double dydt_out[], const gsl_odeiv_system * dydt);
 
 /* General step size control object.
  *
@@ -220,9 +220,9 @@ gsl_odeiv_evolve;
 /* Evolution object methods.
  */
 gsl_odeiv_evolve * gsl_odeiv_evolve_alloc(size_t dim);
-int gsl_odeiv_evolve_apply(gsl_odeiv_evolve *, gsl_odeiv_control * con, gsl_odeiv_step * step, const gsl_odeiv_system * dydt, double * t, double t1, double * h, double y[]);
-int gsl_odeiv_evolve_reset(gsl_odeiv_evolve *);
-void gsl_odeiv_evolve_free(gsl_odeiv_evolve *);
+int gsl_odeiv_evolve_apply(gsl_odeiv_evolve * e, gsl_odeiv_control * con, gsl_odeiv_step * step, const gsl_odeiv_system * dydt, double * t, double t1, double * h, double y[]);
+int gsl_odeiv_evolve_reset(gsl_odeiv_evolve * e);
+void gsl_odeiv_evolve_free(gsl_odeiv_evolve * e);
 
 
 __END_DECLS

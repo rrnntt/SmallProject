@@ -4,6 +4,7 @@
 #project(Numeric)
 
 set( INC_FILES 
+   inc/Numeric/Chebfun.h
    inc/Numeric/ConjugateFRMinimizer.h
    inc/Numeric/CostFunction.h
    inc/Numeric/DllExport.h
@@ -25,6 +26,7 @@ set( INC_FILES
    inc/Numeric/PhysBody.h
    )
 set( SRC_FILES 
+  src/Chebfun.cpp
   src/ConjugateFRMinimizer.cpp
   src/CostFunction.cpp
   src/Distribution.cpp
@@ -64,6 +66,7 @@ ${GSL_LIBS}
 set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
+  test/ChebfunTest.cpp
   test/ConjugateFRMinimizerTest.cpp
   test/DistributionTest.cpp
   test/LeastSquaresTest.cpp
