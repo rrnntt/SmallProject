@@ -44,7 +44,7 @@ QMenu* GoblinTask::menu(QtAPI::SubWindow* w) const
   if (w)
   {
     QtAPI::Table* table = qobject_cast<QtAPI::Table*>(w->widget());
-    if (!table)
+    if (table)
     {
       addTableActions(menu,table);
     }

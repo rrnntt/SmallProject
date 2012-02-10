@@ -99,16 +99,83 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   return plot;
 }
 
+/**
+ * Show plot and draw curves for columns in columnNames. The columns must have Y roles assigned.
+ */
+QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
+  std::vector<std::string>& columnNames) const
+{
+  // find first column with th X role
+  std::vector<std::string> allNames = m_table->getWorkspace()->getColumnNames();
+  DataObjects::NumericColumn* columnX = nullptr;
+  std::string columnXName;
+  for(auto columnName = allNames.begin(); columnName != allNames.end(); ++columnName)
+  {
+    auto column = m_table->getWorkspace()->getColumn(*columnName);
+    auto colNum = column->asNumeric();
+    if (!colNum) continue;
+    if (colNum->getPlotRole() == DataObjects::NumericColumn::X)
+    {
+      columnX = colNum;
+      columnXName = *columnName;
+      break;
+    }
+  }
+  if (!columnX)
+  {
+    errorMessage("No X column defined in the table.");
+    return nullptr;
+  }
+  std::string yAxisTitle; 
+  auto plot = new Plot();
+  plot->setTitle(QString::fromStdString(tws->name()));
+  plot->setAxisTitle(Plot::xBottom,QString::fromStdString(columnXName));
+  for(auto columnName = columnNames.begin(); columnName != columnNames.end(); ++columnName)
+  {
+    auto column = m_table->getWorkspace()->getColumn(*columnName);
+    auto columnY = column->asNumeric();
+    if (!columnY) continue;
+    if (columnY->getPlotRole() != DataObjects::NumericColumn::Y)
+    {
+      errorMessage("Column "+*columnName+" does not have the Y plot role. Skipping.");
+      continue;
+    }
+    PlotCurve* curve = PlotCurve::create();
+    std::vector<double> x,y;
+    columnX->fill(x);
+    columnY->fill(y);
+    curve->setData(&x[0],&y[0],x.size());
+    plot->addCurve(curve);
+    curve->setStyle((PlotCurve::CurveStyle)m_table->getWorkspace()->getCurveStyle());
+    curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
+    if (yAxisTitle.empty())
+    {
+      yAxisTitle = *columnName;
+    }
+    else
+    {
+      yAxisTitle = "Y axis";
+    }
+  }
+  plot->setAxisTitle(Plot::yLeft,QString::fromStdString(yAxisTitle));
+  plot->setZoomBase();
+  WindowManager::instance().newSubWindow(plot);
+  return plot;
+}
+
 //------------------------------------
 //   Slots
 //------------------------------------
 
 void PlotTask::showTablePlot()
 {
-  std::cerr << "showTablePlot()\n";
   if (!m_table) return;
   QItemSelectionModel* selection = m_table->selectionModel();
   std::string columnX,columnY,columnE;
+  // column names for plotting
+  std::vector<std::string> columnNames;
+  // whether the columns have plot roles defined
+  bool haveRoles = false;
   if (selection->hasSelection())
   {
     foreach(const QModelIndex& index,selection->selectedColumns())
@@ -116,26 +183,32 @@ void PlotTask::showTablePlot()
       auto column = m_table->getWorkspace()->getColumn(index.column());
       auto colNum = column->asNumeric();
       if (!colNum) continue;
-      if (columnX.empty())
+      columnNames.push_back(column->name());
+      if (colNum->getPlotRole() == DataObjects::NumericColumn::Y)
       {
-        columnX = column->name();
-      }
-      else if (columnY.empty())
-      {
-        columnY = column->name();
-      }
-      else if (columnE.empty())
-      {
-        columnE = column->name();
-      }
-      else
-      {
-        break;
+        haveRoles = true;
       }
     }
-    if (columnY.empty()) return;
-    showPlot(m_table,columnX,columnY,columnE);
+    if (columnNames.empty()) return;
+    if (haveRoles)
+    {
+      showPlot(m_table->getWorkspace(),columnNames);
+    }
+    else if (columnNames.size() > 1)
+    {
+      columnX = columnNames[0];
+      columnY = columnNames[1];
+      if (columnNames.size() > 2)
+      {
+        columnE = columnNames[2];
+      }
+      showPlot(m_table,columnX,columnY,columnE);
+    }
   }
+  std::cerr << "Columns:\n";
+  std::for_each(columnNames.begin(),columnNames.end(),[](std::string nam){
+    std::cerr << nam << std::endl;
+  });
 }
 
 /**

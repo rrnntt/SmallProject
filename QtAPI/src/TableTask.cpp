@@ -78,6 +78,37 @@ void TableTask::loadAsciiTable()const
   }
 }
 
+/**
+ * Open a Table sub-window for a table workspace.
+ * @param tws :: Shared pointer to a TableWorkspace to be displayed in a Table.
+ */
+void TableTask::showTable(boost::shared_ptr<DataObjects::TableWorkspace> tws)
+{
+  SubWindow* wnd = WindowManager::instance().newSubWindow(new Table(tws));
+  wnd->setWindowTitle(QString::fromStdString(tws->name()));
+}
 
+/**
+ * Open a Table sub-window for a table workspace.
+ * @param wsName :: A name of a TableWorkspace to be displayed in a Table.
+ */
+void TableTask::showTable(const QString& wsName)
+{
+  try
+  {
+    auto tws = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
+      API::WorkspaceManager::instance().retrieve(wsName.toStdString()));
+    if (!tws)
+    {
+      errorMessage("Workspace " + wsName.toStdString()+" is not a TableWorkspace.");
+      return;
+    }
+    showTable(tws);
+  }
+  catch(std::exception& e)
+  {
+    errorMessage("Cannot find workspace "+wsName.toStdString()+": \n"+e.what());
+  }
+}
 
 } // namespace QtAPI

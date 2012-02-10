@@ -40,6 +40,7 @@ protected slots:
   void setRoleXError();
   void setRoleYError();
   void setRole(int role);
+  void workspaceDeleted();
 protected:
   TableModel* tableModel();
   const TableModel* tableModel()const;
@@ -83,6 +84,8 @@ public:
   void setRowCount(int n);
   DataObjects::TableWorkspace_ptr getWorkspace() const{return m_workspace;}
   void setPlotRole(int col,int role);
+signals:
+  void workspaceDeleted();
 public slots:
   void saveAscii();
   void showTableDialog();

@@ -38,6 +38,8 @@ public:
     const std::string& columnX,
     const std::string& columnY,
     const std::string& columnE = "") const;
+  QPointer<Plot> showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
+    std::vector<std::string>& columnNames) const;
 protected slots:
   void showTablePlot();
   void setZoomer();

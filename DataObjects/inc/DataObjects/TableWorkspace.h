@@ -18,6 +18,16 @@ namespace DataObjects
   {
   public:
 
+    // copied from qwt_plot_curve.h
+    enum CurveStyle
+    {
+        NoCurve,
+        Lines,
+        Sticks,
+        Steps,
+        Dots,
+    };
+
     class ColumnNotFound: public std::runtime_error
     {
     public:
@@ -62,6 +72,8 @@ namespace DataObjects
     bool hasColumn(const std::string& colName) const;
     /// Remove all columns
     void removeAllColumns();
+    int getCurveStyle() const {return m_defaultCurveStyle;}
+    void setCurveStyle(int s) {m_defaultCurveStyle = s;}
 
   private:
 
@@ -114,6 +126,7 @@ namespace DataObjects
     /// row count
     int m_rowCount;
     std::string m_defaultSeparator; ///< default separator for saving in ascii files
+    int m_defaultCurveStyle;///< 0-NoCurve, 1-Lines, 2-Sticks, 3-Steps, 4-Dots (must be the same as in qwt_plot_curve.h)
 
     /// Logger
     static Kernel::Logger& g_log;

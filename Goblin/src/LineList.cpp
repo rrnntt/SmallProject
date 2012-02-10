@@ -12,6 +12,7 @@ DECLARE_WORKSPACE(LineList);
 LineList::LineList()
 {
   resetColumns();
+  setCurveStyle(Sticks);
 }
 
 /// Load from an asci file
@@ -40,10 +41,25 @@ void LineList::resetColumns()
   }
   catch(...)
   {}
-  auto dColumn = static_cast<TableColumn<double>*>(getOrAddColumn("double","Line").get());
+  auto dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Line").get());
   m_line = &dColumn->data();
-  dColumn = static_cast<TableColumn<double>*>(getOrAddColumn("double","Height").get());
-  m_line = &dColumn->data();
+  dColumn->setPlotRole(NumericColumn::X);
+  if (this->hasColumn("Height"))
+  {
+    dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Height").get());
+    m_line = &dColumn->data();
+  }
+  else if (this->hasColumn("Intensity"))
+  {
+    dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Intensity").get());
+    m_line = &dColumn->data();
+  }
+  else
+  {
+    dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Height").get());
+    m_line = &dColumn->data();
+  }
+  dColumn->setPlotRole(NumericColumn::Y);
 }
 
 void LineList::makeQs()

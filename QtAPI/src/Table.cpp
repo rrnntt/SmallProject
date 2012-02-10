@@ -1,6 +1,7 @@
 #include "QtAPI/Table.h"
 #include "QtAPI/AddTableColumnDialog.h"
 #include "QtAPI/TableDialog.h"
+#include "QtAPI/SubWindow.h"
 
 #include "API/WorkspaceManager.h"
 #include "DataObjects/NumericColumn.h"
@@ -25,6 +26,7 @@ QTableView(parent)
 {
   TableModel* model = new TableModel(ws,this);
   setModel(model);
+  connect(model,SIGNAL(workspaceDeleted()),this,SLOT(workspaceDeleted()));
 
   this->horizontalHeader()->installEventFilter(this);
   this->verticalHeader()->installEventFilter(this);
@@ -267,6 +269,20 @@ void Table::setRoleYError()
   setRole(DataObjects::NumericColumn::yError);
 }
 
+void Table::workspaceDeleted()
+{
+  //std::cerr << parent()->metaObject()->className() << std::endl;
+  SubWindow* sw = qobject_cast<SubWindow*>(parent());
+  if (sw)
+  {
+    sw->close();
+  }
+  else
+  {
+    close();
+  }
+}
+
 /* --- TableModel --- */
 
 TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):
@@ -489,6 +505,7 @@ void TableModel::showTableDialog()
 
 void TableModel::handleDelete(const API::WorkspaceManager::DeleteNotification& nt)
 {
+  emit workspaceDeleted();
 }
 
 void TableModel::handleModified(const API::WorkspaceManager::ModifiedNotification& nt)

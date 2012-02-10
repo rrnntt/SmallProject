@@ -10,6 +10,11 @@
 
 class QAction;
 
+namespace DataObjects
+{
+  class TableWorkspace;
+}
+
 namespace QtAPI
 {
 
@@ -27,6 +32,8 @@ public:
 
   QPointer<Table> newTable() const;
   void loadAsciiTable() const;
+  void showTable(boost::shared_ptr<DataObjects::TableWorkspace> tws);
+  void showTable(const QString& wsName);
 public slots:
   void showTableDialog();
 protected:

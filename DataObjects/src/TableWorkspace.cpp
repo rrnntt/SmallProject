@@ -23,7 +23,8 @@ Kernel::Logger& TableWorkspace::g_log(Kernel::Logger::get("TableWorkspace"));
 
 TableWorkspace::TableWorkspace():
 m_rowCount(0),
-m_defaultSeparator(",")
+m_defaultSeparator(","),
+m_defaultCurveStyle(Lines)
 {
   std::cerr<<"TableWorkspace\n";
 }
@@ -178,7 +179,7 @@ int TableWorkspace::insertRow(int index)
 
 int TableWorkspace::appendRow()
 {
-  return insertRow(rowCount() - 1);
+  return insertRow(rowCount());
 }
 
 /** @param index Row to delete.
@@ -283,7 +284,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
   // parser for a line of data
   Kernel::SeqParser dataParser;
   // parsers for individual cells, size == columnCount
-  std::vector<Kernel::IParser*> cellParser; 
+  std::vector<Kernel::IParser*> cellParsers; 
 
   std::string str;
   while(std::getline(fil,str))
@@ -303,7 +304,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
       // separator parser
       Kernel::SeqParser* sepParser = new Kernel::SeqParser();
       sepParser->addParser(new Kernel::StringParser("sep="));
-      sepParser->addParser(new Kernel::WordParser);
+      sepParser->addParser(new Kernel::AllParser);
 
       // parse info fileds (after #)
       Kernel::AltParser infoParser;
@@ -328,18 +329,31 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         std::string type = seq->getParser(0)->match();
         std::string name = seq->getParser(2)->match();
         this->addColumn(type,name);
+        // get formatter in square brackets after column name
         Kernel::BracketParser* fmtParser = seq->get<Kernel::BracketParser>(3,0);
         if (fmtParser)
         {
-          if (fmtParser->hasMatch() && !fmtParser->isInnerEmpty())
-          {
+          if (fmtParser->hasMatch() && !fmtParser->isInnerEmpty()) // TODO: create the parser in a separate method
+          {// there is something in the square brackets
             std::string formatter = fmtParser->getParser(0)->match(); // return string from the inner parser
-            std::cerr << "fmt: " << formatter <<  std::endl;
+            // interpret formatter as containing openning and closing delimiters for the column, e.g. quotes
+            // in this case formatter must have even size
+            size_t n2 = formatter.size() / 2;
+            if (2*n2 != formatter.size())
+            {
+              throw std::runtime_error("TableWorkspace::loadASCII: formatter for column "+type+":"+name+
+                " has wrong format:\nopenning and closing delimiters must have equal size.");
+            }
+            cellParsers.push_back(new Kernel::BracketParser(formatter.substr(0,n2),formatter.substr(n2)));
+          }
+          else
+          {
+            cellParsers.push_back(new Kernel::NotStringParser(sep));
           }
         }
         else
         {
-          std::cerr << "Oops...\n";
+          throw std::runtime_error("Strange error in TableWorkspace::loadASCII");
         }
       }
 
@@ -353,21 +367,42 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         if (n == 0) throw std::runtime_error("No columns created");
         for(size_t col = 0; col < n - 1; ++col)
         {
-          dataParser.addParser( new Kernel::NotStringParser(sep),'*');// TODO: replace with custom parser
+          dataParser.addParser( cellParsers[col] ,'*');
           dataParser.addParser( new Kernel::StringParser(sep));
         }
-        dataParser.addParser( new Kernel::AllParser,'*');
+        //dataParser.addParser( new Kernel::AllParser,'*');
+        dataParser.addParser(cellParsers.back());
       }
       dataParser.match(str);
       if (dataParser.hasMatch())
       {
-        insertRow(row);
+        row = appendRow();
         for(size_t col = 0; col < n; ++col)
         {
-          //std::cerr << col<< '>' << dataParser.getParser(col*2)->match() << std::endl;
-          m_columns[col]->fromString(dataParser.getParser(col*2)->match(),row);
+          Kernel::BracketParser* bracketParser = col < n - 1 ?
+             dataParser.get<Kernel::BracketParser>(col*2,0) // it's in a '*' list
+            :dataParser.get<Kernel::BracketParser>(col*2); // last column's parser isn't in a list
+          if (bracketParser)
+          {
+            // read from the inner parser
+            //m_columns[col]->fromString(bracketParser->getParser(0)->match(),row); why doesn't it work?
+            m_columns[col]->fromString(std::string(bracketParser->getInnerStart(),bracketParser->getInnerEnd()),row);
+          }
+          else
+          {
+            m_columns[col]->fromString(dataParser.getParser(col*2)->match(),row);
+          }
         }
-        ++row;
+      }
+      else
+      {
+        // TODO: proper logging
+        std::cerr << "sep=<"<<sep<<">("<<sep.size()<<")"<<std::endl;
+        for(size_t col = 0; col < n - 1; ++col)
+        {
+          std::cerr << "Parser " << col << " " << dataParser.getParser(col*2)->hasMatch() << std::endl;
+        }
+        throw std::runtime_error("Could not read row "+boost::lexical_cast<std::string>(row)+": \n"+str);
       }
     }// end column data
   }// end getline
