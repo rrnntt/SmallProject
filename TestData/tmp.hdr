@@ -1,0 +1,10 @@
+wstart=20000
+wstop=24999.98
+npo=499999
+delw=0.01
+shift=0
+wavcorr=0
+BOCODE=0
+temper=294.9
+length=100
+MIX=1000 11:173.7 

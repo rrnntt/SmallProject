@@ -44,6 +44,8 @@ Framework::~Framework()
 void Framework::openAllLibraries()
 {
   m_libraryManager.OpenAllLibraries(m_binDirectory);
+  //m_libraryManager.OpenAllLibraries(".");
+  std::cerr<< "openAllLibraries\n";
 }
 
 void Framework::registerSingleton(const std::string& name, Singleton* singleton)
@@ -96,7 +98,8 @@ Singleton* Framework::getSingleton(const std::string& name)
 void Framework::parseCommandLine(int argc, char** argv)
 {
   path binPath(argv[0]);
-  m_binDirectory = binPath.parent_path().string()+"/";
+  //binPath.make_absolute();
+  m_binDirectory = absolute(binPath).parent_path().string()+"/";
   std::cerr << "bin directory: " << m_binDirectory << std::endl;
 }
 
