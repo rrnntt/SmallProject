@@ -31,9 +31,15 @@ PlotTask::PlotTask()
   connect(m_setMagnifier,SIGNAL(triggered()),this,SLOT(setMagnifier()));
   addAction("Magnify",m_setMagnifier);
 
+  m_setCustomPicker = new QAction("Custom",this);
+  m_setCustomPicker->setCheckable(true);
+  connect(m_setCustomPicker,SIGNAL(triggered()),this,SLOT(setCustomPicker()));
+  addAction("Custom",m_setCustomPicker);
+
   m_pickerGroup = new  QActionGroup(this);
   m_pickerGroup->addAction(m_setMagnifier);
   m_pickerGroup->addAction(m_setZoomer);
+  m_pickerGroup->addAction(m_setCustomPicker);
 
   m_showPlotDialog = new QAction("Plot settings...",this);
   connect(m_showPlotDialog,SIGNAL(triggered()),this,SLOT(showPlotDialog()));
@@ -227,6 +233,12 @@ void PlotTask::setMagnifier()
 {
   if (!m_plot) return;
   m_plot->enableMagnifier();
+}
+
+void PlotTask::setCustomPicker()
+{
+  if (!m_plot) return;
+  m_plot->enableCustomPicker();
 }
 
 void PlotTask::showPlotDialog()

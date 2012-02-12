@@ -2,6 +2,7 @@
 #include "QtAPI/PlotDefaults.h"
 #include "QtAPI/PlotCurve.h"
 #include "QtAPI/CurveManager.h"
+#include "QtAPI/PlotPicker.h"
 
 #include "qwt_plot_canvas.h"
 #include "qwt_plot_layout.h"
@@ -66,6 +67,7 @@ void Plot::init()
 
   // set default picker
   enableMagnifier();
+  m_customPicker = new PlotPicker(Plot::xBottom,Plot::yLeft,canvas());
 
   //insertLegend(new QwtLegend(),QwtPlot::RightLegend); // to create legend
   //insertLegend(NULL,QwtPlot::RightLegend); // to delete legend
@@ -133,9 +135,8 @@ bool Plot::isZoomerEnabled() const
 
 void Plot::enableZoomer()
 {
+  disablePickers();
   m_zoomer->setEnabled(true);
-  m_magnifier->setEnabled(false);
-  m_panner->setEnabled(false);
   canvas()->setCursor(Qt::CrossCursor);
 }
 
@@ -146,7 +147,7 @@ bool Plot::isMagnifierEnabled() const
 
 void Plot::enableMagnifier()
 {
-  m_zoomer->setEnabled(false);
+  disablePickers();
   m_magnifier->setEnabled(true);
   m_panner->setEnabled(true);
   canvas()->setCursor(Qt::OpenHandCursor);
@@ -157,6 +158,12 @@ void Plot::disablePickers()
   m_zoomer->setEnabled(false);
   m_magnifier->setEnabled(false);
   m_panner->setEnabled(false);
+}
+
+void Plot::enableCustomPicker()
+{
+  disablePickers();
+  m_customPicker->setEnabled(true);
 }
 
 

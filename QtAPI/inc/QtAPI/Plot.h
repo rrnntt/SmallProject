@@ -13,6 +13,7 @@ namespace QtAPI
 {
 
 class PlotCurve;
+class PlotPicker;
 
 class QTAPI_EXPORT Plot: public QwtPlot
 {
@@ -29,6 +30,7 @@ public:
   void enableZoomer();
   bool isMagnifierEnabled() const;
   void enableMagnifier();
+  void enableCustomPicker();
   void disablePickers();
 protected:
   void init();
@@ -37,6 +39,7 @@ private:
   QwtPlotZoomer* m_zoomer; ///< does zooming
   QwtPlotPanner* m_panner; ///< does panning
   QwtPlotMagnifier* m_magnifier; ///< does magnifying
+  PlotPicker* m_customPicker;
 };
 
 } // QtAPI

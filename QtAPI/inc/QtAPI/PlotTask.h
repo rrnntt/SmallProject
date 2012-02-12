@@ -44,6 +44,7 @@ protected slots:
   void showTablePlot();
   void setZoomer();
   void setMagnifier();
+  void setCustomPicker();
   void showPlotDialog();
 protected:
   QMenu* tableMenu(const Table* table) const;
@@ -54,6 +55,7 @@ protected:
   QActionGroup* m_pickerGroup; ///< group for selecting a picker
   QAction *m_setZoomer;    ///< select zoomer
   QAction *m_setMagnifier; ///< select magnifier
+  QAction *m_setCustomPicker; ///< select ???
   QAction *m_showPlotDialog; ///< show plot settings dialog
 };
 
