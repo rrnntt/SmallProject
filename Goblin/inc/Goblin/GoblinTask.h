@@ -4,6 +4,8 @@
 #include "Goblin/DllExport.h"
 #include "QtAPI/Task.h"
 
+#include <QtCore/QPointer>
+
 class QAction;
 
 namespace QtAPI
@@ -28,12 +30,16 @@ public slots:
   void loadEnergyList();
   void loadLineList();
   void comDiff();
+protected slots:
+  void plotLineList();
 protected:
   void addTableActions(QMenu* menu, QtAPI::Table* table) const; 
+  mutable QPointer<QtAPI::Table> m_table;
 
   QAction *m_loadEnergyList;
   QAction *m_loadLineList;
   QAction *m_comdiff;
+  QAction *m_plotLineList;
 };
 
 } // namespace Goblin

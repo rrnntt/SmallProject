@@ -30,8 +30,11 @@ public:
   void enableZoomer();
   bool isMagnifierEnabled() const;
   void enableMagnifier();
-  void enableCustomPicker();
   void disablePickers();
+  void enableCustomPicker();
+  bool hasCustomPicker() const;
+  bool isCustomPickerEnabled() const;
+  void setCustomPicker(PlotPicker* picker);
 protected:
   void init();
 private:

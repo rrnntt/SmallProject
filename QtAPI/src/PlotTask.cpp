@@ -63,6 +63,15 @@ QMenu* PlotTask::menu(SubWindow* w) const
   {
     if (m_plot->isZoomerEnabled()) m_setZoomer->setChecked(true);
     if (m_plot->isMagnifierEnabled()) m_setMagnifier->setChecked(true);
+    if (!m_plot->hasCustomPicker())
+    {
+      m_setCustomPicker->setEnabled(false);
+    }
+    else
+    {
+      m_setCustomPicker->setEnabled(true);
+      if (m_plot->isCustomPickerEnabled()) m_setCustomPicker->setChecked(true);
+    }
     QMenu* theMenu = new QMenu("Plot");
     theMenu->addAction(m_showPlotDialog);
     theMenu->addSeparator();
@@ -237,7 +246,7 @@ void PlotTask::setMagnifier()
 
 void PlotTask::setCustomPicker()
 {
-  if (!m_plot) return;
+  if (!m_plot || !m_plot->hasCustomPicker()) return;
   m_plot->enableCustomPicker();
 }
 

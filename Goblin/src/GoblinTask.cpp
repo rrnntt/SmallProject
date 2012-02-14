@@ -2,11 +2,14 @@
 #include "Goblin/EnergyList.h"
 #include "Goblin/LineList.h"
 #include "Goblin/ComDiffDialog.h"
+#include "Goblin/GoblinPlotPicker.h"
 
 #include "QtAPI/SubWindow.h"
 #include "QtAPI/Table.h"
 #include "QtAPI/WindowManager.h"
 #include "QtAPI/TaskFactory.h"
+#include "QtAPI/TaskManager.h"
+#include "QtAPI/PlotTask.h"
 
 #include "API/WorkspaceFactory.h"
 
@@ -33,6 +36,10 @@ GoblinTask::GoblinTask()
   m_comdiff = new QAction("comdiff",this);
   connect(m_comdiff,SIGNAL(triggered()),this,SLOT(comDiff()));
   addAction("ComDiff",m_comdiff);
+
+  m_plotLineList = new QAction("Plot",this);
+  connect(m_plotLineList,SIGNAL(triggered()),this,SLOT(plotLineList()));
+  addAction("PlotLineList",m_plotLineList);
 }
 
 QMenu* GoblinTask::menu(QtAPI::SubWindow* w) const
@@ -41,6 +48,7 @@ QMenu* GoblinTask::menu(QtAPI::SubWindow* w) const
   menu->addAction(m_loadLineList);
   menu->addAction(m_loadEnergyList);
   menu->addAction(m_comdiff);
+  m_table = nullptr;
   if (w)
   {
     QtAPI::Table* table = qobject_cast<QtAPI::Table*>(w->widget());
@@ -54,8 +62,16 @@ QMenu* GoblinTask::menu(QtAPI::SubWindow* w) const
 
 void GoblinTask::addTableActions(QMenu* menu, QtAPI::Table* table) const
 {
+  m_table = table;
+  auto lineList = boost::dynamic_pointer_cast<LineList>(table->getWorkspace());
+  if (lineList)
+  {
+    menu->addAction(m_plotLineList);
+  }
   auto enList = boost::dynamic_pointer_cast<EnergyList>(table->getWorkspace());
-  if (!enList) return;
+  if (enList)
+  {
+  }
 }
 
 void GoblinTask::loadEnergyList()
@@ -128,6 +144,19 @@ void GoblinTask::createEnergyList()
     {
       errorMessage(std::string("Creating EnergyList failed:\n")+e.what());
     }
+  }
+}
+
+void GoblinTask::plotLineList()
+{
+  if (!m_table) return;
+  auto lineList = boost::dynamic_pointer_cast<LineList>(m_table->getWorkspace());
+  if (!lineList) return;
+  auto task = QtAPI::TaskManager::instance().getAs<QtAPI::PlotTask>("PlotTask");
+  if (task)
+  {
+    auto plot = task->showPlot(lineList,std::vector<std::string>(1,"Intensity"));
+    plot->setCustomPicker(new GoblinPlotPicker(plot));
   }
 }
 

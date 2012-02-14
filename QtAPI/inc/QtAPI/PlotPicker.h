@@ -2,6 +2,7 @@
 #define QTAPI_PLOTPICKER_H
 
 #include "QtAPI/DllExport.h"
+#include "QtAPI/Plot.h"
 #include "qwt_plot_picker.h"
 
 namespace QtAPI
@@ -10,15 +11,15 @@ namespace QtAPI
   class QTAPI_EXPORT PlotPicker: public QwtPlotPicker
 {
 public:
-  PlotPicker(int xAxis, int yAxis,QwtPlotCanvas *canvas);
+  PlotPicker(int xAxis, int yAxis,Plot* plot);
   ~PlotPicker(){}
 protected:
   // Overriden from QwtPlotPicker
-  virtual bool accept(QwtPolygon &selection) const;
-  virtual void begin();
-  virtual void append(const QPoint &);
-  virtual void move(const QPoint &);
-  virtual bool end(bool ok = true);
+  //virtual bool accept(QwtPolygon &selection) const;
+  //virtual void begin();
+  //virtual void append(const QPoint &);
+  //virtual void move(const QPoint &);
+  //virtual bool end(bool ok = true);
 };
 
 } // namespace QtAPI

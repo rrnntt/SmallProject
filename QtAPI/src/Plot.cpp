@@ -24,7 +24,8 @@ namespace QtAPI
 
 Plot::Plot(QWidget *parent)
 :QwtPlot(parent),
-m_curve_count()
+m_curve_count(),
+m_customPicker(nullptr)
 {
   init();
 }
@@ -67,8 +68,6 @@ void Plot::init()
 
   // set default picker
   enableMagnifier();
-  m_customPicker = new PlotPicker(Plot::xBottom,Plot::yLeft,canvas());
-
   //insertLegend(new QwtLegend(),QwtPlot::RightLegend); // to create legend
   //insertLegend(NULL,QwtPlot::RightLegend); // to delete legend
 }
@@ -158,13 +157,38 @@ void Plot::disablePickers()
   m_zoomer->setEnabled(false);
   m_magnifier->setEnabled(false);
   m_panner->setEnabled(false);
+  if (m_customPicker)
+  {
+    m_customPicker->setEnabled(false);
+  }
 }
 
 void Plot::enableCustomPicker()
 {
+  if (! m_customPicker) return;
   disablePickers();
   m_customPicker->setEnabled(true);
+  canvas()->setCursor(Qt::ArrowCursor);
 }
 
+void Plot::setCustomPicker(PlotPicker* picker)
+{
+  if (m_customPicker)
+  {
+    delete m_customPicker;
+  }
+  m_customPicker = picker;
+  enableCustomPicker();
+}
+
+bool Plot::hasCustomPicker() const
+{
+  return m_customPicker != nullptr;
+}
+
+bool Plot::isCustomPickerEnabled() const
+{
+  return m_customPicker && m_customPicker->isEnabled();
+}
 
 } // QtAPI
