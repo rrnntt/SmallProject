@@ -1,10 +1,13 @@
 #include "Goblin/GoblinPlotPicker.h"
 
+#include <QtGui/QPainter>
+
 namespace Goblin
 {
 
 GoblinPlotPicker::GoblinPlotPicker(QtAPI::Plot* plot):
-QtAPI::PlotPicker(QtAPI::Plot::xBottom,QtAPI::Plot::yLeft,plot)
+QtAPI::PlotPicker(QtAPI::Plot::xBottom,QtAPI::Plot::yLeft,plot),
+m_drawSelf(false)
 {
    setSelectionFlags(QwtPicker::RectSelection);// | QwtPicker::DragSelection);
    setTrackerMode(QwtPicker::AlwaysOn);
@@ -17,20 +20,19 @@ bool GoblinPlotPicker::accept(QwtPolygon &selection) const
 
 void GoblinPlotPicker::begin()
 {
-  std::cerr << "begin\n";
+  m_drawSelf = true;
   QtAPI::PlotPicker::begin();
 }
 
 void GoblinPlotPicker::append(const QPoint &p)
 {
-  std::cerr << "append\n";
   QtAPI::PlotPicker::append(p);
 }
 
 void GoblinPlotPicker::move(const QPoint &p)
 {
-  std::cerr << "move\n";
   QtAPI::PlotPicker::move(p);
+  canvas()->plot()->replot();
 }
 
 bool GoblinPlotPicker::end(bool ok)
@@ -42,8 +44,19 @@ bool GoblinPlotPicker::end(bool ok)
   {
     std::cerr << "     " << p[i].x() << ',' << p[i].y() << std::endl;
   }
+  m_drawSelf = false;
+  canvas()->plot()->replot();
   return QtAPI::PlotPicker::end(ok);
 }
 
+void GoblinPlotPicker::draw(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRect &canvasRect) const
+{
+  if (m_drawSelf)
+  {
+    const QwtPolygon& p = selection();
+    if (p.size() != 2) return;
+    painter->drawLine(p[0],p[1]);
+  }
+}
 
 } // namespace Goblin

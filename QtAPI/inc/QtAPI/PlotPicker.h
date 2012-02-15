@@ -4,11 +4,12 @@
 #include "QtAPI/DllExport.h"
 #include "QtAPI/Plot.h"
 #include "qwt_plot_picker.h"
+#include "qwt_plot_item.h"
 
 namespace QtAPI
 {
 
-  class QTAPI_EXPORT PlotPicker: public QwtPlotPicker
+  class QTAPI_EXPORT PlotPicker: public QwtPlotPicker, public QwtPlotItem
 {
 public:
   PlotPicker(int xAxis, int yAxis,Plot* plot);

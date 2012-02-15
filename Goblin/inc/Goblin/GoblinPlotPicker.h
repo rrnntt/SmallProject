@@ -18,6 +18,11 @@ protected:
   virtual void append(const QPoint &);
   virtual void move(const QPoint &);
   virtual bool end(bool ok = true);
+  virtual void draw(QPainter *painter, 
+      const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+      const QRect &canvasRect) const;
+
+  bool m_drawSelf;
 };
 
 } // namespace Goblin
