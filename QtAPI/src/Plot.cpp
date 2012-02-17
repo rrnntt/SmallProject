@@ -160,7 +160,6 @@ void Plot::disablePickers()
   if (m_customPicker)
   {
     m_customPicker->setEnabled(false);
-    m_customPicker->detach();
   }
 }
 
@@ -169,7 +168,6 @@ void Plot::enableCustomPicker()
   if (! m_customPicker) return;
   disablePickers();
   m_customPicker->setEnabled(true);
-  m_customPicker->attach(this);
   canvas()->setCursor(Qt::ArrowCursor);
 }
 
@@ -177,7 +175,7 @@ void Plot::setCustomPicker(PlotPicker* picker)
 {
   if (m_customPicker)
   {
-    m_customPicker->detach();
+    m_customPicker->setEnabled(false);
     delete m_customPicker;
   }
   m_customPicker = picker;

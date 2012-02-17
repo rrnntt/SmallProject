@@ -60,6 +60,7 @@ set( MOC_HEADERS
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/CurveManager.h
    inc/QtAPI/Plot.h
+   inc/QtAPI/PlotPicker.h
    inc/QtAPI/PlotTask.h
    inc/QtAPI/SymbolBox.h
    inc/QtAPI/Table.h
