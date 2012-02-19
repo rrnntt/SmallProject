@@ -2,6 +2,7 @@
 #define GOBLIN_GOBLINPLOTPICKER_H
 
 #include "Goblin/DllExport.h"
+#include "Goblin/LineList.h"
 #include "QtAPI/PlotPicker.h"
 
 namespace Goblin
@@ -18,8 +19,12 @@ protected:
       const QRect &canvasRect) const;
 
   virtual void widgetMousePressEvent(QMouseEvent *);
+  virtual void widgetWheelEvent(QWheelEvent *);
 
   bool m_drawSelf;
+  QPointer<QtAPI::PlotCurve> m_curve;
+  LineList_ptr m_linelist;
+  size_t m_currentLine;
 };
 
 } // namespace Goblin

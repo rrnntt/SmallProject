@@ -35,6 +35,11 @@ public:
   bool hasCustomPicker() const;
   bool isCustomPickerEnabled() const;
   void setCustomPicker(PlotPicker* picker);
+
+  double getXStart() const;
+  double getXEnd() const;
+  double getYStart() const;
+  double getYEnd() const;
 protected:
   void init();
 private:

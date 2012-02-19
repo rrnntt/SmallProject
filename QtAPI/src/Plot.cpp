@@ -192,4 +192,24 @@ bool Plot::isCustomPickerEnabled() const
   return m_customPicker && m_customPicker->isEnabled();
 }
 
+double Plot::getXStart() const
+{
+  return m_plot->canvasMap(QtAPI::Plot::xBottom).s1();
+}
+
+double Plot::getXEnd() const
+{
+  return m_plot->canvasMap(QtAPI::Plot::xBottom).s2();
+}
+
+double Plot::getYStart() const
+{
+  return m_plot->canvasMap(QtAPI::Plot::yLeft).s1();
+}
+
+double Plot::getYEnd() const
+{
+  return m_plot->canvasMap(QtAPI::Plot::yLeft).s2();
+}
+
 } // QtAPI

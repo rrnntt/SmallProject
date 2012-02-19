@@ -171,6 +171,7 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
     {
       yAxisTitle = "Y axis";
     }
+    curve->setWorkspace(tws);
   }
   plot->setAxisTitle(Plot::yLeft,QString::fromStdString(yAxisTitle));
   plot->setZoomBase();
