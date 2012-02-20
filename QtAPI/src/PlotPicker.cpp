@@ -66,6 +66,11 @@ bool PlotPicker::eventFilter(QObject *o, QEvent *e)
   {
     switch(e->type() )
     {
+    case QEvent::MouseButtonDblClick:
+      {
+        widgetMouseDoubleClickEvent((QMouseEvent *)e);
+        break;
+      }
     case QEvent::MouseButtonPress:
       {
         widgetMousePressEvent((QMouseEvent *)e);

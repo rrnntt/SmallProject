@@ -70,12 +70,18 @@ void Plot::init()
   enableMagnifier();
   //insertLegend(new QwtLegend(),QwtPlot::RightLegend); // to create legend
   //insertLegend(NULL,QwtPlot::RightLegend); // to delete legend
+  m_colors << Qt::black << Qt::blue << Qt::green << Qt::red << Qt::cyan << Qt::magenta << Qt::yellow << Qt::gray;
+  m_colors << Qt::darkBlue << Qt::darkGreen << Qt::darkRed << Qt::darkCyan << Qt::darkMagenta << Qt::darkYellow << Qt::darkGray;
+  m_colorIndex = 0;
 }
 
 void Plot::addCurve(PlotCurve* curve)
 {
   curve->attach(this);
   CurveManager::instance().addCurve(curve);
+  curve->setPen(QPen(m_colors[m_colorIndex]));
+  ++m_colorIndex;
+  m_colorIndex %= m_colors.size();
 }
 
 QList<PlotCurve*> Plot::getCurves() const
@@ -115,6 +121,19 @@ PlotCurve* Plot::getCurve(QString name)const
     {
       return curve;
     }
+  }
+  return nullptr;
+}
+
+PlotCurve* Plot::bringForwardCurve(size_t i)
+{
+  auto curves = getCurves();
+  if (i < curves.size())
+  {
+    auto curve = curves[i];
+    curve->detach();
+    curve->attach(this);
+    return curve;
   }
   return nullptr;
 }
@@ -194,22 +213,22 @@ bool Plot::isCustomPickerEnabled() const
 
 double Plot::getXStart() const
 {
-  return m_plot->canvasMap(QtAPI::Plot::xBottom).s1();
+  return canvasMap(QtAPI::Plot::xBottom).s1();
 }
 
 double Plot::getXEnd() const
 {
-  return m_plot->canvasMap(QtAPI::Plot::xBottom).s2();
+  return canvasMap(QtAPI::Plot::xBottom).s2();
 }
 
 double Plot::getYStart() const
 {
-  return m_plot->canvasMap(QtAPI::Plot::yLeft).s1();
+  return canvasMap(QtAPI::Plot::yLeft).s1();
 }
 
 double Plot::getYEnd() const
 {
-  return m_plot->canvasMap(QtAPI::Plot::yLeft).s2();
+  return canvasMap(QtAPI::Plot::yLeft).s2();
 }
 
 } // QtAPI

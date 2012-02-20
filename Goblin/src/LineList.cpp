@@ -2,6 +2,8 @@
 #include "DataObjects/TableColumn.h"
 #include "API/WorkspaceFactory.h"
 
+#include <sstream>
+
 using namespace DataObjects;
 
 namespace Goblin
@@ -47,17 +49,17 @@ void LineList::resetColumns()
   if (this->hasColumn("Height"))
   {
     dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Height").get());
-    m_line = &dColumn->data();
+    m_height = &dColumn->data();
   }
   else if (this->hasColumn("Intensity"))
   {
     dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Intensity").get());
-    m_line = &dColumn->data();
+    m_height = &dColumn->data();
   }
   else
   {
     dColumn = static_cast<NumericTableColumn<double>*>(getOrAddColumn("double","Height").get());
-    m_line = &dColumn->data();
+    m_height = &dColumn->data();
   }
   dColumn->setPlotRole(NumericColumn::Y);
 }
@@ -81,6 +83,35 @@ void LineList::assign(size_t i, const VJKG& qup, const VJKG& qlo)
     (*m_q)[i] = qup;
     (*m_q0)[i] = qlo;
   }
+}
+
+/**
+ * Find index of a line nearest to a frequency x.
+ * @param x :: Frequency to look around.
+ * @return :: index of found line. A valid index guaranteed (if the linelist isn't empty)
+ */
+size_t LineList::findNearest(const double& x) const
+{
+  if (!m_line || m_line->empty()) return 0; // <----------------------! or throw?
+  // assume m_line is sorted
+  auto it = std::lower_bound(m_line->begin(),m_line->end(),x);
+  if (it == m_line->begin()) return 0;
+  if (it == m_line->end()) return m_line->size() - 1;
+  if (fabs(x - *(it-1)) < fabs(x - *it)) it--;
+  return static_cast<size_t>(it - m_line->begin());
+}
+
+/**
+ */
+std::string LineList::lineString(size_t i) const
+{
+  std::ostringstream ostr;
+  ostr << line(i) << ' ' << height(i) << ' ' ;
+  if (this->isAssigned())
+  {
+    ostr << q(i) << ' ' << q0(i);
+  }
+  return ostr.str();
 }
 
 } // namespace Goblin

@@ -76,6 +76,7 @@ QMenu* PlotTask::menu(SubWindow* w) const
     theMenu->addAction(m_showPlotDialog);
     theMenu->addSeparator();
     theMenu->addActions(m_pickerGroup->actions());
+    connect(theMenu,SIGNAL(aboutToShow()),this,SLOT(menuAboutToShow()));
     return theMenu;
   }
   return nullptr;
@@ -179,6 +180,61 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   return plot;
 }
 
+void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWorkspace> tws,
+  std::vector<std::string>& columnNames) const
+{
+  // find first column with th X role
+  std::vector<std::string> allNames = tws->getColumnNames();
+  DataObjects::NumericColumn* columnX = nullptr;
+  std::string columnXName;
+  for(auto columnName = allNames.begin(); columnName != allNames.end(); ++columnName)
+  {
+    auto column = tws->getColumn(*columnName);
+    auto colNum = column->asNumeric();
+    if (!colNum) continue;
+    if (colNum->getPlotRole() == DataObjects::NumericColumn::X)
+    {
+      columnX = colNum;
+      columnXName = *columnName;
+      break;
+    }
+  }
+  if (!columnX)
+  {
+    errorMessage("No X column defined in the table.");
+    return;
+  }
+  std::string yAxisTitle; 
+  for(auto columnName = columnNames.begin(); columnName != columnNames.end(); ++columnName)
+  {
+    auto column = tws->getColumn(*columnName);
+    auto columnY = column->asNumeric();
+    if (!columnY) continue;
+    if (columnY->getPlotRole() != DataObjects::NumericColumn::Y)
+    {
+      errorMessage("Column "+*columnName+" does not have the Y plot role. Skipping.");
+      continue;
+    }
+    PlotCurve* curve = PlotCurve::create();
+    std::vector<double> x,y;
+    columnX->fill(x);
+    columnY->fill(y);
+    curve->setData(&x[0],&y[0],x.size());
+    plot->addCurve(curve);
+    curve->setStyle((PlotCurve::CurveStyle)tws->getCurveStyle());
+    curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
+    if (yAxisTitle.empty())
+    {
+      yAxisTitle = *columnName;
+    }
+    else
+    {
+      yAxisTitle = "Y axis";
+    }
+    curve->setWorkspace(tws);
+  }
+}
+
 //------------------------------------
 //   Slots
 //------------------------------------
@@ -256,6 +312,26 @@ void PlotTask::showPlotDialog()
   if (!m_plot) return;
   PlotDialog dlg(m_plot);
   dlg.exec();
+}
+
+void PlotTask::menuAboutToShow()
+{
+  if (m_plot)
+  {
+    m_setCustomPicker->setEnabled(m_plot->hasCustomPicker());
+    if (m_plot->isMagnifierEnabled())
+    {
+      m_setMagnifier->setChecked(true);
+    }
+    else if (m_plot->isZoomerEnabled())
+    {
+      m_setZoomer->setChecked(true);
+    }
+    else if (m_plot->isCustomPickerEnabled())
+    {
+      m_setCustomPicker->setChecked(true);
+    }
+  }
 }
 
 } // namespace QtAPI

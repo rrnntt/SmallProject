@@ -40,12 +40,17 @@ public:
     const std::string& columnE = "") const;
   QPointer<Plot> showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
     std::vector<std::string>& columnNames) const;
+
+  void addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWorkspace> tws,
+    std::vector<std::string>& columnNames) const;
+
 protected slots:
   void showTablePlot();
   void setZoomer();
   void setMagnifier();
   void setCustomPicker();
   void showPlotDialog();
+  void menuAboutToShow();
 protected:
   QMenu* tableMenu(const Table* table) const;
 

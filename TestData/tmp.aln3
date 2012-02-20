@@ -1,14 +1,15 @@
-# fmt=%d:line
-# fmt=%d:intens
-# fmt=%d:cintens
-# fmt=%vjkg[""]:q
-# fmt=%vjkg[""]:q0
-# fmt=%i:fix
-# fmt=%d:self
-# fmt=%d:shift
-# fmt=%d:air
-# fmt=%d:n_t
-# fmt=%d:e0
+#sep= 
+#double:Line
+#double:Intensity
+#double:cintens
+#VJKG:q[""]
+#VJKG:q0[""]
+#int:fix
+#double:self
+#double:shift
+#double:air
+#double:n_t
+#double:e0
 # par=mLD
 # style=zero
 # temper=296

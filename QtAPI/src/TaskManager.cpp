@@ -49,8 +49,10 @@ void TaskManager::registerDelayed()
     {
       add(taskType,TaskFactory::instance().create(taskType));
     }
-    catch(...)
-    {}
+    catch(std::exception& e)
+    {
+      std::cerr << "Failed to register task " + taskType + " with error " +e.what() << std::endl;
+    }
   });
   m_to_be_registered.clear();
 }

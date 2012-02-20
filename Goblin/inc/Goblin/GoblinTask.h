@@ -11,6 +11,7 @@ class QAction;
 namespace QtAPI
 {
   class Table;
+  class Plot;
 }
 
 namespace Goblin
@@ -32,14 +33,18 @@ public slots:
   void comDiff();
 protected slots:
   void plotLineList();
+  void addLineList();
 protected:
   void addTableActions(QMenu* menu, QtAPI::Table* table) const; 
+  void addPlotActions(QMenu* menu, QtAPI::Plot* plot) const; 
   mutable QPointer<QtAPI::Table> m_table;
+  mutable QPointer<QtAPI::Plot> m_plot;
 
   QAction *m_loadEnergyList;
   QAction *m_loadLineList;
   QAction *m_comdiff;
   QAction *m_plotLineList;
+  QAction *m_addLineList;
 };
 
 } // namespace Goblin

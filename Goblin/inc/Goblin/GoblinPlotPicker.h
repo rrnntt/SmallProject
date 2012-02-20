@@ -19,12 +19,18 @@ protected:
       const QRect &canvasRect) const;
 
   virtual void widgetMousePressEvent(QMouseEvent *);
+  virtual void widgetMouseReleaseEvent(QMouseEvent *);
+  virtual void widgetMouseMoveEvent(QMouseEvent *);
+  virtual void widgetMouseDoubleClickEvent(QMouseEvent *);
   virtual void widgetWheelEvent(QWheelEvent *);
+  virtual void widgetKeyPressEvent(QKeyEvent *);
 
   bool m_drawSelf;
   QPointer<QtAPI::PlotCurve> m_curve;
   LineList_ptr m_linelist;
-  size_t m_currentLine;
+  mutable size_t m_currentLine;
+  bool m_shifting;
+  QPoint m_p0;
 };
 
 } // namespace Goblin

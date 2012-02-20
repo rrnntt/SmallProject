@@ -24,6 +24,7 @@ public:
   QList<PlotCurve*> getCurves() const;
   QStringList getCurveNames() const;
   PlotCurve* getCurve(QString name)const;
+  PlotCurve* bringForwardCurve(size_t i);
 
   void setZoomBase();
   bool isZoomerEnabled() const;
@@ -48,6 +49,8 @@ private:
   QwtPlotPanner* m_panner; ///< does panning
   QwtPlotMagnifier* m_magnifier; ///< does magnifying
   PlotPicker* m_customPicker;
+  QList<QColor> m_colors; ///< colors for stored curves
+  int m_colorIndex;
 };
 
 } // QtAPI

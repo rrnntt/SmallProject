@@ -10,6 +10,7 @@
 #include "QtAPI/TaskFactory.h"
 #include "QtAPI/TaskManager.h"
 #include "QtAPI/PlotTask.h"
+#include "QtAPI/Plot.h"
 
 #include "API/WorkspaceFactory.h"
 
@@ -17,6 +18,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QFileDialog>
 #include <QtCore/QFileInfo>
+#include <QtGui/QInputDialog>
 
 namespace Goblin
 {
@@ -37,9 +39,13 @@ GoblinTask::GoblinTask()
   connect(m_comdiff,SIGNAL(triggered()),this,SLOT(comDiff()));
   addAction("ComDiff",m_comdiff);
 
-  m_plotLineList = new QAction("Plot",this);
+  m_plotLineList = new QAction("Plot line list",this);
   connect(m_plotLineList,SIGNAL(triggered()),this,SLOT(plotLineList()));
   addAction("PlotLineList",m_plotLineList);
+
+  m_addLineList = new QAction("Add line list to plot",this);
+  connect(m_addLineList,SIGNAL(triggered()),this,SLOT(addLineList()));
+  addAction("AddLineList",m_addLineList);
 }
 
 QMenu* GoblinTask::menu(QtAPI::SubWindow* w) const
@@ -49,12 +55,18 @@ QMenu* GoblinTask::menu(QtAPI::SubWindow* w) const
   menu->addAction(m_loadEnergyList);
   menu->addAction(m_comdiff);
   m_table = nullptr;
+  m_plot = nullptr;
   if (w)
   {
     QtAPI::Table* table = qobject_cast<QtAPI::Table*>(w->widget());
     if (table)
     {
       addTableActions(menu,table);
+    }
+    QtAPI::Plot* plot = qobject_cast<QtAPI::Plot*>(w->widget());
+    if (plot)
+    {
+      addPlotActions(menu,plot);
     }
   }
   return menu;
@@ -72,6 +84,12 @@ void GoblinTask::addTableActions(QMenu* menu, QtAPI::Table* table) const
   if (enList)
   {
   }
+}
+
+void GoblinTask::addPlotActions(QMenu* menu, QtAPI::Plot* plot) const
+{
+  m_plot = plot;
+  menu->addAction(m_addLineList);
 }
 
 void GoblinTask::loadEnergyList()
@@ -157,6 +175,29 @@ void GoblinTask::plotLineList()
   {
     auto plot = task->showPlot(lineList,std::vector<std::string>(1,"Intensity"));
     plot->setCustomPicker(new GoblinPlotPicker(plot));
+  }
+}
+
+void GoblinTask::addLineList()
+{
+  if (!m_plot) return;
+
+  QStringList qlinelists;
+  auto linelists = API::WorkspaceManager::instance().getAllOf<LineList>();
+  std::for_each(linelists.begin(),linelists.end(),[&qlinelists](boost::shared_ptr<LineList> ll){
+    qlinelists << QString::fromStdString(ll->name());
+  });
+  if (linelists.empty()) return;
+  QString llName = QInputDialog::getItem(m_plot,"Input","Select line list",qlinelists);
+
+  if (llName.isEmpty()) return;
+
+  auto lineList = boost::dynamic_pointer_cast<LineList>(API::WorkspaceManager::instance().retrieve(llName.toStdString()));
+  if (!lineList) return;
+  auto task = QtAPI::TaskManager::instance().getAs<QtAPI::PlotTask>("PlotTask");
+  if (task)
+  {
+    task->addTableToPlot(m_plot,lineList,std::vector<std::string>(1,"Intensity"));
   }
 }
 

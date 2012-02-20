@@ -17,12 +17,14 @@ public:
   /// Load from an asci file
   virtual void loadAscii(const std::string& fileName);
   size_t size() const {return rowCount();}
-  double line(size_t i){return i<m_line->size()?(*m_line)[i]:0.0;}
-  double height(size_t i){return i<m_height->size()?(*m_height)[i]:0.0;}
+  double line(size_t i)const{return i<m_line->size()?(*m_line)[i]:0.0;}
+  double height(size_t i)const{return i<m_height->size()?(*m_height)[i]:0.0;}
   const VJKG& q(size_t i)const{return (m_q && i<m_q->size())?(*m_q)[i]:m_badQ;}
   const VJKG& q0(size_t i)const{return (m_q0 && i<m_q0->size())?(*m_q0)[i]:m_badQ;}
   bool isAssigned()const {return m_q && m_q0;}
   void assign(size_t i, const VJKG& qup, const VJKG& qlo);
+  size_t findNearest(const double& x) const;
+  std::string lineString(size_t i) const;
 protected:
   void resetColumns();
   void makeQs();

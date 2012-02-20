@@ -24,9 +24,12 @@ protected:
       const QRect &canvasRect) const;
   
   virtual bool eventFilter(QObject *, QEvent *);
+
   virtual void widgetMousePressEvent(QMouseEvent *);
   virtual void widgetMouseReleaseEvent(QMouseEvent *);
   virtual void widgetMouseMoveEvent(QMouseEvent *);
+  virtual void widgetMouseDoubleClickEvent(QMouseEvent *){}
+
   virtual void widgetWheelEvent(QWheelEvent *);
   virtual void widgetKeyPressEvent(QKeyEvent *);
   virtual void widgetKeyReleaseEvent(QKeyEvent *);
