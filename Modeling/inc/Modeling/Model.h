@@ -5,6 +5,9 @@
 #include <osg/Referenced>
 #include <osg/Node>
 
+namespace Modeling
+{
+
 class MODELING_EXPORT Model: public osg::Referenced
 {
 protected:
@@ -24,5 +27,7 @@ protected:
   bool m_updateOn;
   osg::NodeCallback* m_oldCallback;
 };
+
+} // Modeling
 
 #endif /*MODEL_H*/

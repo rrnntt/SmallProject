@@ -2,6 +2,9 @@
 
 #include <QtGui/QPainter>
 
+namespace Modeling
+{
+
 /**
  * Constructor.
  */
@@ -69,3 +72,5 @@ void OSGWidget::setModel(Model* model)
   m_model = model;
   setSceneData( m_model->getNode() );
 }
+
+} // Modeling

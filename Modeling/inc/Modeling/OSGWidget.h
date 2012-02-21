@@ -17,6 +17,9 @@
 
 #include <osgQt/GraphicsWindowQt>
 
+namespace Modeling
+{
+
 class MODELING_EXPORT OSGWidget : public QWidget, public osgViewer::Viewer
 {
 public:
@@ -34,5 +37,6 @@ protected:
     osg::ref_ptr<Model> m_model;
 };
 
+} // Modeling
 
 #endif /*OSGVIEWWIDGET_H*/

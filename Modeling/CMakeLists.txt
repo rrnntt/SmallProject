@@ -6,16 +6,21 @@
 set( INC_FILES 
    inc/Modeling/DllExport.h
    inc/Modeling/OSGWidget.h
+   inc/Modeling/AnimationController.h
    inc/Modeling/OSGPhysModel.h
    inc/Modeling/Model.h
+   inc/Modeling/ModelTask.h
    )
 set( SRC_FILES 
+  src/AnimationController.cpp
   src/OSGWidget.cpp
   src/OSGPhysModel.cpp
   src/Model.cpp
+  src/ModelTask.cpp
   )
   
 set( MOC_HEADERS
+   inc/Modeling/ModelTask.h
    inc/Modeling/OSGWidget.h
 )
 
@@ -61,7 +66,7 @@ qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
 #qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_library( Modeling SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
-include_directories(inc ../API/inc ../Numeric/inc ../DataObjects/inc
+include_directories(inc ../API/inc ../Numeric/inc ../DataObjects/inc ../QtAPI/inc
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."
 ${QT_QTCORE_INCLUDE_DIR}
@@ -73,7 +78,7 @@ ${OSG_BUILDINCLUDEDIR}
 set_target_properties ( Modeling PROPERTIES COMPILE_DEFINITIONS IN_MODELING )
 
 target_link_libraries(Modeling
-API Numeric DataObjects
+API Numeric DataObjects QtAPI
 )
 
 target_link_libraries(Modeling

@@ -1,4 +1,5 @@
 #include "Modeling/Model.h"
+#include "Modeling/AnimationController.h"
 
 #include <osgDB/ReadFile>
 
@@ -9,6 +10,9 @@
 #include <osgAnimation/Bone>
 
 #include <iostream>
+
+namespace Modeling
+{
 
 Model::Model():
 m_node(),m_updateOn(false),m_oldCallback(NULL)
@@ -52,20 +56,23 @@ void Model::ModelNodeCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 
 struct AnimationManagerFinder : public osg::NodeVisitor
 {
-    osg::ref_ptr<osgAnimation::BasicAnimationManager> _am;
-    AnimationManagerFinder() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
-    void apply(osg::Node& node) {
-        if (_am.valid())
+  osg::ref_ptr<osgAnimation::BasicAnimationManager> _am;
+  AnimationManagerFinder() : osg::NodeVisitor(osg::NodeVisitor::TRAVERSE_ALL_CHILDREN) {}
+  void apply(osg::Node& node)
+  {
+    if (_am.valid())
+        return;
+    if (node.getUpdateCallback())
+    {
+        osgAnimation::AnimationManagerBase* b = dynamic_cast<osgAnimation::AnimationManagerBase*>(node.getUpdateCallback());
+        if (b)
+        {
+            _am = new osgAnimation::BasicAnimationManager(*b);
             return;
-        if (node.getUpdateCallback()) {
-            osgAnimation::AnimationManagerBase* b = dynamic_cast<osgAnimation::AnimationManagerBase*>(node.getUpdateCallback());
-            if (b) {
-                _am = new osgAnimation::BasicAnimationManager(*b);
-                return;
-            }
         }
-        traverse(node);
     }
+    traverse(node);
+  }
 };
 
 class AnimtkViewerModelController 
@@ -165,20 +172,29 @@ private:
         _focus(0) {}
 };
 
+/**
+  * Load geometry (and animation) from a file.
+  * @param fname :: A file name.
+  */
 void Model::load(const std::string& fname)
 {
+  // find appropriate loading plugin and load the file
   m_node = osgDB::readNodeFile(fname);
 
-    // Set our Singleton's model.
-    AnimationManagerFinder finder;
-    m_node->accept(finder);
-    if (finder._am.valid()) {
-        m_node->setUpdateCallback(finder._am.get());
-        AnimtkViewerModelController::setModel(finder._am.get());
-        AnimtkViewerModelController::instance().play();
-    } else {
-        osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
-    }
+  // Try to find some animation in the model
+  AnimationManagerFinder finder;
+  m_node->accept(finder);
+  if (finder._am.valid())
+  {
+    // if animation found play it (?)
+      m_node->setUpdateCallback(finder._am.get());
+      AnimationController::setModel(finder._am.get());
+      AnimationController::instance().play();
+//      AnimtkViewerModelController::setModel(finder._am.get());
+//      AnimtkViewerModelController::instance().play();
+  } else {
+      osg::notify(osg::WARN) << "no osgAnimation::AnimationManagerBase found in the subgraph, no animations available" << std::endl;
+  }
 
   //osg::Texture2D *tex = new osg::Texture2D;
   //tex->setWrap( osg::Texture2D::WRAP_S, osg::Texture2D::REPEAT );
@@ -189,3 +205,5 @@ void Model::load(const std::string& fname)
   //dstate->setTextureAttribute(0, new osg::TexEnv );
   //m_node->setStateSet( dstate );
 }
+
+} // namespace Modeling
