@@ -2,6 +2,7 @@
 #define GOBLIN_COMDIFFDIALOG_H
 
 #include "Goblin/DllExport.h"
+#include "Goblin/comdiff.h"
 
 #include <QtGui/QDialog>
 
@@ -22,10 +23,13 @@ private slots:
   void loadLineList();
   void loadEnergyList();
   void createEnergyList();
+  void setLists();
+  void find();
 private:
   void updateLineListCB();
   void updateEnergyListCBs();
   Ui::ComDiffDialog *m_form;
+  comdiff m_cd;
 };
 
 } // namespace Goblin

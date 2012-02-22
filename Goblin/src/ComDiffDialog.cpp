@@ -16,9 +16,15 @@ QDialog(parent),
 m_form(new Ui::ComDiffDialog)
 {
   m_form->setupUi(this);
+  m_form->pteLog->setReadOnly(true);
   connect(m_form->btnLoadLineList,SIGNAL(clicked()),this,SLOT(loadLineList()));
   connect(m_form->btnLoadLowerEnergies,SIGNAL(clicked()),this,SLOT(loadEnergyList()));
   connect(m_form->btnCreateUpperEnergies,SIGNAL(clicked()),this,SLOT(createEnergyList()));
+
+  connect(m_form->btnSet,SIGNAL(clicked()),this,SLOT(setLists()));
+  connect(m_form->btnFind,SIGNAL(clicked()),this,SLOT(find()));
+  updateLineListCB();
+  updateEnergyListCBs();
 }
 
 void ComDiffDialog::updateLineListCB()
@@ -102,4 +108,29 @@ void ComDiffDialog::createEnergyList()
   updateEnergyListCBs();
 }
 
+void ComDiffDialog::setLists()
+{
+  std::string llName = m_form->cbLineList->currentText().toStdString();
+  LineList_ptr ll = boost::dynamic_pointer_cast<LineList>(API::WorkspaceManager::instance().retrieve(llName));
+
+  std::string leName = m_form->cbLowerEnergy->currentText().toStdString();
+  EnergyList_ptr le = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(leName));
+
+  std::string ueName = m_form->cbUpperEnergy->currentText().toStdString();
+  EnergyList_ptr ue = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(ueName));
+
+  m_cd.sp = ll;
+  m_cd.low_ener = le;
+  m_cd.up_ener = ue;
+}
+
+void ComDiffDialog::find()
+{
+  std::string upqstr = m_form->leUpperLevel->text().toStdString();
+  VJKG upq;
+  upq.assign(upqstr);
+  double upperEnergy = m_form->leUpperEnergy->text().toDouble();
+  std::cerr << upq << ' ' << upperEnergy << std::endl;
+  //m_cd.set(
+}
 } // namespace Goblin
