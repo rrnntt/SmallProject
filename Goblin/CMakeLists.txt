@@ -59,6 +59,7 @@ target_link_libraries(Goblin Kernel DataObjects QtAPI qwt
 set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
+  test/ComDiffTest.cpp
   test/EnergyListTest.cpp
 )
 

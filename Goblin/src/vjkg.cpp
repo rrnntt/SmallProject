@@ -226,7 +226,11 @@ void VJKG::assign(const string& str){
    setV(si.c_str());
  };
 
- istringstream isi(str.substr(i2+1));
+ if (i2 > 0)
+ {
+   ++i2;
+ }
+ istringstream isi(str.substr(i2));
  j = k = g = 255;
  isi>>j>>k>>g;
 }

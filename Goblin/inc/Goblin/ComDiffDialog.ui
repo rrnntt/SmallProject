@@ -174,6 +174,9 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Upper state labeling (VJKG)</string>
+   </property>
   </widget>
   <widget class="QPushButton" name="btnFind">
    <property name="geometry">
@@ -197,8 +200,25 @@
      <height>20</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Upper energy estimation</string>
+   </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>cbLineList</tabstop>
+  <tabstop>btnLoadLineList</tabstop>
+  <tabstop>cbUpperEnergy</tabstop>
+  <tabstop>btnCreateUpperEnergies</tabstop>
+  <tabstop>cbLowerEnergy</tabstop>
+  <tabstop>btnLoadLowerEnergies</tabstop>
+  <tabstop>btnSet</tabstop>
+  <tabstop>leUpperEnergy</tabstop>
+  <tabstop>leUpperLevel</tabstop>
+  <tabstop>btnFind</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>pteLog</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

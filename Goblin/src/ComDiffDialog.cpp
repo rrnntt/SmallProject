@@ -8,6 +8,9 @@
 
 #include "API/WorkspaceManager.h"
 
+#include <QtGui/QApplication>
+#include <QtGui/QMessageBox>
+
 namespace Goblin
 {
 
@@ -83,7 +86,9 @@ void ComDiffDialog::loadLineList()
   auto task = QtAPI::TaskManager::instance().getAs<GoblinTask>("GoblinTask");
   if (task)
   {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     task->loadLineList();
+    QApplication::restoreOverrideCursor();
   }
   updateLineListCB();
 }
@@ -93,7 +98,9 @@ void ComDiffDialog::loadEnergyList()
   auto task = QtAPI::TaskManager::instance().getAs<GoblinTask>("GoblinTask");
   if (task)
   {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     task->loadEnergyList();
+    QApplication::restoreOverrideCursor();
   }
   updateEnergyListCBs();
 }
@@ -110,18 +117,25 @@ void ComDiffDialog::createEnergyList()
 
 void ComDiffDialog::setLists()
 {
-  std::string llName = m_form->cbLineList->currentText().toStdString();
-  LineList_ptr ll = boost::dynamic_pointer_cast<LineList>(API::WorkspaceManager::instance().retrieve(llName));
+  try
+  {
+    std::string llName = m_form->cbLineList->currentText().toStdString();
+    LineList_ptr ll = boost::dynamic_pointer_cast<LineList>(API::WorkspaceManager::instance().retrieve(llName));
 
-  std::string leName = m_form->cbLowerEnergy->currentText().toStdString();
-  EnergyList_ptr le = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(leName));
+    std::string leName = m_form->cbLowerEnergy->currentText().toStdString();
+    EnergyList_ptr le = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(leName));
 
-  std::string ueName = m_form->cbUpperEnergy->currentText().toStdString();
-  EnergyList_ptr ue = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(ueName));
+    std::string ueName = m_form->cbUpperEnergy->currentText().toStdString();
+    EnergyList_ptr ue = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(ueName));
 
-  m_cd.sp = ll;
-  m_cd.low_ener = le;
-  m_cd.up_ener = ue;
+    m_cd.sp = ll;
+    m_cd.low_ener = le;
+    m_cd.up_ener = ue;
+  }
+  catch(std::exception& e)
+  {
+    QMessageBox::critical(this,"Error","Failed to set the lists");
+  }
 }
 
 void ComDiffDialog::find()
@@ -131,6 +145,10 @@ void ComDiffDialog::find()
   upq.assign(upqstr);
   double upperEnergy = m_form->leUpperEnergy->text().toDouble();
   std::cerr << upq << ' ' << upperEnergy << std::endl;
-  //m_cd.set(
+  m_cd.set(upperEnergy,upq);
+  m_cd.find();
+
+  m_form->pteLog->clear();
+  m_form->pteLog->insertPlainText(QString::number(m_cd.found.size()));
 }
 } // namespace Goblin
