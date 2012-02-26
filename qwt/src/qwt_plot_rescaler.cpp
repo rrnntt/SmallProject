@@ -68,6 +68,8 @@ QwtPlotRescaler::QwtPlotRescaler(QwtPlotCanvas *canvas,
     d_data->rescalePolicy = policy;
 
     setEnabled(true);
+
+    connect(this,SIGNAL(needReplot()),this,SLOT(replotPlot()),Qt::QueuedConnection);
 }
 
 //! Destructor
@@ -307,7 +309,8 @@ bool QwtPlotRescaler::eventFilter(QObject *o, QEvent *e)
         }
     }
 
-    return false;
+    //e->ignore();
+    return QObject::eventFilter(o,e);
 }
 
 void QwtPlotRescaler::canvasResizeEvent(QResizeEvent* e)
@@ -614,6 +617,8 @@ void QwtPlotRescaler::updateScales(
     plt->setAutoReplot(doReplot);
 
     d_data->inReplot++;
-    plt->replot();
+    //plt->replot();
+    emit needReplot();
     d_data->inReplot--;
 }
+

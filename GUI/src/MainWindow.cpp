@@ -25,7 +25,7 @@ MainWindow::MainWindow()
   :QMainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
-  setGeometry(900,900,300,200);
+  //setGeometry(900,900,300,200);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
 
@@ -44,7 +44,7 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-  std::cerr << "MainWindow destroyed\n";
+  //std::cerr << "MainWindow destroyed\n";
 }
 
 void MainWindow::closeEvent(QCloseEvent*)
@@ -59,7 +59,7 @@ QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)
   connect(subwnd,SIGNAL(subWindowClosed(QtAPI::SubWindow*)),this,SLOT(subWindowClosed(QtAPI::SubWindow*)));
   subwnd->setWidget(widget);
   m_mdiArea->addSubWindow(subwnd);
-  subwnd->resize(300,200);
+  subwnd->resize(400,300);
   subwnd->show();
   return subwnd;
 }

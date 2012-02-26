@@ -5,23 +5,42 @@
 
 set( INC_FILES 
    inc/Teach/DllExport.h
+   inc/Teach/Graph.h
    inc/Teach/Problem.h
+   inc/Teach/GeometryTask.h
    inc/Teach/Text.h
    )
+
 set( SRC_FILES 
+  src/GeometryTask.cpp
+  src/Graph.cpp
   src/Problem.cpp
   src/Text.cpp
   )
-add_library( Teach SHARED ${SRC_FILES} ${INC_FILES} )
+
+set( MOC_HEADERS
+   inc/Teach/GeometryTask.h
+   inc/Teach/Graph.h
+)
+
+set( UI_FILES
+)
+
+qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
+#qt4_wrap_ui(UI_HEADERS ${UI_FILES})
+
+add_library( Teach SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} )
 include_directories(inc 
 ../Kernel/inc
 ../API/inc
 ../Formula/inc
+../QtAPI/inc
+ ../qwt/src
 ${THIRD_PARTY_INCLUDE_DIR}
 )
 set_target_properties ( Teach PROPERTIES COMPILE_DEFINITIONS IN_TEACH )
 target_link_libraries(Teach
-Kernel API Formula 
+Kernel API Formula QtAPI qwt
 )
 
 #

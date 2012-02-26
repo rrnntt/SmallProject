@@ -164,6 +164,7 @@ set( MOC_HEADERS
 	src/qwt_plot_panner.h
 	src/qwt_plot_picker.h
 	src/qwt_plot_zoomer.h
+	src/qwt_plot_rescaler.h
 	src/qwt_scale_widget.h
 	src/qwt_slider.h
 	src/qwt_abstract_slider.h

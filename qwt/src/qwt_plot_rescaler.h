@@ -28,6 +28,7 @@ class QResizeEvent;
 
 class QWT_EXPORT QwtPlotRescaler: public QObject
 {
+Q_OBJECT
 public:
     /*!
         \brief Rescale Policy
@@ -104,6 +105,13 @@ public:
     virtual bool eventFilter(QObject *, QEvent *);
 
     void rescale() const;
+
+signals:
+
+    void needReplot()const;
+protected slots:
+
+  void replotPlot(){plot()->replot();}
 
 protected:
     virtual void canvasResizeEvent(QResizeEvent *);
