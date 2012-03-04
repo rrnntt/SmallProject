@@ -16,6 +16,8 @@
 #include "qwt_double_interval.h"
 #include "qwt_plot_rescaler.h"
 
+#include <iostream>
+
 class QwtPlotRescaler::AxisData
 {
 public:
@@ -366,6 +368,8 @@ void QwtPlotRescaler::rescale(
     const int refAxis = referenceAxis();
     intervals[refAxis] = expandScale(refAxis, oldSize, newSize);
 
+    //std::cerr << "axis " << refAxis << ": " << intervals[refAxis].minValue() << ' ' << intervals[refAxis].minValue() << std::endl;
+
     for ( int axis = 0; axis < QwtPlot::axisCnt; axis++ )
     {
         if ( aspectRatio(axis) > 0.0 && axis != refAxis )
@@ -408,6 +412,7 @@ QwtDoubleInterval QwtPlotRescaler::expandScale( int axis,
 
                 expanded = expandInterval(oldInterval, 
                     width, expandingDirection(axis));
+
             }
             break;
         }
@@ -571,7 +576,7 @@ double QwtPlotRescaler::pixelDist(int axis, const QSize &size) const
 void QwtPlotRescaler::updateScales(
     QwtDoubleInterval intervals[QwtPlot::axisCnt]) const
 {
-    if ( d_data->inReplot >= 5 )
+    if ( d_data->inReplot >= 1 )
     {
         return;
     }
@@ -617,8 +622,8 @@ void QwtPlotRescaler::updateScales(
     plt->setAutoReplot(doReplot);
 
     d_data->inReplot++;
-    //plt->replot();
-    emit needReplot();
+    plt->replot();
+    //emit needReplot();
     d_data->inReplot--;
 }
 

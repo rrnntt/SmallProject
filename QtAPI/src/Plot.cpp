@@ -14,6 +14,8 @@
 #include "qwt_plot_magnifier.h"
 
 #include <QPalette>
+#include <QResizeEvent>
+
 #include <iostream>
 #include <algorithm>
 
@@ -73,6 +75,11 @@ void Plot::init()
   m_colors << Qt::black << Qt::blue << Qt::green << Qt::red << Qt::cyan << Qt::magenta << Qt::yellow << Qt::gray;
   m_colors << Qt::darkBlue << Qt::darkGreen << Qt::darkRed << Qt::darkCyan << Qt::darkMagenta << Qt::darkYellow << Qt::darkGray;
   m_colorIndex = 0;
+}
+
+void Plot::resizeEvent(QResizeEvent* e)
+{
+  QwtPlot::resizeEvent(e);
 }
 
 void Plot::addCurve(PlotCurve* curve)

@@ -43,6 +43,8 @@ public:
   double getYEnd() const;
 protected:
   void init();
+  void resizeEvent(QResizeEvent* e);
+
 private:
   int m_curve_count;
   QwtPlotZoomer* m_zoomer; ///< does zooming
@@ -51,6 +53,8 @@ private:
   PlotPicker* m_customPicker;
   QList<QColor> m_colors; ///< colors for stored curves
   int m_colorIndex;
+
+
 };
 
 } // QtAPI

@@ -10,6 +10,7 @@ set( INC_FILES
    inc/QtAPI/PlotDefaults.h
    inc/QtAPI/PlotDialog.h
    inc/QtAPI/PlotPicker.h
+   inc/QtAPI/PlotRescaler.h
    inc/QtAPI/PlotTask.h
    inc/QtAPI/PatternBox.h
    inc/QtAPI/PenStyleBox.h
@@ -33,6 +34,7 @@ set( SRC_FILES
   src/PlotDefaults.cpp
   src/PlotDialog.cpp
   src/PlotPicker.cpp
+  src/PlotRescaler.cpp
   src/PlotTask.cpp
   src/PatternBox.cpp
   src/PenStyleBox.cpp

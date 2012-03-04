@@ -21,7 +21,7 @@ Graph::Graph()
 
 Graph::~Graph()
 {
-  //delete m_rescaler;
+  delete m_rescaler;
 }
 
 void Graph::setXAxisScale(double min, double max, bool keepRatio)
