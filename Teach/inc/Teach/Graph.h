@@ -4,8 +4,6 @@
 #include "Teach/DllExport.h"
 #include "QtAPI/Plot.h"
 
-#include "qwt_plot_rescaler.h"
-
 namespace Teach
 {
 
@@ -17,9 +15,10 @@ public:
   ~Graph();
   void setXAxisScale(double min, double max, bool keepRatio = true);
   void setYAxisScale(double min, double max, bool keepRatio = true);
-  void correctAxisToAspectRatio();
+  void correctToSquare();
 protected:
-  QwtPlotRescaler *m_rescaler;
+  void paintEvent(QPaintEvent*);
+  bool m_needSquareCorrection;
 };
 
 } // namespace Teach

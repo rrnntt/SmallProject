@@ -6,6 +6,7 @@
 set( INC_FILES 
    inc/Teach/DllExport.h
    inc/Teach/Graph.h
+   inc/Teach/GraphShape.h
    inc/Teach/Problem.h
    inc/Teach/GeometryTask.h
    inc/Teach/Text.h
@@ -14,6 +15,7 @@ set( INC_FILES
 set( SRC_FILES 
   src/GeometryTask.cpp
   src/Graph.cpp
+  src/GraphShape.cpp
   src/Problem.cpp
   src/Text.cpp
   )

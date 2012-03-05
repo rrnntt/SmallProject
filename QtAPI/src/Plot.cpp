@@ -3,6 +3,7 @@
 #include "QtAPI/PlotCurve.h"
 #include "QtAPI/CurveManager.h"
 #include "QtAPI/PlotPicker.h"
+#include "QtAPI/PlotRescaler.h"
 
 #include "qwt_plot_canvas.h"
 #include "qwt_plot_layout.h"
@@ -27,9 +28,20 @@ namespace QtAPI
 Plot::Plot(QWidget *parent)
 :QwtPlot(parent),
 m_curve_count(),
-m_customPicker(nullptr)
+m_customPicker(nullptr),
+m_externalPicker(nullptr),
+m_rescaler(nullptr),
+m_painting(false)
 {
   init();
+}
+
+Plot::~Plot()
+{
+  if (m_rescaler)
+  {
+    delete m_rescaler;
+  }
 }
 
 void Plot::init()
@@ -75,11 +87,36 @@ void Plot::init()
   m_colors << Qt::black << Qt::blue << Qt::green << Qt::red << Qt::cyan << Qt::magenta << Qt::yellow << Qt::gray;
   m_colors << Qt::darkBlue << Qt::darkGreen << Qt::darkRed << Qt::darkCyan << Qt::darkMagenta << Qt::darkYellow << Qt::darkGray;
   m_colorIndex = 0;
+
+  connect(this,SIGNAL(needReplot()),this,SLOT(replot()),Qt::QueuedConnection);
+}
+
+void Plot::delayedReplot()
+{
+  emit needReplot();
+}
+
+void Plot::setRescaler(PlotRescaler* rescaler)
+{
+  if (m_rescaler) delete m_rescaler;
+  m_rescaler = rescaler;
 }
 
 void Plot::resizeEvent(QResizeEvent* e)
 {
   QwtPlot::resizeEvent(e);
+  if (m_rescaler && !m_painting)
+  {
+    m_rescaler->rescale(e->oldSize(),e->size());
+    delayedReplot();
+  }
+}
+
+void Plot::paintEvent(QPaintEvent* e)
+{
+  m_painting = true;
+  QwtPlot::paintEvent(e);
+  m_painting = false;
 }
 
 void Plot::addCurve(PlotCurve* curve)
@@ -187,6 +224,12 @@ void Plot::disablePickers()
   {
     m_customPicker->setEnabled(false);
   }
+  if (m_externalPicker)
+  {
+    m_externalPicker->setEnabled(false);
+    delete m_externalPicker;
+    m_externalPicker = nullptr;
+  }
 }
 
 void Plot::enableCustomPicker()
@@ -216,6 +259,23 @@ bool Plot::hasCustomPicker() const
 bool Plot::isCustomPickerEnabled() const
 {
   return m_customPicker && m_customPicker->isEnabled();
+}
+
+void Plot::setExternalPicker(PlotPicker* picker)
+{
+  disablePickers();
+  m_externalPicker = picker;
+  picker->setEnabled(true);
+}
+
+bool Plot::hasExternalPicker() const
+{
+  if (m_externalPicker != nullptr && !m_externalPicker->isEnabled())
+  {
+    delete m_externalPicker;
+    m_externalPicker = nullptr;
+  }
+  return m_externalPicker != nullptr;
 }
 
 double Plot::getXStart() const
