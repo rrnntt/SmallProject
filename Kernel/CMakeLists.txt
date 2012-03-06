@@ -10,6 +10,7 @@ set( INC_FILES
    inc/Kernel/DataService.h
    inc/Kernel/DllExport.h
    inc/Kernel/DllOpen.h
+   inc/Kernel/GeometryTypes.h
    inc/Kernel/LibraryManager.h
    inc/Kernel/LibraryWrapper.h
    inc/Kernel/DynamicFactory.h
@@ -53,6 +54,7 @@ set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/EParserTest.cpp
+  test/GeometryTypesTest.cpp
   test/PropertyTest.cpp
 )
 
