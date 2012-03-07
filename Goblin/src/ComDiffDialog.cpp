@@ -11,6 +11,8 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMessageBox>
 
+#include <sstream>
+
 namespace Goblin
 {
 
@@ -24,7 +26,6 @@ m_form(new Ui::ComDiffDialog)
   connect(m_form->btnLoadLowerEnergies,SIGNAL(clicked()),this,SLOT(loadEnergyList()));
   connect(m_form->btnCreateUpperEnergies,SIGNAL(clicked()),this,SLOT(createEnergyList()));
 
-  connect(m_form->btnSet,SIGNAL(clicked()),this,SLOT(setLists()));
   connect(m_form->btnFind,SIGNAL(clicked()),this,SLOT(find()));
   updateLineListCB();
   updateEnergyListCBs();
@@ -52,6 +53,7 @@ void ComDiffDialog::updateLineListCB()
   }
   catch(...)
   {}
+  setLists();
 }
 
 void ComDiffDialog::updateEnergyListCBs()
@@ -79,6 +81,7 @@ void ComDiffDialog::updateEnergyListCBs()
   {
     m_form->cbLowerEnergy->setCurrentIndex(i);
   }
+  setLists();
 }
 
 void ComDiffDialog::loadLineList()
@@ -119,18 +122,40 @@ void ComDiffDialog::setLists()
 {
   try
   {
+    m_cd.sp.reset();
+    m_cd.low_ener.reset();
+    m_cd.up_ener.reset();
+
     std::string llName = m_form->cbLineList->currentText().toStdString();
-    LineList_ptr ll = boost::dynamic_pointer_cast<LineList>(API::WorkspaceManager::instance().retrieve(llName));
+    if (!llName.empty())
+    {
+      LineList_ptr ll = boost::dynamic_pointer_cast<LineList>(API::WorkspaceManager::instance().retrieve(llName));
+      m_cd.sp = ll;
+    }
 
     std::string leName = m_form->cbLowerEnergy->currentText().toStdString();
-    EnergyList_ptr le = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(leName));
+    if (!leName.empty())
+    {
+      EnergyList_ptr le = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(leName));
+      m_cd.low_ener = le;
+    }
 
     std::string ueName = m_form->cbUpperEnergy->currentText().toStdString();
-    EnergyList_ptr ue = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(ueName));
+    if (!ueName.empty())
+    {
+      EnergyList_ptr ue = boost::dynamic_pointer_cast<EnergyList>(API::WorkspaceManager::instance().retrieve(ueName));
+      m_cd.up_ener = ue;
+    }
 
-    m_cd.sp = ll;
-    m_cd.low_ener = le;
-    m_cd.up_ener = ue;
+    if (m_cd.sp && m_cd.low_ener && m_cd.up_ener)
+    {
+      m_form->btnFind->setEnabled(true);
+    }
+    else
+    {
+      m_form->btnFind->setEnabled(false);
+    }
+
   }
   catch(std::exception& e)
   {
@@ -147,8 +172,23 @@ void ComDiffDialog::find()
   std::cerr << upq << ' ' << upperEnergy << std::endl;
   m_cd.set(upperEnergy,upq);
   m_cd.find();
-
-  m_form->pteLog->clear();
-  m_form->pteLog->insertPlainText(QString::number(m_cd.found.size()));
+  updateForm();
 }
+
+void ComDiffDialog::updateForm()
+{
+  m_form->pteLog->clear();
+
+  std::ostringstream ostr;
+  ostr << m_cd;
+  m_form->pteLog->insertPlainText(QString::fromStdString(ostr.str()));
+
+  size_t n = m_cd.found.size();
+  m_form->cbSelectFound->clear();
+  for(size_t i = 0; i < n; ++i)
+  {
+    m_form->cbSelectFound->insertItem(
+  }
+}
+
 } // namespace Goblin

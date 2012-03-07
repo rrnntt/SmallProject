@@ -24,6 +24,7 @@ private slots:
   void loadEnergyList();
   void createEnergyList();
   void setLists();
+  void updateForm();
   void find();
 private:
   void updateLineListCB();
