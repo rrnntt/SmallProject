@@ -27,6 +27,8 @@ namespace Kernel
     virtual ~LibraryManager();
     //opens all suitable libraries on a given path
     int OpenAllLibraries(const std::string&, bool isRecursive=false);
+    /// Load a given library
+    bool loadLibrary(const std::string & filepath);
   private:
 
     /// Private copy constructor - NO COPY ALLOWED
@@ -34,8 +36,6 @@ namespace Kernel
     /// Private assignment operator - NO ASSIGNMENT ALLOWED
     LibraryManager& operator = (const LibraryManager&);
 
-    /// Load a given library
-    bool loadLibrary(const std::string & filepath);
     /// Returns true if the library is to be loaded
     bool skip(const std::string & filename);
     ///Storage for the LibraryWrappers.

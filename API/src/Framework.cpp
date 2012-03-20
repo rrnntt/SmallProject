@@ -41,6 +41,11 @@ Framework::~Framework()
   std::cerr << "Framework deleted\n";
 }
 
+bool Framework::openLibrary(const std::string & filepath)
+{
+  return m_libraryManager.loadLibrary(filepath);
+}
+
 void Framework::openAllLibraries()
 {
   m_libraryManager.OpenAllLibraries(m_binDirectory);
@@ -110,6 +115,11 @@ const std::string Framework::binDirectory() const
     throw std::runtime_error("Bin directory is not known");
   }
   return m_binDirectory;
+}
+
+const std::string Framework::testDirectory() const
+{
+  return m_binDirectory + "../../../TestData/";
 }
 
 } // API

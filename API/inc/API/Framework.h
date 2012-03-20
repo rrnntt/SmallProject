@@ -22,6 +22,9 @@ public:
   void parseCommandLine(int argc, char** argv);
   const std::string binDirectory() const;
   void openAllLibraries();
+  /// Load a given library
+  bool openLibrary(const std::string & filepath);
+  const std::string testDirectory() const;
 protected:
   Framework();
   std::map<std::string,Singleton*> m_singletons;

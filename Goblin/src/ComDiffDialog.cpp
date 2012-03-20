@@ -159,7 +159,7 @@ void ComDiffDialog::setLists()
   }
   catch(std::exception& e)
   {
-    QMessageBox::critical(this,"Error","Failed to set the lists");
+    QMessageBox::critical(this,"Error","Failed to set the lists:\n" + QString(e.what()));
   }
 }
 
@@ -185,10 +185,10 @@ void ComDiffDialog::updateForm()
 
   size_t n = m_cd.found.size();
   m_form->cbSelectFound->clear();
-  for(size_t i = 0; i < n; ++i)
-  {
-    m_form->cbSelectFound->insertItem(
-  }
+  //for(size_t i = 0; i < n; ++i)
+  //{
+  //  m_form->cbSelectFound->insertItem(
+  //}
 }
 
 } // namespace Goblin

@@ -264,8 +264,8 @@ void TableWorkspace::saveAscii(const std::string& fileName, const std::string& s
  * Loads a TableWorkspace from an ASCII file. The data must be in columns.
  * The file structure:
  *  - header: lines start with '#' followed by one of these:
- *     <column type>:<column name>
  *     sep=<sparator>
+ *     <column type>:<column name>
  *   separator is a string that divides the columns. Data in the column must not contain <separator>.
  *  - the data in columns
  *  - any line starting with '#' is ignored.
@@ -283,6 +283,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
 
   // parser for a line of data
   Kernel::SeqParser dataParser;
+  size_t firstEmptyParser = 0;
   // parsers for individual cells, size == columnCount
   std::vector<Kernel::IParser*> cellParsers; 
 
@@ -323,6 +324,10 @@ void TableWorkspace::loadAscii(const std::string& fileName)
       if (seq == sepParser)
       {// reading the separator
         sep = seq->getParser(1)->match();
+        if (sep.find_first_not_of(' ') == std::string::npos)
+        {// 
+          sep = "";
+        }
       }
       else if (seq == columnParser)
       {// reading column descriptor
@@ -348,7 +353,14 @@ void TableWorkspace::loadAscii(const std::string& fileName)
           }
           else
           {
-            cellParsers.push_back(new Kernel::NotStringParser(sep));
+            if (!sep.empty())
+            {
+              cellParsers.push_back(new Kernel::NotStringParser(sep));
+            }
+            else
+            {
+              cellParsers.push_back(new Kernel::NotStringParser(" "));
+            }
           }
         }
         else
@@ -365,10 +377,22 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         doneHeader = true;
         n = columnCount();
         if (n == 0) throw std::runtime_error("No columns created");
+        if ( sep.empty() )
+        {
+          dataParser.addParser( new Kernel::StringParser(" "), '*');
+          firstEmptyParser = 1;
+        }
         for(size_t col = 0; col < n - 1; ++col)
         {
           dataParser.addParser( cellParsers[col] ,'*');
-          dataParser.addParser( new Kernel::StringParser(sep));
+          if (!sep.empty())
+          {
+            dataParser.addParser( new Kernel::StringParser(sep));
+          }
+          else
+          {
+            dataParser.addParser( new Kernel::StringParser(" "), '+');
+          }
         }
         //dataParser.addParser( new Kernel::AllParser,'*');
         dataParser.addParser(cellParsers.back());
@@ -379,9 +403,10 @@ void TableWorkspace::loadAscii(const std::string& fileName)
         row = appendRow();
         for(size_t col = 0; col < n; ++col)
         {
+          size_t i = col*2 + firstEmptyParser;
           Kernel::BracketParser* bracketParser = col < n - 1 ?
-             dataParser.get<Kernel::BracketParser>(col*2,0) // it's in a '*' list
-            :dataParser.get<Kernel::BracketParser>(col*2); // last column's parser isn't in a list
+             dataParser.get<Kernel::BracketParser>( i, 0 ) // it's in a '*' list
+            :dataParser.get<Kernel::BracketParser>( i );   // last column's parser isn't in a list
           if (bracketParser)
           {
             // read from the inner parser
@@ -390,7 +415,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
           }
           else
           {
-            m_columns[col]->fromString(dataParser.getParser(col*2)->match(),row);
+            m_columns[col]->fromString(dataParser.getParser(i)->match(),row);
           }
         }
       }

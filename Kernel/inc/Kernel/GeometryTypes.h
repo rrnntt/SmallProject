@@ -6,6 +6,9 @@
 namespace Kernel
 {
 
+/**
+ * A vector in a 2D space.
+ */
 template<class C>
 class Vector2D: public C
 {
@@ -80,6 +83,9 @@ public:
 
 };
 
+/**
+ * A point in a 2D space.
+ */
 template<class C>
 class Point2D: public C
 {
