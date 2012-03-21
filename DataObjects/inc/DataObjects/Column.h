@@ -12,6 +12,7 @@ namespace DataObjects
 {
 
 class NumericColumn;
+class CompoundColumn;
 
 class DATAOBJECTS_EXPORT Column
 {
@@ -36,18 +37,6 @@ public:
 
     /// Returns typeid for the pointer type to the data element in the column
     virtual const std::type_info& get_pointer_type_info()const = 0;
-
-    ///// Prints
-    //virtual void print(std::ostream& s, int index) const = 0;
-
-    ///// Reads
-    //virtual void read(std::istream& s, int index) = 0;
-
-    ///// Save into a file
-    //virtual void saveAscii(std::ostream& s, int index) const;
-
-    ///// Read from a file
-    //virtual void loadAscii(std::istream& s, int index);
 
     /// Return value of a cell as a string
     virtual std::string asString(size_t i) const = 0;
@@ -85,6 +74,9 @@ public:
     bool isNumeric() const;
 
     NumericColumn* asNumeric();
+
+    bool isCompound() const;
+    CompoundColumn* asCompound();
 
 protected:
     /// Sets the new column size.

@@ -285,6 +285,7 @@ void TableWorkspace::loadAscii(const std::string& fileName)
   Kernel::SeqParser dataParser;
   size_t firstEmptyParser = 0;
   // parsers for individual cells, size == columnCount
+  // the parsers will be owned by dataParser - no need to delete explicitly
   std::vector<Kernel::IParser*> cellParsers; 
 
   std::string str;

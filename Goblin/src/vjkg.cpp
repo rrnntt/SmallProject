@@ -378,5 +378,36 @@ void VJKGColumn::fromString(const std::string& str,size_t i)
   m_data[i].assign(str);
 }
 
+/**
+ * Set a component from a string
+ * @param row :: The row number of the data instance
+ * @param name :: The component symbolic name
+ * @param value :: Value of the component
+ */
+void VJKGColumn::componentFromString(size_t row,const std::string& name, const std::string& value)
+{
+  VJKG& data = m_data[row];
+  if (name == "iso")
+  {
+    data.setIso(boost::lexical_cast<int>(value));
+  }
+  else if (name == "j")
+  {
+    data.j = boost::lexical_cast<int>(value);
+  }
+  else if (name == "k")
+  {
+    data.k = boost::lexical_cast<int>(value);
+  }
+  else if (name == "g")
+  {
+    data.g = boost::lexical_cast<int>(value);
+  }
+  else if (name.size() > 1 && name[0] == 'v')
+  {
+    int iv = boost::lexical_cast<int>(name.substr(1));
+    data.setV(iv,boost::lexical_cast<int>(value));
+  }
+}
 
 } // Goblin

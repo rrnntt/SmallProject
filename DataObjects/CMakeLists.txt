@@ -7,6 +7,7 @@ set( INC_FILES
    inc/DataObjects/DllExport.h
    inc/DataObjects/Column.h
    inc/DataObjects/ColumnVector.h
+   inc/DataObjects/CompoundColumn.h
    inc/DataObjects/NumericColumn.h
    inc/DataObjects/ColumnFactory.h
    inc/DataObjects/StringColumn.h

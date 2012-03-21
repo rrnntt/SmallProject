@@ -3,6 +3,7 @@
 
 #include "Goblin/DllExport.h"
 #include "DataObjects/TableColumn.h"
+#include "DataObjects/CompoundColumn.h"
 
 #include <string>
 #include <iostream>
@@ -100,16 +101,17 @@ bool operator<(const VJKG& q1,const VJKG& q2);
 std::ostream& operator << (std::ostream& ostr,const Goblin::VJKG& q);
 std::istream& operator >> (std::istream& istr,Goblin::VJKG& q);
 
-  class VJKGColumn: public DataObjects::TableColumn<VJKG>
-  {
-  public:
-    VJKGColumn():DataObjects::TableColumn<VJKG>(){}
-    /// Return value of a cell as a string
-    virtual std::string asString(size_t i) const;
-    /// Read value from a string
-    virtual void fromString(const std::string& str,size_t i);
+class VJKGColumn: public DataObjects::TableColumn<VJKG>, public DataObjects::CompoundColumn
+{
+public:
+  VJKGColumn():DataObjects::TableColumn<VJKG>(){}
+  /// Return value of a cell as a string
+  virtual std::string asString(size_t i) const;
+  /// Read value from a string
+  virtual void fromString(const std::string& str,size_t i);
+  virtual void componentFromString(size_t row, const std::string& , const std::string&);
 
-  };
+};
 
 } // Goblin
 

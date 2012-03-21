@@ -1,5 +1,6 @@
 #include "DataObjects/Column.h"
 #include "DataObjects/NumericColumn.h"
+#include "DataObjects/CompoundColumn.h"
 
 #include <sstream>
 
@@ -26,31 +27,6 @@ std::istream& operator>>(std::istream& s,Boolean& b)
   return s;
 }
 
-//std::string Column::asString(size_t i) const
-//{
-//  std::stringstream ostr;
-//  this->print(ostr,i);
-//  return ostr.str();
-//}
-//
-//void Column::fromString(const std::string& str,size_t i) 
-//{
-//  std::istringstream istr(str);
-//  this->read(istr,i);
-//}
-
-///// Save into a file
-//void Column::saveAscii(std::ostream& s, int index) const
-//{
-//  this->print(s,index);
-//}
-//
-///// Read from a file
-//void Column::loadAscii(std::istream& s, int index)
-//{
-//  this->read(s,index);
-//}
-
 /// Is the data numeric (converts to double)?
 bool Column::isNumeric() const
 {
@@ -61,6 +37,18 @@ bool Column::isNumeric() const
 NumericColumn* Column::asNumeric()
 {
   return dynamic_cast<NumericColumn*>(this);
+}
+
+/// Is it a column of compound data (struct or class)
+bool Column::isCompound() const
+{
+  return dynamic_cast<const CompoundColumn*>(this) != nullptr;
+}
+
+/// Returns a cast pointer to CompoundColumn or nullptr
+CompoundColumn* Column::asCompound()
+{
+  return dynamic_cast<CompoundColumn*>(this);
 }
 
 } // DataObjects
