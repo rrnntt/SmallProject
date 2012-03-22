@@ -42,14 +42,14 @@ public:
   }
 
   /// Create an instance of Base
-  Base* create(const std::string& tname)
+  Base* create(const std::string& tname) const
   {
-    typename MapType::iterator it = m_map.find(tname);
+    auto it = m_map.find(tname);
     if (it == m_map.end())
     {
       throw std::runtime_error("Factory type "+tname+" is undefined.");
     }
-    return m_map[tname]->create();
+    return it->second->create();
   }
 
   /// Check if type has been declared

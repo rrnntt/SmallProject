@@ -1,17 +1,16 @@
-#ifndef NUMERIC_JACOBIAN_H
-#define NUMERIC_JACOBIAN_H
+#ifndef NUMERIC_JACOBIAN_H_
+#define NUMERIC_JACOBIAN_H_
 
-#include "Numeric/DllExport.h"
-
-#include <stdexcept>
-
+//----------------------------------------------------------------------
+// Includes
+//----------------------------------------------------------------------
 namespace Numeric
 {
-
 /** 
     Represents the Jacobian in IFitFunction::functionDeriv.
+
 */
-class NUMERIC_EXPORT Jacobian
+class Jacobian
 {
 public:
   /**  Set a value to a Jacobian matrix element.
@@ -27,17 +26,6 @@ public:
   */
   virtual double get(size_t iY, size_t iP) = 0;
 
-  ///@cond do not document
-  /**  Add number to all iY (data) Jacobian elements for a given iP (parameter)
-  *   @param value :: Value to add
-  */
-  virtual void addNumberToColumn(const double& value, const size_t& iActiveP) 
-  {
-    (void)value; (void)iActiveP; // Avoid compiler warning
-    throw std::runtime_error("No addNumberToColumn() method of Jacobian provided");
-  }
-  ///@endcond
-
   /// Virtual destructor
   virtual ~Jacobian() {};
 protected:
@@ -45,4 +33,4 @@ protected:
 
 } // namespace Numeric
 
-#endif // NUMERIC_JACOBIAN_H
+#endif /*NUMERIC_JACOBIAN_H_*/

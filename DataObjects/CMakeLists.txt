@@ -5,21 +5,24 @@
 
 set( INC_FILES 
    inc/DataObjects/DllExport.h
+   inc/DataObjects/ChebfunWorkspace.h
    inc/DataObjects/Column.h
    inc/DataObjects/ColumnVector.h
    inc/DataObjects/CompoundColumn.h
-   inc/DataObjects/NumericColumn.h
    inc/DataObjects/ColumnFactory.h
+   inc/DataObjects/NumericColumn.h
    inc/DataObjects/StringColumn.h
    inc/DataObjects/TableColumn.h
    inc/DataObjects/TableWorkspace.h
    inc/DataObjects/Unit.h
 # Algorithms
    inc/DataObjects/CalculateColumnValues.h
+   inc/DataObjects/CreateChebfun.h
    inc/DataObjects/CreateUniformRandomData.h
    inc/DataObjects/CreateDistribution.h
    )
 set( SRC_FILES 
+   src/ChebfunWorkspace.cpp
    src/Column.cpp
    src/ColumnVector.cpp
    src/NumericColumn.cpp
@@ -30,6 +33,7 @@ set( SRC_FILES
    src/Unit.cpp
 # Algorithms
    src/CalculateColumnValues.cpp
+   src/CreateChebfun.cpp
    src/CreateUniformRandomData.cpp
    src/CreateDistribution.cpp
   )
@@ -45,6 +49,8 @@ target_link_libraries(DataObjects Kernel API Formula Numeric)
 
 set( SRC_FILES 
   test/main.cpp
+  test/ChebfunWorkspaceTest.cpp
+  test/CreateChebfunTest.cpp
   test/CalculateColumnValuesTest.cpp
   test/TableTest.cpp
 )

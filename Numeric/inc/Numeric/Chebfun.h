@@ -161,6 +161,9 @@ namespace Numeric
     friend class chebfunTest;
   };
 
+  typedef boost::shared_ptr<chebfun> chebfun_ptr;
+  typedef boost::shared_ptr<const chebfun> chebfun_const_ptr;
+
 } // Numeric
 
 

@@ -1,155 +1,521 @@
+//----------------------------------------------------------------------
+// Includes
+//----------------------------------------------------------------------
 #include "Numeric/ParamFunction.h"
+#include "Numeric/IConstraint.h"
+#include "Numeric/ParameterTie.h"
 
-#include <algorithm>
+#include <boost/lexical_cast.hpp>
+
+#include <sstream>
+#include <iostream>
+#include <limits>
 
 namespace Numeric
 {
 
-ParamFunction::ParamFunction()
+/// Copy contructor
+ParamFunction::ParamFunction(const ParamFunction& f)
 {
+  m_isFixed.assign(f.m_isFixed.begin(),f.m_isFixed.end());
+  m_parameterNames.assign(f.m_parameterNames.begin(),f.m_parameterNames.end());
+  m_parameterDescriptions.assign(f.m_parameterDescriptions.begin(),f.m_parameterDescriptions.end());
+  m_parameters.assign(f.m_parameters.begin(),f.m_parameters.end());
 }
 
-/// Get i-th parameter
+///Assignment operator
+ParamFunction& ParamFunction::operator=(const ParamFunction& f)
+{
+  m_isFixed.assign(f.m_isFixed.begin(),f.m_isFixed.end());
+  m_parameterNames.assign(f.m_parameterNames.begin(),f.m_parameterNames.end());
+  m_parameterDescriptions.assign(f.m_parameterDescriptions.begin(),f.m_parameterDescriptions.end());
+  m_parameters.assign(f.m_parameters.begin(),f.m_parameters.end());
+  return *this;
+}
+
+/// Destructor
+ParamFunction::~ParamFunction()
+{
+  for(std::vector<ParameterTie*>::iterator it = m_ties.begin();it != m_ties.end(); ++it)
+  {
+    delete *it;
+  }
+  m_ties.clear();
+  for(std::vector<IConstraint*>::iterator it = m_constraints.begin();it!= m_constraints.end();++it)
+  {
+    delete *it;
+  }
+  m_constraints.clear();
+}
+
+
+/** Sets a new value to the i-th parameter.
+ *  @param i :: The parameter index
+ *  @param value :: The new value
+ *  @param explicitlySet :: A boolean falgging the parameter as explicitly set (by user)
+ */
+void ParamFunction::setParameter(size_t i, const double& value, bool explicitlySet)
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  m_parameters[i] = value;
+  if (explicitlySet)
+  {
+    m_explicitlySet[i] = true;
+  }
+}
+
+/** Sets a new parameter description to the i-th parameter.
+ *  @param i :: The parameter index
+ *  @param description :: New parameter description
+ */
+void ParamFunction::setParameterDescription(size_t i, const std::string& description)
+{
+  if( i >= nParams() )
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  m_parameterDescriptions[i] = description;
+}
+
+/** Get the i-th parameter.
+ *  @param i :: The parameter index
+ *  @return the value of the requested parameter
+ */
 double ParamFunction::getParameter(size_t i)const
 {
-  validateParameterIndex(i);
-  return m_parameters[i].value;
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return m_parameters[i];
 }
 
-/// Get parameter by name.
-double ParamFunction::getParameter(const std::string& pname)const
+/**
+ * Sets a new value to a parameter by name.
+ * @param name :: The name of the parameter.
+ * @param value :: The new value
+ * @param explicitlySet :: A boolean flagging the parameter as explicitly set (by user)
+ */
+void ParamFunction::setParameter(const std::string& name, const double& value, bool explicitlySet)
 {
-  auto it = std::find_if(m_parameters.begin(),m_parameters.end(),[&pname](const ParamStorageType& s)->bool{
-    return s.name == pname;
-  });
-  if (it == m_parameters.end()) throw std::runtime_error("Parameter " + pname + " not found in function " + this->name());
-  return it->value;
+  std::string ucName(name);
+  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
+  std::vector<std::string>::const_iterator it = 
+    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
+  if (it == m_parameterNames.end())
+  {
+    std::ostringstream msg;
+    msg << "ParamFunction parameter ("<<ucName<<") does not exist.";
+    throw std::invalid_argument(msg.str());
+  }
+  setParameter(static_cast<int>(it - m_parameterNames.begin()),value,explicitlySet);
 }
 
-/// Set i-th parameter
-void ParamFunction::setParameter(size_t i, const double& value)
+/**
+ * Sets a new description to a parameter by name.
+ * @param name :: The name of the parameter.
+ * @param description :: New parameter description
+ */
+void ParamFunction::setParameterDescription(const std::string& name, const std::string& description)
 {
-  validateParameterIndex(i);
-  m_parameters[i].value = value;
+  std::string ucName(name);
+  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
+  std::vector<std::string>::const_iterator it = 
+    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
+  if (it == m_parameterNames.end())
+  {
+    std::ostringstream msg;
+    msg << "ParamFunction parameter ("<<ucName<<") does not exist.";
+    throw std::invalid_argument(msg.str());
+  }
+  setParameterDescription(static_cast<int>(it - m_parameterNames.begin()),description);
 }
 
-/// Set parameter by name.
-void ParamFunction::setParameter(const std::string& pname, const double& value)
+
+/**
+ * Parameters by name.
+ * @param name :: The name of the parameter.
+ * @return the value of the named parameter
+ */
+double ParamFunction::getParameter(const std::string& name)const
 {
-  auto it = std::find_if(m_parameters.begin(),m_parameters.end(),[&pname](const ParamStorageType& s)->bool{
-    return s.name == pname;
-  });
-  if (it == m_parameters.end()) throw std::runtime_error("Parameter " + pname + " not found in function " + this->name());
-  it->value = value;
+  std::string ucName(name);
+  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
+  std::vector<std::string>::const_iterator it = 
+    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
+  if (it == m_parameterNames.end())
+  {
+    std::ostringstream msg;
+    msg << "ParamFunction parameter ("<<ucName<<") does not exist.";
+    throw std::invalid_argument(msg.str());
+  }
+  return m_parameters[it - m_parameterNames.begin()];
 }
 
-/// Total number of parameters
-size_t ParamFunction::nParams()const
+/**
+ * Returns the index of the parameter named name.
+ * @param name :: The name of the parameter.
+ * @return the index of the named parameter
+ */
+size_t ParamFunction::parameterIndex(const std::string& name)const
 {
-  return m_parameters.size();
+  std::string ucName(name);
+  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
+  std::vector<std::string>::const_iterator it = 
+    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
+  if (it == m_parameterNames.end())
+  {
+    std::ostringstream msg;
+    msg << "ParamFunction "<<this->name()<<" does not have parameter ("<<ucName<<").";
+    throw std::invalid_argument(msg.str());
+  }
+  return int(it - m_parameterNames.begin());
 }
 
-/// Returns the index of parameter name
-size_t ParamFunction::parameterIndex(const std::string& pname)const
-{
-  auto it = std::find_if(m_parameters.begin(),m_parameters.end(),[&pname](const ParamStorageType& s)->bool{
-    return s.name == pname;
-  });
-  if (it == m_parameters.end()) throw std::runtime_error("Parameter " + pname + " not found in function " + this->name());
-  return static_cast<size_t>(it - m_parameters.begin());
-}
-
-/// Returns the name of parameter i
+/** Returns the name of parameter i
+ * @param i :: The index of a parameter
+ * @return the name of the parameter at the requested index
+ */
 std::string ParamFunction::parameterName(size_t i)const
 {
-  validateParameterIndex(i);
-  return m_parameters[i].name;
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return m_parameterNames[i];
 }
 
-/// Number of active (in terms of fitting) parameters
-size_t ParamFunction::nActive()const
+/** Returns the description of parameter i
+ * @param i :: The index of a parameter
+ * @return the description of the parameter at the requested index
+ */
+std::string ParamFunction::parameterDescription(size_t i)const
 {
-  return m_activeIndex.size();
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return m_parameterDescriptions[i];
 }
 
-/// Value of i-th active parameter. Override this method to make fitted parameters different from the declared
-double ParamFunction::activeParameter(size_t i)const
+/** 
+ * Get the fitting error for a parameter
+ * @param i :: The index of a parameter
+ * @return :: the error
+ */
+double ParamFunction::getError(size_t i) const
 {
-  validateActiveParameterIndex(i);
-  return m_parameters[m_activeIndex[i]].value;
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return m_errors[i];
 }
 
-/// Set new value of i-th active parameter. Override this method to make fitted parameters different from the declared
-void ParamFunction::setActiveParameter(size_t i, double value)
+/** 
+ * Set the fitting error for a parameter
+ * @param i :: The index of a parameter
+ * @param err :: The error value to set
+ */
+void ParamFunction::setError(size_t i, double err)
 {
-  validateActiveParameterIndex(i);
-  m_parameters[m_activeIndex[i]].value = value;
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  m_errors[i] = err;
 }
 
-/// Returns the name of active parameter i
-std::string ParamFunction::nameOfActive(size_t i)const
+
+/**
+ * Declare a new parameter. To used in the implementation'c constructor.
+ * @param name :: The parameter name.
+ * @param initValue :: The initial value for the parameter
+ * @param description :: The description for the parameter
+ */
+void ParamFunction::declareParameter(const std::string& name,double initValue, const std::string& description)
 {
-  validateActiveParameterIndex(i);
-  return m_parameters[m_activeIndex[i]].name;
+  std::string ucName(name);
+  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
+  std::vector<std::string>::const_iterator it = 
+    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
+  if (it != m_parameterNames.end())
+  {
+    std::ostringstream msg;
+    msg << "ParamFunction parameter ("<<ucName<<") already exists.";
+    throw std::invalid_argument(msg.str());
+  }
+
+  m_isFixed.push_back(false);
+  m_parameterNames.push_back(ucName);
+  m_parameterDescriptions.push_back(description);
+  m_parameters.push_back(initValue);
+  m_errors.push_back(0.0);
+  m_explicitlySet.push_back(false);
 }
 
-/// Check if declared parameter i is fixed
+/**
+ * query if the parameter is fixed
+ * @param i :: The index of a declared parameter
+ * @return true if parameter i is active
+ */
 bool ParamFunction::isFixed(size_t i)const
 {
-  return std::find(m_activeIndex.begin(),m_activeIndex.end(),i) == m_activeIndex.end();
+  if (i >= nParams())
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  return m_isFixed[i];
 }
 
-/// Fixes declared parameter i
+/** This method doesn't create a tie
+ * @param i :: A declared parameter index to be fixed
+ */
 void ParamFunction::fix(size_t i)
 {
-  auto it = std::find(m_activeIndex.begin(),m_activeIndex.end(),i);
-  if (it != m_activeIndex.end())
-  {
-    m_activeIndex.erase(it);
-  }
+  if ( isFixed(i) ) return;
+  m_isFixed[i] = true;
 }
 
-/// Restores declared parameter i for fitting
+/** Makes a parameter active again. It doesn't change the parameter's tie.
+ * @param i :: A declared parameter index to be restored to active
+ */
 void ParamFunction::unfix(size_t i)
 {
-  auto it = std::find(m_activeIndex.begin(),m_activeIndex.end(),i);
-  if (it == m_activeIndex.end())
+  if ( !isFixed(i) ) return;
+  m_isFixed[i] = false;
+}
+
+/**
+ * Attaches a tie to this ParamFunction. The attached tie is owned by the ParamFunction.
+ * @param tie :: A pointer to a new tie
+ */
+void ParamFunction::addTie(ParameterTie* tie)
+{
+  size_t iPar = tie->getIndex();
+  bool found = false;
+  for(std::vector<ParameterTie*>::size_type i=0;i<m_ties.size();i++)
   {
-    it = std::find_if(m_activeIndex.begin(),m_activeIndex.end(),[&i](size_t j)->bool{return j > i;});
-    m_activeIndex.insert(it,i);
+    if (m_ties[i]->getIndex() == iPar) 
+    {
+      found = true;
+      delete m_ties[i];
+      m_ties[i] = tie;
+      break;
+    }
+  }
+  if (!found)
+  {
+    m_ties.push_back(tie);
   }
 }
 
 /**
- * Declare a new parameter.
- * @param pname :: A parameter name.
- * @param initValue :: Optional initial value.
+ * Apply the ties.
  */
-void ParamFunction::declareParameter(const std::string& pname, double initValue) 
+void ParamFunction::applyTies()
 {
-  if (hasParameter(pname))
+  for(std::vector<ParameterTie*>::iterator tie=m_ties.begin();tie!=m_ties.end();++tie)
   {
-    throw std::runtime_error("Parameter " + pname + " already defined.");
+    (**tie).eval();
   }
-  m_parameters.push_back(ParamStorageType());
-  m_parameters.back().name = pname;
-  m_parameters.back().value = initValue;
-  m_activeIndex.resize(m_parameters.size());
-  size_t i = 0;
-  std::generate(m_activeIndex.begin(),m_activeIndex.end(),[&i]()->size_t{
-    return i++;
-  });
 }
 
 /**
- * Check if a parameter name was already declared.
- * @param pname :: A parameter name.
+ * Used to find ParameterTie for a parameter i
  */
-bool ParamFunction::hasParameter(const std::string& pname) const
+class ReferenceEqual
 {
-  return std::find_if(m_parameters.begin(),m_parameters.end(),[&pname](const ParamStorageType& s)->bool{
-    return s.name == pname;
-  }) != m_parameters.end();
+  const size_t m_i;///< index to find
+public:
+  /** Constructor
+   */
+  ReferenceEqual(size_t i):m_i(i){}
+  /**Bracket operator
+   * @param p :: the parameter you are looking for
+   * @return True if found
+   */
+  bool operator()(ParameterReference* p)
+  {
+    return p->getIndex() == m_i;
+  }
+};
+
+/** Removes i-th parameter's tie if it is tied or does nothing.
+ * @param i :: The index of the tied parameter.
+ * @return True if successfull
+ */
+bool ParamFunction::removeTie(size_t i)
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  std::vector<ParameterTie*>::iterator it = std::find_if(m_ties.begin(),m_ties.end(),ReferenceEqual(i));
+  if (it != m_ties.end())
+  {
+    delete *it;
+    m_ties.erase(it);
+    unfix(i);
+    return true;
+  }
+  return false;
+}
+
+/** Get tie of parameter number i
+ * @param i :: The index of a declared parameter.
+ * @return A pointer to the tie
+ */
+ParameterTie* ParamFunction::getTie(size_t i)const
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  std::vector<ParameterTie*>::const_iterator it = std::find_if(m_ties.begin(),m_ties.end(),ReferenceEqual(i));
+  if (it != m_ties.end())
+  {
+    return *it;
+  }
+  return NULL;
+}
+
+/** Remove all ties
+ */
+void ParamFunction::clearTies()
+{
+  for(std::vector<ParameterTie*>::iterator it = m_ties.begin();it != m_ties.end(); ++it)
+  {
+    size_t i = getParameterIndex(**it);
+    unfix(i);
+    delete *it;
+  }
+  m_ties.clear();
+}
+
+/** Add a constraint
+ *  @param ic :: Pointer to a constraint.
+ */
+void ParamFunction::addConstraint(IConstraint* ic)
+{
+  size_t iPar = ic->getIndex();
+  bool found = false;
+  for(std::vector<IConstraint*>::size_type i=0;i<m_constraints.size();i++)
+  {
+    if (m_constraints[i]->getIndex() == iPar) 
+    {
+      found = true;
+      delete m_constraints[i];
+      m_constraints[i] = ic;
+      break;
+    }
+  }
+  if (!found)
+  {
+    m_constraints.push_back(ic);
+  }
+}
+
+/** Get constraint of parameter number i
+ * @param i :: The index of a declared parameter.
+ * @return A pointer to the constraint or NULL
+ */
+IConstraint* ParamFunction::getConstraint(size_t i)const
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  std::vector<IConstraint*>::const_iterator it = std::find_if(m_constraints.begin(),m_constraints.end(),ReferenceEqual(i));
+  if (it != m_constraints.end())
+  {
+    return *it;
+  }
+  return NULL;
+}
+
+/** Remove a constraint
+ * @param parName :: The name of a parameter which constarint to remove.
+ */
+void ParamFunction::removeConstraint(const std::string& parName)
+{
+  size_t iPar = parameterIndex(parName);
+  for(std::vector<IConstraint*>::iterator it=m_constraints.begin();it!=m_constraints.end();++it)
+  {
+    if (iPar == (**it).getIndex())
+    {
+      delete *it;
+      m_constraints.erase(it);
+      break;
+    }
+  }
+}
+
+void ParamFunction::setParametersToSatisfyConstraints()
+{
+  for (size_t i = 0; i < m_constraints.size(); i++)
+  {
+    m_constraints[i]->setParamToSatisfyConstraint();
+  }
+}
+
+
+
+/// Nonvirtual member which removes all declared parameters
+void ParamFunction::clearAllParameters()
+{
+  for(std::vector<ParameterTie*>::iterator it = m_ties.begin();it != m_ties.end(); ++it)
+  {
+    delete *it;
+  }
+  m_ties.clear();
+  for(std::vector<IConstraint*>::iterator it = m_constraints.begin();it!= m_constraints.end();++it)
+  {
+    delete *it;
+  }
+  m_constraints.clear();
+
+  m_parameters.clear();
+  m_parameterNames.clear();
+  m_parameterDescriptions.clear();
+  m_isFixed.clear();
+}
+
+/// Get the address of the parameter
+/// @param i :: the index of the parameter required
+/// @returns the address of the parameter
+double* ParamFunction::getParameterAddress(size_t i)
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return &m_parameters[i];
+}
+
+/// Checks if a parameter has been set explicitly
+bool ParamFunction::isExplicitlySet(size_t i)const
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return m_explicitlySet[i];
+}
+
+/**
+ * Returns the index of parameter if the ref points to this ParamFunction
+ * @param ref :: A reference to a parameter
+ * @return Parameter index or number of nParams() if parameter not found
+ */
+size_t ParamFunction::getParameterIndex(const ParameterReference& ref)const
+{
+  if (ref.getFunction() == this && ref.getIndex() < nParams())
+  {
+    return ref.getIndex();
+  }
+  return nParams();
 }
 
 } // namespace Numeric

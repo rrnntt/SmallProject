@@ -15,7 +15,7 @@ class API_EXPORT AlgorithmFactory: public Kernel::DynamicFactory<Algorithm>, pro
 public:
   virtual std::string name() const {return "AlgorithmFactory";}
   static AlgorithmFactory& instance();
-  boost::shared_ptr<Algorithm> createAlgorithm(const std::string& name);
+  boost::shared_ptr<Algorithm> createAlgorithm(const std::string& name) const;
 };
 
 } // API

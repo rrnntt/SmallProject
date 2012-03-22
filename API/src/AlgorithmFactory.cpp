@@ -23,7 +23,7 @@ AlgorithmFactory& AlgorithmFactory::instance()
   }
 }
 
-boost::shared_ptr<Algorithm> AlgorithmFactory::createAlgorithm(const std::string& name)
+boost::shared_ptr<Algorithm> AlgorithmFactory::createAlgorithm(const std::string& name) const
 {
   return Algorithm_ptr(create(name));
 }

@@ -21,7 +21,7 @@ CalculateColumnValues::CalculateColumnValues()
 }
 
 /**
- * Retrieve the input table workspace from its property and validat it.
+ * Retrieve the input table workspace from its property and validate it.
  */
 boost::shared_ptr<TableWorkspace> CalculateColumnValues::getTableWorkspace()
 {

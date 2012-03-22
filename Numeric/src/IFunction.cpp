@@ -1,10 +1,27 @@
+//----------------------------------------------------------------------
+// Includes
+//----------------------------------------------------------------------
 #include "Numeric/IFunction.h"
+#include "Numeric/Jacobian.h"
+#include "Numeric/IConstraint.h"
+#include "Numeric/ParameterTie.h"
+#include "Numeric/ConstraintFactory.h"
 
 #include <boost/lexical_cast.hpp>
+
+#include <limits>
 #include <sstream>
+#include <iostream> 
 
 namespace Numeric
 {
+  
+/**
+ * Destructor
+ */
+  IFunction::~IFunction()
+  {
+  }
 
 /** Base class implementation of derivative IFunction throws error. This is to check if such a function is provided
     by derivative class. In the derived classes this method must return the derivatives of the function
@@ -14,29 +31,61 @@ namespace Numeric
  * @param jacobian :: Pointer to a Jacobian matrix. If it is NULL the method is called in order to check whether it's implemented or not.
  *      If the derivatives are implemented the method must simply return, otherwise it must throw Kernel::Exception::NotImplementedError.
  */
-void IFunction::functionDeriv(FunctionDomain& domain, Jacobian& jacobian)
+void IFunction::functionDeriv(const FunctionDomain& domain, Jacobian& jacobian)
 {
   UNUSED_ARG(domain);
   UNUSED_ARG(jacobian);
   throw ("No derivative IFunction provided");
 }
 
-
-
-/** Update active parameters. Ties are applied.
- *  @param in :: Pointer to an array with active parameters values. Must be at least nActive() doubles long.
+/**
+ * Ties a parameter to other parameters
+ * @param parName :: The name of the parameter to tie.
+ * @param expr ::    A math expression 
+ * @return newly ties parameters
  */
-//void IFunction::updateActive(const double* in)
-//{
-//  if (in)
-//  {
-//    for(size_t i=0;i<nActive();i++)
-//    {
-//      setActiveParameter(i,in[i]);
-//    }
-//  }
-//}
+ParameterTie* IFunction::tie(const std::string& parName,const std::string& expr)
+{
+  ParameterTie* ti = new ParameterTie(this,parName,expr);
+  addTie(ti);
+  this->fix(getParameterIndex(*ti));
+  return ti;
+}
 
+/**
+ * Add ties to the function.
+ * @param ties :: Comma-separated list of name=value pairs where name is a parameter name and value
+ *  is a math expression tying the parameter to other parameters or a constant.
+ */
+void IFunction::addTies(const std::string& ties)
+{
+  //Expression list;
+  //list.parse(ties);
+  //list.toList();
+  //for(auto t = list.begin(); t != list.end(); ++t)
+  //{
+  //  if (t->name() == "=" && t->size() >= 2)
+  //  {
+  //    size_t n = t->size() - 1;
+  //    const std::string value = (*t)[n].str();
+  //    for( size_t i = n; i != 0; )
+  //    {
+  //      --i;
+  //      this->tie( (*t)[i].name(), value );
+  //    }
+  //  }
+  //}
+}
+
+/** Removes the tie off a parameter. The parameter becomes active
+ * This method can be used when constructing and editing the IFunction in a GUI
+ * @param parName :: The name of the parameter which ties will be removed.
+ */
+void IFunction::removeTie(const std::string& parName)
+{
+  size_t i = parameterIndex(parName);
+  this->removeTie(i);
+}
 
 /**
  * Writes a string that can be used in Fit.IFunction to create a copy of this IFunction
@@ -60,7 +109,95 @@ std::string IFunction::asString()const
   {
     ostr<<','<<parameterName(i)<<'='<<getParameter(i);
   }
+  std::string constraints;
+  for(size_t i=0;i<nParams();i++)
+  {
+    const IConstraint* c = getConstraint(i);
+    if (c)
+    {
+      std::string tmp = c->asString();
+      if (!tmp.empty())
+      {
+        if (!constraints.empty())
+        {
+          constraints += ",";
+        }
+        constraints += tmp;
+      }
+    }
+  }
+  if (!constraints.empty())
+  {
+    ostr << ",constraints=(" << constraints << ")";
+  }
+
+  std::string ties;
+  for(size_t i=0;i<nParams();i++)
+  {
+    const ParameterTie* tie = getTie(i);
+    if (tie)
+    {
+      std::string tmp = tie->asString(this);
+      if (!tmp.empty())
+      {
+        if (!ties.empty())
+        {
+          ties += ",";
+        }
+        ties += tmp;
+      }
+    }
+  }
+  if (!ties.empty())
+  {
+    ostr << ",ties=(" << ties << ")";
+  }
   return ostr.str();
+}
+
+/** Add a list of conatraints from a string
+ * @param str :: A comma-separated list of name=expr pairs, where name is a parameter name and 
+ *  expr is a constraint expression.
+ */
+void IFunction::addConstraints(const std::string& str)
+{
+  //Expression list;
+  //list.parse(str);
+  //list.toList();
+  //for(auto expr = list.begin(); expr != list.end(); ++expr)
+  //{
+  //  IConstraint* c = ConstraintFactory::Instance().createInitialized(this,*expr);
+  //  this->addConstraint(c);
+  //}
+}
+
+/**
+ * Return a vector with all parameter names.
+ */
+std::vector<std::string> IFunction::getParameterNames() const
+{
+  std::vector<std::string> out;
+  for(size_t i = 0; i < nParams(); ++i)
+  {
+    out.push_back(parameterName(i));
+  }
+  return out;
+}
+
+/// Function to return all of the categories that contain this function
+const std::vector<std::string> IFunction::categories() const
+{
+  std::vector < std::string > res;
+  //Poco::StringTokenizer tokenizer(category(), categorySeparator(),
+  //    Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+  //Poco::StringTokenizer::Iterator h = tokenizer.begin();
+
+  //for (; h != tokenizer.end(); ++h)
+  //{
+  //  res.push_back(*h);
+  //}
+
+  return res;
 }
 
 /**
@@ -303,23 +440,104 @@ void IFunction::Attribute::fromString(const std::string& str)
   apply(tmp);
 }
 
-/**
- * Check if a parameter index is valid. If not - throw range_error.
- * @param i :: An index to check.
- */
-void IFunction::validateParameterIndex(size_t i) const
+/// Value of i-th active parameter. Override this method to make fitted parameters different from the declared
+double IFunction::activeParameter(size_t i)const 
 {
-  if (i >= nParams()) throw std::range_error("Parameter index out of range");
+  if ( !isActive(i) )
+  {
+    throw std::runtime_error("Attempt to use an inactive parameter");
+  }
+  return getParameter(i);
 }
 
-/**
- * Check if an active parameter index is valid. If not - throw range_error.
- * @param i :: An index to check.
- */
-void IFunction::validateActiveParameterIndex(size_t i) const
+/// Set new value of i-th active parameter. Override this method to make fitted parameters different from the declared
+void IFunction::setActiveParameter(size_t i, double value) 
 {
-  if (i >= nActive()) throw std::range_error("Active parameter index out of range");
+  if ( !isActive(i) )
+  {
+    throw std::runtime_error("Attempt to use an inactive parameter");
+  }
+  setParameter(i,value);
+}
+
+/// Returns the name of active parameter i
+std::string IFunction::nameOfActive(size_t i)const 
+{
+  if ( !isActive(i) )
+  {
+    throw std::runtime_error("Attempt to use an inactive parameter");
+  }
+  return parameterName(i);
+}
+
+/// Returns the name of active parameter i
+std::string IFunction::descriptionOfActive(size_t i)const 
+{
+  if ( !isActive(i) )
+  {
+    throw std::runtime_error("Attempt to use an inactive parameter");
+  }
+  return parameterDescription(i);
+}
+
+/** Calculate numerical derivatives.
+ * @param out :: Derivatives
+ * @param xValues :: X values for data points
+ * @param nData :: Number of data points
+ */
+void IFunction::calNumericalDeriv(const FunctionDomain& domain, Jacobian& jacobian)
+{
+    const double minDouble = std::numeric_limits<double>::min();
+    const double epsilon = std::numeric_limits<double>::epsilon() * 100;
+    double stepPercentage = 0.001; // step percentage
+    double step; // real step
+    double cutoff = 100.0*minDouble/stepPercentage;
+    size_t nParam = nParams();
+    size_t nData = domain.size();
+
+    // allocate memory if not already done
+    if (m_minusStep.size() != domain.size())
+    {
+      m_minusStep.reset(domain);
+      m_plusStep.reset(domain);
+    }
+
+    applyTies(); // just in case
+    function(domain,m_minusStep);
+
+    for (size_t iP = 0; iP < nParam; iP++)
+    {
+      if ( isActive(iP) )
+      {
+        const double& val = activeParameter(iP);
+        if (fabs(val) < cutoff)
+        {
+          step = epsilon;
+        }
+        else
+        {
+          step = val*stepPercentage;
+        }
+
+        double paramPstep = val + step;
+        setActiveParameter(iP, paramPstep);
+        applyTies(); 
+        function(domain,m_plusStep);
+
+        step = paramPstep - val;
+        setActiveParameter(iP, val);
+
+        for (size_t i = 0; i < nData; i++) 
+        {
+          jacobian.set(i,iP, 
+            (m_plusStep.getCalculated(i) - m_minusStep.getCalculated(i))/step);
+        }
+      }
+    }
 }
 
 
 } // namespace Numeric
+
+
+///\endcond TEMPLATE
