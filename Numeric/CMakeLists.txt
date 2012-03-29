@@ -30,6 +30,7 @@ set( INC_FILES
    inc/Numeric/PhysModel.h
 #   inc/Numeric/SeriesFunction.h
    inc/Numeric/SomeFunction.h
+   inc/Numeric/UserFunction1D.h
    inc/Numeric/V3D.h
    inc/Numeric/Vector.h
    )
@@ -54,6 +55,7 @@ set( SRC_FILES
   src/ParameterTie.cpp
 #  src/SeriesFunction.cpp
   src/SomeFunction.cpp
+  src/UserFunction1D.cpp
   src/Vector.cpp
   src/V3D.cpp
   src/PhysModel.cpp
@@ -90,6 +92,7 @@ set( SRC_FILES
   test/SeriesFunctionTest.cpp
   test/SimplexMinimizerTest.cpp
   test/SomeFunctionTest.cpp
+  test/UserFunction1DTest.cpp
   test/VectorTest.cpp
 )
 

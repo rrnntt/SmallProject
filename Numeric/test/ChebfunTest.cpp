@@ -5,7 +5,7 @@
 
 using namespace Numeric;
 
-TEST(ChebfunTest, Test)
+TEST(ChebfunTest, UniformFitTest)
 {
 }
 
