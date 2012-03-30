@@ -1,0 +1,5 @@
+
+class ${class_name}: public ${parent_class}
+{
+public:
+};
