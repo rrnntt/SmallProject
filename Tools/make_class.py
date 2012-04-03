@@ -24,13 +24,15 @@ is_algorithm = False
 if len(sys.argv) > 3:
 	if sys.argv[3] == 'singleton':
 		is_singleton = True
-	if sys.argv[3] == 'factory':
+	elif sys.argv[3] == 'factory':
 		is_singleton = True
 		is_factory = True
 		if len(sys.argv) > 4:
 			factory_type = sys.argv[4]
-	if sys.argv[3] == 'algorithm':
+	elif sys.argv[3] == 'algorithm':
 		is_algorithm = True
+	else:
+		raise Exception('Cannot create ' + sys.argv[3])
 
 # upper case names
 NAMESPACE_NAME = namespace_name.upper()
@@ -43,14 +45,27 @@ dictionary = {'Namespace':namespace_name,
 }
 
 # define the output file names
-header_file_name = class_name + '.h'
-cpp_file_name = class_name + '.cpp'
+header_folder = 'test'
+cpp_folder = 'test'
+test_folder = 'test'
+header_file_name = header_folder+'/'+class_name + '.h'
+cpp_file_name = cpp_folder+'/'+class_name + '.cpp'
 test_file_name = ''
 if namespace_name != 'GUI':
-	test_file_name = class_name + 'Test.cpp'
+	test_file_name = test_folder+'/'+class_name + 'Test.cpp'
+	
+#define template names
+header_template = ''
+cpp_template = ''
+if is_singleton:
+	header_template = 'SingletonHTemplate.txt'
+	cpp_template = 'SingletonCPPTemplate.txt'
+else:
+	header_template = 'ClassHTemplate.txt'
+	cpp_template = 'ClassCPPTemplate.txt'
 
-parse_file('ClassHTemplate.txt',header_file_name,dictionary)
-parse_file('ClassCPPTemplate.txt',cpp_file_name,dictionary)
+parse_file(header_template,header_file_name,dictionary)
+parse_file(cpp_template,cpp_file_name,dictionary)
 if len(test_file_name) > 0:
 	parse_file('ClassTestTemplate.txt',test_file_name,dictionary)
 
