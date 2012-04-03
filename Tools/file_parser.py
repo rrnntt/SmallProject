@@ -1,7 +1,7 @@
-import sys
-import os
-import os.path
-import shutil
+#import sys
+#import os
+#import os.path
+#import shutil
 
 def replace_templates(s,d):
 	'''
@@ -29,11 +29,12 @@ def parse_file(infile,outfile,d):
 	ofil.write(replace_templates(s,d))
 	ofil.close()
 		
-d = {'a':'b','b':'a'}
+if __name__ == "__main__":
+	d = {'a':'b','b':'a'}
 
-s = '${a} is b, ${b} is a'
+	s = '${a} is b, ${b} is a'
 
-print s
-print replace_templates(s,d)
+	print s
+	print replace_templates(s,d)
 
-parse_file('templ1.txt','class1.hxx',{'class_name':'Derived','parent_class':'Base'})
+	parse_file('templ1.txt','class1.hxx',{'class_name':'Derived','parent_class':'Base'})

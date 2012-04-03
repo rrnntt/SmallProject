@@ -1,0 +1,20 @@
+#include "${Namespace}/${ClassName}.h"
+
+namespace ${NAMESPACE}
+{
+
+/**
+ * Constructor.
+ */
+${ClassName}::${ClassName}()
+{
+}
+
+/**
+ * Destructor.
+ */
+${ClassName}::~${ClassName}()
+{
+}
+
+} // ${NAMESPACE}
