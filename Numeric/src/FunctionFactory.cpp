@@ -14,7 +14,7 @@ namespace Numeric
 
     FunctionFactory& FunctionFactory::instance()
     {
-      Singleton* s = API::Framework::instance().getSingleton("WorkspaceFactory");
+      Singleton* s = API::Framework::instance().getSingleton("FunctionFactory");
       if (s == nullptr)
       {
         FunctionFactory *f = new FunctionFactory();

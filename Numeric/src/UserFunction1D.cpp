@@ -1,6 +1,7 @@
 #include "Numeric/UserFunction1D.h"
 #include "Formula/Namespace.h"
 #include "Formula/Expression.h"
+#include "Formula/Scalar.h"
 
 namespace Numeric
 {
@@ -8,6 +9,15 @@ namespace Numeric
 /// Function you want to fit to.
 void UserFunction1D::function1D(double* out, const double* xValues, const size_t nData)const
 {
+  if (!m_namespace || !m_expression)
+  {
+    throw std::runtime_error("UserFunction1D is not set");
+  }
+  for(size_t i = 0; i < nData; ++i)
+  {
+    m_x = xValues[i];
+    out[i] = m_expression->eval().as<Formula::Scalar>();
+  }
 }
 
 /// Return a value of attribute attName
@@ -30,8 +40,12 @@ void UserFunction1D::setAttribute(const std::string& attName,const UserFunction1
   if (attName == "Formula")
   {
     m_formula = att.asString();
+    setFormula();
   }
-  throw std::runtime_error("Attribute " + attName + " is undefined");
+  else
+  {
+    throw std::runtime_error("Attribute " + attName + " is undefined");
+  }
 }
 
 /**
@@ -50,11 +64,19 @@ void UserFunction1D::setFormula()
   for(auto var = vars.begin(); var != vars.end(); ++var)
   {
     const std::string& varName = *var;
-    m_namespace->addVariable("Scalar",varName);
-    if (varName != "x")
+    if (varName == "x")
+    {
+      m_namespace->addVariable(Formula::Variable_ptr(new Formula::Scalar(&m_x)),varName);
+    }
+    else
     {
       this->declareParameter(varName);
     }
+  }
+  for(size_t i = 0; i < nParams(); ++i)
+  {
+    const std::string& varName = parameterName(i);
+    m_namespace->addVariable(Formula::Variable_ptr(new Formula::Scalar(this->getParameterAddress(i))),varName);
   }
   m_expression.reset(new Formula::Expression(m_namespace,parser));
 

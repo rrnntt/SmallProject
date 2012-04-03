@@ -3,6 +3,7 @@
 
 #include "Numeric/DllExport.h"
 #include "Numeric/IFunction1D.h"
+#include "Numeric/ParamFunction.h"
 
 namespace Formula
 {
@@ -13,9 +14,11 @@ namespace Formula
 namespace Numeric
 {
 
-class NUMERIC_EXPORT UserFunction1D: public IFunction1D
+class NUMERIC_EXPORT UserFunction1D: public IFunction1D, public ParamFunction
 {
 public:
+  /// Returns the function's name
+  virtual std::string name()const {return "UserFunction1D";}
   /// Function you want to fit to.
   virtual void function1D(double* out, const double* xValues, const size_t nData)const;
   /// Returns the number of attributes associated with the function
@@ -34,6 +37,8 @@ protected:
   /// namespace
   boost::shared_ptr<Formula::Namespace> m_namespace;
   boost::shared_ptr<Formula::Expression> m_expression;
+  /// the x variable
+  mutable double m_x;
 };
 
 } // namespace Numeric

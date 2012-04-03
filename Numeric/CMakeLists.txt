@@ -83,14 +83,14 @@ set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/ChebfunTest.cpp
-  test/ConjugateFRMinimizerTest.cpp
+  #test/ConjugateFRMinimizerTest.cpp
   test/DistributionTest.cpp
-  test/LeastSquaresTest.cpp
+  #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp
   test/FunctionPropertyTest.cpp
   test/ParamFunctionTest.cpp
   test/SeriesFunctionTest.cpp
-  test/SimplexMinimizerTest.cpp
+  #test/SimplexMinimizerTest.cpp
   test/SomeFunctionTest.cpp
   test/UserFunction1DTest.cpp
   test/VectorTest.cpp
