@@ -41,7 +41,8 @@ CLASS_NAME = class_name.upper()
 dictionary = {'Namespace':namespace_name,
 				'NAMESPACE':NAMESPACE_NAME,
 				'ClassName':class_name,
-				'CLASSNAME':CLASS_NAME
+				'CLASSNAME':CLASS_NAME,
+				'classname':CLASS_NAME.lower()
 }
 
 # define the output file names
@@ -57,7 +58,13 @@ if namespace_name != 'GUI':
 #define template names
 header_template = ''
 cpp_template = ''
-if is_singleton:
+if is_factory:
+	header_template = 'FactoryHTemplate.txt'
+	cpp_template = 'SingletonCPPTemplate.txt'
+	dictionary['FactoryType'] = factory_type
+	dictionary['FACTORYTYPE'] = factory_type.upper()
+	dictionary['factorytype'] = factory_type.lower()
+elif is_singleton:
 	header_template = 'SingletonHTemplate.txt'
 	cpp_template = 'SingletonCPPTemplate.txt'
 else:

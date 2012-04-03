@@ -7,7 +7,7 @@
 namespace ${Namespace}
 {
 
-class ${NAMESPACE}_EXPORT ${ClassName}, protected API::Singleton
+class ${NAMESPACE}_EXPORT ${ClassName}: protected API::Singleton
 {
 public:
   virtual std::string name() const {return "${ClassName}";}
