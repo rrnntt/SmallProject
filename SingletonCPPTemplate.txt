@@ -20,7 +20,7 @@ ${ClassName}& ${ClassName}::instance()
   API::Singleton* s = API::Framework::instance().getSingleton("${ClassName}");
   if (s == nullptr)
   {
-    ${ClassName} *f = new ${ClassName}("${ClassName}");
+    ${ClassName} *f = new ${ClassName}();
     API::Framework::instance().registerSingleton("${ClassName}",f);
     return *f;
   }

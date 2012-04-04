@@ -9,7 +9,7 @@ namespace Numeric
   size_t JointDomain::size() const
   {
     size_t n = 0;
-    std::for_each(m_domains.begin(),m_domains.end(),[&n](const FunctionDomain_ptr d){
+    std::for_each(m_domains.begin(),m_domains.end(),[&n](const FunctionDomain_sptr d){
       n += d->size();
     });
     return n;
@@ -24,7 +24,7 @@ namespace Numeric
   {
     return *m_domains.at(i);
   }
-  void JointDomain::addDomain(FunctionDomain_ptr domain)
+  void JointDomain::addDomain(FunctionDomain_sptr domain)
   {
     m_domains.push_back(domain);
   }

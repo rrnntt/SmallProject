@@ -5,9 +5,10 @@
 // Includes
 //----------------------------------------------------------------------
 #include "Numeric/DllExport.h"
-#include "Numeric/CostFunctionFactory.h"
 
 #include <boost/shared_ptr.hpp>
+
+#include <vector>
 
 namespace Numeric
 {
@@ -51,17 +52,7 @@ public:
 };
 
 /// define a shared pointer to a cost function
-typedef boost::shared_ptr<ICostFunction> ICostFunction_ptr;
-
-/**
- * Macro for declaring a new type of cost functions to be used with the CostFunctionFactory
- */
-#define DECLARE_COSTFUNCTION(classname,username) \
-        namespace { \
-	int register_costfunction_##classname( \
-  ((Numeric::CostFunctionFactory::instance().subscribe<classname>(#username)) \
-	, 0)); \
-	} 
+typedef boost::shared_ptr<ICostFunction> ICostFunction_sptr;
 
 } // namespace Numeric
 

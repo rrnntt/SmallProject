@@ -12,6 +12,7 @@ set( INC_FILES
    inc/Numeric/CostFuncFitting.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
+   inc/Numeric/FuncMinimizerFactory.h
    inc/Numeric/FunctionDomain.h
    inc/Numeric/FunctionDomain1D.h
    inc/Numeric/FunctionFactory.h
@@ -22,12 +23,15 @@ set( INC_FILES
    inc/Numeric/GSLVector.h
    inc/Numeric/IConstraint.h
    inc/Numeric/ICostFunction.h
+   inc/Numeric/IFuncMinimizer.h
    inc/Numeric/IFunction.h
    inc/Numeric/IFunction1D.h
    inc/Numeric/IFunctionValues.h
    inc/Numeric/IPeakFunction.h
    inc/Numeric/Jacobian.h
    inc/Numeric/JointDomain.h
+   inc/Numeric/LeastSquares.h
+   inc/Numeric/LevenbergMarquardt.h
    inc/Numeric/MultiDomainFunction.h
    inc/Numeric/ParameterReference.h
    inc/Numeric/ParameterTie.h
@@ -36,6 +40,7 @@ set( INC_FILES
    inc/Numeric/PhysModel.h
 #   inc/Numeric/SeriesFunction.h
    inc/Numeric/SomeFunction.h
+   inc/Numeric/StdJacobian.h
    inc/Numeric/UserFunction1D.h
    inc/Numeric/V3D.h
    inc/Numeric/Vector.h
@@ -47,15 +52,19 @@ set( SRC_FILES
   src/CostFunctionFactory.cpp
   src/CostFuncFitting.cpp
   src/Distribution.cpp
+  src/FuncMinimizerFactory.cpp
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp
   src/FunctionFactory.cpp
   src/FunctionProperty.cpp
   src/FunctionValues.cpp
+  src/IFuncMinimizer.cpp
   src/IFunction.cpp
   src/IFunction1D.cpp
   src/IPeakFunction.cpp
   src/JointDomain.cpp
+  src/LeastSquares.cpp
+  src/LevenbergMarquardt.cpp
   src/MultiDomainFunction.cpp
   src/ParamFunction.cpp
   src/ParameterReference.cpp
@@ -96,6 +105,10 @@ set( SRC_FILES
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp
   test/FunctionPropertyTest.cpp
+  test/FuncMinimizerFactoryTest.cpp
+  test/IFuncMinimizerTest.cpp
+  test/LeastSquaresTest.cpp
+  test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp
   test/SeriesFunctionTest.cpp
   #test/SimplexMinimizerTest.cpp

@@ -60,7 +60,7 @@ header_template = ''
 cpp_template = ''
 if is_factory:
 	header_template = 'FactoryHTemplate.txt'
-	cpp_template = 'SingletonCPPTemplate.txt'
+	cpp_template = 'FactoryCPPTemplate.txt'
 	dictionary['FactoryType'] = factory_type
 	dictionary['FACTORYTYPE'] = factory_type.upper()
 	dictionary['factorytype'] = factory_type.lower()

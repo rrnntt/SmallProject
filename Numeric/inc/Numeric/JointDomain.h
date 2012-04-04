@@ -23,9 +23,9 @@ public:
   virtual size_t getNParts() const;
   /// Return i-th domain
   virtual const FunctionDomain& getDomain(size_t i) const;
-  void addDomain(FunctionDomain_ptr domain);
+  void addDomain(FunctionDomain_sptr domain);
 protected:
-  std::vector< FunctionDomain_ptr > m_domains;
+  std::vector< FunctionDomain_sptr > m_domains;
 };
 
 } // namespace Numeric

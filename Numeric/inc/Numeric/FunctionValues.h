@@ -109,7 +109,7 @@ protected:
 };
 
 /// typedef for a shared pointer
-typedef boost::shared_ptr<FunctionValues> FunctionValues_ptr;
+typedef boost::shared_ptr<FunctionValues> FunctionValues_sptr;
 
 } // namespace Numeric
 

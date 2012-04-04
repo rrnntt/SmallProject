@@ -34,7 +34,7 @@ protected:
 };
 
 /// typedef for a shared pointer
-typedef boost::shared_ptr<IFunctionValues> IFunctionValues_ptr;
+typedef boost::shared_ptr<IFunctionValues> IFunctionValues_sptr;
 
 } // NUMERIC
 

@@ -26,7 +26,7 @@ public:
 
   /// Set fitting function.
   virtual void setFittingFunction(IFunction_sptr function, 
-    FunctionDomain_ptr domain, IFunctionValues_ptr values);
+    FunctionDomain_sptr domain, IFunctionValues_sptr values);
 
   /// Get fitting function.
   virtual IFunction_sptr getFittingFunction(){return m_function;}
@@ -39,8 +39,8 @@ public:
 
   /// Calculate fitting errors
   virtual void calFittingErrors(const GSLMatrix& covar);
-  FunctionDomain_ptr getDomain() const {return m_domain;}
-  IFunctionValues_ptr getValues() const {return m_values;}
+  FunctionDomain_sptr getDomain() const {return m_domain;}
+  IFunctionValues_sptr getValues() const {return m_values;}
 
 protected:
 
@@ -55,8 +55,8 @@ protected:
   void setDirty();
   
   IFunction_sptr m_function;
-  FunctionDomain_ptr m_domain;
-  IFunctionValues_ptr m_values;
+  FunctionDomain_sptr m_domain;
+  IFunctionValues_sptr m_values;
   std::vector<size_t> m_indexMap;
 
   mutable bool m_dirtyVal;
