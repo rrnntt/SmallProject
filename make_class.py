@@ -2,6 +2,8 @@ import sys
 import os
 import os.path
 import shutil
+import file_parser
+from file_parser import parse_file
 
 '''
 Creates a class template for SmallProject
@@ -22,150 +24,55 @@ is_algorithm = False
 if len(sys.argv) > 3:
 	if sys.argv[3] == 'singleton':
 		is_singleton = True
-	if sys.argv[3] == 'factory':
+	elif sys.argv[3] == 'factory':
 		is_singleton = True
 		is_factory = True
 		if len(sys.argv) > 4:
 			factory_type = sys.argv[4]
-	if sys.argv[3] == 'algorithm':
+	elif sys.argv[3] == 'algorithm':
 		is_algorithm = True
-
-
-header_ifdef = namespace_name + '_' + class_name + '_H'
-header_ifdef = header_ifdef.upper()
-has_namespace = namespace_name != 'GUI'
-has_dll_export = has_namespace
-tab = '  '
-if is_singleton or is_factory or is_algorithm:
-	is_subclass = True
-else:
-	is_subclass = False
-
-# start writing the class' header file
-header = '#ifndef ' + header_ifdef +'\n#define ' + header_ifdef + '\n\n'
-
-if has_dll_export:
-	header += '#include "' + namespace_name + '/DllExport.h"\n'
-	
-if is_singleton:
-	header += '#include "API/Singleton.h"\n'
-if is_algorithm:
-	header += '#include "API/Algorithm.h"\n'
-if is_factory:
-	header += '#include "Kernel/DynamicFactory.h"\n'
-header += '\n'
-
-if has_namespace:
-	header += 'namespace ' + namespace_name + '\n{\n\n'
-
-header += 'class '
-if has_dll_export: # add dll export stuff
-	header += namespace_name.upper() + '_EXPORT '
-
-header += class_name 
-if is_subclass:
-	header += ': '
-if is_singleton:
-	header += 'protected API::Singleton'
-if is_factory:
-	header += ', public Kernel::DynamicFactory<' + factory_type + '>'
-if is_algorithm:
-	header += 'public API::Algorithm'
-header += '\n{\n'
-header += 'public:\n'
-header += tab + class_name + '();\n'
-header += tab + '~' + class_name + '(){}\n'
-if is_singleton:
-	header += tab + 'virtual std::string name() const {return "' + class_name + '";}\n'
-	header += tab + 'static ' + class_name + '& instance();\n'
-if is_algorithm:
-	header += tab + 'virtual std::string name() const {return "' + class_name + '";}\n'
-	header += 'protected:\n' + tab + 'virtual void exec();\n'
-header += '};\n\n'
-
-if has_namespace:
-	header += '} // namespace ' + namespace_name + '\n'
-
-if is_factory:
-	type_split = factory_type.split('::')
-	if len(type_split) > 0:
-		type_name = type_split[len(type_split)-1]
 	else:
-		type_name = ''
-	header += '\n#define DECLARE_' + type_name.upper() + '(type) \\\n'
-	header += 'int declare_'+type_name.lower()+'_##type( ('+namespace_name+'::'+class_name+'::instance().subscribe<type>(#type),0));\n\n'
+		raise Exception('Cannot create ' + sys.argv[3])
 
-header += '#endif // ' + header_ifdef + '\n'
-# end writing the class' header file
+# upper case names
+NAMESPACE_NAME = namespace_name.upper()
+CLASS_NAME = class_name.upper()
 
+dictionary = {'Namespace':namespace_name,
+				'NAMESPACE':NAMESPACE_NAME,
+				'ClassName':class_name,
+				'CLASSNAME':CLASS_NAME,
+				'classname':CLASS_NAME.lower()
+}
 
-# start writing the source file
-source = '#include "'
-if has_namespace:
-	source += namespace_name + '/'
-source += class_name + '.h"\n'
-if is_singleton:
-	source += '#include "API/Framework.h"\n'
-if is_algorithm:
-	source += '#include "API/AlgorithmFactory.h"\n'
+# define the output file names
+header_folder = namespace_name+'/inc/'+namespace_name
+cpp_folder = namespace_name+'/src'
+test_folder = namespace_name+'/test'
+header_file_name = header_folder+'/'+class_name + '.h'
+cpp_file_name = cpp_folder+'/'+class_name + '.cpp'
+test_file_name = ''
+if namespace_name != 'GUI':
+	test_file_name = test_folder+'/'+class_name + 'Test.cpp'
+	
+#define template names
+header_template = ''
+cpp_template = ''
+if is_factory:
+	header_template = 'FactoryHTemplate.txt'
+	cpp_template = 'SingletonCPPTemplate.txt'
+	dictionary['FactoryType'] = factory_type
+	dictionary['FACTORYTYPE'] = factory_type.upper()
+	dictionary['factorytype'] = factory_type.lower()
+elif is_singleton:
+	header_template = 'SingletonHTemplate.txt'
+	cpp_template = 'SingletonCPPTemplate.txt'
+else:
+	header_template = 'ClassHTemplate.txt'
+	cpp_template = 'ClassCPPTemplate.txt'
 
-source += '\n'
-if has_namespace:
-	source += 'namespace ' + namespace_name + '\n{\n\n'
+parse_file(header_template,header_file_name,dictionary)
+parse_file(cpp_template,cpp_file_name,dictionary)
+if len(test_file_name) > 0:
+	parse_file('ClassTestTemplate.txt',test_file_name,dictionary)
 
-if is_algorithm:
-	source += 'DECLARE_ALGORITHM(' + class_name + ');\n\n'
-
-source += class_name + '::' + class_name + '()\n{\n}\n\n'
-
-if is_algorithm:
-	source += 'void ' + class_name + '::exec()\n{\n}\n\n'
-
-if is_singleton:
-	source += class_name + '& ' + class_name + '::' + 'instance()\n{\n'
-	source += tab + 'Singleton* s = API::Framework::instance().getSingleton("' + class_name + '");\n'
-	source += tab + 'if (s == nullptr)\n'+tab+'{\n'
-	source += tab + tab + class_name + ' *f = new ' + class_name + '();\n'
-	source += tab + tab + 'API::Framework::instance().registerSingleton("' + class_name + '",f);\n'
-	source += tab + tab + 'return *f;\n'
-	source += tab + '}\n'
-	source += tab + 'else\n'
-	source += tab + '{\n'
-	source += tab + tab + 'return *static_cast<' + class_name + '*>(s);\n'
-	source += tab + '}\n}\n\n'
-
-if has_namespace:
-	source += '} // namespace ' + namespace_name + '\n'
-# end writing the source file
-
-# start writing test file
-if has_namespace:
-	test = '#include "gtest/gtest.h"\n'
-	test += '#include "' + namespace_name + '/' + class_name + '.h"\n\n'
-	test += '#include <iostream>\n\n'
-	test += 'TEST('+class_name+'Test, Test)\n{\n}\n\n'
-# end writing test file
-
-# saving the code in files
-header_path = namespace_name + '/inc/'
-if has_namespace:
-	header_path += namespace_name + '/'
-header_path += class_name + '.h'
-source_path = namespace_name + '/src/' + class_name + '.cpp'
-test_path = namespace_name + '/test/' + class_name + 'Test.cpp'
-
-header_file = open(header_path,'w')
-header_file.write(header)
-header_file.close()
-
-source_file = open(source_path,'w')
-source_file.write(source)
-source_file.close()
-
-if has_namespace:
-	try:
-		test_file = open(test_path,'w')
-		test_file.write(test)
-		test_file.close()
-	except:
-		pass

@@ -18,7 +18,7 @@ TEST(UserFunction1DTest, Test)
   EXPECT_EQ(fun.getParameter("a"),1.0);
   EXPECT_EQ(fun.getParameter("b"),2.0);
 
-  FunctionDomain1D x(0,10,11);
+  FunctionDomain1DVector x(0,10,11);
   FunctionValues y(x);
   fun.function(x,y);
   for(size_t i = 0; i < y.size(); ++i)

@@ -110,7 +110,7 @@ namespace Numeric
   //  for( std::vector<std::string>::const_iterator it = names.begin(); 
   //       it != names.end(); ++it )
   //  {
-  //    IFunction_ptr func = this->createFitFunction(*it);
+  //    IFunction_sptr func = this->createFitFunction(*it);
   //    if ( func && dynamic_cast<FunctionType*>(func.get()) )
   //    {
   //      typeNames.push_back(*it);

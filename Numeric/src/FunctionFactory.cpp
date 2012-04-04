@@ -32,9 +32,9 @@ namespace Numeric
       g_log.debug("FunctionFactory created.");
     }
 
-    IFunction_ptr FunctionFactory::createFunction(const std::string& type) const
+    IFunction_sptr FunctionFactory::createFunction(const std::string& type) const
     {
-      IFunction_ptr fun = IFunction_ptr(create(type));
+      IFunction_sptr fun = IFunction_sptr(create(type));
       return fun;
     }
 
@@ -48,7 +48,7 @@ namespace Numeric
      * input = "name=LinearBackground,A0=0,A1=1; name = Gaussian, PeakCentre=10.,Sigma=1"
      * @return A pointer to the created function
      */
-    IFunction_ptr FunctionFactory::createInitialized(const std::string& input) const
+    IFunction_sptr FunctionFactory::createInitialized(const std::string& input) const
     {
       Kernel::EParser expr;
       try
@@ -64,7 +64,7 @@ namespace Numeric
       std::map<std::string,std::string> parentAttributes;
       if (e.name() == ";")
       {
-        IFunction_ptr fun = createComposite(e,parentAttributes);
+        IFunction_sptr fun = createComposite(e,parentAttributes);
         if (!fun) inputError();
         return fun;
       }
@@ -78,7 +78,7 @@ namespace Numeric
      * @param expr :: The input expression
      * @return A pointer to the created function
      */
-    IFunction_ptr FunctionFactory::createSimple(const Kernel::EParser& expr, std::map<std::string,std::string>& parentAttributes)const
+    IFunction_sptr FunctionFactory::createSimple(const Kernel::EParser& expr, std::map<std::string,std::string>& parentAttributes)const
     {
       if (expr.name() == "=" && expr.size() > 1)
       {
@@ -100,7 +100,7 @@ namespace Numeric
       }
       std::string fnName = term[1].name();
 
-      IFunction_ptr fun = createFunction(fnName);
+      IFunction_sptr fun = createFunction(fnName);
       for(auto t = terms.begin() + 1; t != terms.end(); ++t)
       {// loop over function's parameters/attributes
         term = *t;
@@ -211,7 +211,7 @@ namespace Numeric
       for(;it!=terms.end();++it)
       {
         const Kernel::EParser& term = *it;//->bracketsRemoved();
-        IFunction_ptr fun;
+        IFunction_sptr fun;
         std::map<std::string,std::string> pAttributes;
         if (term.name() == ";")
         {
@@ -266,7 +266,7 @@ namespace Numeric
      *    expression such as "0 < Sigma < 1" or a list of constraint expressions separated by commas ','
      *    and enclosed in brackets "(...)" .
      */
-    void FunctionFactory::addConstraints(IFunction_ptr fun,const Kernel::EParser& expr)const
+    void FunctionFactory::addConstraints(IFunction_sptr fun,const Kernel::EParser& expr)const
     {
       if (expr.name() == ",")
       {
@@ -286,7 +286,7 @@ namespace Numeric
      * @param fun :: The function
      * @param expr :: The constraint expression.
      */
-    void FunctionFactory::addConstraint(IFunction_ptr fun,const Kernel::EParser& expr)const
+    void FunctionFactory::addConstraint(IFunction_sptr fun,const Kernel::EParser& expr)const
     {
       IConstraint* c = ConstraintFactory::instance().createInitialized(fun.get(),expr);
       fun->addConstraint(c);
@@ -297,7 +297,7 @@ namespace Numeric
      * @param expr :: The tie expression: either parName = TieString or a list
      *   of name = string pairs
      */
-    void FunctionFactory::addTies(IFunction_ptr fun,const Kernel::EParser& expr)const
+    void FunctionFactory::addTies(IFunction_sptr fun,const Kernel::EParser& expr)const
     {
       if (expr.name() == "=")
       {
@@ -316,7 +316,7 @@ namespace Numeric
      * @param fun :: The function
      * @param expr :: The tie expression: parName = TieString
      */
-    void FunctionFactory::addTie(IFunction_ptr fun,const Kernel::EParser& expr)const
+    void FunctionFactory::addTie(IFunction_sptr fun,const Kernel::EParser& expr)const
     {
       if (expr.size() > 1)
       {// if size > 2 it is interpreted as setting a tie (last expr.term) to multiple parameters, e.g 
@@ -334,7 +334,7 @@ namespace Numeric
       * Create a fitting function from a string.
       * @param input :: The input string, has a form of a function call: funName(attr1=val,param1=val,...,ties=(param3=2*param1,...),constraints=(p2>0,...))
       */
-    IFunction_ptr FunctionFactory::createFitFunction(const std::string& input) const
+    IFunction_sptr FunctionFactory::createFitFunction(const std::string& input) const
     {
       Kernel::EParser expr;
       try
@@ -352,13 +352,13 @@ namespace Numeric
       * Create a fitting function from an expression.
       * @param expr :: The input expression made by parsing the input string to createFitFunction(const std::string& input)
       */
-    IFunction_ptr FunctionFactory::createFitFunction(const Kernel::EParser& expr) const
+    IFunction_sptr FunctionFactory::createFitFunction(const Kernel::EParser& expr) const
     {
       const Kernel::EParser& e = expr;//.bracketsRemoved();
 
       std::string fnName = e.name();
 
-      IFunction_ptr fun( create(fnName) );
+      IFunction_sptr fun( create(fnName) );
       if (!fun)
       {
         throw std::runtime_error("Cannot create function "+fnName);

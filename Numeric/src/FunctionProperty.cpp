@@ -12,7 +12,7 @@ namespace Numeric
     {
       throw std::runtime_error("Property does not convert to FunctionProperty");
     }
-    m_value = static_cast<IFunction_ptr>(*p);
+    m_value = static_cast<IFunction_sptr>(*p);
   }
 
   Kernel::Property& FunctionProperty::operator=(const std::string& str)

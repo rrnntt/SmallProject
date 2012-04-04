@@ -8,6 +8,8 @@ set( INC_FILES
    inc/Numeric/CompositeDomain.h
    inc/Numeric/CompositeFunction.h
    inc/Numeric/ConstraintFactory.h
+   inc/Numeric/CostFunctionFactory.h
+   inc/Numeric/CostFuncFitting.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
    inc/Numeric/FunctionDomain.h
@@ -15,10 +17,14 @@ set( INC_FILES
    inc/Numeric/FunctionFactory.h
    inc/Numeric/FunctionProperty.h
    inc/Numeric/FunctionValues.h
+   inc/Numeric/GSLJacobian.h
+   inc/Numeric/GSLMatrix.h
+   inc/Numeric/GSLVector.h
    inc/Numeric/IConstraint.h
    inc/Numeric/ICostFunction.h
    inc/Numeric/IFunction.h
    inc/Numeric/IFunction1D.h
+   inc/Numeric/IFunctionValues.h
    inc/Numeric/IPeakFunction.h
    inc/Numeric/Jacobian.h
    inc/Numeric/JointDomain.h
@@ -39,6 +45,7 @@ set( SRC_FILES
   src/CompositeFunction.cpp
   src/ConstraintFactory.cpp
   src/CostFunctionFactory.cpp
+  src/CostFuncFitting.cpp
   src/Distribution.cpp
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp
@@ -84,6 +91,7 @@ set( SRC_FILES
   test/main.cpp
   test/ChebfunTest.cpp
   #test/ConjugateFRMinimizerTest.cpp
+  test/CostFuncFittingTest.cpp
   test/DistributionTest.cpp
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp

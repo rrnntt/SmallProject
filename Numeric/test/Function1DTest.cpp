@@ -42,7 +42,7 @@ protected:
 TEST(Function1DTest, Test)
 {
   Function1DTestFunction fun;
-  FunctionDomain1D domain(0.0,1.0,10);
+  FunctionDomain1DVector domain(0.0,1.0,10);
   FunctionValues values(domain);
   fun.function(domain,values);
   for(size_t i = 0; i < domain.size(); ++i)

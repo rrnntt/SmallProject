@@ -89,7 +89,7 @@ public:
   /// Return parameter index from a parameter reference.
   size_t getParameterIndex(const ParameterReference& ref)const;
   /// Get the containing function
-  IFunction_ptr getContainingFunction(const ParameterReference& ref)const;
+  IFunction_sptr getContainingFunction(const ParameterReference& ref)const;
 
   /// Apply the ties
   void applyTies();
@@ -113,17 +113,17 @@ public:
              /* CompositeFunction own methods */
 
   /// Add a function at the back of the internal function list
-  virtual size_t addFunction(IFunction_ptr f);
+  virtual size_t addFunction(IFunction_sptr f);
   /// Returns the pointer to i-th function
-  IFunction_ptr getFunction(std::size_t i)const;
+  IFunction_sptr getFunction(std::size_t i)const;
   /// Number of functions
   std::size_t nFunctions()const{return m_functions.size();}
   /// Remove a function
   void removeFunction(size_t i);
   /// Replace a function
-  void replaceFunction(size_t i,IFunction_ptr f);
+  void replaceFunction(size_t i,IFunction_sptr f);
   /// Replace a function
-  void replaceFunctionPtr(const IFunction_ptr f_old,IFunction_ptr f_new);
+  void replaceFunctionPtr(const IFunction_sptr f_old,IFunction_sptr f_new);
   /// Get the function index
   std::size_t functionIndex(std::size_t i)const;
   /// Get the function index
@@ -172,7 +172,7 @@ private:
   static void parseName(const std::string& varName,size_t& index, std::string& name);
 
   /// Pointers to the included funtions
-  std::vector<IFunction_ptr> m_functions;
+  std::vector<IFunction_sptr> m_functions;
   /// Individual function parameter offsets (function index in m_functions)
   /// e.g. m_functions[i]->parameter(m_paramOffsets[i]+1) gives second declared parameter of i-th function
   std::vector<size_t> m_paramOffsets;

@@ -352,9 +352,9 @@ protected:
 };
 
 ///shared pointer to the function base class
-typedef boost::shared_ptr<IFunction> IFunction_ptr;
+typedef boost::shared_ptr<IFunction> IFunction_sptr;
 ///shared pointer to the function base class (const version)
-typedef boost::shared_ptr<const IFunction> IFunction_const_ptr;
+typedef boost::shared_ptr<const IFunction> IFunction_const_sptr;
 
 } // namespace Numeric
 

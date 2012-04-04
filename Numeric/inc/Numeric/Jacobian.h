@@ -4,13 +4,15 @@
 //----------------------------------------------------------------------
 // Includes
 //----------------------------------------------------------------------
+#include "Numeric/DllExport.h"
+
 namespace Numeric
 {
 /** 
     Represents the Jacobian in IFitFunction::functionDeriv.
 
 */
-class Jacobian
+class NUMERIC_EXPORT Jacobian
 {
 public:
   /**  Set a value to a Jacobian matrix element.

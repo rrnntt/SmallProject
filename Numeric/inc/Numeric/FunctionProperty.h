@@ -8,16 +8,16 @@
 namespace Numeric
 {
 
-class NUMERIC_EXPORT FunctionProperty: public Kernel::PropertyType<IFunction_ptr>
+class NUMERIC_EXPORT FunctionProperty: public Kernel::PropertyType<IFunction_sptr>
 {
 public:
-    FunctionProperty():PropertyType<IFunction_ptr>(){}
-    FunctionProperty(const IFunction_ptr& value):PropertyType<IFunction_ptr>(value){}
+    FunctionProperty():PropertyType<IFunction_sptr>(){}
+    FunctionProperty(const IFunction_sptr& value):PropertyType<IFunction_sptr>(value){}
     FunctionProperty(const Property& prop);
     virtual Property& operator=(const std::string& str);
     virtual operator std::string() const;
-    virtual operator IFunction_ptr() const {return m_value;}
-    virtual Property& operator=(const IFunction_ptr& value) {m_value = value; return *this;}
+    virtual operator IFunction_sptr() const {return m_value;}
+    virtual Property& operator=(const IFunction_sptr& value) {m_value = value; return *this;}
 };
 
 } // namespace Numeric
