@@ -1,10 +1,13 @@
 #include "Numeric/UserFunction1D.h"
+#include "Numeric/FunctionFactory.h"
 #include "Formula/Namespace.h"
 #include "Formula/Expression.h"
 #include "Formula/Scalar.h"
 
 namespace Numeric
 {
+
+DECLARE_FUNCTION(UserFunction1D);
 
 /// Function you want to fit to.
 void UserFunction1D::function1D(double* out, const double* xValues, const size_t nData)const

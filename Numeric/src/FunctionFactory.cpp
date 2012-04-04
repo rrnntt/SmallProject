@@ -144,20 +144,20 @@ namespace Numeric
      * @param expr :: The input expression
      * @return A pointer to the created function
      */
-    CompositeFunction_ptr FunctionFactory::createComposite(const Kernel::EParser& expr, std::map<std::string,std::string>& parentAttributes)const
+    CompositeFunction_sptr FunctionFactory::createComposite(const Kernel::EParser& expr, std::map<std::string,std::string>& parentAttributes)const
     {
       if (expr.name() != ";") inputError(expr.str());
 
       if (expr.size() == 0)
       {
-        return CompositeFunction_ptr();
+        return CompositeFunction_sptr();
       }
 
       auto terms = expr.terms();
       auto it = terms.begin();
       const Kernel::EParser& term = *it;//->bracketsRemoved();
 
-      CompositeFunction_ptr cfun;
+      CompositeFunction_sptr cfun;
       if (term.name() == "=")
       {
         if (term[0]->name() == "composite")
@@ -364,15 +364,27 @@ namespace Numeric
         throw std::runtime_error("Cannot create function "+fnName);
       }
 
-      auto terms = e.terms();
+      if (e.size() == 0)
+      {
+        return fun;
+      }
+      else if (e[0]->name() != ",")
+      {
+        throw std::runtime_error("createFitFunction: wrong syntax");
+      }
+
+      auto terms = e[0]->terms();
       auto term = terms.begin();
 
       for(;term!=terms.end();++term)
       {// loop over function's parameters/attributes
-        if ((*term)->name() == "=")
+        const Kernel::EParser& t = (**term);
+        if (t.name() == "=")
         {
-          std::string parName = (*term)[0].name();
-          std::string parValue = (*term)[1].str();
+          const Kernel::EParser* left = t[0];
+          const Kernel::EParser* right = t[1];
+          std::string parName = left->name();
+          std::string parValue = right->str();
           if (fun->hasAttribute(parName))
           {// set attribute
             if (parValue.size() > 1 && parValue[0] == '"')
@@ -398,14 +410,14 @@ namespace Numeric
         }
         else // if the term isn't a name=value pair it could be a member function of a composite function
         {
-          throw std::runtime_error("Composite functions are not implemented yet for IFunction");
-          //CompositeFunction* cfun = dynamic_cast<CompositeFunction*>(fun);
-          //if (!cfun)
-          //{
-          //  throw std::runtime_error("Cannot add a function to a non-composite function "+fnName);
-          //}
-          //IFunction* mem = createFitFunction(*term);
-          //cfun->addFunction(mem);
+          //throw std::runtime_error("Composite functions are not implemented yet for IFunction");
+          CompositeFunction_sptr cfun = boost::dynamic_pointer_cast<CompositeFunction>(fun);
+          if (!cfun)
+          {
+            throw std::runtime_error("Cannot add a function to a non-composite function "+fnName);
+          }
+          IFunction_sptr mem = createFitFunction(t);
+          cfun->addFunction(mem);
         }
       }// for term
 

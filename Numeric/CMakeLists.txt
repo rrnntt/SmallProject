@@ -104,6 +104,7 @@ set( SRC_FILES
   test/DistributionTest.cpp
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp
+  test/FunctionFactoryTest.cpp
   test/FunctionPropertyTest.cpp
   test/FuncMinimizerFactoryTest.cpp
   test/IFuncMinimizerTest.cpp

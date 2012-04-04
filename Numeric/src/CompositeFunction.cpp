@@ -15,9 +15,9 @@
 namespace Numeric
 {
 
-using std::size_t;
-
 DECLARE_FUNCTION(CompositeFunction)
+
+using std::size_t;
 
 /// Copy contructor
 CompositeFunction::CompositeFunction(const CompositeFunction& f):

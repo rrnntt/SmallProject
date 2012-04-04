@@ -31,7 +31,14 @@ void IFunction1D::functionDeriv(const FunctionDomain& domain, Jacobian& jacobian
   {
     throw std::invalid_argument("Unexpected domain in IFunction1D");
   }
-  functionDeriv1D(&jacobian,d1d->getPointerAt(0),d1d->size());
+  try
+  {
+    functionDeriv1D(&jacobian,d1d->getPointerAt(0),d1d->size());
+  }
+  catch(...)
+  {
+    this->calNumericalDeriv(domain,jacobian);
+  }
 }
 
 /** Base class implementation of derivative IFunction1D throws error. This is to check if such a function is provided

@@ -280,7 +280,7 @@ namespace Kernel
     EParser(const EParser* p);
     ~EParser();
     void parse(const std::string& str);
-    void log(const std::string& padding = "");
+    void log(const std::string& padding = "")const;
     Operators_ptr operators() const {return m_operators;}
       /// Returns this expression as a string. It does not simply returns the input string 
       /// but recreates it.

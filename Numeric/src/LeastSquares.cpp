@@ -58,7 +58,7 @@ double LeastSquares::val() const
 
 void LeastSquares::addVal(FunctionDomain_sptr domain, FunctionValues_sptr values)const
 {
-  m_function->function(*m_domain,*values);
+  m_function->function(*domain,*values);
   size_t ny = m_values->size();
 
   double retVal = 0.0;

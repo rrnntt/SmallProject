@@ -69,8 +69,8 @@ private:
 };
 
 /// typedef for a shared pointer to a FunctionDomain1D
-typedef boost::shared_ptr<FunctionDomain1D> FunctionDomain1D_ptr;
-typedef boost::shared_ptr<const FunctionDomain1D> FunctionDomain1D_const_ptr;
+typedef boost::shared_ptr<FunctionDomain1D> FunctionDomain1D_sptr;
+typedef boost::shared_ptr<const FunctionDomain1D> FunctionDomain1D_const_sptr;
 
 } // namespace Numeric
 

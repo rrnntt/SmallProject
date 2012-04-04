@@ -788,7 +788,7 @@ void EParser::sortPrecedence()
   m_terms.assign(new_terms.begin(),new_terms.end());
 }
 
-void EParser::log(const std::string& padding)
+void EParser::log(const std::string& padding)const
 {
   std::string op = m_op.empty() ? " " : m_op;
   std::cerr << padding << op << '['<<m_funct<<']';
