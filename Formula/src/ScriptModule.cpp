@@ -191,7 +191,7 @@ namespace Formula
             throw std::invalid_argument("Keyword argument expected in "+fnName);
           }
           Expression valExpr(m_namespace,arg[1]);
-          fun->setArgument(arg[0]->name(),valExpr.eval());
+          fun->setArgument(arg[0].name(),valExpr.eval());
         }
       }
       fun->eval();

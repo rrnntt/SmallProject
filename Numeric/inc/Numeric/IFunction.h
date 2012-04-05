@@ -199,7 +199,7 @@ public:
   /// Returns the function's name
   virtual std::string name()const = 0;
   /// Writes itself into a string
-  virtual std::string asString()const;
+  virtual std::string asString(bool fmt = false, size_t level = 0)const;
 
   /// The categories the Fit function belong to.
   /// Categories must be listed as a semi colon separated list.

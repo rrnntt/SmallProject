@@ -43,10 +43,10 @@ namespace Numeric
      * @param type :: The function's type
      * @return A pointer to the created function
      */
-    boost::shared_ptr<IFunction> createFunction(const std::string& type) const;
+    //boost::shared_ptr<IFunction> createFunction(const std::string& type) const;
 
-    ///Creates an instance of a function
-    boost::shared_ptr<IFunction> createInitialized(const std::string& input) const;
+    /////Creates an instance of a function
+    //boost::shared_ptr<IFunction> createInitialized(const std::string& input) const;
 
     ///Creates an instance of a function
     boost::shared_ptr<IFunction> createFitFunction(const std::string& input) const;

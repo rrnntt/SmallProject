@@ -91,10 +91,19 @@ void IFunction::removeTie(const std::string& parName)
  * Writes a string that can be used in Fit.IFunction to create a copy of this IFunction
  * @return string representation of the function
  */
-std::string IFunction::asString()const
+std::string IFunction::asString(bool fmt, size_t level)const
 {
+  std::string nl = fmt? "\n" : "";
+  std::string padding = fmt && level ? std::string(level*2,' ') : "";
+  std::string padding2 = padding + "  ";
+
   std::ostringstream ostr;
-  ostr << "name="<<this->name();
+  
+  // write function name
+  ostr << padding << this->name() << "(" << nl;
+  bool needComma = false;
+
+  // write function attributes
   std::vector<std::string> attr = this->getAttributeNames();
   for(size_t i=0;i<attr.size();i++)
   {
@@ -102,13 +111,27 @@ std::string IFunction::asString()const
     std::string attValue = this->getAttribute(attr[i]).value();
     if (!attValue.empty())
     {
-      ostr<<','<<attName<<'='<<attValue;
+      if (needComma)
+      {
+        ostr << ',' << nl;
+      }
+      needComma = true;
+      ostr << padding2 << attName << '=' << attValue;
     }
   }
+
+  // write function parameters
   for(size_t i=0;i<nParams();i++)
   {
-    ostr<<','<<parameterName(i)<<'='<<getParameter(i);
+    if (needComma)
+    {
+      ostr << ',' << nl;
+    }
+    needComma = true;
+    ostr << padding2 << parameterName(i) << '=' << getParameter(i);
   }
+
+  // write constraints
   std::string constraints;
   for(size_t i=0;i<nParams();i++)
   {
@@ -131,6 +154,7 @@ std::string IFunction::asString()const
     ostr << ",constraints=(" << constraints << ")";
   }
 
+  // write ties
   std::string ties;
   for(size_t i=0;i<nParams();i++)
   {
@@ -152,6 +176,7 @@ std::string IFunction::asString()const
   {
     ostr << ",ties=(" << ties << ")";
   }
+  ostr << nl << padding << ")";
   return ostr.str();
 }
 

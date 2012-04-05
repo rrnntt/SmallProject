@@ -39,8 +39,7 @@ TEST(ParamFunctionTest, Test)
   EXPECT_EQ(fun.nameOfActive(0),"A");
   EXPECT_EQ(fun.activeParameter(0),100);
   fun.unfix(2);
-  EXPECT_EQ(fun.nameOfActive(1),"C");
-  EXPECT_EQ(fun.activeParameter(1),300);
+  EXPECT_THROW(fun.nameOfActive(1),std::runtime_error);
   fun.unfix(1);
   EXPECT_EQ(fun.nameOfActive(1),"B");
   EXPECT_EQ(fun.activeParameter(1),200);

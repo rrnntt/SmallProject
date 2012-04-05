@@ -34,7 +34,22 @@ DECLARE_FUNCTION(FunctionFactoryTestFunction);
 
 TEST(FunctionFactoryTest, CreateFunctionTest)
 {
-  IFunction_sptr fun = FunctionFactory::instance().createFunction("FunctionFactoryTestFunction");
+  IFunction_sptr fun = FunctionFactory::instance().createFitFunction("FunctionFactoryTestFunction");
+  EXPECT_TRUE( fun.get() != nullptr );
+  //Function1DTestFunction fun;
+  FunctionDomain1DVector domain(0.0,1.0,10);
+  FunctionValues values(domain);
+  fun->function(domain,values);
+  for(size_t i = 0; i < domain.size(); ++i)
+  {
+    double x = domain[i];
+    EXPECT_EQ( 1.0 * x - 3.0, values.getCalculated(i));
+  }
+}
+
+TEST(FunctionFactoryTest, CreateFitFunction_with_brackets_Test)
+{
+  IFunction_sptr fun = FunctionFactory::instance().createFitFunction("FunctionFactoryTestFunction()");
   EXPECT_TRUE( fun.get() != nullptr );
   //Function1DTestFunction fun;
   FunctionDomain1DVector domain(0.0,1.0,10);
@@ -53,6 +68,7 @@ TEST(FunctionFactoryTest, CreateFitFunctionTest)
   EXPECT_TRUE( fun.get() != nullptr );
   EXPECT_EQ(fun->getParameter("A"),10);
   EXPECT_EQ(fun->getParameter("B"),20);
+  //std::cerr << fun->asString() << std::endl;
 }
 
 TEST(FunctionFactoryTest, CreateCompositeFunctionTest)
@@ -76,4 +92,17 @@ TEST(FunctionFactoryTest, CreateCompositeFunctionTest)
   EXPECT_EQ(cf->getParameter("f0.B"),20);
   EXPECT_EQ(cf->getParameter("f1.A"),30);
   EXPECT_EQ(cf->getParameter("f1.B"),40);
+
+  std::cerr << '\n' << fun->asString(true) << '\n' << std::endl;
+
+  IFunction_sptr fun1 = FunctionFactory::instance().createFitFunction(ini);
+  EXPECT_TRUE( fun1.get() != nullptr );
+  cf = boost::dynamic_pointer_cast<CompositeFunction>(fun1);
+  EXPECT_TRUE( cf.get() != nullptr );
+  EXPECT_EQ( cf->nFunctions(), 2 );
+  EXPECT_EQ(cf->getParameter("f0.A"),10);
+  EXPECT_EQ(cf->getParameter("f0.B"),20);
+  EXPECT_EQ(cf->getParameter("f1.A"),30);
+  EXPECT_EQ(cf->getParameter("f1.B"),40);
+
 }

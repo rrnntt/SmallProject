@@ -483,7 +483,9 @@ SeqParser(p)
 
 //-----------------------------------------------------
 /*--- EParser ---*/  
-EParser::EParser()
+EParser::EParser():
+m_ifrom(0),
+m_n(0)
 {
 
   m_operators.reset(new Operators());
@@ -508,14 +510,18 @@ EParser::EParser()
 }
 
 /// contructor
-EParser::EParser(const std::vector<std::string>& binary,const std::set<std::string>& unary)
+EParser::EParser(const std::vector<std::string>& binary,const std::set<std::string>& unary):
+m_ifrom(0),
+m_n(0)
 {
   m_operators.reset(new Operators());
   m_operators->add_operators(binary);
   m_operators->add_unary(unary);
 }
 
-EParser::EParser(Operators_ptr operators)
+EParser::EParser(Operators_ptr operators):
+m_ifrom(0),
+m_n(0)
 {
   m_operators = operators;
 }
@@ -524,12 +530,16 @@ EParser::EParser(const EParser& expr):
 m_funct(expr.m_funct),
 m_op(expr.m_op),
 m_terms(expr.m_terms),
-m_operators(expr.m_operators)
+m_operators(expr.m_operators),
+m_ifrom(expr.m_ifrom),
+m_n(expr.m_n)
 {
 }
 
 EParser::EParser(const EParser* pexpr)
-:m_operators(pexpr->m_operators)
+:m_operators(pexpr->m_operators),
+m_ifrom(0),
+m_n(0)
 {
 }
 
@@ -546,10 +556,10 @@ EParser::~EParser()
 
 void EParser::parse(const std::string& str)
 {
-  parse(str.begin(),str.end());
+  parse(str, str.begin(),str.end());
 }
 
-void EParser::parse(std::string::const_iterator start,std::string::const_iterator end)
+void EParser::parse(const std::string& str, std::string::const_iterator start,std::string::const_iterator end)
 {
   m_terms.clear();
   m_op = "";
@@ -583,11 +593,11 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
         m_funct = un_op;
         EParser* ep = new EParser;
         m_terms.push_back(ep);
-        ep->setFunct(firstTerm->getParser());
+        ep->setFunct(str,firstTerm->getParser());
       }
       else
       {// no unary operator
-        setFunct(firstTerm->getParser());
+        setFunct(str,firstTerm->getParser());
       }
     }
     else
@@ -595,7 +605,7 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
 
       m_op = "";
       m_funct = "void";
-      EParser* ep = addTerm(firstTerm->getParser());
+      EParser* ep = addTerm(str,firstTerm->getParser());
       if (un->hasMatch())
       {
         ep->m_op = un->match();
@@ -605,7 +615,7 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
         SeqParser* term = static_cast<SeqParser*>(otherTerms->getParser(i));
         if (term->hasMatch())
         {
-          EParser* ep = addTerm(term->getParser(1)); // TermParser
+          EParser* ep = addTerm(str,term->getParser(1)); // TermParser
           ep->m_op = term->getParser(0)->match();    // List of CharParser
         }
       }
@@ -618,9 +628,11 @@ void EParser::parse(std::string::const_iterator start,std::string::const_iterato
     m_funct = "void";
   }
 
+  m_ifrom = static_cast<size_t>(start - str.begin());
+  m_n = static_cast<size_t>(expr.getEnd() - expr.getStart());
 }
 
-void EParser::setFunct(IParser* parser)
+void EParser::setFunct(const std::string& str, IParser* parser)
 {
   TermParser* term = dynamic_cast<TermParser*>(parser);
   if(term)
@@ -632,6 +644,8 @@ void EParser::setFunct(IParser* parser)
   if (var || num)
   {
     m_funct = parser->match();
+    m_ifrom = static_cast<size_t>(parser->getStart() - str.begin());
+    m_n = static_cast<size_t>(parser->getEnd() - parser->getStart());
     return;
   }
   
@@ -640,7 +654,7 @@ void EParser::setFunct(IParser* parser)
   {
     auto start = brak->getInnerStart();
     auto end = brak->getInnerEnd();
-    this->parse(start,end);
+    this->parse(str,start,end);
     return;
   }
 
@@ -649,7 +663,7 @@ void EParser::setFunct(IParser* parser)
   {
     m_funct = fun->getParser(0)->match();
     EParser* ep = new EParser;
-    ep->parse(fun->getInnerStart(),fun->getInnerEnd());
+    ep->parse(str,fun->getInnerStart(),fun->getInnerEnd());
     if (ep->m_funct != "void")
     {
       m_terms.push_back(ep);
@@ -663,6 +677,8 @@ void EParser::setFunct(IParser* parser)
       //  //EParser& ep = m_terms.back();
       //}
     }
+    m_ifrom = static_cast<size_t>(fun->getStart() - str.begin());
+    m_n = static_cast<size_t>(fun->getEnd() - fun->getStart());
     return;
   }
   
@@ -671,10 +687,10 @@ void EParser::setFunct(IParser* parser)
   throw std::runtime_error("setFunct failed");
 }
 
-EParser* EParser::addTerm(IParser* parser)
+EParser* EParser::addTerm(const std::string& str, IParser* parser)
 {
   EParser* ep = new EParser;
-  ep->setFunct(parser);
+  ep->setFunct(str,parser);
   m_terms.push_back(ep);
   return ep;
 }
@@ -865,6 +881,34 @@ std::set<std::string> EParser::getVariables() const
   return vars;
 }
 
+/**
+ * Find direct parent of p among the children of this parser.
+ */
+const EParser& EParser::parentOf(const EParser& p) const
+{
+  const EParser* pp = findParentOf(&p);
+  return pp ? *pp : *this;
+}
 
+const EParser* EParser::findParentOf(const EParser* p) const
+{
+  if (size() == 0)
+  {
+    if (this != p)
+    {
+      return nullptr;
+    }
+    return this;
+  }
+
+  for(auto t = m_terms.begin(); t != m_terms.end(); ++t)
+  {
+    const EParser* pp = *t;//.findParentOf(p);
+    if (pp == p) return this;
+    pp = pp->findParentOf(p);
+    if (pp) return pp;
+  }
+  return nullptr;
+}
 
 } // Kernel

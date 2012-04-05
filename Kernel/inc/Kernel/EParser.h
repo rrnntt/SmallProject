@@ -299,22 +299,30 @@ namespace Kernel
     typedef std::vector<EParser*>::const_iterator iterator;
     iterator begin()const{return m_terms.begin();}
     iterator end()const{return m_terms.end();}
-    const EParser* operator[](size_t i)const{return m_terms.at(i);}
+    const EParser& operator[](size_t i)const{return *m_terms.at(i);}
     std::set<std::string> getVariables() const;
+
+    size_t getStartPos() const {return m_ifrom;}
+    size_t getStringSize() const {return m_n;}
+    const EParser& parentOf(const EParser& p) const;
   protected:
 
-    void parse(std::string::const_iterator start,std::string::const_iterator end);
-    void setFunct(IParser* parser);
-    EParser* addTerm(IParser* parser);
+    void parse(const std::string& str, std::string::const_iterator start,std::string::const_iterator end);
+    void setFunct(const std::string& str, IParser* parser);
+    EParser* addTerm(const std::string& str, IParser* parser);
     void moveTerms(EParser* ep);
     void sortPrecedence();
     IParser* createBinParser()const;
+    const EParser* findParentOf(const EParser* p) const;
 
     std::string m_funct; ///< Function name
     std::string m_op;    ///< Operator connecting this expression to its sibling on the left
     std::vector<EParser*> m_terms;///< Child expressions (function arguments)
 
     Operators_ptr m_operators;
+    
+    size_t m_ifrom;
+    size_t m_n;
 
   };
 

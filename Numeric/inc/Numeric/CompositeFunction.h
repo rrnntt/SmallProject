@@ -32,7 +32,7 @@ public:
   /// Returns the function's name
   virtual std::string name()const {return "CompositeFunction";}
   /// Writes itself into a string
-  std::string asString()const;
+  std::string asString(bool fmt = false, size_t level = 0)const;
   /// Function you want to fit to. 
   /// @param domain :: The buffer for writing the calculated values. Must be big enough to accept dataSize() values
   virtual void function(const FunctionDomain& domain, FunctionValues& values)const;

@@ -18,6 +18,7 @@ set( INC_FILES
    inc/Kernel/Notification.h
    inc/Kernel/EParser.h
    inc/Kernel/Operators.h
+   inc/Kernel/ParsedExpressionString.h
    inc/Kernel/Property.h
    inc/Kernel/PropertyManager.h
    inc/Kernel/Str.h
@@ -32,6 +33,7 @@ set( SRC_FILES
   src/LibraryWrapper.cpp
   src/EParser.cpp
   src/Operators.cpp
+  src/ParsedExpressionString.cpp
   src/Property.cpp
   src/PropertyManager.cpp
   src/Str.cpp
@@ -55,6 +57,7 @@ set( SRC_FILES
   test/main.cpp
   test/EParserTest.cpp
   test/GeometryTypesTest.cpp
+  test/ParsedExpressionStringTest.cpp
   test/PropertyTest.cpp
 )
 

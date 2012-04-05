@@ -66,25 +66,29 @@ void CompositeFunction::init()
  *   }
  * @return the string representation of the composite function
  */
-std::string CompositeFunction::asString()const
+std::string CompositeFunction::asString(bool fmt, size_t level)const
 {
+  std::string nl = fmt? "\n" : "";
+  std::string padding = fmt && level ? std::string(level*2,' ') : "";
+
   std::ostringstream ostr;
-  if (name() != "CompositeFunction")
-  {
-    ostr << "composite=" <<name() << ";";
-  }
+
+  // write function name
+  ostr << padding << name() << "(" << nl;
+
+  // write member functions
   for(size_t i=0;i<nFunctions();i++)
   {
     IFunction_sptr fun = getFunction(i);
-    bool isComp = boost::dynamic_pointer_cast<CompositeFunction>(fun) != 0;
-    if (isComp) ostr << '(';
-    ostr << fun->asString();
-    if (isComp) ostr << ')';
+    ostr << fun->asString(fmt,level + 1);
     if (i < nFunctions() - 1)
     {
-      ostr << ';';
+      ostr << ',';
     }
+      ostr << nl;
   }
+
+  // write ties
   std::string ties;
   for(size_t i=0;i<nParams();i++)
   {
@@ -100,7 +104,7 @@ std::string CompositeFunction::asString()const
         {
           if (!ties.empty())
           {
-            ties += ",";
+            ties += "," + nl;
           }
           ties += tmp;
         }
@@ -109,8 +113,9 @@ std::string CompositeFunction::asString()const
   }
   if (!ties.empty())
   {
-    ostr << ";ties=(" << ties << ")";
+    ostr << padding << "  ,ties=(" << nl << padding << "  " << ties << ")" << nl;
   }
+  ostr << padding << ")";
   return ostr.str();
 }
 

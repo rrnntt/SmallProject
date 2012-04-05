@@ -73,7 +73,7 @@ namespace Formula
       {
         throw std::invalid_argument("Actual function arguments must be passed as name=value");
       }
-      std::string name = arg[0]->name();
+      std::string name = arg[0].name();
       const Kernel::EParser& value = arg[1];
       setArgument(name,value);
     }
@@ -191,23 +191,23 @@ namespace Formula
   {
     if (code.name() == ":") // define variable
     {
-      std::string type = code[0]->name();
+      std::string type = code[0].name();
       std::string name,value = "";
-      if (code[1]->name() != "=")
+      if (code[1].name() != "=")
       {
-        name = code[1]->name();
+        name = code[1].name();
       }
       else
       {
         name = code[1][0].name();
-        Expression valExpr(m_local_namespace,(*code[1])[1]->str());
+        Expression valExpr(m_local_namespace,code[1][1].str());
         value = valExpr.eval().toString();
       }
       return new ScriptLineDef(m_local_namespace,type,name,value);
     }
     else if (code.name() == "=") // assign new value
     {
-      std::string name = code[0]->name();
+      std::string name = code[0].name();
       const Kernel::EParser& value = code[1];
       return new ScriptLineSet(m_local_namespace,name,Expression_ptr(new Expression(m_local_namespace,value)));
     }
@@ -259,7 +259,7 @@ namespace Formula
         {
           throw std::invalid_argument("Actual function arguments must be passed as name=value");
         }
-        std::string name = arg[0]->name();
+        std::string name = arg[0].name();
         const Kernel::EParser& value = arg[1];
         call->setArgument(name,value);
       }
