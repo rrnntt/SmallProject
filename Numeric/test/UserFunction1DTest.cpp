@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "Numeric/UserFunction1D.h"
+#include "Numeric/FunctionFactory.h"
 
 #include <iostream>
 
@@ -28,3 +29,8 @@ TEST(UserFunction1DTest, Test)
   }
 }
 
+TEST(UserFunction1DTest, FactoryTest)
+{
+  EXPECT_NO_THROW(FunctionFactory::instance().createFitFunction("UserFunction1D(Formula=a+ b * x)"));
+  EXPECT_NO_THROW(FunctionFactory::instance().createFitFunction("UserFunction1D(Formula=a+ b * x,a=1)"));
+}

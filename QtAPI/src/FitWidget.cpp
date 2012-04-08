@@ -70,6 +70,10 @@ bool FitWidget::eventFilter(QObject *obj, QEvent *ev)
       emit needUpdateExpression();
     }
   }
+  else if (ev->type() == QEvent::FocusOut)
+  {
+    std::cerr << "event " << ev->type() << std::endl;
+  }
   return QWidget::eventFilter(obj,ev);
 }
 
@@ -81,8 +85,7 @@ void FitWidget::updateExpression()
       m_form->teFunction->toPlainText().toStdString());
     if (fun)
     {
-      std::cerr << "Function OK" << std::endl;
-      m_expression.reset(fun->asString());
+      m_expression.reset(fun->asString(true));
       m_form->teFunction->setText(QString::fromStdString(m_expression));
     }
     else
@@ -93,7 +96,12 @@ void FitWidget::updateExpression()
   catch(std::exception& e)
   {
     TaskManager::instance().errorMessage(std::string("Error in function:\n")+e.what());
+    m_form->teFunction->setText(QString::fromStdString(m_expression));
   }
+}
+
+QString FitWidget::getFunction()
+{
 }
 
 /**
@@ -101,7 +109,9 @@ void FitWidget::updateExpression()
  */
 void FitWidget::addFunction()
 {
+  //updateExpression();
   std::cerr << "add function" << std::endl; 
+  auto fun = Numeric::FunctionFactory::instance().createFitFunction(m_expression);
 }
 
 } // QtAPI

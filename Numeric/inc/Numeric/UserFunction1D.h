@@ -29,6 +29,8 @@ public:
   virtual Attribute getAttribute(const std::string& attName)const;
   /// Set a value to attribute attName
   virtual void setAttribute(const std::string& attName,const Attribute& );
+  /// Check if attribute attName exists
+  virtual bool hasAttribute(const std::string& attName)const { return attName == "Formula";}
 protected:
   /// Parse the formula and create the expression
   void setFormula();

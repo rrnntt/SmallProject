@@ -21,6 +21,7 @@ public:
   ~FitWidget();
 protected:
   bool eventFilter(QObject *obj, QEvent *ev);
+  QString getFunction();
 signals:
   void needUpdateExpression();
 protected slots:

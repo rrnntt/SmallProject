@@ -18,6 +18,7 @@ set( INC_FILES
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/FileTask.h
    inc/QtAPI/FitWidget.h
+   inc/QtAPI/SelectFunctionDialog.h
    inc/QtAPI/SymbolBox.h
    inc/QtAPI/Task.h
    inc/QtAPI/Table.h
@@ -39,6 +40,7 @@ set( SRC_FILES
   src/PlotTask.cpp
   src/PatternBox.cpp
   src/PenStyleBox.cpp
+  src/SelectFunctionDialog.cpp
   src/SubWindow.cpp
   src/AddTableColumnDialog.cpp
   src/SymbolBox.cpp
@@ -67,6 +69,7 @@ set( MOC_HEADERS
    inc/QtAPI/Plot.h
    inc/QtAPI/PlotPicker.h
    inc/QtAPI/PlotTask.h
+   inc/QtAPI/SelectFunctionDialog.h
    inc/QtAPI/SymbolBox.h
    inc/QtAPI/Table.h
    inc/QtAPI/TableDialog.h
@@ -79,6 +82,7 @@ set( UI_FILES
    inc/QtAPI/FitWidget.ui
    inc/QtAPI/PlotDialog.ui
    inc/QtAPI/AddTableColumnDialog.ui
+   inc/QtAPI/SelectFunctionDialog.ui
    inc/QtAPI/TableDialog.ui
 )
 

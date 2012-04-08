@@ -9,6 +9,7 @@ set( INC_FILES
    #inc/Demo.h
    inc/FitBrowser.h
    inc/MainWindow.h
+   inc/MyApplication.h
    inc/ViewTask.h
    inc/WorkspaceExplorer.h
    )
@@ -19,6 +20,7 @@ set( SRC_FILES
   src/FitBrowser.cpp
   src/main.cpp
   src/MainWindow.cpp
+  src/MyApplication.cpp
   src/ViewTask.cpp
   src/WorkspaceExplorer.cpp
   )

@@ -339,7 +339,11 @@ namespace Numeric
       Kernel::EParser expr;
       try
       {
-        expr.parse(input);
+        std::string ini(input);
+        std::for_each(ini.begin(),ini.end(),[](char& c){
+          if (c == '\n') c = ' ';
+        });
+        expr.parse(ini);
       }
       catch(...)
       {
@@ -368,10 +372,10 @@ namespace Numeric
       {
         return fun;
       }
-      else if (e[0].name() != ",")
-      {
-        throw std::runtime_error("createFitFunction: wrong syntax");
-      }
+      //else if (e[0].name() != ",")
+      //{
+      //  throw std::runtime_error("createFitFunction: wrong syntax");
+      //}
 
       auto terms = e[0].terms();
       auto term = terms.begin();

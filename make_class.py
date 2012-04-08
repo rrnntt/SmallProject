@@ -46,7 +46,10 @@ dictionary = {'Namespace':namespace_name,
 }
 
 # define the output file names
-header_folder = namespace_name+'/inc/'+namespace_name
+if namespace_name == 'GUI':
+	header_folder = namespace_name+'/inc'
+else:
+	header_folder = namespace_name+'/inc/'+namespace_name
 cpp_folder = namespace_name+'/src'
 test_folder = namespace_name+'/test'
 header_file_name = header_folder+'/'+class_name + '.h'
