@@ -5,6 +5,7 @@
 #include "MainWindow.h"
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
+#include "FitBrowser.h"
 
 #include "QtAPI/TaskFactory.h"
 #include "QtAPI/WindowManager.h"
@@ -37,4 +38,6 @@ void ViewTask::setMainWindow(MainWindow* wnd)
   m_mainWindow->m_algorithmExplorer->hide();
   m_menu->addAction(m_mainWindow->m_workspaceExplorer->toggleViewAction());
   m_mainWindow->m_workspaceExplorer->hide();
+  m_menu->addAction(m_mainWindow->m_fitBrowser->toggleViewAction());
+  m_mainWindow->m_fitBrowser->hide();
 }

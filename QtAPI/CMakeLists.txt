@@ -17,6 +17,7 @@ set( INC_FILES
    inc/QtAPI/SubWindow.h
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/FileTask.h
+   inc/QtAPI/FitWidget.h
    inc/QtAPI/SymbolBox.h
    inc/QtAPI/Task.h
    inc/QtAPI/Table.h
@@ -43,6 +44,7 @@ set( SRC_FILES
   src/SymbolBox.cpp
   src/Task.cpp
   src/FileTask.cpp
+  src/FitWidget.cpp
   src/Table.cpp
   src/TableDialog.cpp
   src/TableTask.cpp
@@ -61,6 +63,7 @@ set( MOC_HEADERS
    inc/QtAPI/SubWindow.h
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/CurveManager.h
+   inc/QtAPI/FitWidget.h
    inc/QtAPI/Plot.h
    inc/QtAPI/PlotPicker.h
    inc/QtAPI/PlotTask.h
@@ -73,6 +76,7 @@ set( MOC_HEADERS
 )
 
 set( UI_FILES
+   inc/QtAPI/FitWidget.ui
    inc/QtAPI/PlotDialog.ui
    inc/QtAPI/AddTableColumnDialog.ui
    inc/QtAPI/TableDialog.ui
@@ -82,7 +86,7 @@ qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
 qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_library( QtAPI SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
-include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc ../Formula/inc 
+include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc ../Formula/inc ../Numeric/inc
 "${CMAKE_BINARY_DIR}/QtAPI"
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."
@@ -93,7 +97,7 @@ ${QT_QTOPENGL_INCLUDE_DIR}
 set_target_properties ( QtAPI PROPERTIES COMPILE_DEFINITIONS IN_QTAPI )
 
 target_link_libraries(QtAPI
-Kernel API DataObjects Formula qwt
+Kernel API DataObjects Formula Numeric qwt
 )
 
 target_link_libraries(QtAPI

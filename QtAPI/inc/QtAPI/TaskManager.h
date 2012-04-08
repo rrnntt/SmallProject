@@ -20,6 +20,7 @@ public:
   void setFrontTask(const std::string& taskName);
   template<class T>
   boost::shared_ptr<T> getAs(const std::string& tname) const;
+  void errorMessage(const std::string& mess) const;
 protected:
   TaskManager(const std::string& name);
   void registerDelayed();

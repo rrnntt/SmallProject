@@ -6,6 +6,8 @@
 
 #include "API/Framework.h"
 
+#include <QMessageBox>
+
 #include <iostream>
 
 namespace QtAPI
@@ -56,5 +58,12 @@ void TaskManager::registerDelayed()
   });
   m_to_be_registered.clear();
 }
+
+void TaskManager::errorMessage(const std::string& mess) const
+{
+  QMessageBox::critical(nullptr,"Error",QString::fromStdString(mess));
+}
+
+
 
 } // QtAPI

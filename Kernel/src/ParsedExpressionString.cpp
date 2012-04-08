@@ -13,6 +13,15 @@ m_expression(str)
 }
 
 /**
+ * Set a new expression string
+ */
+void ParsedExpressionString::reset(const std::string& str)
+{
+  m_expression = str;
+  m_parser.parse(m_expression);
+}
+
+/**
  * Return the inner-most parser containing symbol at position i.
  * @param i :: Position of the symbol in the string
  */

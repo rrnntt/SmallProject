@@ -3,6 +3,7 @@
 #include "ViewTask.h"
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
+#include "FitBrowser.h"
 
 #include "API/Framework.h"
 
@@ -38,6 +39,11 @@ MainWindow::MainWindow()
   m_workspaceExplorer = new WorkspaceExplorer(this);
   m_workspaceExplorer->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   this->addDockWidget(Qt::RightDockWidgetArea,m_workspaceExplorer);
+
+  // FitBrowser
+  m_fitBrowser = new FitBrowser(this);
+  m_fitBrowser->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  this->addDockWidget(Qt::LeftDockWidgetArea,m_fitBrowser);
 
   //createMenus();
 }

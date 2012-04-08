@@ -6,6 +6,7 @@
 
 class AlgorithmExplorer;
 class WorkspaceExplorer;
+class FitBrowser;
 
 class QMdiArea;
 class QMdiSubWindow;
@@ -36,6 +37,7 @@ private:
   QMdiArea* m_mdiArea;
   AlgorithmExplorer* m_algorithmExplorer;
   WorkspaceExplorer* m_workspaceExplorer;
+  FitBrowser* m_fitBrowser;
   friend class FileTask;
   friend class ViewTask;
 };
