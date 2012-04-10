@@ -1,9 +1,11 @@
 #include "QtAPI/FitWidget.h"
 #include "ui_FitWidget.h"
 #include "QtAPI/TaskManager.h"
+#include "QtAPI/SelectFunctionDialog.h"
 
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/IFunction.h"
+#include "Numeric/CompositeFunction.h"
 
 #include <QTextEdit>
 #include <QMenu>
@@ -102,6 +104,12 @@ void FitWidget::updateExpression()
 
 QString FitWidget::getFunction()
 {
+  auto dlg = new SelectFunctionDialog(this);
+  if (dlg->exec() == QDialog::Accepted)
+  {
+
+  }
+  return "";
 }
 
 /**
@@ -109,9 +117,26 @@ QString FitWidget::getFunction()
  */
 void FitWidget::addFunction()
 {
-  //updateExpression();
-  std::cerr << "add function" << std::endl; 
-  auto fun = Numeric::FunctionFactory::instance().createFitFunction(m_expression);
+
+  auto dlg = new SelectFunctionDialog(this);
+  if (dlg->exec() == QDialog::Accepted)
+  {
+    std::string fnName = dlg->getSelection().function;
+    auto f = Numeric::FunctionFactory::instance().createFitFunction(fnName);
+    //updateExpression();
+    std::cerr << "add function" << std::endl; 
+    auto fun = Numeric::FunctionFactory::instance().createFitFunction(m_expression);
+    auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(fun);
+    if (!cf)
+    {
+      cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(
+        Numeric::FunctionFactory::instance().createFitFunction("CompositeFunction"));
+      cf->addFunction(fun);
+    }
+    cf->addFunction(f);
+    m_expression.reset(cf->asString(true));
+    m_form->teFunction->setText(QString::fromStdString(m_expression));
+  }
 }
 
 } // QtAPI
