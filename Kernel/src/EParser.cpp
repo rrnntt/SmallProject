@@ -571,12 +571,16 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
   expr.addParser(new CharParser(' '),'*');
   TermParser* firstTerm = static_cast<TermParser*>(expr.addParser(new TermParser()));
 
-  std::string symbols = m_operators->getBinSymbols() + m_operators->getUnSymbols() + " ";
+  std::string symbols = m_operators->getBinSymbols() + m_operators->getUnSymbols();
   SeqParser* terms = new SeqParser;
   //terms->addParser(new CharParser(' '),'*');
-  terms->addParser(new CharParser(symbols),'+');
+  terms->addParser(new CharParser(symbols + " "),'+');
   //terms->addParser(new CharParser(' '),'*');
-  terms->addParser(new TermParser());
+  auto t = new TermParser();
+  auto seq = new SeqParser;
+  seq->addParser(new NotParser(symbols),'+');
+  t->addParser(seq);
+  terms->addParser(t);
 
   ListParser* otherTerms = static_cast<ListParser*>(expr.addParser(terms,'*'));
 
@@ -681,6 +685,13 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     m_n = static_cast<size_t>(fun->getEnd() - fun->getStart());
     return;
   }
+  else // unrecognized stuff
+  {
+    m_funct = parser->match();
+    m_ifrom = static_cast<size_t>(parser->getStart() - str.begin());
+    m_n = static_cast<size_t>(parser->getEnd() - parser->getStart());
+    return;
+  }
   
   //addParser(new BracketParser);
 
@@ -695,6 +706,10 @@ EParser* EParser::addTerm(const std::string& str, IParser* parser)
   return ep;
 }
 
+/**
+ * Create a parser for a binary operator. It is an AltParser trying all
+ * defined operators in turn.
+ */
 IParser* EParser::createBinParser()const
 {
   std::vector<std::string> ops = m_operators->getAllBinary();

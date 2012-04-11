@@ -33,6 +33,21 @@ TEST(EParserTest, NotString1)
   EXPECT_EQ(parser.match(),",abc");
 }
 
+TEST(EParserTest, NotParser) 
+{
+  std::string str("<stuff>=123");
+  NotParser parser("=,;");
+  parser.match(str);
+  EXPECT_TRUE(parser.hasMatch());
+  EXPECT_EQ(parser.match(),"<");
+
+  SeqParser seq;
+  seq.addParser(new NotParser("=,;"),'+');
+  seq.match(str);
+  EXPECT_TRUE(seq.hasMatch());
+  EXPECT_EQ(seq.match(),"<stuff>");
+}
+
 TEST(EParserTest, SeqList) 
 {
   SeqParser seq;
@@ -102,7 +117,7 @@ TEST(EParserTest, VarName)
   EXPECT_EQ(var.match(),"x12");
 }
 
-TEST(EParserTest, NUmber) 
+TEST(EParserTest, Number) 
 {
   std::string str = "12.34";
   NumberParser num;
@@ -217,4 +232,22 @@ TEST(EParserTest, UnaryAndBinary)
   EParser parser;
   parser.parse(str);
   EXPECT_EQ(parser.str(),"(x=-(1)+y)");
+}
+
+TEST(EParserTest, EParserOperators) 
+{
+  std::vector<std::string> ops;
+  ops.push_back(";");
+  ops.push_back(",");
+  ops.push_back("=");
+
+  // EParser must have at least 1 unary operator :-(
+  std::set<std::string> un;
+  un.insert("$");
+
+  std::string str = "x = y,z=  +x";
+  EParser parser(ops,un);
+  parser.parse(str);
+  parser.log();
+  EXPECT_EQ(parser.str(),"(x=y)");
 }

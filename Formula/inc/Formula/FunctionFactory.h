@@ -14,7 +14,7 @@ class FORMULA_EXPORT FunctionFactory: public Kernel::DynamicFactory<Function>, p
 public:
   /// constructor
   FunctionFactory();
-  virtual std::string name() const {return "FunctionFactory";}
+  virtual std::string name() const {return "Formula::FunctionFactory";}
   /// Returns reference to the global instance of the factory
   static FunctionFactory& instance();
   template<class F>

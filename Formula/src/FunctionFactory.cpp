@@ -9,11 +9,11 @@ namespace Formula
 
   FunctionFactory& FunctionFactory::instance()
   {
-    API::Singleton* s = API::Framework::instance().getSingleton("FunctionFactory");
+    API::Singleton* s = API::Framework::instance().getSingleton("Formula::FunctionFactory");
     if (s == nullptr)
     {
       FunctionFactory *vf = new FunctionFactory();
-      API::Framework::instance().registerSingleton("FunctionFactory",vf);
+      API::Framework::instance().registerSingleton("Formula::FunctionFactory",vf);
       return *vf;
     }
     else

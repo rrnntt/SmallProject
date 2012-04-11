@@ -20,7 +20,7 @@ m_form(new Ui::SelectFunctionDialog())
     m_form->cbFunction->addItem(QString::fromStdString(*f));
   }
   updateForm(0);
-  connect(m_form->cbFunction,SIGNAL(currentItemChanged(int)),this,SLOT(updateForm(int)));
+  connect(m_form->cbFunction,SIGNAL(currentIndexChanged(int)),this,SLOT(updateForm(int)));
 }
 
 /**
@@ -37,7 +37,7 @@ SelectFunctionDialog::~SelectFunctionDialog()
 void SelectFunctionDialog::updateForm(int i)
 {
   QString fun = m_form->cbFunction->currentText();
-  if (fun == "UserFunction1D")
+  if (fun != "UserFunction1D")
   {
     m_form->lblFormula->setVisible(false);
     m_form->leFormula->setVisible(false);

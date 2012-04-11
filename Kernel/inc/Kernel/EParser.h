@@ -44,6 +44,9 @@ namespace Kernel
   };
 
   //------------------------------------------------------------
+  /**
+   * Match 1 character from a list
+   */
   class KERNEL_EXPORT CharParser: public IParser
   {
   public:
@@ -57,6 +60,9 @@ namespace Kernel
   };
 
   //------------------------------------------------------------
+  /**
+   * Match 1 character not from a list
+   */
   class KERNEL_EXPORT NotParser: public IParser
   {
   public:
@@ -69,6 +75,9 @@ namespace Kernel
   };
 
   //------------------------------------------------------------
+  /**
+   * Match exact string
+   */
   class KERNEL_EXPORT StringParser: public IParser
   {
   public:
@@ -81,6 +90,9 @@ namespace Kernel
   };
 
   //------------------------------------------------------------
+  /**
+   * Match all characters until a string is found.
+   */
   class KERNEL_EXPORT NotStringParser: public IParser
   {
   public:
@@ -111,6 +123,9 @@ namespace Kernel
   };
 
   //------------------------------------------------------------
+  /**
+   * Match all characters 
+   */
   class KERNEL_EXPORT AllParser: public IParser
   {
   public:

@@ -37,16 +37,8 @@ namespace Numeric
   class NUMERIC_EXPORT FunctionFactory : public Kernel::DynamicFactory<IFunction>, protected API::Singleton
   {
   public:
-    virtual std::string name() const {return "FunctionFactory";}
+    virtual std::string name() const {return "Numeric::FunctionFactory";}
     static FunctionFactory& instance();
-    /**Creates an instance of a function
-     * @param type :: The function's type
-     * @return A pointer to the created function
-     */
-    //boost::shared_ptr<IFunction> createFunction(const std::string& type) const;
-
-    /////Creates an instance of a function
-    //boost::shared_ptr<IFunction> createInitialized(const std::string& input) const;
 
     ///Creates an instance of a function
     boost::shared_ptr<IFunction> createFitFunction(const std::string& input) const;

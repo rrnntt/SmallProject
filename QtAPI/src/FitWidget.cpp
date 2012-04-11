@@ -123,8 +123,16 @@ void FitWidget::addFunction()
   {
     std::string fnName = dlg->getSelection().function;
     auto f = Numeric::FunctionFactory::instance().createFitFunction(fnName);
+    if (f->name() == "UserFunction1D")
+    {
+      std::string formula = dlg->getSelection().formula;
+      if ( formula.empty() )
+      {
+        formula = "a + b * x";
+      }
+      f->setAttributeValue("Formula",formula);
+    }
     //updateExpression();
-    std::cerr << "add function" << std::endl; 
     auto fun = Numeric::FunctionFactory::instance().createFitFunction(m_expression);
     auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(fun);
     if (!cf)
