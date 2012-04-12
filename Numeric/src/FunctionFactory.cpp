@@ -161,7 +161,7 @@ namespace Numeric
       //  throw std::runtime_error("createFitFunction: wrong syntax");
       //}
 
-      auto terms = e[0].terms();
+      auto terms = e.terms();//e[0].terms();
       auto term = terms.begin();
 
       for(;term!=terms.end();++term)
