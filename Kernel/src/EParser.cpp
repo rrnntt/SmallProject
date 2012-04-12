@@ -668,7 +668,7 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     m_funct = fun->getParser(0)->match();
     EParser* ep = new EParser;
     ep->parse(str,fun->getInnerStart(),fun->getInnerEnd());
-    if (ep->m_funct != "void")
+    if (ep->m_funct != "void" && ep->m_funct != ",")
     {
       m_terms.push_back(ep);
     }
