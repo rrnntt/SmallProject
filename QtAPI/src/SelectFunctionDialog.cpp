@@ -53,10 +53,10 @@ SelectFunctionDialog::Selection SelectFunctionDialog::getSelection()const
 {
   Selection selection;
   selection.function = m_form->cbFunction->currentText().toStdString();
-  if (m_form->leFormula->isVisible())
-  {
+  //if (m_form->leFormula->isVisible())
+  //{
     selection.formula = m_form->leFormula->text().toStdString();
-  }
+  //}
   return selection;
 }
 
