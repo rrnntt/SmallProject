@@ -9,7 +9,7 @@ TEST(Kernel_ParsedExpressionString_Test, FunctionTest)
   EXPECT_EQ(static_cast<std::string>(ps), "Function(x,y)");
   EXPECT_EQ(ps.parser(4).name(), "Function");
   EXPECT_EQ(ps.parser(9).name(), "x");
-  EXPECT_EQ(ps.parser(10).name(), ",");
+  EXPECT_EQ(ps.parser(10).name(), "Function");
   EXPECT_EQ(ps.parser(11).name(), "y");
   EXPECT_EQ(ps.parser(12).name(), "Function");
 }

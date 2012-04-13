@@ -420,6 +420,19 @@ public:
 };
 DECLARE_FUNCTION(LogFunction,"log","Scalar");
 
+class ExpFunction: public ScalarFunction1Arg
+{
+public:
+  std::string type()const{return "ExpFunction";}
+  const Variable& eval()const
+  {
+    double arg = m_argv[0]().as<Scalar>();
+    m_return.setValue(exp(arg));
+    return m_return;
+  }
+};
+DECLARE_FUNCTION(ExpFunction,"exp","Scalar");
+
 class ScalarCompareFunction: public ReturnTypeFunction<Bool>
 {// "= != > >= < <="
 public:

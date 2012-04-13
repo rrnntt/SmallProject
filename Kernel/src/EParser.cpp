@@ -852,6 +852,9 @@ void EParser::moveTerms(EParser* ep)
   ep->m_terms.clear();
 }
 
+/**
+ * Convert expression to string
+ */
 std::string EParser::str(bool printOp)const
 {
   std::ostringstream res;
@@ -866,15 +869,25 @@ std::string EParser::str(bool printOp)const
     prec = 1000;
   }
 
+  bool brackets = prec == 1000;
+
   if (m_terms.size())
   {
-    bool bk = prec > m_operators->op_prec(m_terms[0]->m_funct);
-    if (bk) res << '(' ;
+    if (brackets)
+    {
+      res << '(' ;
+      prec = m_operators->op_prec(",");
+    }
     for(size_t i=0;i<m_terms.size();i++)
     {
+      size_t prec1 = m_operators->op_prec(m_terms[i]->m_funct);
+      if (prec1 == 0) prec1 = 1000;
+      bool bk = prec > prec1;
+      if (bk) res << '(' ;
       res << m_terms[i]->str(true).c_str();
+      if (bk) res <<')';
     }
-    if (bk) res <<')';
+    if (brackets) res << ')' ;
   }
   return res.str();
 }
