@@ -320,6 +320,8 @@ namespace Kernel
     size_t getStartPos() const {return m_ifrom;}
     size_t getStringSize() const {return m_n;}
     const EParser& parentOf(const EParser& p) const;
+    EParser& parentOf(const EParser& p);
+
   protected:
 
     void parse(const std::string& str, std::string::const_iterator start,std::string::const_iterator end);
@@ -339,6 +341,7 @@ namespace Kernel
     size_t m_ifrom;
     size_t m_n;
 
+    static const std::string g_spaces;
   };
 
 } // Kernel

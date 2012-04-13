@@ -12,6 +12,9 @@ class FitBrowser: public QDockWidget
 public:
   FitBrowser(QWidget *parent);
   ~FitBrowser();
+protected slots:
+  void saved();
+  void unsaved();
 };
 
 #endif // FITBROWSER_H

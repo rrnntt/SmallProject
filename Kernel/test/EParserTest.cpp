@@ -215,6 +215,9 @@ TEST(EParserTest, FunctionExpression)
   EParser parser;
   parser.parse(str);
   EXPECT_EQ(parser.str(),"sin(x+y)*1+somefun(x,1,2,sin(x))");
+
+  parser.parse("fun(\n)");
+  EXPECT_EQ(parser.str(),"fun");
 }
 
 TEST(EParserTest, String) 

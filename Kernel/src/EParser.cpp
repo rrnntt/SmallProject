@@ -461,16 +461,18 @@ std::string::const_iterator BracketParser::test(std::string::const_iterator star
 NameBracketParser::NameBracketParser(IParser* p):
 SeqParser()
 {
+  const std::string spaces(" \n\t");
   m_name = static_cast<VarNameParser*>(addParser(new VarNameParser));
-  addParser(new CharParser(' '),'*');
+  addParser(new CharParser(spaces),'*');
   m_brackets = static_cast<BracketParser*>(addParser(new BracketParser(p)));
 }
 
 NameBracketParser::NameBracketParser(const std::string& bra, const std::string& ket, IParser* p):
 SeqParser()
 {
+  const std::string spaces(" \n\t");
   m_name = static_cast<VarNameParser*>(addParser(new VarNameParser));
-  addParser(new CharParser(' '),'*');
+  addParser(new CharParser(spaces),'*');
   m_brackets = static_cast<BracketParser*>(addParser(new BracketParser(bra,ket,p)));
 }
 
@@ -483,6 +485,9 @@ SeqParser(p)
 
 //-----------------------------------------------------
 /*--- EParser ---*/  
+
+const std::string EParser::g_spaces = (" \n\t");
+
 EParser::EParser():
 m_ifrom(0),
 m_n(0)
@@ -566,16 +571,14 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
   m_funct = "";
 
   SeqParser expr;
-  expr.addParser(new CharParser(' '),'*');
+  expr.addParser(new CharParser(g_spaces),'*');
   IParser* un = expr.addParser(new CharParser(m_operators->getUnSymbols()),'*');
-  expr.addParser(new CharParser(' '),'*');
+  expr.addParser(new CharParser(g_spaces),'*');
   TermParser* firstTerm = static_cast<TermParser*>(expr.addParser(new TermParser()));
 
   std::string symbols = m_operators->getBinSymbols() + m_operators->getUnSymbols();
   SeqParser* terms = new SeqParser;
-  //terms->addParser(new CharParser(' '),'*');
-  terms->addParser(new CharParser(symbols + " "),'+');
-  //terms->addParser(new CharParser(' '),'*');
+  terms->addParser(new CharParser(symbols + g_spaces),'+');
   auto t = new TermParser();
   auto seq = new SeqParser;
   seq->addParser(new NotParser(symbols),'+');
@@ -634,6 +637,10 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
 
   m_ifrom = static_cast<size_t>(start - str.begin());
   m_n = static_cast<size_t>(expr.getEnd() - expr.getStart());
+  if (m_ifrom == 0 && m_n == 0)
+  {
+    throw std::runtime_error("Oops001");
+  }
 }
 
 void EParser::setFunct(const std::string& str, IParser* parser)
@@ -650,6 +657,7 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     m_funct = parser->match();
     m_ifrom = static_cast<size_t>(parser->getStart() - str.begin());
     m_n = static_cast<size_t>(parser->getEnd() - parser->getStart());
+  if (this->m_n == 0) throw std::runtime_error("Oops002");
     return;
   }
   
@@ -659,6 +667,7 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     auto start = brak->getInnerStart();
     auto end = brak->getInnerEnd();
     this->parse(str,start,end);
+  if (this->m_n == 0) throw std::runtime_error("Oops003");
     return;
   }
 
@@ -683,6 +692,7 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     }
     m_ifrom = static_cast<size_t>(fun->getStart() - str.begin());
     m_n = static_cast<size_t>(fun->getEnd() - fun->getStart());
+  if (this->m_n == 0) throw std::runtime_error("Oops004");
     return;
   }
   else // unrecognized stuff
@@ -690,9 +700,11 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     m_funct = parser->match();
     m_ifrom = static_cast<size_t>(parser->getStart() - str.begin());
     m_n = static_cast<size_t>(parser->getEnd() - parser->getStart());
+  if (this->m_n == 0) throw std::runtime_error("Oops005");
     return;
   }
   
+  if (this->m_n == 0) throw std::runtime_error("Oops006");
   //addParser(new BracketParser);
 
   throw std::runtime_error("setFunct failed");
@@ -703,6 +715,10 @@ EParser* EParser::addTerm(const std::string& str, IParser* parser)
   EParser* ep = new EParser;
   ep->setFunct(str,parser);
   m_terms.push_back(ep);
+  if (ep->m_n == 0)
+  {
+    throw std::runtime_error("Oops3");
+  }
   return ep;
 }
 
@@ -739,6 +755,10 @@ void EParser::sortPrecedence()
   size_t prec = 1000;
   for(auto term=m_terms.begin(); term!=m_terms.end(); ++term)
   {
+    if ((*term)->m_n == 0)
+    {
+      throw std::runtime_error("Oops4");
+    }
     // Build parser to parse a binary op followed by optional unary operator,
     // all surroun
     SeqParser op;
@@ -746,13 +766,13 @@ void EParser::sortPrecedence()
     // Binary ops start with the second term
     if (term != m_terms.begin())
     {
-      op.addParser(new CharParser(' '),'*');
+      op.addParser(new CharParser(g_spaces),'*');
       //bin = op.addParser(new CharParser(m_operators->getBinSymbols()),'*');
       bin = op.addParser(BinaryParser->clone());
     }
-    op.addParser(new CharParser(' '),'*');
+    op.addParser(new CharParser(g_spaces),'*');
     IParser* un = op.addParser(new CharParser(m_operators->getUnSymbols()),'*');
-    op.addParser(new CharParser(' '),'*');
+    op.addParser(new CharParser(g_spaces),'*');
     //std::cerr << "op='" << (**term).m_op << "'\n";
     op.match((**term).m_op);
     std::string un_op = un->hasMatch() && !un->isEmpty() ? un->match() : "";
@@ -762,6 +782,8 @@ void EParser::sortPrecedence()
     {
       EParser* new_term = new EParser;
       new_term->m_terms.push_back(*term);
+      new_term->m_ifrom = (*term)->m_ifrom;
+      new_term->m_n = (*term)->m_n;
       *term = new_term;
       (**term).m_funct = un_op;
       (**term).m_terms[0]->m_op = "";
@@ -772,6 +794,10 @@ void EParser::sortPrecedence()
       else
       {
         (**term).m_op = "";
+      }
+      if (new_term->m_n == 0)
+      {
+        throw std::runtime_error("Oops1");
       }
     }
     if (bin)
@@ -807,6 +833,8 @@ void EParser::sortPrecedence()
           p->m_terms.push_back(m_terms[j]);
         }
         p->sortPrecedence();
+        p->m_ifrom = p->m_terms.front()->m_ifrom;
+        p->m_n = p->m_terms.back()->m_ifrom + p->m_terms.back()->m_n - p->m_ifrom;
       }
       else
       {
@@ -814,6 +842,10 @@ void EParser::sortPrecedence()
       }
       i0 = i;
       new_terms.push_back(p);
+      if (p->m_n == 0)
+      {
+        throw std::runtime_error("Oops2");
+      }
     }
   }
   m_terms.assign(new_terms.begin(),new_terms.end());
@@ -915,6 +947,12 @@ std::set<std::string> EParser::getVariables() const
 const EParser& EParser::parentOf(const EParser& p) const
 {
   const EParser* pp = findParentOf(&p);
+  return pp ? *pp : *this;
+}
+
+EParser& EParser::parentOf(const EParser& p)
+{
+  EParser* pp = const_cast<EParser*>(findParentOf(&p));
   return pp ? *pp : *this;
 }
 

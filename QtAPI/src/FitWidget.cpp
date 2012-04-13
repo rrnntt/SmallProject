@@ -7,11 +7,14 @@
 #include "Numeric/IFunction.h"
 #include "Numeric/CompositeFunction.h"
 
+#include "DataObjects/TableWorkspace.h"
+
 #include <QTextEdit>
 #include <QMenu>
 #include <QAction>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QStringList>
 
 namespace QtAPI
 {
@@ -30,6 +33,15 @@ m_expression("CompositeFunction()")
   //m_form->teFunction->setReadOnly(true);
 
   connect(this,SIGNAL(needUpdateExpression()),this,SLOT(updateExpression()),Qt::QueuedConnection);
+  connect(m_form->teFunction,SIGNAL(textChanged()),this,SIGNAL(unsaved()));
+  connect(this,SIGNAL(needUpdateWorkspaces()),this,SLOT(fillWorkspaces()),Qt::QueuedConnection);
+
+  m_form->sbMaxIterations->setValue(500);
+  fillWorkspaces();
+
+  setHandler(this,&FitWidget::handleAdd);
+  setHandler(this,&FitWidget::handleDelete);
+  API::WorkspaceManager::instance().notificationCenter.addObserver(this);
 }
 
 /**
@@ -38,6 +50,26 @@ m_expression("CompositeFunction()")
 FitWidget::~FitWidget()
 {
   delete m_form;
+  API::WorkspaceManager::instance().notificationCenter.removeObserver(this);
+}
+
+void FitWidget::handleAdd(const API::WorkspaceManager::AddNotification& nt)
+{
+  needUpdateWorkspaces();
+}
+
+void FitWidget::handleDelete(const API::WorkspaceManager::DeleteNotification& nt)
+{
+  needUpdateWorkspaces();
+}
+
+/**
+ * Checks if a function name is registered.
+ * @param fName :: Function name to test.
+ */
+bool FitWidget::isFunction(const std::string& fName) const
+{
+  return Numeric::FunctionFactory::instance().exists(fName);
 }
 
 /**
@@ -53,13 +85,30 @@ bool FitWidget::eventFilter(QObject *obj, QEvent *ev)
     QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
     if (mev->button() == Qt::RightButton)
     {// right button - context menu
-      QMenu *context = new QMenu;
+      auto cursor = m_form->teFunction->cursorForPosition(mev->pos());
+      m_form->teFunction->setTextCursor(cursor);
+      int textPos = cursor.position();
+      if (textPos >= m_expression.size())
+      {
+        textPos = 0;
+      }
+      auto& pparser = m_expression.parser(textPos);
 
-      QAction *action = new QAction("Add function",this);
-      connect(action,SIGNAL(triggered()),this,SLOT(addFunction()));
-      context->addAction(action);
+      if ( isFunction(pparser.name()) )
+      {
+        auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(Numeric::FunctionFactory::instance().createFitFunction(pparser.name()));
+        if (cf)
+        {
+          QMenu *context = new QMenu;
 
-      context->exec(QCursor::pos());
+          QAction *action = new QAction("Add function",this);
+          connect(action,SIGNAL(triggered()),this,SLOT(addFunction()));
+          context->addAction(action);
+
+          context->exec(QCursor::pos());
+        }
+      }
+
       ev->accept();
       return true;
     }
@@ -74,11 +123,14 @@ bool FitWidget::eventFilter(QObject *obj, QEvent *ev)
   }
   else if (ev->type() == QEvent::FocusOut)
   {
-    std::cerr << "event " << ev->type() << std::endl;
+    //std::cerr << "event " << ev->type() << std::endl;
   }
   return QWidget::eventFilter(obj,ev);
 }
 
+/**
+ * Update m_expression to match the formula editor contents
+ */
 void FitWidget::updateExpression()
 {
   try
@@ -100,6 +152,16 @@ void FitWidget::updateExpression()
     TaskManager::instance().errorMessage(std::string("Error in function:\n")+e.what());
     m_form->teFunction->setText(QString::fromStdString(m_expression));
   }
+  emit saved();
+}
+
+/**
+ * Update the formula editor contents to match m_expression
+ */
+void FitWidget::updateEditor()
+{
+  m_form->teFunction->setText(QString::fromStdString(m_expression));
+  emit saved();
 }
 
 QString FitWidget::getFunction()
@@ -117,6 +179,13 @@ QString FitWidget::getFunction()
  */
 void FitWidget::addFunction()
 {
+  // text cursor position in the formula editor
+  int textPos = m_form->teFunction->textCursor().position();
+  if (textPos >= m_expression.size())
+  {
+    textPos = 0;
+  }
+  auto& pparser = m_expression.parser(textPos);
 
   auto dlg = new SelectFunctionDialog(this);
   if (dlg->exec() == QDialog::Accepted)
@@ -133,7 +202,7 @@ void FitWidget::addFunction()
       f->setAttributeValue("Formula",formula);
     }
     //updateExpression();
-    auto fun = Numeric::FunctionFactory::instance().createFitFunction(m_expression);
+    auto fun = Numeric::FunctionFactory::instance().createFitFunction(pparser.str());
     auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(fun);
     if (!cf)
     {
@@ -142,9 +211,31 @@ void FitWidget::addFunction()
       cf->addFunction(fun);
     }
     cf->addFunction(f);
-    m_expression.reset(cf->asString(true));
-    m_form->teFunction->setText(QString::fromStdString(m_expression));
+
+    std::string expr = m_expression;
+    expr.replace(pparser.getStartPos(),pparser.getStringSize(),cf->asString());
+    fun = Numeric::FunctionFactory::instance().createFitFunction(expr);
+    m_expression.reset(fun->asString(true));
+    updateEditor();
   }
+}
+
+void FitWidget::fillWorkspaces()
+{
+  m_form->cbWorkspace->blockSignals(true);
+  if (m_form->cbWorkspace->count() > 0)
+    m_form->cbWorkspace->clear();
+  auto wss = API::WorkspaceManager::instance().getAllOf<DataObjects::TableWorkspace>();
+  QStringList qNames;
+  std::cerr << "Names:\n";
+  for(auto ws = wss.begin(); ws != wss.end(); ++ws)
+  {
+    QString name = QString::fromStdString((**ws).name());
+    qNames << name;
+    std::cerr << (**ws).name() << std::endl;
+  }
+  m_form->cbWorkspace->insertItems(0,qNames);
+  m_form->cbWorkspace->blockSignals(false);
 }
 
 } // QtAPI

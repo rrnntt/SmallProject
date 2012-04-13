@@ -3,6 +3,7 @@
 
 #include "QtAPI/DllExport.h"
 #include "Kernel/ParsedExpressionString.h"
+#include "API/WorkspaceManager.h"
 
 #include <QWidget>
 
@@ -13,7 +14,7 @@ namespace Ui {
 namespace QtAPI
 {
 
-class QTAPI_EXPORT FitWidget: public QWidget
+class QTAPI_EXPORT FitWidget: public QWidget, public Kernel::NotificationObserver
 {
   Q_OBJECT
 public:
@@ -22,12 +23,21 @@ public:
 protected:
   bool eventFilter(QObject *obj, QEvent *ev);
   QString getFunction();
+  bool isFunction(const std::string& fName) const;
 signals:
   void needUpdateExpression();
+  void saved();
+  void unsaved();
+  void needUpdateWorkspaces();
 protected slots:
   void addFunction();
   void updateExpression();
+  void updateEditor();
+  void fillWorkspaces();
 private:
+  void handleAdd(const API::WorkspaceManager::AddNotification& nt);
+  void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);
+
   Ui::FitWidget *m_form;
   Kernel::ParsedExpressionString m_expression;
 };

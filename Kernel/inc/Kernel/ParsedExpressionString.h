@@ -20,6 +20,7 @@ public:
   operator const std::string& () const {return m_expression;}
   const EParser& parser() const {return m_parser;}
   const EParser& parser(size_t i) const;
+  size_t size() const {return m_expression.size();}
 protected:
   const EParser& findParser(const EParser& p, size_t i) const;
   std::string m_expression;///< the string

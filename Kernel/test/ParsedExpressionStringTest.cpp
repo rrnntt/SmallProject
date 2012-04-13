@@ -29,3 +29,11 @@ TEST(Kernel_ParsedExpressionString_Test, SumTest)
   EXPECT_EQ(ps.parser().parentOf(ps.parser(5)).name(), "+");
   EXPECT_EQ(ps.parser().parentOf(ps.parser(3)).name(), "+");
 }
+
+TEST(Kernel_ParsedExpressionString_Test, Function1Test)
+{
+  ParsedExpressionString ps("Function(fun(x=2),g(y=1))");
+  EXPECT_EQ(static_cast<std::string>(ps), "Function(x,y)");
+  EXPECT_EQ(ps.parser(15).name(), "=");
+}
+
