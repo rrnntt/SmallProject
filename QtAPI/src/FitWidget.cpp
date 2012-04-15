@@ -14,6 +14,8 @@
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
 
+#include "API/WorkspaceFactory.h"
+
 #include <QTextEdit>
 #include <QMenu>
 #include <QAction>
@@ -379,7 +381,21 @@ void FitWidget::fit()
     minimizer.initialize(Numeric::ICostFunction_sptr(leastSquares));
 
     minimizer.minimize();
-    std::cerr << fun->asString() << std::endl;
+    m_expression.reset(fun->asString(true));
+    updateEditor();
+
+    auto parsTable = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
+      API::Workspace_ptr(API::WorkspaceFactory::instance().create("TableWorkspace"))
+      );
+    parsTable->addColumn("string","Name");
+    parsTable->addColumn("double","Value");
+    for(size_t i = 0; i < fun->nParams(); ++i)
+    {
+      int row = parsTable->appendRow();
+      parsTable->getColumn(row)->cell<std::string>(i) = fun->parameterName(i);
+      parsTable->getColumn(row)->cell<double>(i) = fun->getParameter(i);
+    }
+    API::WorkspaceManager::instance().addOrReplace(wsName+"_Parameters",parsTable);
   }
   catch(std::exception& e)
   {
