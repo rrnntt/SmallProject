@@ -40,7 +40,7 @@ namespace DataObjects
     /// Removes a column.
     void removeColumn( const std::string& name);
     /// Number of columns in the workspace.
-    int columnCount() const {return static_cast<int>(m_columns.size());}
+    size_t columnCount() const {return m_columns.size();}
     /// Gets the shared pointer to a column.
     Column_ptr getColumn(const std::string& name);
     Column_ptr getColumn(const std::string& name)const;
@@ -51,7 +51,7 @@ namespace DataObjects
     /// Returns a vector of all column names.
     std::vector<std::string> getColumnNames();
     /// Number of rows in the workspace.
-    int rowCount() const {return m_rowCount;}
+    size_t rowCount() const {return m_rowCount;}
     /// Resizes the workspace.
     void setRowCount(int count);
     /// Inserts a row before row pointed to by index and fills it with default vales.
@@ -124,7 +124,7 @@ namespace DataObjects
     /// Shared pointers to the columns.
     std::vector< boost::shared_ptr<Column> > m_columns;
     /// row count
-    int m_rowCount;
+    size_t m_rowCount;
     std::string m_defaultSeparator; ///< default separator for saving in ascii files
     int m_defaultCurveStyle;///< 0-NoCurve, 1-Lines, 2-Sticks, 3-Steps, 4-Dots (must be the same as in qwt_plot_curve.h)
 

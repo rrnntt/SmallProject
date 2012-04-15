@@ -34,6 +34,8 @@ protected slots:
   void updateExpression();
   void updateEditor();
   void fillWorkspaces();
+  void fillColumns();
+  void fit();
 private:
   void handleAdd(const API::WorkspaceManager::AddNotification& nt);
   void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);

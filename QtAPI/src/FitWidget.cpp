@@ -6,8 +6,13 @@
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/IFunction.h"
 #include "Numeric/CompositeFunction.h"
+#include "Numeric/LeastSquares.h"
+#include "Numeric/LevenbergMarquardt.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include "DataObjects/TableWorkspace.h"
+#include "DataObjects/NumericColumn.h"
 
 #include <QTextEdit>
 #include <QMenu>
@@ -35,6 +40,8 @@ m_expression("CompositeFunction()")
   connect(this,SIGNAL(needUpdateExpression()),this,SLOT(updateExpression()),Qt::QueuedConnection);
   connect(m_form->teFunction,SIGNAL(textChanged()),this,SIGNAL(unsaved()));
   connect(this,SIGNAL(needUpdateWorkspaces()),this,SLOT(fillWorkspaces()),Qt::QueuedConnection);
+  connect(m_form->cbWorkspace,SIGNAL(currentIndexChanged()),this,SLOT(fillColumns()));
+  connect(m_form->btnFit,SIGNAL(clicked()),this,SLOT(fit()));
 
   m_form->sbMaxIterations->setValue(500);
   fillWorkspaces();
@@ -236,6 +243,149 @@ void FitWidget::fillWorkspaces()
   }
   m_form->cbWorkspace->insertItems(0,qNames);
   m_form->cbWorkspace->blockSignals(false);
+  fillColumns();
+}
+
+void FitWidget::fillColumns()
+{
+  if (m_form->cbWorkspace->count() == 0)
+  {
+    return;
+  }
+  try
+  {
+    auto ws = API::WorkspaceManager::instance().retrieve(m_form->cbWorkspace->currentText().toStdString());
+    auto tws = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(ws);
+    if (!tws) return;
+    QStringList colNames;
+    std::string xColumn;
+    std::string yColumn;
+    std::string errColumn;
+    // find all numeric columns
+    for(size_t i = 0;i<tws->columnCount(); ++i)
+    {
+      auto col = tws->getColumn(i);
+      auto num = col->asNumeric();
+      if (num)
+      {
+        colNames << QString::fromStdString(col->name());
+        if (xColumn.empty() && num->getPlotRole() == DataObjects::NumericColumn::X)
+        {
+          xColumn = col->name();
+        }
+        if (yColumn.empty() && num->getPlotRole() == DataObjects::NumericColumn::Y)
+        {
+          yColumn = col->name();
+        }
+        if (errColumn.empty() && num->getPlotRole() == DataObjects::NumericColumn::yError)
+        {
+          errColumn = col->name();
+        }
+      }
+    }
+
+    if (xColumn.empty() || yColumn.empty())
+    {
+      foreach(QString qname,colNames)
+      {
+        std::string name = qname.toStdString();
+        if (xColumn.empty())
+        {
+          if (name != yColumn)
+          {
+            xColumn = name;
+          }
+        }
+        if (yColumn.empty())
+        {
+          if (name != xColumn)
+          {
+            yColumn = name;
+          }
+        }
+      }
+    }
+    colNames.prepend("");
+    m_form->cbXColumn->insertItems(0,colNames);
+    if (!xColumn.empty())
+    {
+      m_form->cbXColumn->setCurrentIndex(m_form->cbXColumn->findText(QString::fromStdString(xColumn)));
+    }
+    m_form->cbYColumn->insertItems(0,colNames);
+    if (!yColumn.empty())
+    {
+      m_form->cbYColumn->setCurrentIndex(m_form->cbYColumn->findText(QString::fromStdString(yColumn)));
+    }
+    m_form->cbErrColumn->insertItems(0,colNames);
+    if (!errColumn.empty())
+    {
+      m_form->cbErrColumn->setCurrentIndex(m_form->cbErrColumn->findText(QString::fromStdString(errColumn)));
+    }
+  }
+  catch(...)
+  {
+    return;
+  }
+}
+
+void FitWidget::fit()
+{
+  std::string wsName = m_form->cbWorkspace->currentText().toStdString();
+  if (wsName.empty()) return;
+  try
+  {
+    auto ws = API::WorkspaceManager::instance().retrieve(wsName);
+    auto tws = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(ws);
+    if (!tws) throw std::runtime_error("Table workspace not found");
+    std::string xColumn = m_form->cbXColumn->currentText().toStdString();
+    if (xColumn.empty()) throw std::runtime_error("X column was not set");
+    std::string yColumn = m_form->cbYColumn->currentText().toStdString();
+    if (yColumn.empty()) throw std::runtime_error("Y column was not set");
+    std::string errColumn = m_form->cbErrColumn->currentText().toStdString();
+    auto xCol = tws->getColumn(xColumn)->asNumeric();
+    if (!xCol) throw std::runtime_error("Column " + xColumn + " must be numeric");
+    auto yCol = tws->getColumn(yColumn)->asNumeric();
+    if (!yCol) throw std::runtime_error("Column " + yColumn + " must be numeric");
+    DataObjects::NumericColumn* errCol = nullptr;
+    if (!errColumn.empty())
+    {
+      errCol = tws->getColumn(errColumn)->asNumeric();
+      if (!errCol) throw std::runtime_error("Column " + errColumn + " must be numeric");
+    }
+    std::vector<double> x;
+    std::vector<double> y;
+    std::vector<double> err;
+    xCol->fill(x);
+    yCol->fill(y);
+    if (errCol)
+    {
+      errCol->fill(err);
+    }
+    else
+    {
+      err.resize(y.size(),1.0);
+    }
+    Numeric::FunctionDomain1D_sptr domain(new Numeric::FunctionDomain1DVector(x));
+    Numeric::FunctionValues_sptr values(new Numeric::FunctionValues(*domain));
+    values->setFitData(y);
+    values->setFitWeights(err);
+
+    std::string ini = m_form->teFunction->toPlainText().toStdString();
+    auto fun = Numeric::FunctionFactory::instance().createFitFunction(ini);
+
+    Numeric::LeastSquares* leastSquares = new Numeric::LeastSquares;
+    leastSquares->setFittingFunction(fun,domain,values);
+    Numeric::LevenbergMarquardt minimizer;
+    minimizer.initialize(Numeric::ICostFunction_sptr(leastSquares));
+
+    minimizer.minimize();
+    std::cerr << fun->asString() << std::endl;
+  }
+  catch(std::exception& e)
+  {
+    TaskManager::instance().errorMessage(std::string("Fit failed:\n")+e.what());
+  }
+
 }
 
 } // QtAPI
