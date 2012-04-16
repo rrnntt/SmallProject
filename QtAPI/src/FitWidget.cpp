@@ -13,6 +13,7 @@
 
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
+#include "DataObjects/StringColumn.h"
 
 #include "API/WorkspaceFactory.h"
 
@@ -42,7 +43,7 @@ m_expression("CompositeFunction()")
   connect(this,SIGNAL(needUpdateExpression()),this,SLOT(updateExpression()),Qt::QueuedConnection);
   connect(m_form->teFunction,SIGNAL(textChanged()),this,SIGNAL(unsaved()));
   connect(this,SIGNAL(needUpdateWorkspaces()),this,SLOT(fillWorkspaces()),Qt::QueuedConnection);
-  connect(m_form->cbWorkspace,SIGNAL(currentIndexChanged()),this,SLOT(fillColumns()));
+  connect(m_form->cbWorkspace,SIGNAL(currentIndexChanged(int)),this,SLOT(fillColumns(int)));
   connect(m_form->btnFit,SIGNAL(clicked()),this,SLOT(fit()));
 
   m_form->sbMaxIterations->setValue(500);
@@ -248,7 +249,7 @@ void FitWidget::fillWorkspaces()
   fillColumns();
 }
 
-void FitWidget::fillColumns()
+void FitWidget::fillColumns(int)
 {
   if (m_form->cbWorkspace->count() == 0)
   {
@@ -307,6 +308,9 @@ void FitWidget::fillColumns()
         }
       }
     }
+    m_form->cbXColumn->clear();
+    m_form->cbYColumn->clear();
+    m_form->cbErrColumn->clear();
     colNames.prepend("");
     m_form->cbXColumn->insertItems(0,colNames);
     if (!xColumn.empty())
@@ -384,18 +388,55 @@ void FitWidget::fit()
     m_expression.reset(fun->asString(true));
     updateEditor();
 
+    // create a table with parameters
     auto parsTable = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
       API::Workspace_ptr(API::WorkspaceFactory::instance().create("TableWorkspace"))
       );
     parsTable->addColumn("string","Name");
     parsTable->addColumn("double","Value");
+    parsTable->setRowCount(fun->nParams());
+    auto nameColumn = static_cast<DataObjects::StringColumn*>(parsTable->getColumn(0).get());
+    auto& names = nameColumn->data();
+    auto valueColumn = static_cast<DataObjects::TableColumn<double>*>(parsTable->getColumn(1).get());
+    auto& vals = valueColumn->data();
     for(size_t i = 0; i < fun->nParams(); ++i)
     {
-      int row = parsTable->appendRow();
-      parsTable->getColumn(row)->cell<std::string>(i) = fun->parameterName(i);
-      parsTable->getColumn(row)->cell<double>(i) = fun->getParameter(i);
+      names[i] = fun->parameterName(i);
+      vals[i] = fun->getParameter(i);
     }
     API::WorkspaceManager::instance().addOrReplace(wsName+"_Parameters",parsTable);
+
+    // create a table with comparison data
+    auto diffTable = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
+      API::Workspace_ptr(API::WorkspaceFactory::instance().create("TableWorkspace"))
+      );
+    diffTable->addColumn("double",xColumn);
+    diffTable->addColumn("double",yColumn);
+    diffTable->addColumn("double","Calc");
+    diffTable->addColumn("double","Diff");
+    diffTable->setRowCount(x.size());
+    auto diffXColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn(xColumn).get());
+    auto& xs = diffXColumn->data();
+    auto diffYColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn(yColumn).get());
+    auto& ys = diffYColumn->data();
+    auto diffCalcColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn("Calc").get());
+    auto& cals = diffCalcColumn->data();
+    auto diffDiffColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn("Diff").get());
+    auto& diffs = diffDiffColumn->data();
+    assert(x.size() == xs.size());
+    
+    for(size_t i = 0; i < x.size(); ++i)
+    {
+      xs[i] = x[i];
+      ys[i] = y[i];
+      cals[i] = values->getCalculated(i);
+      diffs[i] = ys[i] - cals[i];
+    }
+    diffXColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::X);
+    diffYColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
+    diffCalcColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
+    diffDiffColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
+    API::WorkspaceManager::instance().addOrReplace(wsName+"_Calc",diffTable);
   }
   catch(std::exception& e)
   {

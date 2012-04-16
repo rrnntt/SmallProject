@@ -198,7 +198,7 @@ TEST(EParserTest, SimpleExpression)
   std::string str = " - x + y * 18 - (a + (b/c))";
   EParser parser;
   parser.parse(str);
-  EXPECT_EQ(parser.str(),"-(x)+y*18-a+b/c");
+  EXPECT_EQ(parser.str(),"-x+y*18-a+b/c");
 }
 
 TEST(EParserTest, MinusExpression) 
@@ -234,7 +234,7 @@ TEST(EParserTest, UnaryAndBinary)
   std::string str = "x = - 1 + y";
   EParser parser;
   parser.parse(str);
-  EXPECT_EQ(parser.str(),"x=-(1)+y");
+  EXPECT_EQ(parser.str(),"x=-1+y");
 }
 
 TEST(EParserTest, EParserOperators) 
@@ -277,4 +277,22 @@ TEST(EParserTest, EParserStr)
 
   parser.parse("fun(a,b,a+b,f(x,y,(z+1)^2))");
   EXPECT_EQ(parser.str(),"fun(a,b,a+b,f(x,y,(z+1)^2))");
+}
+
+TEST(EParserTest, EParserUnary) 
+{
+  EParser parser;
+
+  parser.parse("-a");
+  EXPECT_EQ(parser.str(),"-a");
+
+  parser.parse("-abs(x)");
+  EXPECT_EQ(parser.str(),"-abs(x)");
+
+  parser.parse("-(x+y)");
+  EXPECT_EQ(parser.str(),"-(x+y)");
+
+  parser.parse("-fun(x+y)");
+  EXPECT_EQ(parser.str(),"-fun(x+y)");
+
 }

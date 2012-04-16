@@ -34,7 +34,7 @@ protected slots:
   void updateExpression();
   void updateEditor();
   void fillWorkspaces();
-  void fillColumns();
+  void fillColumns(int i = 0);
   void fit();
 private:
   void handleAdd(const API::WorkspaceManager::AddNotification& nt);

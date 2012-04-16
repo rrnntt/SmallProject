@@ -5,6 +5,7 @@
 
 set( INC_FILES 
    inc/Numeric/Chebfun.h
+   inc/Numeric/Chebyshev.h
    inc/Numeric/CompositeDomain.h
    inc/Numeric/CompositeFunction.h
    inc/Numeric/ConstraintFactory.h
@@ -47,6 +48,7 @@ set( INC_FILES
    )
 set( SRC_FILES 
   src/Chebfun.cpp
+  src/Chebyshev.cpp
   src/CompositeFunction.cpp
   src/ConstraintFactory.cpp
   src/CostFunctionFactory.cpp

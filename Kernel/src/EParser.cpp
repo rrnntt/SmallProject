@@ -903,6 +903,15 @@ std::string EParser::str(bool printOp)const
 
   bool brackets = prec == 1000;
 
+  if (brackets && m_operators->is_unary(m_funct))
+  {
+    size_t prec1 = m_operators->op_prec(m_terms.front()->name());
+    if (prec1 == 0)
+    {
+      brackets = false;
+    }
+  }
+
   if (m_terms.size())
   {
     if (brackets)
