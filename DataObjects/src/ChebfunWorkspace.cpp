@@ -6,7 +6,8 @@ namespace DataObjects
 
 DECLARE_WORKSPACE(ChebfunWorkspace);
 
-ChebfunWorkspace::ChebfunWorkspace()
+ChebfunWorkspace::ChebfunWorkspace():
+m_fun(new Numeric::chebfun)
 {
 }
 

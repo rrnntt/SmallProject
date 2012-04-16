@@ -5,11 +5,14 @@
 
 set( INC_FILES 
    inc/DataObjects/DllExport.h
+   inc/DataObjects/AddChebfun.h
+   inc/DataObjects/ChebfunToTable.h
    inc/DataObjects/ChebfunWorkspace.h
    inc/DataObjects/Column.h
    inc/DataObjects/ColumnVector.h
    inc/DataObjects/CompoundColumn.h
    inc/DataObjects/ColumnFactory.h
+   inc/DataObjects/CopyChebfun.h
    inc/DataObjects/NumericColumn.h
    inc/DataObjects/StringColumn.h
    inc/DataObjects/TableColumn.h
@@ -22,11 +25,14 @@ set( INC_FILES
    inc/DataObjects/CreateDistribution.h
    )
 set( SRC_FILES 
+   src/AddChebfun.cpp
+   src/ChebfunToTable.cpp
    src/ChebfunWorkspace.cpp
    src/Column.cpp
    src/ColumnVector.cpp
    src/NumericColumn.cpp
    src/ColumnFactory.cpp
+   src/CopyChebfun.cpp
    src/StringColumn.cpp
    src/TableColumn.cpp
    src/TableWorkspace.cpp
@@ -49,6 +55,7 @@ target_link_libraries(DataObjects Kernel API Formula Numeric)
 
 set( SRC_FILES 
   test/main.cpp
+  test/AddChebfunTest.cpp
   test/ChebfunWorkspaceTest.cpp
   test/CreateChebfunTest.cpp
   test/CalculateColumnValuesTest.cpp

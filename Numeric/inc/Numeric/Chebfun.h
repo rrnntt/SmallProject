@@ -2,6 +2,7 @@
 #define NUMERIC_CHEBFUN_H
 
 #include "Numeric/DllExport.h"
+
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
@@ -9,6 +10,8 @@ typedef double (*AFunction)(double);
 
 namespace Numeric
 {
+  class IFunction;
+
   class NUMERIC_EXPORT chebfun
   {
   public:
@@ -23,8 +26,10 @@ namespace Numeric
     void setEndX(const double& d);
     void setRange(const double& s,const double& e);
     double& param(size_t i){return m_a.at(i);}
-    const std::vector<double>& points()const{return *m_x;}
+    const std::vector<double>& xpoints()const{return *m_x;}
+    const std::vector<double>& ypoints()const{return m_p;}
     void fit(AFunction f){fit<AFunction>(f);}
+    void fit(const IFunction& ifun);
     template<class T>
     void fit(T f)
     {
@@ -83,6 +88,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator+=(AFunction f){return this->operator+=<AFunction>(f);}
+    chebfun& operator+=(const chebfun& f);
 
     /// -= operators
     chebfun& operator-=(double v)
@@ -103,6 +109,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator-=(AFunction f){return this->operator-=<AFunction>(f);}
+    chebfun& operator-=(const chebfun& f);
 
     /// *= operators
     chebfun& operator*=(double v)
@@ -123,6 +130,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator*=(AFunction f){return this->operator*=<AFunction>(f);}
+    chebfun& operator*=(const chebfun& f);
 
     /// /= operators
     chebfun& operator/=(double v)
@@ -143,6 +151,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator/=(AFunction f){return this->operator/=<AFunction>(f);}
+    chebfun& operator/=(const chebfun& f);
 
     double integrate(int pwr = 1);
 

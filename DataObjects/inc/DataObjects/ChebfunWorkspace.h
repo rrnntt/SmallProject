@@ -22,7 +22,8 @@ public:
   void setEndX(const double& d){m_fun->setEndX(d);}
   void setRange(const double& s,const double& e){m_fun->setRange(s,e);}
   double& param(size_t i){return m_fun->param(i);}
-  const std::vector<double>& points()const{return m_fun->points();}
+  const std::vector<double>& xpoints()const{return m_fun->xpoints();}
+  Numeric::chebfun& fun() {return *m_fun;}
 protected:
   Numeric::chebfun_ptr m_fun;
 };

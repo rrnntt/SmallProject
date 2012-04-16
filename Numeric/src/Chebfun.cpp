@@ -1,4 +1,7 @@
 #include "Numeric/Chebfun.h"
+#include "Numeric/IFunction.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_fft_real.h>
@@ -423,6 +426,100 @@ namespace Numeric
     double res = gsl_integration_glfixed (&fun, m_startX,m_endX, quad);
     gsl_integration_glfixed_table_free(quad);
     return res;
+  }
+
+  void chebfun::fit(const IFunction& ifun)
+  {
+    m_p.resize(m_x->size());
+    calcX();
+    FunctionDomain1DView domain(m_x->data(),m_x->size());
+    FunctionValues values(domain);
+    ifun.function(domain,values);
+    for(size_t i=0;i<m_x->size();++i)
+    {
+      m_p[i] = values.getCalculated(i);
+    }
+    calcA();
+  }
+
+  chebfun& chebfun::operator+=(const chebfun& f)
+  {
+    if (m_x == f.m_x)
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] += f.m_p[i];
+      }
+    }
+    else
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] += f((*m_x)[i]);
+      }
+    }
+    calcA();
+    return *this;
+  }
+
+  chebfun& chebfun::operator-=(const chebfun& f)
+  {
+    if (m_x == f.m_x)
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] -= f.m_p[i];
+      }
+    }
+    else
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] -= f((*m_x)[i]);
+      }
+    }
+    calcA();
+    return *this;
+  }
+
+  chebfun& chebfun::operator*=(const chebfun& f)
+  {
+    if (m_x == f.m_x)
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] *= f.m_p[i];
+      }
+    }
+    else
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] *= f((*m_x)[i]);
+      }
+    }
+    calcA();
+    return *this;
+  }
+
+  chebfun& chebfun::operator/=(const chebfun& f)
+  {
+    if (m_x == f.m_x)
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] /= f.m_p[i];
+      }
+    }
+    else
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        m_p[i] /= f((*m_x)[i]);
+      }
+    }
+    calcA();
+    return *this;
   }
 
 } // Numeric

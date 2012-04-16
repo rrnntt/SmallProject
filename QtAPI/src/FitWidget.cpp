@@ -95,6 +95,11 @@ bool FitWidget::eventFilter(QObject *obj, QEvent *ev)
     QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
     if (mev->button() == Qt::RightButton)
     {// right button - context menu
+      
+      if (m_form->teFunction->textCursor().hasSelection())
+      {// if editor has a selection - do default stuff
+        return QWidget::eventFilter(obj,ev);
+      }
       auto cursor = m_form->teFunction->cursorForPosition(mev->pos());
       m_form->teFunction->setTextCursor(cursor);
       int textPos = cursor.position();
@@ -104,19 +109,26 @@ bool FitWidget::eventFilter(QObject *obj, QEvent *ev)
       }
       auto& pparser = m_expression.parser(textPos);
 
+      bool doAddFunction = textPos == 0;
+
       if ( isFunction(pparser.name()) )
       {
         auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(Numeric::FunctionFactory::instance().createFitFunction(pparser.name()));
         if (cf)
         {
-          QMenu *context = new QMenu;
-
-          QAction *action = new QAction("Add function",this);
-          connect(action,SIGNAL(triggered()),this,SLOT(addFunction()));
-          context->addAction(action);
-
-          context->exec(QCursor::pos());
+          doAddFunction = true;
         }
+      }
+
+      if (doAddFunction)
+      {
+        QMenu *context = new QMenu;
+
+        QAction *action = new QAction("Add function",this);
+        connect(action,SIGNAL(triggered()),this,SLOT(addFunction()));
+        context->addAction(action);
+
+        context->exec(QCursor::pos());
       }
 
       ev->accept();
@@ -211,8 +223,10 @@ void FitWidget::addFunction()
       }
       f->setAttributeValue("Formula",formula);
     }
+
     //updateExpression();
     auto fun = Numeric::FunctionFactory::instance().createFitFunction(pparser.str());
+
     auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(fun);
     if (!cf)
     {
@@ -220,10 +234,17 @@ void FitWidget::addFunction()
         Numeric::FunctionFactory::instance().createFitFunction("CompositeFunction"));
       cf->addFunction(fun);
     }
-    cf->addFunction(f);
 
     std::string expr = m_expression;
-    expr.replace(pparser.getStartPos(),pparser.getStringSize(),cf->asString());
+    if (cf->nFunctions() > 0)
+    {
+      cf->addFunction(f);
+      expr.replace(pparser.getStartPos(),pparser.getStringSize(),cf->asString());
+    }
+    else
+    {
+      expr = f->asString();
+    }
     fun = Numeric::FunctionFactory::instance().createFitFunction(expr);
     m_expression.reset(fun->asString(true));
     updateEditor();
