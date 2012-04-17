@@ -8,6 +8,8 @@
 #include <gsl/gsl_integration.h>
 //#include <gsl/gsl_fft_halfcomplex.h>
 
+#include <boost/lexical_cast.hpp>
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <algorithm>
@@ -38,6 +40,7 @@ namespace Numeric
     */
   chebfun& chebfun::operator=(const chebfun& other)
   {
+    m_n = other.m_n;
     m_startX = other.m_startX;
     m_endX = other.m_endX;
     m_x = other.m_x;
@@ -442,6 +445,17 @@ namespace Numeric
     calcA();
   }
 
+  void chebfun::fit(AFunction f)
+  {
+    m_p.resize(m_x->size());
+    calcX();
+    for(size_t i=0;i<m_x->size();++i)
+    {
+      m_p[i] = f((*m_x)[i]);
+    }
+    calcA();
+  }
+
   chebfun& chebfun::operator+=(const chebfun& f)
   {
     if (m_x == f.m_x)
@@ -522,5 +536,46 @@ namespace Numeric
     return *this;
   }
 
-} // Numeric
+  /**
+   * Assign m_p directly from p.
+   * @param p :: Values to assign to m_p. Sizes of vectors must match exactly.
+   */
+  void chebfun::setP(const std::vector<double>& p)
+  {
+    const size_t n = p.size();
+    if (m_p.size() != n) throw std::runtime_error("chebfun::setP: Wrong size " + 
+      boost::lexical_cast<std::string>(m_p.size()) + " " + boost::lexical_cast<std::string>(n)
+      );
+    m_p.assign(p.begin(),p.end());
+    calcA();
+  }
 
+  /**
+   * Create a chebfun from uniform data.
+   * @param start :: Start of the interval
+   * @param end :: End of the interval.
+   * @param p :: Vector with function values to fit to. p[0] is at start, p[n-1] is at end.
+   *   Values in between are positioned uniformly in the interval [start,end]. Distance between
+   *   adjacent values dx = (end - start) / (n - 1)
+   */
+  void chebfun::uniformFit(double start, double end, const std::vector<double>& p)
+  {
+    const double PI = 2*acos(0.0);
+    chebfun cheb(p.size() - 1, -1.0, 1.0);
+    cheb.setP(p);
+
+    // increase order to improve acuracy
+    set(3*p.size(), start, end);
+    const double D = end - start;
+
+    for(size_t i = 0; i < m_x->size(); ++i)
+    {
+      double xx = (*m_x)[i];
+      double xx1 = cos(PI*(xx - start) / D);
+      m_p[i] = cheb(xx1);
+      //std::cerr << xx << ' ' << xx1 << ' ' << cheb(xx1) -  p[n - 1 - i] << std::endl;
+    }
+    calcA();
+  }
+
+} // Numeric

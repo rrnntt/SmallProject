@@ -28,19 +28,9 @@ namespace Numeric
     double& param(size_t i){return m_a.at(i);}
     const std::vector<double>& xpoints()const{return *m_x;}
     const std::vector<double>& ypoints()const{return m_p;}
-    void fit(AFunction f){fit<AFunction>(f);}
     void fit(const IFunction& ifun);
-    template<class T>
-    void fit(T f)
-    {
-      m_p.resize(m_x->size());
-      calcX();
-      for(size_t i=0;i<m_x->size();++i)
-      {
-        m_p[i] = f((*m_x)[i]);
-      }
-      calcA();
-    }
+    void fit(AFunction f);
+    void uniformFit(double start, double end, const std::vector<double>& p);
     /// calculate value at point x using the m_a's and treating them as expansion coefficients over Chebyshev T polynomials
     double valueT(const double& x)const;
     /// calculate value at point x using the m_a's and treating them as expansion coefficients over Chebyshev U polynomials
@@ -61,11 +51,9 @@ namespace Numeric
       fit(f);
       return *this;
     }
-    template<class T>
-    chebfun& operator=(const T& f)
+    chebfun& operator=(const double& f)
     {
-      std::fill(m_p.begin(),m_p.end(),0.0);
-      (*this)+=f;
+      std::fill(m_p.begin(),m_p.end(),f);
       return *this;
     }
 
@@ -77,8 +65,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator+=(int v){return *this+=double(v);}
-    template<class T>
-    chebfun& operator+=(const T& f)
+    chebfun& operator+=(AFunction f)
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -87,7 +74,7 @@ namespace Numeric
       calcA();
       return *this;
     }
-    chebfun& operator+=(AFunction f){return this->operator+=<AFunction>(f);}
+    
     chebfun& operator+=(const chebfun& f);
 
     /// -= operators
@@ -98,8 +85,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator-=(int v){return *this-=double(v);}
-    template<class T>
-    chebfun& operator-=(T f)
+    chebfun& operator-=(AFunction f)
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -108,7 +94,7 @@ namespace Numeric
       calcA();
       return *this;
     }
-    chebfun& operator-=(AFunction f){return this->operator-=<AFunction>(f);}
+    
     chebfun& operator-=(const chebfun& f);
 
     /// *= operators
@@ -119,8 +105,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator*=(int v){return *this*=double(v);}
-    template<class T>
-    chebfun& operator*=(T f)
+    chebfun& operator*=(AFunction f)
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -129,7 +114,7 @@ namespace Numeric
       calcA();
       return *this;
     }
-    chebfun& operator*=(AFunction f){return this->operator*=<AFunction>(f);}
+    
     chebfun& operator*=(const chebfun& f);
 
     /// /= operators
@@ -140,8 +125,7 @@ namespace Numeric
       return *this;
     }
     chebfun& operator/=(int v){return *this/=double(v);}
-    template<class T>
-    chebfun& operator/=(T f)
+    chebfun& operator/=(AFunction f)
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -150,16 +134,18 @@ namespace Numeric
       calcA();
       return *this;
     }
-    chebfun& operator/=(AFunction f){return this->operator/=<AFunction>(f);}
+    
     chebfun& operator/=(const chebfun& f);
 
     double integrate(int pwr = 1);
 
     void calcP(); ///< calc m_p form m_a
-  private:
+  protected:
 
     void calcX();
     void calcA(); ///< calc m_a from m_p
+    /// Set m_p vector of function values directly from a std::vector. Size of p must be == m_p.size()
+    void setP(const std::vector<double>& p);
 
     int m_n;                 ///< polynomial order
     double m_startX,m_endX;  ///< set boundaries where the function is defined
@@ -167,7 +153,6 @@ namespace Numeric
     boost::shared_ptr< std::vector<double> > m_w; ///< some weights used in the barycentric formula, m_n + 1 items
     std::vector<double> m_p; ///< function values at m_x points, m_n + 1 items
     std::vector<double> m_a; ///< polynomial coefficients, m_n + 1 items
-    friend class chebfunTest;
   };
 
   typedef boost::shared_ptr<chebfun> chebfun_ptr;
