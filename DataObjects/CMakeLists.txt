@@ -23,6 +23,7 @@ set( INC_FILES
    inc/DataObjects/CreateChebfun.h
    inc/DataObjects/CreateUniformRandomData.h
    inc/DataObjects/CreateDistribution.h
+   inc/DataObjects/EvalChebfun.h
    inc/DataObjects/UniformChebfun.h
    )
 set( SRC_FILES 
@@ -43,6 +44,7 @@ set( SRC_FILES
    src/CreateChebfun.cpp
    src/CreateUniformRandomData.cpp
    src/CreateDistribution.cpp
+   src/EvalChebfun.cpp
    src/UniformChebfun.cpp
   )
 add_library( DataObjects SHARED ${SRC_FILES} ${INC_FILES} )
