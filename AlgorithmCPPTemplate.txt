@@ -1,0 +1,23 @@
+#include "${Namespace}/${ClassName}.h"
+
+#include "API/AlgorithmFactory.h"
+#include "API/WorkspaceProperty.h"
+
+#include "Kernel/CommonProperties.h"
+
+namespace ${Namespace}
+{
+
+DECLARE_ALGORITHM(${ClassName});
+
+/// Constructor. Declare algorithm properties.
+${ClassName}::${ClassName}()
+{
+}
+
+/// Execute algorithm.
+void ${ClassName}::exec()
+{
+}
+
+} // namespace ${Namespace}

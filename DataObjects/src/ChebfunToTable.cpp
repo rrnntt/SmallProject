@@ -58,8 +58,8 @@ void ChebfunToTable::exec()
   Numeric::chebfun& fun = cws->fun();
   if (n == fun.n())
   {
-    x.assign(fun.xpoints().begin(),fun.xpoints().end());
-    y.assign(fun.ypoints().begin(),fun.ypoints().end());
+    x.assign(fun.xpoints().rbegin(),fun.xpoints().rend());
+    y.assign(fun.ypoints().rbegin(),fun.ypoints().rend());
   }
   else
   {

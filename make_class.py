@@ -70,6 +70,9 @@ if is_factory:
 elif is_singleton:
 	header_template = 'SingletonHTemplate.txt'
 	cpp_template = 'SingletonCPPTemplate.txt'
+elif is_algorithm:
+	header_template = 'AlgorithmHTemplate.txt'
+	cpp_template = 'AlgorithmCPPTemplate.txt'
 else:
 	header_template = 'ClassHTemplate.txt'
 	cpp_template = 'ClassCPPTemplate.txt'

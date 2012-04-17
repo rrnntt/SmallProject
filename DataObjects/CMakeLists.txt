@@ -5,9 +5,6 @@
 
 set( INC_FILES 
    inc/DataObjects/DllExport.h
-   inc/DataObjects/AddChebfun.h
-   inc/DataObjects/ChebfunToTable.h
-   inc/DataObjects/ChebfunWorkspace.h
    inc/DataObjects/Column.h
    inc/DataObjects/ColumnVector.h
    inc/DataObjects/CompoundColumn.h
@@ -19,29 +16,34 @@ set( INC_FILES
    inc/DataObjects/TableWorkspace.h
    inc/DataObjects/Unit.h
 # Algorithms
+   inc/DataObjects/AddChebfun.h
+   inc/DataObjects/ChebfunToTable.h
+   inc/DataObjects/ChebfunWorkspace.h
    inc/DataObjects/CalculateColumnValues.h
    inc/DataObjects/CreateChebfun.h
    inc/DataObjects/CreateUniformRandomData.h
    inc/DataObjects/CreateDistribution.h
+   inc/DataObjects/UniformChebfun.h
    )
 set( SRC_FILES 
-   src/AddChebfun.cpp
-   src/ChebfunToTable.cpp
-   src/ChebfunWorkspace.cpp
    src/Column.cpp
    src/ColumnVector.cpp
    src/NumericColumn.cpp
    src/ColumnFactory.cpp
-   src/CopyChebfun.cpp
    src/StringColumn.cpp
    src/TableColumn.cpp
    src/TableWorkspace.cpp
    src/Unit.cpp
 # Algorithms
+   src/AddChebfun.cpp
+   src/ChebfunToTable.cpp
+   src/ChebfunWorkspace.cpp
    src/CalculateColumnValues.cpp
+   src/CopyChebfun.cpp
    src/CreateChebfun.cpp
    src/CreateUniformRandomData.cpp
    src/CreateDistribution.cpp
+   src/UniformChebfun.cpp
   )
 add_library( DataObjects SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ../Numeric/inc ${THIRD_PARTY_INCLUDE_DIR})

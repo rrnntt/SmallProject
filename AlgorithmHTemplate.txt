@@ -1,0 +1,21 @@
+#ifndef ${NAMESPACE}_${CLASSNAME}_H
+#define ${NAMESPACE}_${CLASSNAME}_H
+
+#include "${Namespace}/DllExport.h"
+#include "API/Algorithm.h"
+
+namespace ${Namespace}
+{
+
+class ${NAMESPACE}_EXPORT ${ClassName}: public API::Algorithm
+{
+public:
+  ${ClassName}();
+  virtual std::string name() const {return "${ClassName}";}
+protected:
+  virtual void exec();
+};
+
+} // ${NAMESPACE}
+
+#endif // ${NAMESPACE}_${CLASSNAME}_H
