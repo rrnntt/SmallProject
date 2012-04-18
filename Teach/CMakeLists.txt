@@ -9,11 +9,15 @@ set( INC_FILES
    inc/Teach/GraphShape.h
    inc/Teach/Problem.h
    inc/Teach/GeometryTask.h
+   inc/Teach/Geom2DObject.h
+   inc/Teach/Geom2DWorkspace.h
    inc/Teach/Text.h
    )
 
 set( SRC_FILES 
   src/GeometryTask.cpp
+  src/Geom2DObject.cpp
+  src/Geom2DWorkspace.cpp
   src/Graph.cpp
   src/GraphShape.cpp
   src/Problem.cpp
@@ -36,13 +40,14 @@ include_directories(inc
 ../Kernel/inc
 ../API/inc
 ../Formula/inc
+../Numeric/inc
 ../QtAPI/inc
  ../qwt/src
 ${THIRD_PARTY_INCLUDE_DIR}
 )
 set_target_properties ( Teach PROPERTIES COMPILE_DEFINITIONS IN_TEACH )
 target_link_libraries(Teach
-Kernel API Formula QtAPI qwt
+Kernel API Formula Numeric QtAPI qwt
 )
 
 #

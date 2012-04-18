@@ -46,9 +46,14 @@ dictionary = {'Namespace':namespace_name,
 }
 
 # define the output file names
-header_folder = 'test'
-cpp_folder = 'test'
-test_folder = 'test'
+root = '../'
+template_dir = 'templates/'
+if namespace_name == 'GUI':
+	header_folder = namespace_name+'/inc'
+else:
+	header_folder = namespace_name+'/inc/'+namespace_name
+cpp_folder = namespace_name+'/src'
+test_folder = namespace_name+'/test'
 header_file_name = header_folder+'/'+class_name + '.h'
 cpp_file_name = cpp_folder+'/'+class_name + '.cpp'
 test_file_name = ''
@@ -60,19 +65,22 @@ header_template = ''
 cpp_template = ''
 if is_factory:
 	header_template = 'FactoryHTemplate.txt'
-	cpp_template = 'SingletonCPPTemplate.txt'
+	cpp_template = 'FactoryCPPTemplate.txt'
 	dictionary['FactoryType'] = factory_type
 	dictionary['FACTORYTYPE'] = factory_type.upper()
 	dictionary['factorytype'] = factory_type.lower()
 elif is_singleton:
 	header_template = 'SingletonHTemplate.txt'
 	cpp_template = 'SingletonCPPTemplate.txt'
+elif is_algorithm:
+	header_template = 'AlgorithmHTemplate.txt'
+	cpp_template = 'AlgorithmCPPTemplate.txt'
 else:
 	header_template = 'ClassHTemplate.txt'
 	cpp_template = 'ClassCPPTemplate.txt'
 
-parse_file(header_template,header_file_name,dictionary)
-parse_file(cpp_template,cpp_file_name,dictionary)
+parse_file(template_dir + header_template,root + header_file_name,dictionary)
+parse_file(template_dir + cpp_template,root + cpp_file_name,dictionary)
 if len(test_file_name) > 0:
-	parse_file('ClassTestTemplate.txt',test_file_name,dictionary)
+	parse_file(template_dir + 'ClassTestTemplate.txt',root + test_file_name,dictionary)
 

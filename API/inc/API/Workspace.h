@@ -12,9 +12,7 @@ namespace API
 class API_EXPORT Workspace
 {
 public:
-  Workspace();
-  Workspace(const Workspace&);
-  virtual ~Workspace();
+  virtual ~Workspace(){}
   virtual std::string id()const = 0;
   std::string name() const {return m_name;}
   void setName(const std::string& nm)  {m_name = nm;}

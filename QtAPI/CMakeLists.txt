@@ -9,9 +9,12 @@ set( INC_FILES
    inc/QtAPI/PlotCurve.h
    inc/QtAPI/PlotDefaults.h
    inc/QtAPI/PlotDialog.h
+   inc/QtAPI/PlotItem.h
+   inc/QtAPI/PlotObject.h
    inc/QtAPI/PlotPicker.h
    inc/QtAPI/PlotRescaler.h
    inc/QtAPI/PlotTask.h
+   inc/QtAPI/PlotWorkspace.h
    inc/QtAPI/PatternBox.h
    inc/QtAPI/PenStyleBox.h
    inc/QtAPI/SubWindow.h
@@ -35,9 +38,12 @@ set( SRC_FILES
   src/PlotCurve.cpp
   src/PlotDefaults.cpp
   src/PlotDialog.cpp
+  src/PlotItem.cpp
+  src/PlotObject.cpp
   src/PlotPicker.cpp
   src/PlotRescaler.cpp
   src/PlotTask.cpp
+  src/PlotWorkspace.cpp
   src/PatternBox.cpp
   src/PenStyleBox.cpp
   src/SelectFunctionDialog.cpp

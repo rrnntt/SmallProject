@@ -7,18 +7,6 @@
 namespace API
 {
 
-Workspace::Workspace()
-{
-}
-
-Workspace::~Workspace()
-{
-}
-
-Workspace::Workspace(const Workspace& c)
-{
-}
-
 void Workspace::modified()
 {
   WorkspaceManager::instance().modified(name());

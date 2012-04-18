@@ -36,9 +36,12 @@ def parse_file(infile,outfile,d):
 	ifil = open(infile,'r')
 	s = ifil.read()
 	ifil.close()
-	ofil = open(outfile,'w')
-	ofil.write(replace_templates(s,d))
-	ofil.close()
+	try:
+		ofil = open(outfile,'w')
+		ofil.write(replace_templates(s,d))
+		ofil.close()
+	except:
+		print 'Cannot write',outfile
 
 if __name__ == "__main__":
 	d = {'a':'b','b':'a'}
