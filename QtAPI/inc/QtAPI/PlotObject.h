@@ -16,6 +16,8 @@ namespace QtAPI
 class QTAPI_EXPORT PlotObject
 {
 public:
+  /// Plot object id type, objects are identified by ids rather than pointers. Start with 1, 0 means all objects
+  typedef size_t id_t;
   PlotObject();
   virtual ~PlotObject(){}
   /*!
@@ -26,7 +28,7 @@ public:
   \param yMap Maps y-values into pixel coordinates.
   \param canvasRect Contents rect of the canvas in painter coordinates
   */
-  virtual void draw(QPainter *painter, 
+  virtual void drawObject(QPainter *painter, 
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRect &canvasRect) const = 0;
 };

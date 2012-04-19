@@ -19,17 +19,19 @@ namespace QtAPI
 class QTAPI_EXPORT PlotWorkspace: public API::Workspace
 {
 public:
-  /// Plot object id type, objects are identified by ids rather than pointers.
-  typedef size_t ObjectID_t;
   PlotWorkspace();
   ~PlotWorkspace();
   /// Return workspace identifier
   virtual std::string id()const {return "PlotWorkspace";}
   /// Return a pointer to a plot object with given id
-  PlotObject* getPlotObject(ObjectID_t id) const;
+  PlotObject* getPlotObject(PlotObject::id_t id) const;
+  virtual void draw(QPainter *painter, 
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+    const QRect &canvasRect) const;
 protected:
   /// Store the plot objects in a map
-  QHash<ObjectID_t, PlotObject*> m_objects;
+  QHash<PlotObject::id_t, PlotObject*> m_objects;
+  PlotObject::id_t m_idSeed;
 };
 
 /// Define a shared pointer to the workspace

@@ -239,6 +239,9 @@ void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWo
 //   Slots
 //------------------------------------
 
+/**
+ * Plot selected columns of a TbaleWorkspace
+ */
 void PlotTask::showTablePlot()
 {
   if (!m_table) return;
@@ -277,10 +280,10 @@ void PlotTask::showTablePlot()
       showPlot(m_table,columnX,columnY,columnE);
     }
   }
-  std::cerr << "Columns:\n";
-  std::for_each(columnNames.begin(),columnNames.end(),[](std::string nam){
-    std::cerr << nam << std::endl;
-  });
+  //std::cerr << "Columns:\n";
+  //std::for_each(columnNames.begin(),columnNames.end(),[](std::string nam){
+  //  std::cerr << nam << std::endl;
+  //});
 }
 
 /**

@@ -16,7 +16,7 @@ namespace QtAPI
 class QTAPI_EXPORT PlotItem: public QwtPlotItem
 {
 public:
-  PlotItem(PlotWorkspace_sptr ws, PlotWorkspace::ObjectID_t id);
+  PlotItem(PlotWorkspace_sptr ws, PlotObject::id_t id = 0);
   ~PlotItem();
   /*!
   \brief Draw the item
@@ -34,7 +34,7 @@ protected:
   /// Weak pointer to the workspace holding the plot object
   PlotWorkspace_wptr m_workspace;
   /// The id of the plot object
-  PlotWorkspace::ObjectID_t m_id;
+  PlotObject::id_t m_id;
 };
 
 } // QTAPI
