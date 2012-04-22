@@ -51,7 +51,9 @@ public:
   FunctionDomain1DVector(const std::vector<double>& xvalues);
   FunctionDomain1DVector(std::vector<double>::const_iterator from, std::vector<double>::const_iterator to);
   FunctionDomain1DVector(const FunctionDomain1DVector&);
+  FunctionDomain1DVector(const FunctionDomain1D&);
   FunctionDomain1DVector& operator=(const FunctionDomain1DVector&);
+  FunctionDomain1DVector& operator=(const FunctionDomain1D&);
 protected:
   std::vector<double> m_X; ///< vector of function arguments
 };

@@ -5,6 +5,7 @@
 set( INC_FILES 
    inc/QtAPI/DllExport.h
    inc/QtAPI/ColorBox.h
+   inc/QtAPI/FunctionCurve.h
    inc/QtAPI/Plot.h
    inc/QtAPI/PlotCurve.h
    inc/QtAPI/PlotDefaults.h
@@ -34,6 +35,7 @@ set( INC_FILES
    )
 set( SRC_FILES 
   src/ColorBox.cpp
+  src/FunctionCurve.cpp
   src/Plot.cpp
   src/PlotCurve.cpp
   src/PlotDefaults.cpp

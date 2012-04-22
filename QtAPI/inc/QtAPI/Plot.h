@@ -2,6 +2,7 @@
 #define QTAPI_PLOT_H
 
 #include "DllExport.h"
+#include "QtAPI/PlotWorkspace.h"
 
 #include "qwt_plot.h"
 
@@ -71,7 +72,10 @@ private:
   mutable PlotPicker* m_externalPicker;
 
   PlotRescaler* m_rescaler; ///< helps to rescale the axes after resizing the canvas.
-  bool m_painting;
+  bool m_painting;  ///< if plot in a QPaint event
+
+  /// Store the plot objects 
+  PlotWorkspace_sptr m_plotObjects;
 
 };
 

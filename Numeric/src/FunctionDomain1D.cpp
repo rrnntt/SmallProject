@@ -68,6 +68,16 @@ FunctionDomain1D(NULL,0)
  * Copy constructor.
  * @param right :: The other domain.
  */
+FunctionDomain1DVector::FunctionDomain1DVector(const FunctionDomain1D& right):
+FunctionDomain1D(NULL,0)
+{
+  *this = right;
+}
+
+/**
+ * Copy constructor.
+ * @param right :: The other domain.
+ */
 FunctionDomain1DVector::FunctionDomain1DVector(const FunctionDomain1DVector& right):
 FunctionDomain1D(NULL,0)
 {
@@ -85,6 +95,22 @@ FunctionDomain1DVector& FunctionDomain1DVector::operator=(const FunctionDomain1D
     throw std::invalid_argument("FunctionDomain1D cannot have zero size.");
   }
   m_X.assign(right.m_X.begin(),right.m_X.end());
+  resetData(&m_X[0],m_X.size());
+  return *this;
+}
+
+/**
+ * Copy assignment operator.
+ * @param right :: The other domain.
+ */
+FunctionDomain1DVector& FunctionDomain1DVector::operator=(const FunctionDomain1D& right)
+{
+  if (right.size() == 0)
+  {
+    throw std::invalid_argument("FunctionDomain1D cannot have zero size.");
+  }
+  const double* data = right.getPointerAt(0);
+  m_X.assign(data, data + right.size());
   resetData(&m_X[0],m_X.size());
   return *this;
 }
