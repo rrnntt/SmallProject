@@ -32,6 +32,9 @@ public:
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRect &canvasRect) const;
 
+  /// Return the bounding rectangle
+  virtual QRectF boundingRect() const;
+
   /// Set the curve values from two std vectors
   void setData(const std::vector<double>& x, const std::vector<double>& y);
 
@@ -40,10 +43,15 @@ public:
 
 protected:
 
+  /// calculate and cache the current bounfing rect
+  void calcBoundingRect();
+
   /// Store the x values
   Numeric::FunctionDomain1D_sptr m_x;
   /// Store the y values
   Numeric::FunctionValues m_y;
+  /// cache the bounding rect
+  mutable QRectF m_boundingRect;
 };
 
 } // QTAPI

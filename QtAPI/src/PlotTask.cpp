@@ -2,9 +2,10 @@
 #include "QtAPI/Table.h"
 #include "QtAPI/Plot.h"
 #include "QtAPI/CurveManager.h"
-#include "QtAPI/PlotCurve.h"
+#include "QtAPI/FunctionCurve.h"
 #include "QtAPI/WindowManager.h"
 #include "QtAPI/PlotDialog.h"
+#include "QtAPI/PlotCurve.h"
 
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/NumericColumn.h"
@@ -98,17 +99,19 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   auto colX = tws->getColumn(columnX)->asNumeric();
   auto colY = tws->getColumn(columnY)->asNumeric();
 
-  PlotCurve* curve = PlotCurve::create();
+  FunctionCurve* curve = new FunctionCurve;
   std::vector<double> x,y;
   colX->fill(x);
   colY->fill(y);
-  curve->setData(&x[0],&y[0],x.size());
+  curve->setData(x,y);
   auto plot = new Plot();
   plot->addCurve(curve);
-  curve->setTitle(QString::fromStdString(tws->name() + "_" + columnX + "_" + columnY));
+
+  //curve->setTitle(QString::fromStdString(tws->name() + "_" + columnX + "_" + columnY));
   plot->setTitle(QString::fromStdString(tws->name()));
   plot->setAxisTitle(Plot::xBottom,QString::fromStdString(columnX));
   plot->setAxisTitle(Plot::yLeft,QString::fromStdString(columnY));
+  plot->updateAxes();
   plot->setZoomBase();
 
   WindowManager::instance().newSubWindow(plot);
@@ -156,14 +159,14 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
       errorMessage("Column "+*columnName+" does not have the Y plot role. Skipping.");
       continue;
     }
-    PlotCurve* curve = PlotCurve::create();
+    FunctionCurve* curve = new FunctionCurve;
     std::vector<double> x,y;
     columnX->fill(x);
     columnY->fill(y);
-    curve->setData(&x[0],&y[0],x.size());
+    curve->setData(x,y);
     plot->addCurve(curve);
-    curve->setStyle((PlotCurve::CurveStyle)m_table->getWorkspace()->getCurveStyle());
-    curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
+    //curve->setStyle((PlotCurve::CurveStyle)m_table->getWorkspace()->getCurveStyle());
+    //curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
     if (yAxisTitle.empty())
     {
       yAxisTitle = *columnName;
@@ -172,9 +175,10 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
     {
       yAxisTitle = "Y axis";
     }
-    curve->setWorkspace(tws);
+    //curve->setWorkspace(tws);
   }
   plot->setAxisTitle(Plot::yLeft,QString::fromStdString(yAxisTitle));
+  plot->updateAxes();
   plot->setZoomBase();
   WindowManager::instance().newSubWindow(plot);
   return plot;
@@ -215,14 +219,15 @@ void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWo
       errorMessage("Column "+*columnName+" does not have the Y plot role. Skipping.");
       continue;
     }
-    PlotCurve* curve = PlotCurve::create();
+    FunctionCurve* curve = new FunctionCurve;
     std::vector<double> x,y;
     columnX->fill(x);
     columnY->fill(y);
-    curve->setData(&x[0],&y[0],x.size());
+    curve->setData(x,y);
     plot->addCurve(curve);
-    curve->setStyle((PlotCurve::CurveStyle)tws->getCurveStyle());
-    curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
+    plot->updateAxes();
+    //curve->setStyle((PlotCurve::CurveStyle)tws->getCurveStyle());
+    //curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
     if (yAxisTitle.empty())
     {
       yAxisTitle = *columnName;
@@ -231,7 +236,6 @@ void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWo
     {
       yAxisTitle = "Y axis";
     }
-    curve->setWorkspace(tws);
   }
 }
 

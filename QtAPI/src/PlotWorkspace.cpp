@@ -2,6 +2,8 @@
 
 #include "API/WorkspaceFactory.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace QtAPI
 {
 
@@ -20,6 +22,19 @@ m_idSeed(1)
  */
 PlotWorkspace::~PlotWorkspace()
 {
+}
+
+/**
+ * Add new object to the workspace.
+ * @param obj :: Pointer to the new object.
+ * @return :: The id assigned to the new object.
+ */
+PlotObject::id_t PlotWorkspace::addObject(PlotObject* obj)
+{
+  PlotObject::id_t id = m_idSeed;
+  m_objects.insert(id, obj);
+  ++m_idSeed;
+  return id;
 }
 
 /**
@@ -49,5 +64,16 @@ void PlotWorkspace::draw(QPainter *painter, const QwtScaleMap &xMap, const QwtSc
   }
 }
 
+/// Return the bounding rectangle
+QRectF PlotWorkspace::boundingRect() const
+{
+  QRectF rect;
+  for(auto it = m_objects.begin(); it != m_objects.end(); ++it)
+  {
+    QRectF r = it.value()->boundingRect();
+    rect = rect.united(r);
+  }
+  return rect;
+}
 
 } // QtAPI

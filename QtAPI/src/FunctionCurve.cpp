@@ -47,6 +47,7 @@ void FunctionCurve::setData(const std::vector<double>& x, const std::vector<doub
   m_x.reset(new Numeric::FunctionDomain1DVector(x));
   m_y.reset(*m_x);
   m_y.setCalculated(y);
+  calcBoundingRect();
 }
 
 /**
@@ -69,6 +70,40 @@ void FunctionCurve::setData(const Numeric::FunctionDomain& domain, const Numeric
   m_x.reset(new Numeric::FunctionDomain1DVector(*d1d));
   m_y.reset(*m_x);
   fun.function(domain,m_y);
+  calcBoundingRect();
+}
+
+/// calculate and cache the current bounfing rect
+void FunctionCurve::calcBoundingRect()
+{
+  const size_t n = m_x->size();
+  if ( n == 0 )
+  {
+    m_boundingRect = QRectF();
+  }
+  double minX = (*m_x)[0];
+  double maxX = (*m_x)[n - 1];
+  double minY = m_y.getCalculated(0);
+  double maxY = m_y.getCalculated(0);
+  for(size_t i = 0; i < n; ++i)
+  {
+    const double y = m_y.getCalculated(i);
+    if ( y < minY ) 
+    {
+      minY = y;
+    }
+    if ( y > maxY ) 
+    {
+      maxY = y;
+    }
+  }
+  m_boundingRect = QRectF(minX,minY,maxX - minX, maxY - minY);
+}
+
+/// Return the bounding rectangle
+QRectF FunctionCurve::boundingRect() const
+{
+  return m_boundingRect;
 }
 
 
@@ -97,16 +132,22 @@ void FunctionCurve::drawObject(QPainter *painter,
     if ( istart > 0 ) --istart;
     break;
   }
+  if ( istart >= n ) return;
   // draw the points
   int x1 = xMap.transform((*m_x)[istart]);
-  int x2 = yMap.transform(m_y.getCalculated(istart));
-  for(size_t i = istart; i < n; ++i)
+  int y1 = yMap.transform(m_y.getCalculated(istart));
+  for(size_t i = istart + 1; i < n; ++i)
   {
     const double& x = (*m_x)[i];
     if ( x > end ) break;
-    int 
-    painter->drawLine();
+    int x2 = xMap.transform(x);
+    int y2 = yMap.transform(m_y.getCalculated(i));
+    painter->drawLine(x1,y1,x2,y2);
+    x1 = x2;
+    y1 = y2;
   }
 }
+
+
 
 } // QtAPI

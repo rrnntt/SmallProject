@@ -2,12 +2,17 @@
 #define QTAPI_PLOTITEM_H
 
 #include "QtAPI/DllExport.h"
-#include "QtAPI/PlotWorkspace.h"
+#include "QtAPI/PlotObject.h"
 
 #include <qwt_plot_item.h>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+
 namespace QtAPI
 {
+
+  class PlotWorkspace;
 
 /**
  * An interface class between Plot and PlotObject. Inherits QwtPlotItem and is managed by Plot.
@@ -16,7 +21,7 @@ namespace QtAPI
 class QTAPI_EXPORT PlotItem: public QwtPlotItem
 {
 public:
-  PlotItem(PlotWorkspace_sptr ws, PlotObject::id_t id = 0);
+  PlotItem(boost::shared_ptr<PlotWorkspace> ws, PlotObject::id_t id = 0);
   ~PlotItem();
   /*!
   \brief Draw the item
@@ -29,10 +34,11 @@ public:
   virtual void draw(QPainter *painter, 
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRect &canvasRect) const ;
+  virtual QwtDoubleRect boundingRect() const;
 
 protected:
   /// Weak pointer to the workspace holding the plot object
-  PlotWorkspace_wptr m_workspace;
+  boost::weak_ptr<PlotWorkspace> m_workspace;
   /// The id of the plot object
   PlotObject::id_t m_id;
 };

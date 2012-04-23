@@ -40,6 +40,8 @@ public:
   void zeroCalculated();
   /// set all calculated values to same number
   void setCalculated(double value);
+  /// copy caluculated values from a std vector
+  void setCalculated(const std::vector<double>& y);
 
   /// Reset the values to match a new domain.
   void reset(const FunctionDomain& domain);

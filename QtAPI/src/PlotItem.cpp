@@ -1,4 +1,5 @@
 #include "QtAPI/PlotItem.h"
+#include "QtAPI/PlotWorkspace.h"
 
 namespace QtAPI
 {
@@ -11,6 +12,8 @@ namespace QtAPI
 PlotItem::PlotItem(PlotWorkspace_sptr ws, PlotObject::id_t id):
 m_workspace(ws),m_id(id)
 {
+  setItemAttribute(QwtPlotItem::Legend);
+  setItemAttribute(QwtPlotItem::AutoScale);
 }
 
 /**
@@ -47,5 +50,28 @@ void PlotItem::draw(QPainter *painter,
     }
   }
 }
+
+/**
+ * Return the bounding rectangle
+ */
+QwtDoubleRect PlotItem::boundingRect() const
+{
+  auto ws = m_workspace.lock();
+  if (!ws) return QwtDoubleRect();
+  if (m_id == 0)
+  {
+    return ws->boundingRect();
+  }
+  else
+  {
+    PlotObject* po = ws->getPlotObject(m_id);
+    if (po)
+    {
+      return po->boundingRect();
+    }
+  }
+  return QwtDoubleRect();
+}
+
 
 } // QtAPI

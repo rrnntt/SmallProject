@@ -86,6 +86,19 @@ namespace Numeric
   }
 
   /**
+   * copy caluculated values from a std vector
+   * @param y :: Vector with calculated values
+   */
+  void FunctionValues::setCalculated(const std::vector<double>& y)
+  {
+    if (y.size() != this->size())
+    {
+      throw std::invalid_argument("Setting data of a wrong size");
+    }
+    m_calculated.assign(y.begin(),y.end());
+  }
+
+  /**
    * Copy calculated values to a buffer
    * @param to :: Pointer to the buffer
    */

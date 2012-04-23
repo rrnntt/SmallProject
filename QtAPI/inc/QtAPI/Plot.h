@@ -18,6 +18,7 @@ namespace QtAPI
 class PlotCurve;
 class PlotPicker;
 class PlotRescaler;
+class FunctionCurve;
 
 class QTAPI_EXPORT Plot: public QwtPlot
 {
@@ -25,11 +26,14 @@ class QTAPI_EXPORT Plot: public QwtPlot
 public:
   Plot(QWidget *parent = NULL);
   ~Plot();
-  void addCurve(PlotCurve* curve);
-  QList<PlotCurve*> getCurves() const;
-  QStringList getCurveNames() const;
-  PlotCurve* getCurve(QString name)const;
-  PlotCurve* bringForwardCurve(size_t i);
+
+  /* PlotObjects */
+  /// Add a new object to the PlotWorkspace
+  void addObject(PlotObject* obj);
+  /// Add a new item to the Plot
+  void addItem(PlotItem* item);
+  /// Add a curve. Automatically set line colour.
+  void addCurve(FunctionCurve* curve);
 
   void setZoomBase();
   bool isZoomerEnabled() const;
@@ -61,7 +65,7 @@ protected:
   void paintEvent(QPaintEvent*);
 
 private:
-  int m_curve_count;
+  //int m_curve_count;
   QList<QColor> m_colors; ///< colors for stored curves
   int m_colorIndex;
 

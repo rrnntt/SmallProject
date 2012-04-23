@@ -3,9 +3,11 @@
 
 #include "QtAPI/DllExport.h"
 
+#include <QRectF>
+#include <QPen>
+
 class QPainter;
 class QwtScaleMap;
-class QRect;
 
 namespace QtAPI
 {
@@ -31,6 +33,16 @@ public:
   virtual void drawObject(QPainter *painter, 
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRect &canvasRect) const = 0;
+  /// Return the bounding rectangle
+  virtual QRectF boundingRect() const = 0;
+
+  void setPen(const QPen& pen) {m_pen = pen;}
+  const QPen& pen() const {return m_pen;}
+
+protected:
+
+  QPen m_pen;
+
 };
 
 } // QTAPI

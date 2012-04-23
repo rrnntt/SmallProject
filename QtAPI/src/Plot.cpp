@@ -4,6 +4,8 @@
 #include "QtAPI/CurveManager.h"
 #include "QtAPI/PlotPicker.h"
 #include "QtAPI/PlotRescaler.h"
+#include "QtAPI/PlotItem.h"
+#include "QtAPI/FunctionCurve.h"
 
 #include "qwt_plot_canvas.h"
 #include "qwt_plot_layout.h"
@@ -27,13 +29,16 @@ namespace QtAPI
 
 Plot::Plot(QWidget *parent)
 :QwtPlot(parent),
-m_curve_count(),
+//m_curve_count(),
 m_customPicker(nullptr),
 m_externalPicker(nullptr),
 m_rescaler(nullptr),
-m_painting(false)
+m_painting(false),
+m_plotObjects(new PlotWorkspace)
 {
   init();
+  //PlotItem* item = new PlotItem(m_plotObjects, 0);
+  //item->attach(this);
 }
 
 Plot::~Plot()
@@ -119,68 +124,59 @@ void Plot::paintEvent(QPaintEvent* e)
   m_painting = false;
 }
 
-void Plot::addCurve(PlotCurve* curve)
-{
-  curve->attach(this);
-  CurveManager::instance().addCurve(curve);
-  curve->setPen(QPen(m_colors[m_colorIndex]));
-  ++m_colorIndex;
-  m_colorIndex %= m_colors.size();
-}
+//QList<PlotCurve*> Plot::getCurves() const
+//{
+//  QList<PlotCurve*> out;
+//  QwtPlotItemList items = itemList();
+//  foreach(QwtPlotItem* item,items)
+//  {
+//    auto curve = dynamic_cast<PlotCurve*>(item);
+//    out.append(curve);
+//  }
+//  return out;
+//}
+//
+//QStringList Plot::getCurveNames() const
+//{
+//  QList<PlotCurve*> curves = getCurves();
+//  QStringList names;
+//  foreach(const PlotCurve* curve,curves)
+//  {
+//    QString title = curve->title().text();
+//    if (title.isEmpty())
+//    {
+//      title = "Unknown";
+//    }
+//    names << title;
+//  }
+//  return names;
+//}
 
-QList<PlotCurve*> Plot::getCurves() const
-{
-  QList<PlotCurve*> out;
-  QwtPlotItemList items = itemList();
-  foreach(QwtPlotItem* item,items)
-  {
-    auto curve = dynamic_cast<PlotCurve*>(item);
-    out.append(curve);
-  }
-  return out;
-}
-
-QStringList Plot::getCurveNames() const
-{
-  QList<PlotCurve*> curves = getCurves();
-  QStringList names;
-  foreach(const PlotCurve* curve,curves)
-  {
-    QString title = curve->title().text();
-    if (title.isEmpty())
-    {
-      title = "Unknown";
-    }
-    names << title;
-  }
-  return names;
-}
-
-PlotCurve* Plot::getCurve(QString name)const
-{
-  auto curves = getCurves();
-  foreach(PlotCurve* curve,curves)
-  {
-    if (curve->title() == name)
-    {
-      return curve;
-    }
-  }
-  return nullptr;
-}
-
-PlotCurve* Plot::bringForwardCurve(size_t i)
-{
-  auto curves = getCurves();
-  if (i < curves.size())
-  {
-    auto curve = curves[i];
-    curve->detach();
-    curve->attach(this);
-    return curve;
-  }
-  return nullptr;
-}
+//PlotCurve* Plot::getCurve(QString name)const
+//{
+//  auto curves = getCurves();
+//  foreach(PlotCurve* curve,curves)
+//  {
+//    if (curve->title() == name)
+//    {
+//      return curve;
+//    }
+//  }
+//  return nullptr;
+//}
+//
+//PlotCurve* Plot::bringForwardCurve(size_t i)
+//{
+//  auto curves = getCurves();
+//  if (i < curves.size())
+//  {
+//    auto curve = curves[i];
+//    curve->detach();
+//    curve->attach(this);
+//    return curve;
+//  }
+//  return nullptr;
+//}
 
 /**
  * Set current scale to be zoomer's base
@@ -297,5 +293,38 @@ double Plot::getYEnd() const
 {
   return canvasMap(QtAPI::Plot::yLeft).s2();
 }
+
+/* PlotObjects */
+
+/**
+ * Add a new object to the PlotWorkspace. It will be displayed.
+ * @param obj :: Pointer to the new object.
+ */
+void Plot::addObject(PlotObject* obj)
+{
+  auto id = m_plotObjects->addObject(obj);
+  addItem( new PlotItem(m_plotObjects, id) );
+}
+
+/**
+ * Add a new item to the Plot to be displayed.
+ * @param item :: Pointer to the new item. It may refer to object in other workspaces.
+ */
+void Plot::addItem(PlotItem* item)
+{
+  item->attach(this);
+}
+
+/**
+ * Add a curve. Automatically set line colour.
+ */
+void Plot::addCurve(FunctionCurve* curve)
+{
+  addObject(curve);
+  curve->setPen(QPen(m_colors[m_colorIndex]));
+  ++m_colorIndex;
+  m_colorIndex %= m_colors.size();
+}
+
 
 } // QtAPI
