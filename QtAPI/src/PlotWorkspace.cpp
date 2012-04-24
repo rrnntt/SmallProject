@@ -76,4 +76,15 @@ QRectF PlotWorkspace::boundingRect() const
   return rect;
 }
 
+/// Return a list of curve ids
+QList<PlotObject::id_t> PlotWorkspace::getIDs() const
+{
+  QList<PlotObject::id_t> out;
+  for(auto it = m_objects.begin(); it != m_objects.end(); ++it)
+  {
+    out << it.key();
+  }
+  return out;
+}
+
 } // QtAPI

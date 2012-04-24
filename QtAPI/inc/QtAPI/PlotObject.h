@@ -2,6 +2,7 @@
 #define QTAPI_PLOTOBJECT_H
 
 #include "QtAPI/DllExport.h"
+#include "API/Workspace.h"
 
 #include <QRectF>
 #include <QPen>
@@ -22,6 +23,10 @@ public:
   typedef size_t id_t;
   PlotObject();
   virtual ~PlotObject(){}
+
+  /// If an object has a connection to a workspace, it can return a pointer to it.
+  /// Useful for interactions with workspaces via Plot and pickers.
+  virtual API::Workspace_ptr getWorkspace() const {return API::Workspace_ptr();}
   /*!
   \brief Draw the item
 

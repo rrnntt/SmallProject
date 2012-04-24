@@ -34,6 +34,12 @@ public:
   void addItem(PlotItem* item);
   /// Add a curve. Automatically set line colour.
   void addCurve(FunctionCurve* curve);
+  /// Return a list of curve ids
+  QList<PlotObject::id_t> getCurveIDs() const;
+  /// Return a pointer to a curve
+  FunctionCurve* getCurve(PlotObject::id_t id) const;
+  /// Bring forward (place on top) a curve following given in the internal list of curves
+  PlotObject::id_t bringForwardNextCurve(PlotObject::id_t id);
 
   void setZoomBase();
   bool isZoomerEnabled() const;
@@ -78,7 +84,9 @@ private:
   PlotRescaler* m_rescaler; ///< helps to rescale the axes after resizing the canvas.
   bool m_painting;  ///< if plot in a QPaint event
 
-  /// Store the plot objects 
+  /// Store curves
+  PlotWorkspace_sptr m_curves;
+  /// Store other objects 
   PlotWorkspace_sptr m_plotObjects;
 
 };

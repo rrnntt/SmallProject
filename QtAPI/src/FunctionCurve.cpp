@@ -39,9 +39,10 @@ void FunctionCurve::setData(const std::vector<double>& x, const std::vector<doub
   }
   for(size_t i = 1; i < x.size(); ++i)
   {
-    if ( x[i] <= x[i - 1] )
+    if ( x[i] < x[i - 1] ) // strictly < allow repeating points
     {
-      throw std::invalid_argument("FunctionCurve: x values must be in ascending order");
+      throw std::invalid_argument("FunctionCurve: x values must be in ascending order\n"
+        "Line "+QString::number(i).toStdString());
     }
   }
   m_x.reset(new Numeric::FunctionDomain1DVector(x));

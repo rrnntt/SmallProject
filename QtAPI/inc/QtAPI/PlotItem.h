@@ -23,6 +23,8 @@ class QTAPI_EXPORT PlotItem: public QwtPlotItem
 public:
   PlotItem(boost::shared_ptr<PlotWorkspace> ws, PlotObject::id_t id = 0);
   ~PlotItem();
+  /// Return plot object id
+  PlotObject::id_t getID() const {return m_id;}
   /*!
   \brief Draw the item
 

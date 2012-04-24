@@ -1,5 +1,5 @@
 #include "Goblin/GoblinPlotPicker.h"
-#include "QtAPI/PlotCurve.h"
+#include "QtAPI/FunctionCurve.h"
 
 #include "qwt_scale_map.h"
 #include <QtGui/QPainter>
@@ -15,11 +15,15 @@ m_drawSelf(false),
 m_currentLine(0),
 m_shifting(false)
 {
-  auto curveList = plot->getCurves();
-  if (!curveList.isEmpty())
+  auto curveIdList = plot->getCurveIDs();
+  if (!curveIdList.isEmpty())
   {
-    m_curve = curveList[0];
-    m_linelist = boost::dynamic_pointer_cast<LineList>(m_curve->getWorkspace());
+    m_curve_id = curveIdList[0];
+    auto curve = plot->getCurve(m_curve_id);
+    if ( curve )
+    {
+      m_linelist = boost::dynamic_pointer_cast<LineList>(curve->getWorkspace());
+    }
   }
 }
 
@@ -53,7 +57,11 @@ void GoblinPlotPicker::draw(QPainter *painter, const QwtScaleMap &xMap, const Qw
     int y2 = yMap.p2();
     painter->setPen(Qt::red); // <-----------------------------!
     painter->drawLine(x1,y1,x1,y2);
-    painter->setPen(m_curve->pen()); // <-----------------------------!
+    auto curve = m_plot->getCurve(m_curve_id);
+    if ( curve )
+    {
+      painter->setPen(curve->pen()); // <-----------------------------!
+    }
     QFontMetrics fm(m_plot->font());
     
     painter->drawText(0,fm.height(),QString::fromStdString(m_linelist->lineString(m_currentLine)));
@@ -150,11 +158,12 @@ void GoblinPlotPicker::widgetKeyPressEvent(QKeyEvent *ke)
 {
   if (ke->key() == Qt::Key_Tab && m_plot)
   {
-    auto curve = m_plot->bringForwardCurve(1);
+    auto new_id = m_plot->bringForwardNextCurve(m_curve_id);
+    auto curve = m_plot->getCurve(new_id);
     if (curve)
     {
-      m_curve = curve;
-      m_linelist = boost::dynamic_pointer_cast<LineList>(m_curve->getWorkspace());
+      m_curve_id = new_id;
+      m_linelist = boost::dynamic_pointer_cast<LineList>(curve->getWorkspace());
       std::cerr << m_linelist->name() << std::endl;
       m_plot->replot();
     }

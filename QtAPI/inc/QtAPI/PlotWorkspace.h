@@ -28,6 +28,9 @@ public:
   PlotObject::id_t addObject(PlotObject* obj);
   /// Return a pointer to a plot object with given id
   PlotObject* getPlotObject(PlotObject::id_t id) const;
+  /// Return a list of all ids
+  QList<PlotObject::id_t> getIDs() const;
+
   virtual void draw(QPainter *painter, 
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRect &canvasRect) const;

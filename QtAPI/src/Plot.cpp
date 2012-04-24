@@ -34,6 +34,7 @@ m_customPicker(nullptr),
 m_externalPicker(nullptr),
 m_rescaler(nullptr),
 m_painting(false),
+m_curves(new PlotWorkspace),
 m_plotObjects(new PlotWorkspace)
 {
   init();
@@ -320,10 +321,61 @@ void Plot::addItem(PlotItem* item)
  */
 void Plot::addCurve(FunctionCurve* curve)
 {
-  addObject(curve);
+  auto id = m_curves->addObject(curve);
+  addItem( new PlotItem(m_curves, id) );
   curve->setPen(QPen(m_colors[m_colorIndex]));
   ++m_colorIndex;
   m_colorIndex %= m_colors.size();
+}
+
+/// Return a list of curve ids
+QList<PlotObject::id_t> Plot::getCurveIDs() const
+{
+  return m_curves->getIDs();
+}
+
+/**
+ * Return a pointer to a curve by an id. DO NOT KEEP THE POINTER, KEEP ID!
+ * If curve doesn't exist return nullptr.
+ * @param id :: Id of a curve.
+ */
+FunctionCurve* Plot::getCurve(PlotObject::id_t id) const
+{
+  auto obj = m_curves->getPlotObject(id);
+  if ( !obj ) return nullptr;
+  return dynamic_cast<FunctionCurve*>(obj);
+}
+
+/**
+ * Bring forward the next curve. 
+ */
+PlotObject::id_t Plot::bringForwardNextCurve(PlotObject::id_t id)
+{
+  // find ID that follows id in m_curves workspace
+  auto ids = m_curves->getIDs();
+  for(int i = 0; i < ids.size(); ++i)
+  {
+    if ( ids[i] == id )
+    {
+      if ( i < ids.size() - 1 ) id = ids[i + 1];
+      else
+        id = ids[0];
+    }
+  }
+
+  // find the item with that id
+  auto items = this->itemList();
+  foreach(QwtPlotItem* item, items)
+  {
+    auto plotItem = dynamic_cast<PlotItem*>(item);
+    if ( plotItem && plotItem->getID() == id )
+    {// detach and re-attach it
+      plotItem->detach();
+      plotItem->attach(this);
+    }
+  }
+
+  return id;
 }
 
 

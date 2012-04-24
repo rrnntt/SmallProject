@@ -4,6 +4,7 @@
 #include "Goblin/DllExport.h"
 #include "Goblin/LineList.h"
 #include "QtAPI/PlotPicker.h"
+#include "QtAPI/PlotObject.h"
 
 namespace Goblin
 {
@@ -26,7 +27,8 @@ protected:
   virtual void widgetKeyPressEvent(QKeyEvent *);
 
   bool m_drawSelf;
-  QPointer<QtAPI::PlotCurve> m_curve;
+  //QPointer<QtAPI::FunctionCurve> m_curve;
+  QtAPI::PlotObject::id_t m_curve_id;
   LineList_ptr m_linelist;
   mutable size_t m_currentLine;
   bool m_shifting;

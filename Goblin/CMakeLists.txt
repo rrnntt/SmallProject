@@ -39,7 +39,7 @@ qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
 qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_library( Goblin SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} )
-include_directories(inc ${THIRD_PARTY_INCLUDE_DIR} ../API/inc ../DataObjects/inc ../QtAPI/inc ../qwt/src
+include_directories(inc ${THIRD_PARTY_INCLUDE_DIR} ../API/inc ../DataObjects/inc ../Numeric/inc ../QtAPI/inc ../qwt/src
 "${CMAKE_BINARY_DIR}/Goblin"
 )
 set_target_properties ( Goblin PROPERTIES COMPILE_DEFINITIONS IN_GOBLIN )
@@ -48,7 +48,7 @@ set_target_properties ( Goblin PROPERTIES COMPILE_DEFINITIONS IN_GOBLIN )
 #set( GSL_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gsl.lib")
 #set( GSL_LIBS "optimized;${GSL_RELEASE_LIB};debug;${GSL_DEBUG_LIB};")
 
-target_link_libraries(Goblin Kernel DataObjects QtAPI qwt
+target_link_libraries(Goblin Kernel DataObjects Numeric QtAPI qwt
 #${GSL_LIBS}
 )
 
