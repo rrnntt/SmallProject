@@ -2,7 +2,7 @@
 #include "ui_PlotDialog.h"
 #include "QtAPI/Plot.h"
 #include "QtAPI/PlotDefaults.h"
-#include "QtAPI/PlotCurve.h"
+#include "QtAPI/FunctionCurve.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -74,20 +74,33 @@ void PlotDialog::init()
 
 void PlotDialog::initCurvePage()
 {
-  //ui->cbCurve->addItems(m_plot->getCurveNames());
-  //QStringList styles;
-  //styles << "Lines" << "Sticks" << "Steps" << "Dots";
-  //ui->cbStyle->addItems(styles);
-  //auto name = ui->cbCurve->currentText();
-  //auto curve = m_plot->getCurve(name);
-  //if (curve)
-  //{
-  //  ui->cbStyle->setCurrentIndex(curve->style()-1);
-  //  QPen pen = curve->pen();
-  //  ui->cbLineColor->setColor(pen.color());
-  //  ui->cbPenStyle->setStyle(pen.style());
-  //  ui->sbLineWidth->setValue(pen.width());
-  //}
+  auto curveIDs = m_plot->getCurveIDs();
+  if ( curveIDs.isEmpty() ) return;
+  foreach(PlotObject::id_t id, curveIDs)
+  {
+    if ( id == 0 ) continue;
+    ui->cbCurve->addItem(QString::number(id),id);
+  }
+
+  ui->cbStyle->addItem("NoCurve",FunctionCurve::NoCurve);
+  ui->cbStyle->addItem("Lines",FunctionCurve::Lines);
+  ui->cbStyle->addItem("Sticks",FunctionCurve::Sticks);
+  ui->cbStyle->addItem("Steps",FunctionCurve::Steps);
+  ui->cbStyle->addItem("Dots",FunctionCurve::Dots);
+  auto ci = ui->cbCurve->currentIndex();
+  auto curve = m_plot->getCurve(ui->cbCurve->itemData(ci).toInt());
+  if (curve)
+  {
+    int si = ui->cbStyle->findData(curve->getCurveStyle());
+    if ( si >= 0 )
+    {
+      ui->cbStyle->setCurrentIndex(si);
+    }
+    QPen pen = curve->pen();
+    ui->cbLineColor->setColor(pen.color());
+    ui->cbPenStyle->setStyle(pen.style());
+    ui->sbLineWidth->setValue(pen.width());
+  }
 }
 
 void PlotDialog::accept()
@@ -113,23 +126,16 @@ void PlotDialog::apply()
 
 void PlotDialog::applyCurve()
 {
-  //auto name = ui->cbCurve->currentText();
-  //auto curve = m_plot->getCurve(name);
-  //if (!curve) return;
-  //if (PlotCurve::NoCurve != 0)
-  //{
-  //  throw std::runtime_error("Definition of plot styles has changed!");
-  //}
-  //auto style = static_cast<PlotCurve::CurveStyle>(ui->cbStyle->currentIndex() + 1);
-  //if (style != curve->style())
-  //{
-  //  curve->setStyle(style);
-  //}
-  //QPen pen = curve->pen();
-  //pen.setColor(ui->cbLineColor->color());
-  //pen.setStyle(ui->cbPenStyle->style());
-  //pen.setWidth(ui->sbLineWidth->value());
-  //curve->setPen(pen);
+  auto ci = ui->cbCurve->currentIndex();
+  auto curve = m_plot->getCurve(ui->cbCurve->itemData(ci).toInt());
+  if ( !curve ) return;
+  auto style = ui->cbStyle->itemData(ui->cbStyle->currentIndex()).toInt();
+  curve->setCurveStyle(static_cast<FunctionCurve::CurveStyle>(style));
+  QPen pen = curve->pen();
+  pen.setColor(ui->cbLineColor->color());
+  pen.setStyle(ui->cbPenStyle->style());
+  pen.setWidth(ui->sbLineWidth->value());
+  curve->setPen(pen);
 }
 
 void PlotDialog::applyPlot()

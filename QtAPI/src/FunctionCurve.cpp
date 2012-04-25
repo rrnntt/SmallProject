@@ -135,12 +135,18 @@ void FunctionCurve::drawObject(QPainter *painter,
   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
   const QRect &canvasRect) const
 {
+  painter->save();
+  painter->setPen(pen());
   switch( m_curveStyle )
   {
+  case NoCurve: drawNoCurve(painter, xMap, yMap, canvasRect); break;
   case Lines: drawLines(painter, xMap, yMap, canvasRect); break;
   case Sticks: drawSticks(painter, xMap, yMap, canvasRect); break;
+  case Steps: drawSteps(painter, xMap, yMap, canvasRect); break;
+  case Dots: drawDots(painter, xMap, yMap, canvasRect); break;
   default: drawLines(painter, xMap, yMap, canvasRect); break;
   };
+  painter->restore();
 }
 
 /// Draw curve in Lines style
@@ -254,6 +260,168 @@ void FunctionCurve::drawSticks(QPainter *painter, const QwtScaleMap &xMap, const
   {
     drawSymbols(painter,istart,iend);
   }
+}
+
+/// Draw curve in Steps style
+void FunctionCurve::drawSteps(QPainter *painter, 
+  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+  const QRect &canvasRect) const
+{
+  const double start = xMap.s1();
+  const double end = xMap.s2();
+
+  const size_t n = m_x->size();
+  // find first point to draw which is 0 or the one before first visible
+  size_t istart = 0;
+  for(; istart < n; ++istart)
+  {
+    const double& x = (*m_x)[istart];
+    if ( x < start ) continue;
+    if ( x > end ) break;
+    if ( istart > 0 ) --istart;
+    break;
+  }
+  if ( istart >= n ) return;
+  size_t iend = n;
+
+  bool doDrawSymbols = m_symbol->style() != QwtSymbol::NoSymbol;
+  if ( doDrawSymbols && m_pointCoords.size() != n )
+  {
+    m_pointCoords.resize(n);
+  }
+
+  // draw the points
+  int x1 = xMap.transform((*m_x)[istart]);
+  int y1 = yMap.transform(m_y.getCalculated(istart));
+  if ( doDrawSymbols )
+  {
+    m_pointCoords[istart] = QPoint(x1,y1);
+  }
+  for(size_t i = istart + 1; i < n; ++i)
+  {
+    const double& x = (*m_x)[i];
+    if ( x > end )
+    {
+      iend = i;
+      break;
+    }
+    int x2 = xMap.transform(x);
+    int y2 = yMap.transform(m_y.getCalculated(i));
+    painter->drawLine(x1,y1,x2,y1);
+    painter->drawLine(x2,y1,x2,y2);
+    x1 = x2;
+    y1 = y2;
+    if ( doDrawSymbols )
+    {
+      m_pointCoords[i] = QPoint(x1,y1);
+    }
+  }
+
+  // draw the symbols
+  if ( doDrawSymbols )
+  {
+    drawSymbols(painter,istart,iend);
+  }
+}
+
+/// Draw curve in Dots style
+void FunctionCurve::drawDots(QPainter *painter, 
+  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+  const QRect &canvasRect) const
+{
+  const double start = xMap.s1();
+  const double end = xMap.s2();
+
+  const size_t n = m_x->size();
+  // find first point to draw which is 0 or the one before first visible
+  size_t istart = 0;
+  for(; istart < n; ++istart)
+  {
+    const double& x = (*m_x)[istart];
+    if ( x < start ) continue;
+    if ( x > end ) break;
+    if ( istart > 0 ) --istart;
+    break;
+  }
+  if ( istart >= n ) return;
+  size_t iend = n;
+
+  bool doDrawSymbols = m_symbol->style() != QwtSymbol::NoSymbol;
+  if ( doDrawSymbols && m_pointCoords.size() != n )
+  {
+    m_pointCoords.resize(n);
+  }
+
+  // draw the points
+  for(size_t i = istart; i < n; ++i)
+  {
+    const double& x = (*m_x)[i];
+    if ( x > end )
+    {
+      iend = i;
+      break;
+    }
+    int x1 = xMap.transform(x);
+    int y1 = yMap.transform(m_y.getCalculated(i));
+    painter->drawPoint(x1,y1);
+    if ( doDrawSymbols )
+    {
+      m_pointCoords[i] = QPoint(x1,y1);
+    }
+  }
+
+  // draw the symbols
+  if ( doDrawSymbols )
+  {
+    drawSymbols(painter,istart,iend);
+  }
+}
+
+/// Draw curve in NoCurve style
+void FunctionCurve::drawNoCurve(QPainter *painter, 
+  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+  const QRect &canvasRect) const
+{
+  bool doDrawSymbols = m_symbol->style() != QwtSymbol::NoSymbol;
+  if ( !doDrawSymbols ) return;
+
+  const double start = xMap.s1();
+  const double end = xMap.s2();
+
+  const size_t n = m_x->size();
+  // find first point to draw which is 0 or the one before first visible
+  size_t istart = 0;
+  for(; istart < n; ++istart)
+  {
+    const double& x = (*m_x)[istart];
+    if ( x < start ) continue;
+    if ( x > end ) break;
+    if ( istart > 0 ) --istart;
+    break;
+  }
+  if ( istart >= n ) return;
+  size_t iend = n;
+
+  if ( m_pointCoords.size() != n )
+  {
+    m_pointCoords.resize(n);
+  }
+
+  // draw the points
+  for(size_t i = istart; i < n; ++i)
+  {
+    const double& x = (*m_x)[i];
+    if ( x > end )
+    {
+      iend = i;
+      break;
+    }
+    int x1 = xMap.transform(x);
+    int y1 = yMap.transform(m_y.getCalculated(i));
+    m_pointCoords[i] = QPoint(x1,y1);
+  }
+  // draw the symbols
+  drawSymbols(painter,istart,iend);
 }
 
 /**

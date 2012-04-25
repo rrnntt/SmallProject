@@ -81,6 +81,18 @@ protected:
   void drawSticks(QPainter *painter, 
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRect &canvasRect) const;
+  /// Draw curve in Steps style
+  void drawSteps(QPainter *painter, 
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+    const QRect &canvasRect) const;
+  /// Draw curve in Dots style
+  void drawDots(QPainter *painter, 
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+    const QRect &canvasRect) const;
+  /// Draw curve in NoCurve style
+  void drawNoCurve(QPainter *painter, 
+    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+    const QRect &canvasRect) const;
 
   /// Store the x values
   Numeric::FunctionDomain1D_sptr m_x;
