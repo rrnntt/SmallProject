@@ -105,7 +105,7 @@ void GoblinTask::loadEnergyList()
         API::WorkspaceFactory::instance().create("EnergyList")  ));
       ws->loadAscii(fileName.toStdString());
       API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
-      QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().newSubWindow(new QtAPI::Table(ws));
+      QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().createSubWindow(new QtAPI::Table(ws));
       wnd->setWindowTitle(name);
     }
     catch(std::exception& e)
@@ -128,7 +128,7 @@ void GoblinTask::loadLineList()
         API::WorkspaceFactory::instance().create("LineList")  ));
       ws->loadAscii(fileName.toStdString());
       API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
-      QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().newSubWindow(new QtAPI::Table(ws));
+      QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().createSubWindow(new QtAPI::Table(ws));
       wnd->setWindowTitle(name);
     }
     catch(std::exception& e)
@@ -155,7 +155,7 @@ void GoblinTask::createEnergyList()
       DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
         API::WorkspaceFactory::instance().create("EnergyList")  ));
       API::WorkspaceManager::instance().addOrReplace(name,ws);
-      QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().newSubWindow(new QtAPI::Table(ws));
+      QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().createSubWindow(new QtAPI::Table(ws));
       wnd->setWindowTitle(QString::fromStdString(name));
     }
     catch(std::exception& e)

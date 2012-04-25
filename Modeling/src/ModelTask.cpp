@@ -39,7 +39,7 @@ void ModelTask::testModel()
     Model* model = new Model;
     model->load( fileName.toStdString() );
     viewWidget->setModel( model );
-    QtAPI::WindowManager::instance().newSubWindow(viewWidget);
+    QtAPI::WindowManager::instance().createSubWindow(viewWidget);
   }
 
 }

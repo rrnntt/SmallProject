@@ -84,6 +84,7 @@ set( MOC_HEADERS
    inc/QtAPI/TableTask.h
    inc/QtAPI/FileTask.h
    inc/QtAPI/Task.h
+   inc/QtAPI/WindowManager.h
 )
 
 set( UI_FILES

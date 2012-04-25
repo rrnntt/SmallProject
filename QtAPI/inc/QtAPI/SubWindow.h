@@ -16,6 +16,7 @@ class QTAPI_EXPORT SubWindow: public QMdiSubWindow
 public:
   SubWindow(QWidget *parent = NULL);
   virtual QMenu* makeContext() const {return nullptr;}
+  QWidget* getWidget() const {return m_internalWidget;}
 signals:
   void subWindowBecameActive(QtAPI::SubWindow* w);
   void subWindowClosed(QtAPI::SubWindow* w);
@@ -24,6 +25,12 @@ protected slots:
 protected:
   bool event(QEvent * e);
   void closeEvent(QCloseEvent * e);
+  /// Set user defined internal child widget
+  void setInternalWidget(QWidget* w) {m_internalWidget = w;}
+  /// Internal widget of user defined type
+  QWidget *m_internalWidget;
+
+  friend class WindowManager;
 };
 
 } // QtAPI

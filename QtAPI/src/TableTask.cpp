@@ -47,7 +47,7 @@ QPointer<Table> TableTask::newTable() const
   ws->addColumn("double","Y");
   ws->setRowCount(30);
   Table* table = new Table(ws);
-  SubWindow* wnd = WindowManager::instance().newSubWindow(table);
+  SubWindow* wnd = WindowManager::instance().createSubWindow(table);
   wnd->setWindowTitle(name);
   return table;
 }
@@ -68,7 +68,7 @@ void TableTask::loadAsciiTable()const
         API::WorkspaceFactory::instance().create("TableWorkspace")  ));
       ws->loadAscii(fileName.toStdString());
       API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
-      SubWindow* wnd = WindowManager::instance().newSubWindow(new Table(ws));
+      SubWindow* wnd = WindowManager::instance().createSubWindow(new Table(ws));
       wnd->setWindowTitle(name);
     }
     catch(std::exception& e)
@@ -84,7 +84,7 @@ void TableTask::loadAsciiTable()const
  */
 void TableTask::showTable(boost::shared_ptr<DataObjects::TableWorkspace> tws)
 {
-  SubWindow* wnd = WindowManager::instance().newSubWindow(new Table(tws));
+  SubWindow* wnd = WindowManager::instance().createSubWindow(new Table(tws));
   wnd->setWindowTitle(QString::fromStdString(tws->name()));
 }
 

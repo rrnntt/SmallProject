@@ -27,7 +27,7 @@ QMenu* GeometryTask::menu(QtAPI::SubWindow* w) const
 Graph* GeometryTask::createGraph() const
 {
   auto graph = new Graph();
-  QtAPI::WindowManager::instance().newSubWindow(graph);
+  QtAPI::WindowManager::instance().createSubWindow(graph);
   return graph;
 }
 

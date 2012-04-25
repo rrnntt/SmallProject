@@ -8,7 +8,8 @@
 namespace QtAPI
 {
 
-WindowManager::WindowManager()
+WindowManager::WindowManager():
+m_objectHelper(new WindowManagerQObjectHelper(this))
 {
 }
 
@@ -64,5 +65,46 @@ void WindowManager::customMenuBar(QMenuBar* menubar, SubWindow* wnd) const
     }
   }
 }
+
+/**
+ * Creates a new sub-window. Calls virtual newSubWindow() method which must be implemented
+ * by concrete window managers.
+ * @param widget :: User provided internal widget of the subwindow.
+ */
+SubWindow* WindowManager::createSubWindow(QWidget* widget)
+{
+  SubWindow* sw = this->newSubWindow(widget);
+  if ( widget->parentWidget() != sw )
+  {
+    throw std::runtime_error("Wrongly set parent");
+  }
+  sw->setInternalWidget(widget);
+  addSubWindow(sw);
+  QObject::connect(sw,SIGNAL(subWindowClosed(QtAPI::SubWindow*)),m_objectHelper,SLOT(subWindowClosed(QtAPI::SubWindow*)));
+  return sw;
+}
+
+/// Add subwindow to the list
+void WindowManager::addSubWindow(SubWindow* w)
+{
+  m_subWindows << w;
+}
+
+/// Remove subwindow to the list
+void WindowManager::removeSubWindow(SubWindow* w)
+{
+  m_subWindows.removeOne(w);
+}
+
+//-------------------------------------------------------
+//  WindowManagerQObjectHelper methods
+//-------------------------------------------------------
+
+void WindowManagerQObjectHelper::subWindowClosed(SubWindow* w)
+{
+  //std::cerr << "Subwindow closed" << std::endl;
+  m_windowManager->removeSubWindow(w);
+}
+
 
 } // namespace QtAPI

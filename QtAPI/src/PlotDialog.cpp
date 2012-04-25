@@ -3,6 +3,7 @@
 #include "QtAPI/Plot.h"
 #include "QtAPI/PlotDefaults.h"
 #include "QtAPI/FunctionCurve.h"
+#include "QtAPI/WindowManager.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -70,6 +71,7 @@ void PlotDialog::init()
   ui->cbShowLegend->setChecked(m_plot->legend() != NULL);
   
   initCurvePage();
+  initCurveCopyPage();
 }
 
 void PlotDialog::initCurvePage()
@@ -100,6 +102,20 @@ void PlotDialog::initCurvePage()
     ui->cbLineColor->setColor(pen.color());
     ui->cbPenStyle->setStyle(pen.style());
     ui->sbLineWidth->setValue(pen.width());
+  }
+}
+
+void PlotDialog::initCurveCopyPage()
+{
+  auto subWindows = WindowManager::instance().getSubWindows();
+  foreach(SubWindow* sw, subWindows)
+  {
+    QWidget* w = sw->getWidget();
+    Plot* plot = dynamic_cast<Plot*>(w);
+    if ( plot )
+    {
+      ui->cbPlots->addItem(plot->title().text());
+    }
   }
 }
 

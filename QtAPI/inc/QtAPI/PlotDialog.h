@@ -25,6 +25,7 @@ protected:
     void changeEvent(QEvent *e);
     void init();
     void initCurvePage();
+    void initCurveCopyPage();
     void apply();
     void applyPlot();
     void applyCurve();

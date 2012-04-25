@@ -115,7 +115,7 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   plot->updateAxes();
   plot->setZoomBase();
 
-  WindowManager::instance().newSubWindow(plot);
+  WindowManager::instance().createSubWindow(plot);
   return plot;
 }
 
@@ -182,7 +182,7 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   plot->setAxisTitle(Plot::yLeft,QString::fromStdString(yAxisTitle));
   plot->updateAxes();
   plot->setZoomBase();
-  WindowManager::instance().newSubWindow(plot);
+  WindowManager::instance().createSubWindow(plot);
   return plot;
 }
 
