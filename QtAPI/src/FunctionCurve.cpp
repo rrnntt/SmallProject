@@ -13,7 +13,10 @@ namespace QtAPI
  * Constructor.
  */
 FunctionCurve::FunctionCurve():
-m_x(new Numeric::FunctionDomain1DVector(0.0))
+m_x(new Numeric::FunctionDomain1DVector(0.0)),
+m_curveStyle(Lines),
+m_symbol(new QwtSymbol)
+//m_symbol(new QwtSymbol(QwtSymbol::Diamond,QBrush(Qt::gray),QPen(Qt::black),QSize(4,4)))
 {
   m_y.reset(*m_x);
 }
@@ -23,6 +26,19 @@ m_x(new Numeric::FunctionDomain1DVector(0.0))
  */
 FunctionCurve::~FunctionCurve()
 {
+}
+
+/// Set new symbol type and appearance (size and colour)
+void FunctionCurve::setSymbol(const QwtSymbol &s)
+{
+  delete m_symbol;
+  m_symbol = s.clone();
+}
+
+/// Get current symbol
+const QwtSymbol& FunctionCurve::symbol() const
+{
+  return *m_symbol;
 }
 
 /**
@@ -119,6 +135,18 @@ void FunctionCurve::drawObject(QPainter *painter,
   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
   const QRect &canvasRect) const
 {
+  switch( m_curveStyle )
+  {
+  case Lines: drawLines(painter, xMap, yMap, canvasRect); break;
+  case Sticks: drawSticks(painter, xMap, yMap, canvasRect); break;
+  default: drawLines(painter, xMap, yMap, canvasRect); break;
+  };
+}
+
+/// Draw curve in Lines style
+void FunctionCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+  const QRect &canvasRect) const
+{
   const double start = xMap.s1();
   const double end = xMap.s2();
 
@@ -134,21 +162,114 @@ void FunctionCurve::drawObject(QPainter *painter,
     break;
   }
   if ( istart >= n ) return;
+  size_t iend = n;
+
+  bool doDrawSymbols = m_symbol->style() != QwtSymbol::NoSymbol;
+  if ( doDrawSymbols && m_pointCoords.size() != n )
+  {
+    m_pointCoords.resize(n);
+  }
+
   // draw the points
   int x1 = xMap.transform((*m_x)[istart]);
   int y1 = yMap.transform(m_y.getCalculated(istart));
+  if ( doDrawSymbols )
+  {
+    m_pointCoords[istart] = QPoint(x1,y1);
+  }
   for(size_t i = istart + 1; i < n; ++i)
   {
     const double& x = (*m_x)[i];
-    if ( x > end ) break;
+    if ( x > end )
+    {
+      iend = i;
+      break;
+    }
     int x2 = xMap.transform(x);
     int y2 = yMap.transform(m_y.getCalculated(i));
     painter->drawLine(x1,y1,x2,y2);
     x1 = x2;
     y1 = y2;
+    if ( doDrawSymbols )
+    {
+      m_pointCoords[i] = QPoint(x1,y1);
+    }
+  }
+
+  // draw the symbols
+  if ( doDrawSymbols )
+  {
+    drawSymbols(painter,istart,iend);
   }
 }
 
+/// Draw curve in Sticks style
+void FunctionCurve::drawSticks(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+  const QRect &canvasRect) const
+{
+  const double start = xMap.s1();
+  const double end = xMap.s2();
+
+  const size_t n = m_x->size();
+  // find first point to draw which is 0 or the one before first visible
+  size_t istart = 0;
+  for(; istart < n; ++istart)
+  {
+    const double& x = (*m_x)[istart];
+    if ( x < start ) continue;
+    if ( x > end ) break;
+    if ( istart > 0 ) --istart;
+    break;
+  }
+  if ( istart >= n ) return;
+  size_t iend = n;
+
+  bool doDrawSymbols = m_symbol->style() != QwtSymbol::NoSymbol;
+  if ( doDrawSymbols && m_pointCoords.size() != n )
+  {
+    m_pointCoords.resize(n);
+  }
+
+  // draw the points
+  int y1 = yMap.p1();
+  for(size_t i = istart; i < n; ++i)
+  {
+    const double& x = (*m_x)[i];
+    if ( x > end )
+    {
+      iend = i;
+      break;
+    }
+    int x2 = xMap.transform(x);
+    int y2 = yMap.transform(m_y.getCalculated(i));
+    painter->drawLine(x2,y1,x2,y2);
+    if ( doDrawSymbols )
+    {
+      m_pointCoords[i] = QPoint(x2,y2);
+    }
+  }
+
+  // draw the symbols
+  if ( doDrawSymbols )
+  {
+    drawSymbols(painter,istart,iend);
+  }
+}
+
+/**
+ * Draw the symbols. Symbol positions are taken from m_pointCoords.
+ * @param painter :: The painter object
+ * @param istart :: Starting index
+ * @param iend :: End index
+ */
+void FunctionCurve::drawSymbols(QPainter *painter, size_t istart, size_t iend) const
+{
+  if ( m_pointCoords.size() < (int)iend ) return;
+  for(size_t i = istart; i < iend; ++i)
+  {
+    m_symbol->draw(painter,m_pointCoords[i]);
+  }
+}
 
 
 } // QtAPI

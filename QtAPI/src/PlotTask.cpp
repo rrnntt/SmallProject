@@ -104,6 +104,7 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   colX->fill(x);
   colY->fill(y);
   curve->setData(x,y);
+  curve->setWorkspace(tws);
   auto plot = new Plot();
   plot->addCurve(curve);
 
@@ -164,8 +165,9 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
     columnX->fill(x);
     columnY->fill(y);
     curve->setData(x,y);
+    curve->setWorkspace(tws);
     plot->addCurve(curve);
-    //curve->setStyle((PlotCurve::CurveStyle)m_table->getWorkspace()->getCurveStyle());
+    curve->setCurveStyle((FunctionCurve::CurveStyle)m_table->getWorkspace()->getCurveStyle());
     //curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
     if (yAxisTitle.empty())
     {
@@ -224,9 +226,10 @@ void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWo
     columnX->fill(x);
     columnY->fill(y);
     curve->setData(x,y);
+    curve->setWorkspace(tws);
     plot->addCurve(curve);
     plot->updateAxes();
-    //curve->setStyle((PlotCurve::CurveStyle)tws->getCurveStyle());
+    curve->setCurveStyle((FunctionCurve::CurveStyle)tws->getCurveStyle());
     //curve->setTitle(QString::fromStdString(tws->name() + "_" + columnXName + "_" + *columnName));
     if (yAxisTitle.empty())
     {
