@@ -70,6 +70,10 @@ public:
   void setRescaler(PlotRescaler* rescaler);
 
   void delayedReplot();
+  /// Save to a file as an image
+  void saveAsImage(const QString& fileName) ;
+  /// Save to a PDF file
+  void saveAsPDF(const QString& fileName) ;
 
 signals:
   void needReplot();

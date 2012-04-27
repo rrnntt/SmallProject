@@ -18,6 +18,8 @@
 
 #include <QPalette>
 #include <QResizeEvent>
+#include <QPixmap>
+#include <QPrinter>
 
 #include <iostream>
 #include <algorithm>
@@ -450,6 +452,34 @@ void Plot::removeCurve(PlotObject::id_t id)
       delete item;
     }
   }
+}
+
+/**
+ * Save to a file as an image
+ * @param fileName :: Name of a file to save to.
+ */
+void Plot::saveAsImage(const QString& fileName)
+{
+  QPixmap image(this->size());
+  image.fill();
+  this->print(image);
+  image.save(fileName);
+}
+
+/**
+ * Save to a PDF file
+ * @param fileName :: Name of a file to save to.
+ */
+void Plot::saveAsPDF(const QString& fileName)
+{
+  QPrinter printer;
+  printer.setDocName ("Test");
+  printer.setCreator("Test");
+  printer.setFullPage(true);
+  printer.setOutputFileName(fileName);
+  printer.setOutputFormat(QPrinter::PdfFormat);
+  print(printer);
+
 }
 
 

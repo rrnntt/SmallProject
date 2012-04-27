@@ -51,6 +51,8 @@ protected slots:
   void setCustomPicker();
   void showPlotDialog();
   void menuAboutToShow();
+  void savePlotAsImage();
+  void savePlotAsPDF();
 protected:
   QMenu* tableMenu(const Table* table) const;
 
@@ -62,6 +64,8 @@ protected:
   QAction *m_setMagnifier; ///< select magnifier
   QAction *m_setCustomPicker; ///< select ???
   QAction *m_showPlotDialog; ///< show plot settings dialog
+  QAction *m_savePlotAsImage; ///< save imported image to a file
+  QAction *m_savePlotAsPDF; ///< save to a PDF file
 };
 
 } // namespace QtAPI

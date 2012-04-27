@@ -12,6 +12,7 @@
 
 #include <QtGui/QMenu>
 #include <QtGui/QActionGroup>
+#include <QtGui/QFileDialog>
 
 namespace QtAPI
 {
@@ -45,6 +46,14 @@ PlotTask::PlotTask()
   m_showPlotDialog = new QAction("Plot settings...",this);
   connect(m_showPlotDialog,SIGNAL(triggered()),this,SLOT(showPlotDialog()));
   addAction("PlotSettings",m_showPlotDialog);
+
+  m_savePlotAsImage = new QAction("Save as image ...",this);
+  connect(m_savePlotAsImage,SIGNAL(triggered()),this,SLOT(savePlotAsImage()));
+  addAction("SaveAsImage",m_savePlotAsImage);
+
+  m_savePlotAsPDF = new QAction("Save as PDF ...",this);
+  connect(m_savePlotAsPDF,SIGNAL(triggered()),this,SLOT(savePlotAsPDF()));
+  addAction("SaveAsPDF",m_savePlotAsPDF);
 }
 
 QMenu* PlotTask::menu(SubWindow* w) const
@@ -77,6 +86,9 @@ QMenu* PlotTask::menu(SubWindow* w) const
     theMenu->addAction(m_showPlotDialog);
     theMenu->addSeparator();
     theMenu->addActions(m_pickerGroup->actions());
+    theMenu->addSeparator();
+    theMenu->addAction(m_savePlotAsImage);
+    theMenu->addAction(m_savePlotAsPDF);
     connect(theMenu,SIGNAL(aboutToShow()),this,SLOT(menuAboutToShow()));
     return theMenu;
   }
@@ -340,6 +352,26 @@ void PlotTask::menuAboutToShow()
     {
       m_setCustomPicker->setChecked(true);
     }
+  }
+}
+
+void PlotTask::savePlotAsImage()
+{
+  if (!m_plot) return;
+  QString fileName = QFileDialog::getSaveFileName(m_plot,"Save as image");
+  if ( !fileName.isEmpty() )
+  {
+    m_plot->saveAsImage( fileName );
+  }
+}
+
+void PlotTask::savePlotAsPDF()
+{
+  if (!m_plot) return;
+  QString fileName = QFileDialog::getSaveFileName(m_plot,"Save as image");
+  if ( !fileName.isEmpty() )
+  {
+    m_plot->saveAsPDF( fileName );
   }
 }
 
