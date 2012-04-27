@@ -22,10 +22,15 @@ public:
   /// Plot object id type, objects are identified by ids rather than pointers. Start with 1, 0 means all objects
   typedef size_t id_t;
   PlotObject();
+  PlotObject(const PlotObject&);
   virtual ~PlotObject(){}
+
+  /// "Virtual copy constructor"
+  virtual PlotObject* clone() const = 0;
 
   /// If an object has a connection to a workspace, it can return a pointer to it.
   /// Useful for interactions with workspaces via Plot and pickers.
+  /// This workspace is different from a PlotWorkspace containing this object.
   virtual API::Workspace_ptr getWorkspace() const {return API::Workspace_ptr();}
   /*!
   \brief Draw the item
@@ -41,11 +46,19 @@ public:
   /// Return the bounding rectangle
   virtual QRectF boundingRect() const = 0;
 
+  /// Set and get the current pen
   void setPen(const QPen& pen) {m_pen = pen;}
   const QPen& pen() const {return m_pen;}
 
+  /// Set and get the title
+  void setTitle(const QString& title) {m_title = title;}
+  QString getTitle() const {return m_title;}
+
 protected:
 
+  /// Title ob the object
+  QString m_title;
+  /// Pen to draw this object with
   QPen m_pen;
 
 };

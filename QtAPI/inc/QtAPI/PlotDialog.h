@@ -9,6 +9,8 @@ namespace Ui {
     class PlotDialog;
 }
 
+class QListWidget;
+
 namespace QtAPI
 {
 
@@ -29,10 +31,17 @@ protected:
     void apply();
     void applyPlot();
     void applyCurve();
+    /// Fills a list widget with curves from a plot
+    void fillCurves(QListWidget* cb, Plot* plot);
 
 private slots:
 
     void accept();
+    void updateCurveList(int);
+    void copyCurve();
+    void deleteCurve();
+    void updateCurve(int);
+    void updateThisCurveList();
 
 private:
     Ui::PlotDialog *ui;

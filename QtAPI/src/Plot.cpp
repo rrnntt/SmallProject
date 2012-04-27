@@ -335,6 +335,28 @@ QList<PlotObject::id_t> Plot::getCurveIDs() const
 }
 
 /**
+ * Return a list of curve items. Only FunctionCurve object are included.
+ */
+QList<PlotItem*> Plot::getAllCurveItems() const
+{
+  auto items = this->itemList();
+  QList<PlotItem*> out;
+  foreach(QwtPlotItem* item, items)
+  {
+    auto plotItem = dynamic_cast<PlotItem*>(item);
+    if ( plotItem && plotItem->getWorkspace() )
+    {
+      auto obj = plotItem->getWorkspace()->getPlotObject(plotItem->getID());
+      if ( obj && dynamic_cast<FunctionCurve*>(obj) )
+      {
+        out << plotItem;
+      }
+    }
+  }
+  return out;
+}
+
+/**
  * Return a pointer to a curve by an id. DO NOT KEEP THE POINTER, KEEP ID!
  * If curve doesn't exist return nullptr.
  * @param id :: Id of a curve.
@@ -376,6 +398,58 @@ PlotObject::id_t Plot::bringForwardNextCurve(PlotObject::id_t id)
   }
 
   return id;
+}
+
+/**
+ * Creates a plot item pointing to an object owned by this plot.
+ * @param id :: ID of the object.
+ */
+PlotItem* Plot::createPlotItem(PlotObject::id_t id) const
+{
+  auto obj = m_curves->getPlotObject(id);
+  if ( obj )
+  {
+    return new PlotItem(m_curves, id);
+  }
+  else
+  {
+    obj = m_plotObjects->getPlotObject(id);
+    if ( obj )
+    {
+      return new PlotItem(m_plotObjects, id);
+    }
+  }
+  return nullptr;
+}
+
+
+/**
+ * Copy a curve from another plot. Puts a PlotItem referencing the curve into 
+ * this plot.
+ */
+void Plot::copyCurve(Plot* plot, PlotObject::id_t id)
+{
+  auto curve = plot->getCurve(id);
+  auto newCurve = dynamic_cast<FunctionCurve*>(curve->clone());
+  if ( newCurve ) addCurve( newCurve );
+}
+
+/**
+ * Remove a curve.
+ * @param id :: ID of a curve to remove.
+ */
+void Plot::removeCurve(PlotObject::id_t id)
+{
+  auto items = getAllCurveItems();
+  foreach(PlotItem* item, items)
+  {
+    if ( item->getID() == id && item->getWorkspace() == m_curves )
+    {
+      m_curves->removeObject(id);
+      item->detach();
+      delete item;
+    }
+  }
 }
 
 

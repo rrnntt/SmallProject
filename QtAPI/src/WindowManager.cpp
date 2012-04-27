@@ -9,7 +9,8 @@ namespace QtAPI
 {
 
 WindowManager::WindowManager():
-m_objectHelper(new WindowManagerQObjectHelper(this))
+m_objectHelper(new WindowManagerQObjectHelper(this)),
+m_idSeed(1)
 {
 }
 
@@ -79,6 +80,7 @@ SubWindow* WindowManager::createSubWindow(QWidget* widget)
     throw std::runtime_error("Wrongly set parent");
   }
   sw->setInternalWidget(widget);
+  sw->setID(m_idSeed++);
   addSubWindow(sw);
   QObject::connect(sw,SIGNAL(subWindowClosed(QtAPI::SubWindow*)),m_objectHelper,SLOT(subWindowClosed(QtAPI::SubWindow*)));
   return sw;
@@ -94,6 +96,16 @@ void WindowManager::addSubWindow(SubWindow* w)
 void WindowManager::removeSubWindow(SubWindow* w)
 {
   m_subWindows.removeOne(w);
+}
+
+/// Get a subwindow by its id
+SubWindow* WindowManager::getSubWindow(size_t id) const
+{
+  for(auto sw = m_subWindows.begin(); sw != m_subWindows.end(); ++sw)
+  {
+    if ( (**sw).getID() == id ) return *sw;
+  }
+  return nullptr;
 }
 
 //-------------------------------------------------------

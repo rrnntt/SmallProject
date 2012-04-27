@@ -123,7 +123,7 @@ void SymbolBox::init(bool showNoSymbol)
   p.end();
 }
 
-void SymbolBox::setStyle(const QwtSymbol::Style& style)
+void SymbolBox::setSymbolStyle(const QwtSymbol::Style& style)
 {
   // Avoid compiler warnings relating to symbols + sizeof(symbols) being out of range
   size_t n = sizeof(symbols);
@@ -171,7 +171,7 @@ int SymbolBox::symbolIndex(const QwtSymbol::Style& style)
 //  return (int(ite - symbols));
 }
 
-QwtSymbol::Style SymbolBox::style(int index)
+QwtSymbol::Style SymbolBox::symbolStyle(int index)
 {
   if (index >= 0 && index < (int)sizeof(symbols))
     return symbols[index];

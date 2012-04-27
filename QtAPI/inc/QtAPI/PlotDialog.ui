@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>471</width>
-    <height>393</height>
+    <width>564</width>
+    <height>504</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Plot settings</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4">
+  <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -297,17 +297,27 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="cbSymbolShape"/>
+             <widget class="QtAPI::SymbolBox" name="cbSymbolShape"/>
             </item>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QLabel" name="label_16">
               <property name="text">
                <string>Size</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
+            <item row="2" column="1">
              <widget class="QSpinBox" name="sbSymbolSize"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>Brush</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QtAPI::ColorBox" name="cbSymbolColor"/>
             </item>
            </layout>
           </widget>
@@ -333,14 +343,14 @@
       <attribute name="title">
        <string>Curves</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_8">
+      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,0">
        <item>
         <widget class="QSplitter" name="splitter">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
          <widget class="QWidget" name="">
-          <layout class="QVBoxLayout" name="verticalLayout_7">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <widget class="QComboBox" name="cbPlots"/>
            </item>
@@ -349,8 +359,39 @@
            </item>
           </layout>
          </widget>
-         <widget class="QListView" name="lstThisCurves"/>
+         <widget class="QListWidget" name="lstThisCurves"/>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QPushButton" name="btnCopy">
+           <property name="text">
+            <string>Copy &gt;&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnDelete">
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -399,6 +440,11 @@
    <class>QtAPI::PenStyleBox</class>
    <extends>QComboBox</extends>
    <header>QtAPI/PenStyleBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QtAPI::SymbolBox</class>
+   <extends>QComboBox</extends>
+   <header>QtAPI/SymbolBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

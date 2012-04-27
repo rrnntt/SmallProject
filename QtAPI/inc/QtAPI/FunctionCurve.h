@@ -35,10 +35,14 @@ public:
   };
 
   FunctionCurve();
+  FunctionCurve(const FunctionCurve& right);
   ~FunctionCurve();
 
-   virtual API::Workspace_ptr getWorkspace() const {return m_workspace;}
-   void setWorkspace(API::Workspace_ptr workspace) {m_workspace = workspace;}
+  /// "Virtual copy constructor"
+  virtual PlotObject* clone() const;
+
+  virtual API::Workspace_ptr getWorkspace() const {return m_workspace;}
+  void setWorkspace(API::Workspace_ptr workspace) {m_workspace = workspace;}
 
   /*!
   \brief Draw the item

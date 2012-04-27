@@ -26,6 +26,8 @@ public:
   virtual std::string id()const {return "PlotWorkspace";}
   /// Add an object
   PlotObject::id_t addObject(PlotObject* obj);
+  /// Remove an object
+  void removeObject(PlotObject::id_t id);
   /// Return a pointer to a plot object with given id
   PlotObject* getPlotObject(PlotObject::id_t id) const;
   /// Return a list of all ids

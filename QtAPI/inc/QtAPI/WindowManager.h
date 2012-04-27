@@ -28,6 +28,8 @@ public:
   virtual void customMenuBar(QMenuBar*, SubWindow* wnd) const;
   /// Get a list of all subwindows
   QList<SubWindow*> getSubWindows() const {return m_subWindows;}
+  /// Get a subwindow by its id
+  SubWindow* getSubWindow(size_t id) const;
 
 protected:
   /// Implemented by concrete managers to create instances of subwindows
@@ -43,6 +45,8 @@ protected:
 
   /// Keep all open subwindows
   QList<SubWindow*> m_subWindows;
+  /// Seed for subwindow ids.
+  size_t m_idSeed;
 };
 
 /**

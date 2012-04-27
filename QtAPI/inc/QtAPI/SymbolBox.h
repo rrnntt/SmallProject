@@ -22,10 +22,10 @@ public:
    */
   SymbolBox(bool showNoSymbol = true, QWidget *parent = 0);
 
-  void setStyle(const QwtSymbol::Style& c);
+  void setSymbolStyle(const QwtSymbol::Style& c);
   QwtSymbol::Style selectedSymbol() const;
 
-  static QwtSymbol::Style style(int index);
+  static QwtSymbol::Style symbolStyle(int index);
   static int symbolIndex(const QwtSymbol::Style& style);
   static QList<int> defaultSymbols();
 

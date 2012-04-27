@@ -21,6 +21,24 @@ m_symbol(new QwtSymbol)
   m_y.reset(*m_x);
 }
 
+FunctionCurve::FunctionCurve(const FunctionCurve& right):
+PlotObject(right),
+m_x(new Numeric::FunctionDomain1DVector(*right.m_x)),
+m_curveStyle(right.m_curveStyle),
+m_workspace(right.m_workspace),
+m_symbol(new QwtSymbol(*right.m_symbol))
+{
+  m_y.reset(*m_x);
+  m_y = right.m_y;
+}
+
+/// "Virtual copy constructor"
+PlotObject* FunctionCurve::clone() const
+{
+  return new FunctionCurve(*this);
+}
+
+
 /**
  * Destructor.
  */
@@ -136,7 +154,11 @@ void FunctionCurve::drawObject(QPainter *painter,
   const QRect &canvasRect) const
 {
   painter->save();
-  painter->setPen(pen());
+  QPen p = pen();
+  //painter->setRenderHint(QPainter::Antialiasing);
+  //p.setJoinStyle(Qt::RoundJoin);
+  //p.setCapStyle(Qt::RoundCap);
+  painter->setPen(p);
   switch( m_curveStyle )
   {
   case NoCurve: drawNoCurve(painter, xMap, yMap, canvasRect); break;
@@ -172,6 +194,7 @@ void FunctionCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, const 
 
   bool doDrawSymbols = m_symbol->style() != QwtSymbol::NoSymbol;
   if ( doDrawSymbols && m_pointCoords.size() != n )
+  //if ( m_pointCoords.size() != n )
   {
     m_pointCoords.resize(n);
   }
@@ -201,6 +224,7 @@ void FunctionCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, const 
       m_pointCoords[i] = QPoint(x1,y1);
     }
   }
+  //painter->drawPolyline(m_pointCoords.data()+istart,iend - istart); // higher quality
 
   // draw the symbols
   if ( doDrawSymbols )

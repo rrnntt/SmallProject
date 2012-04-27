@@ -25,6 +25,8 @@ public:
   ~PlotItem();
   /// Return plot object id
   PlotObject::id_t getID() const {return m_id;}
+  /// Return the workspace owning the object
+  boost::shared_ptr<PlotWorkspace> getWorkspace() const {return m_workspace.lock();}
   /*!
   \brief Draw the item
 

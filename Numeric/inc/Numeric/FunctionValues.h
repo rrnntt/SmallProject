@@ -53,6 +53,16 @@ public:
   void addToCalculated(size_t i, double value) {m_calculated[i] += value;}
 
   /// Add other calculated values
+  FunctionValues& operator=(const FunctionValues& values)
+  {
+    if (size() != values.size())
+    {
+      throw std::runtime_error("Cannot add values: sizes do not match");
+    }
+    values.copyTo(getPointerToCalculated(0));
+    return *this;
+  }
+  /// Add other calculated values
   FunctionValues& operator+=(const FunctionValues& values)
   {
     if (size() != values.size())

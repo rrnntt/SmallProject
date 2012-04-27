@@ -73,5 +73,4 @@ QwtDoubleRect PlotItem::boundingRect() const
   return QwtDoubleRect();
 }
 
-
 } // QtAPI

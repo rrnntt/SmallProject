@@ -36,10 +36,18 @@ public:
   void addCurve(FunctionCurve* curve);
   /// Return a list of curve ids
   QList<PlotObject::id_t> getCurveIDs() const;
+  /// Return a list of curve items
+  QList<PlotItem*> getAllCurveItems() const;
   /// Return a pointer to a curve
   FunctionCurve* getCurve(PlotObject::id_t id) const;
+  /// Creates a plot item pointing to an object owned by this plot.
+  PlotItem* createPlotItem(PlotObject::id_t id) const;
   /// Bring forward (place on top) a curve following given in the internal list of curves
   PlotObject::id_t bringForwardNextCurve(PlotObject::id_t id);
+  /// Copy a curve.
+  void copyCurve(Plot* plot, PlotObject::id_t id);
+  /// Remove a curve
+  void removeCurve(PlotObject::id_t);
 
   void setZoomBase();
   bool isZoomerEnabled() const;

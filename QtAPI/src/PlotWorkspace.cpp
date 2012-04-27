@@ -38,6 +38,15 @@ PlotObject::id_t PlotWorkspace::addObject(PlotObject* obj)
 }
 
 /**
+ * Remove an object
+ * @param id :: ID of an object to remove
+ */
+void PlotWorkspace::removeObject(PlotObject::id_t id)
+{
+  m_objects.remove(id);
+}
+
+/**
  * Return a pointer to a plot object with given id
  * @param id :: An object id
  * @return :: A pointer to a plot object or nullptr if it doesn't exist
