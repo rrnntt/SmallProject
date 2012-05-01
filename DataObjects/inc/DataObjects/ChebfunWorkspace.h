@@ -28,5 +28,9 @@ protected:
   Numeric::chebfun_ptr m_fun;
 };
 
+/// typedef shared pointer
+typedef boost::shared_ptr<ChebfunWorkspace> ChebfunWorkspace_sptr;
+typedef boost::shared_ptr<const ChebfunWorkspace> ChebfunWorkspace_const_sptr;
+
 } // namespace DataObjects
 #endif // DATAOBJECTS_CHEBFUNWORKSPACE_H

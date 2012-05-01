@@ -16,7 +16,7 @@ DECLARE_ALGORITHM(CreateChebfun);
 
 CreateChebfun::CreateChebfun()
 {
-  declare("OutputWorkspace",new API::WorkspaceProperty(Kernel::Property::Output));
+  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Output));
   declare("StartX",new Kernel::DoubleProperty);
   declare("EndX",new Kernel::DoubleProperty);
   declare("N",new Kernel::IntProperty);
