@@ -1,13 +1,13 @@
-#ifndef TEACH_GRAPH_H
-#define TEACH_GRAPH_H
+#ifndef TEACHQT_GRAPH_H
+#define TEACHQT_GRAPH_H
 
-#include "Teach/DllExport.h"
+#include "TeachQt/DllExport.h"
 #include "QtAPI/Plot.h"
 
-namespace Teach
+namespace TeachQt
 {
 
-class TEACH_EXPORT Graph: public QtAPI::Plot
+class TEACHQT_EXPORT Graph: public QtAPI::Plot
 {
   Q_OBJECT
 public:
@@ -22,4 +22,4 @@ protected:
 };
 
 } // namespace Teach
-#endif // TEACH_GRAPH_H
+#endif // TEACHQT_GRAPH_H

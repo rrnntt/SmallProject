@@ -5,10 +5,7 @@
 
 set( INC_FILES 
    inc/Teach/DllExport.h
-   inc/Teach/Graph.h
-   inc/Teach/GraphShape.h
    inc/Teach/Problem.h
-   inc/Teach/GeometryTask.h
    inc/Teach/Geom2DObject.h
    inc/Teach/Geom2DWorkspace.h
    inc/Teach/SimulateParticle.h
@@ -16,41 +13,25 @@ set( INC_FILES
    )
 
 set( SRC_FILES 
-  src/GeometryTask.cpp
   src/Geom2DObject.cpp
   src/Geom2DWorkspace.cpp
-  src/Graph.cpp
-  src/GraphShape.cpp
   src/Problem.cpp
   src/SimulateParticle.cpp
   src/Text.cpp
   )
 
-set( MOC_HEADERS
-   inc/Teach/GeometryTask.h
-   inc/Teach/Graph.h
-)
-
-set( UI_FILES
-)
-
-qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
-#qt4_wrap_ui(UI_HEADERS ${UI_FILES})
-
-add_library( Teach SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} )
+add_library( Teach SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc 
 ../Kernel/inc
 ../API/inc
 ../Formula/inc
 ../Numeric/inc
 ../DataObjects/inc
-../QtAPI/inc
- ../qwt/src
 ${THIRD_PARTY_INCLUDE_DIR}
 )
 set_target_properties ( Teach PROPERTIES COMPILE_DEFINITIONS IN_TEACH )
 target_link_libraries(Teach
-QtAPI Kernel API Formula Numeric DataObjects qwt
+Kernel API Formula Numeric DataObjects
 )
 
 #
@@ -70,9 +51,7 @@ include_directories(test ${THIRD_PARTY_INCLUDE_DIR} )
 find_library(GTEST_DEBUG_LIB gtest_d "${THIRD_PARTY_LIB_DIR}")
 find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
 target_link_libraries(TeachTest 
-${GTEST_LIBS} Formula Teach QtAPI
-${QT_QTCORE_LIBRARY}
-${QT_QTGUI_LIBRARY}
+${GTEST_LIBS} Formula Teach
 )
 
 # Add to UnitTests folder in an IDE

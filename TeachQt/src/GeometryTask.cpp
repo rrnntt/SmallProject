@@ -1,11 +1,11 @@
-#include "Teach/GeometryTask.h"
-#include "Teach/Graph.h"
+#include "TeachQt/GeometryTask.h"
+#include "TeachQt/Graph.h"
 #include "QtAPI/TaskFactory.h"
 #include "QtAPI/WindowManager.h"
 
 #include <QtGui/QMenu>
 
-namespace Teach
+namespace TeachQt
 {
 
 DECLARE_TASK(GeometryTask);

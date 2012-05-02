@@ -1,9 +1,9 @@
-#include "Teach/Graph.h"
+#include "TeachQt/Graph.h"
 #include "QtAPI/PlotRescaler.h"
 
-#include "Teach/GraphShape.h"
+#include "TeachQt/GraphShape.h"
 
-namespace Teach
+namespace TeachQt
 {
 
 Graph::Graph():

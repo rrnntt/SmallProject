@@ -1,4 +1,4 @@
-#include "Teach/GraphShape.h"
+#include "TeachQt/GraphShape.h"
 
 #include "qwt_scale_map.h"
 
@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-namespace Teach
+namespace TeachQt
 {
 
 GraphShape::GraphShape()

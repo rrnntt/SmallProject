@@ -1,17 +1,17 @@
-#ifndef TEACH_GEOMETRYTASK_H
-#define TEACH_GEOMETRYTASK_H
+#ifndef TEACHQT_GEOMETRYTASK_H
+#define TEACHQT_GEOMETRYTASK_H
 
-#include "Teach/DllExport.h"
+#include "TeachQt/DllExport.h"
 #include "QtAPI/Task.h"
 
 class QAction;
 
-namespace Teach
+namespace TeachQt
 {
 
 class Graph;
 
-class TEACH_EXPORT GeometryTask: public QtAPI::Task
+class TEACHQT_EXPORT GeometryTask: public QtAPI::Task
 {
   Q_OBJECT
 public:
@@ -30,4 +30,4 @@ protected:
 };
 
 } // namespace Teach
-#endif // TEACH_GEOMETRYTASK_H
+#endif // TEACHQT_GEOMETRYTASK_H

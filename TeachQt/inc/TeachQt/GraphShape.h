@@ -1,16 +1,16 @@
-#ifndef TEACH_GRAPHSHAPE_H
-#define TEACH_GRAPHSHAPE_H
+#ifndef TEACHQT_GRAPHSHAPE_H
+#define TEACHQT_GRAPHSHAPE_H
 
-#include "Teach/DllExport.h"
+#include "TeachQt/DllExport.h"
 
 #include "qwt_plot_item.h"
 
 #include <QtGui/QPen>
 
-namespace Teach
+namespace TeachQt
 {
 
-class TEACH_EXPORT GraphShape: public QwtPlotItem
+class TEACHQT_EXPORT GraphShape: public QwtPlotItem
 {
 public:
   GraphShape();
@@ -25,7 +25,7 @@ protected:
   QPen m_pen;
 };
 
-class TEACH_EXPORT GraphPoint: public GraphShape
+class TEACHQT_EXPORT GraphPoint: public GraphShape
 {
 public:
   GraphPoint();
@@ -39,7 +39,7 @@ protected:
   int m_size;
 };
 
-class TEACH_EXPORT GraphCircle: public GraphShape
+class TEACHQT_EXPORT GraphCircle: public GraphShape
 {
 public:
   GraphCircle();
@@ -56,7 +56,7 @@ protected:
   QPointF m_centre;
 };
 
-class TEACH_EXPORT GraphLineSegment: public GraphShape
+class TEACHQT_EXPORT GraphLineSegment: public GraphShape
 {
 public:
   GraphLineSegment();
@@ -70,4 +70,4 @@ protected:
 };
 
 } // namespace Teach
-#endif // TEACH_GRAPHSHAPE_H
+#endif // TEACHQT_GRAPHSHAPE_H
