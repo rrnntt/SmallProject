@@ -14,6 +14,8 @@ namespace API
   {
   public:
     WorkspaceProperty(Kernel::Property::Direction dir = Kernel::Property::Input);
+    WorkspaceProperty(const WorkspaceProperty& value);
+    WorkspaceProperty& operator=(const WorkspaceProperty& value);
     virtual Kernel::Property& operator=(const std::string& str);
     virtual operator std::string() const;
     virtual operator Workspace_ptr() const;

@@ -28,7 +28,7 @@ void UniformChebfun::exec()
   API::WorkspaceProperty inProp = get("InputTable").as<API::WorkspaceProperty>();
   auto tws = inProp.to<TableWorkspace>();
 
-  API::WorkspaceProperty outProp = get("OutputChebfun").as<API::WorkspaceProperty>();
+  API::WorkspaceProperty& outProp = get("OutputChebfun").as<API::WorkspaceProperty>();
 
   std::string xColumnName = get("XColumn");
   auto xColumn = static_cast<DataObjects::TableColumn<double>*>(tws->getColumn(xColumnName).get());
@@ -43,7 +43,7 @@ void UniformChebfun::exec()
   double start = x.front();
   double end = x.back();
 
-  cws->fun().uniformFit(start,end,y);
+  cws->fun(0).uniformFit(start,end,y);
 
   outProp = boost::shared_ptr<ChebfunWorkspace>(cws);
 

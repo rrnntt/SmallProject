@@ -4,28 +4,45 @@
 #include "DataObjects/DllExport.h"
 #include "API/Workspace.h"
 #include "Numeric/Chebfun.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
+#include "Numeric/JointDomain.h"
+
+#include <vector>
 
 namespace DataObjects
 {
 
+/**
+ * 
+ */
 class DATAOBJECTS_EXPORT ChebfunWorkspace: public API::Workspace
 {
 public:
   ChebfunWorkspace();
   ~ChebfunWorkspace(){}
   virtual std::string id()const {return "ChebfunWorkspace";}
-  int n()const{return m_fun->n();}
-  void set(int n,const double& startX = -1,const double& endX = 1){m_fun->set(n,startX,endX);}
-  double startX()const{return m_fun->startX();}
-  void setStartX(const double& d){m_fun->setStartX(d);}
-  double endX()const{return m_fun->endX();}
-  void setEndX(const double& d){m_fun->setEndX(d);}
-  void setRange(const double& s,const double& e){m_fun->setRange(s,e);}
-  double& param(size_t i){return m_fun->param(i);}
-  const std::vector<double>& xpoints()const{return m_fun->xpoints();}
-  Numeric::chebfun& fun() {return *m_fun;}
+  /// Start of the domain
+  double startX()const {return m_fun.front()->startX();}
+  /// End of the domain
+  double endX()const{return m_fun.back()->endX();}
+  /// Number of chebfuns in the workspace
+  size_t nfuns() const {return m_fun.size();}
+  Numeric::chebfun& fun(size_t i) {return *(m_fun[i]);}
+  /// Creates a domain for the region on which the workspace is defined.
+  Numeric::FunctionDomain1D_sptr createDomainFromXPoints() const;
+  /// Creates a domain for the region on which the workspace is defined.
+  Numeric::FunctionDomain1D_sptr createDomain(size_t n) const;
+  /// Creates a domain for the region on which the workspace is defined.
+  Numeric::JointDomain_sptr createJointDomain() const;
+  /// Evaluate chebfuns on a given domain
+  void function(const Numeric::FunctionDomain1D& domain, Numeric::FunctionValues& values)const ;
+  /// Performs a binary opera
+  void binaryOperation(const ChebfunWorkspace& cws, const char op);
+     /* Binary operators */
+  ChebfunWorkspace& operator+=(const ChebfunWorkspace& cws);
 protected:
-  Numeric::chebfun_ptr m_fun;
+  std::vector<Numeric::chebfun_ptr> m_fun;
 };
 
 /// typedef shared pointer

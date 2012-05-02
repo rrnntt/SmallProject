@@ -12,6 +12,25 @@ namespace API
   }
 
   /**
+   * Copy constructor
+   */
+  WorkspaceProperty::WorkspaceProperty(const WorkspaceProperty& value)
+  {
+    *this = value;
+  }
+
+  /**
+   * Copy assignment.
+   */
+  WorkspaceProperty& WorkspaceProperty::operator=(const WorkspaceProperty& value)
+  {
+    m_direction = value.m_direction;
+    m_name = value.m_name;
+    m_value = value.m_value;
+    return *this;
+  }
+
+  /**
     * Assign property from a string.
     * @param str :: Name of the workspace in WorkspaceManager.
     */

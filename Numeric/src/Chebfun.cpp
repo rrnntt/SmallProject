@@ -17,7 +17,7 @@
 
 namespace Numeric
 {
-  chebfun::chebfun(int n, const double& startX,const double& endX)
+  chebfun::chebfun(size_t n, const double& startX,const double& endX)
   {
     if (n >= 0)
     {
@@ -53,7 +53,7 @@ namespace Numeric
   /**
     * Resets the x array (if it isn't shared)
     */
-  void chebfun::set(int n,const double& startX,const double& endX)
+  void chebfun::set(size_t n,const double& startX,const double& endX)
   {
     m_startX = startX;
     m_endX = endX;
@@ -122,7 +122,7 @@ namespace Numeric
     double b2 = 0.;
     double b1 = 0.;
     double b;
-    for(int j = m_n; j > 0; --j)
+    for(size_t j = m_n; j > 0; --j)
     {
       b = b1*xx*2 - b2 + m_a[j];
       b2 = b1;
@@ -144,7 +144,7 @@ namespace Numeric
     double b2 = 0.;
     double b1 = 0.;
     double b;
-    for(int j = m_n; j > 0; --j)
+    for(size_t j = m_n; j > 0; --j)
     {
       b = b1*xx*2 - b2 + m_a[j];
       b2 = b1;
@@ -166,7 +166,7 @@ namespace Numeric
     double b2 = 0.;
     double b1 = 0.;
     double b;
-    for(int j = m_n - 1; j > 0; --j)
+    for(size_t j = m_n - 1; j > 0; --j)
     {
       b = b1*xx*2 - b2 + m_a[j + 1]*(j+1);
       b2 = b1;
@@ -181,7 +181,7 @@ namespace Numeric
     */
   double chebfun::derivT2(const double& x)const
   {
-    double n2 = m_n*m_n;
+    double n2 = double(m_n)*m_n;
     double res = n2*(n2-1)/3;
     if ( m_n % 2 != 0 ) res = -res;
     return res;
@@ -228,7 +228,7 @@ namespace Numeric
     double b  = (m_endX - m_startX)/2;
     for(size_t i = 0; i < m_x->size(); ++i)
     {
-      int j = m_x->size() - 1 - i;
+      size_t j = m_x->size() - 1 - i;
       (*m_x)[i] = x0 + b * cos( M_PI*i/m_n );
       (*m_w)[i] = 1.;
       if ( i % 2 != 0 ) (*m_w)[i] = -1.;
@@ -269,7 +269,7 @@ namespace Numeric
        */
       class HalfComplex
       {
-        int m_size;           ///< size of the transformed data
+        size_t m_size;           ///< size of the transformed data
         double* m_data; ///< pointer to the transformed data
         bool m_even;          ///< true if the size of the original data is even
       public:
@@ -278,17 +278,17 @@ namespace Numeric
          * @param data A pointer to the transformed complex data
          * @param n The size of untransformed real data
          */
-        HalfComplex(double* data,const int& n):m_size(n/2+1),m_data(data),m_even(n/2*2==n)
+        HalfComplex(double* data,const size_t& n):m_size(n/2+1),m_data(data),m_even(n/2*2==n)
         {
         }
         /// Returns the size of the transform
-        int size()const{return m_size;}
+        size_t size()const{return m_size;}
         /**
          * The real part of i-th transform coefficient
          * @param i The index of the complex transform coefficient
          * @return The real part 
          */
-        double real(int i)const
+        double real(size_t i)const
         {
           if (i >= m_size) return 0.;
           if (i == 0) return m_data[0];
@@ -299,7 +299,7 @@ namespace Numeric
          * @param i The index of the complex transform coefficient
          * @return The imaginary part 
          */
-        double imag(int i)const
+        double imag(size_t i)const
         {
           if (i >= m_size) return 0.;
           if (i == 0) return 0;
@@ -312,7 +312,7 @@ namespace Numeric
          * @param re The real part of the new value
          * @param im The imaginary part of the new value
          */
-        void set(int i,const double& re,const double& im)
+        void set(size_t i,const double& re,const double& im)
         {
           if (i >= m_size) return;
           if (i == 0)// this is purely real
@@ -336,7 +336,7 @@ namespace Numeric
    */
   void chebfun::calcA()
   {
-    int n = m_n+1;
+    size_t n = m_n + 1;
     m_a.resize(n);
 
     //// This is a correct and direct transform from m_p to m_a
@@ -577,5 +577,28 @@ namespace Numeric
     }
     calcA();
   }
+
+  /// Creates a domain for the region on which the workspace is defined.
+  Numeric::FunctionDomain1D_sptr chebfun::createDomainFromXPoints() const
+  {
+    std::vector<double> x;
+    x.resize( m_n + 1 );
+
+    auto xf = xpoints();
+    std::copy(xf.rbegin(), xf.rend(), x.begin() );
+    auto domain = new Numeric::FunctionDomain1DVector( x );
+
+    return Numeric::FunctionDomain1D_sptr( domain );
+  }
+
+  /**
+   * Creates a regular n-point domain for the region on which the workspace is defined.
+   */
+  Numeric::FunctionDomain1D_sptr chebfun::createDomain(size_t n) const
+  {
+    return Numeric::FunctionDomain1D_sptr( new Numeric::FunctionDomain1DVector(startX(), endX(), n) );
+  }
+
+
 
 } // Numeric

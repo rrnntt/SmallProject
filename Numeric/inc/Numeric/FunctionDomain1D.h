@@ -27,6 +27,8 @@ public:
   double operator[](size_t i) const {return m_data[i];}
   /// Get a pointer to i-th value
   const double* getPointerAt(size_t i) const {return m_data + i;}
+  /// Create a sub-domain
+  boost::shared_ptr<FunctionDomain1D> createSubDomain(double start, double end) const;
 protected:
   /// Protected constructor, shouldn't be created directly. Use FunctionDomain1DView instead.
   FunctionDomain1D(const double* x, size_t n):m_data(x),m_n(n){}

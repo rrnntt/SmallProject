@@ -2,6 +2,8 @@
 #define NUMERIC_CHEBFUN_H
 
 #include "Numeric/DllExport.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -15,18 +17,21 @@ namespace Numeric
   class NUMERIC_EXPORT chebfun
   {
   public:
-    chebfun(int n = -1, const double& startX = -1,const double& endX = 1);
+    chebfun(size_t n = -1, const double& startX = -1,const double& endX = 1);
     chebfun(const chebfun& other);
     chebfun& operator=(const chebfun& other);
-    int n()const{return m_n;}
-    void set(int n,const double& startX = -1,const double& endX = 1);
+    /// Order of the polynomial
+    size_t n()const{return m_n;}
+    void set(size_t n,const double& startX = -1,const double& endX = 1);
     double startX()const{return m_startX;}
     void setStartX(const double& d);
     double endX()const{return m_endX;}
     void setEndX(const double& d);
     void setRange(const double& s,const double& e);
     double& param(size_t i){return m_a.at(i);}
+    /// Get the vector of x-points, size n() + 1
     const std::vector<double>& xpoints()const{return *m_x;}
+    /// Get the vector of y-points, size n() + 1
     const std::vector<double>& ypoints()const{return m_p;}
     void fit(const IFunction& ifun);
     void fit(AFunction f);
@@ -137,6 +142,11 @@ namespace Numeric
     
     chebfun& operator/=(const chebfun& f);
 
+    /// Creates a domain for the region on which the workspace is defined.
+    Numeric::FunctionDomain1D_sptr createDomainFromXPoints() const;
+    /// Creates a domain for the region on which the workspace is defined.
+    Numeric::FunctionDomain1D_sptr createDomain(size_t n) const;
+
     double integrate(int pwr = 1);
 
     void calcP(); ///< calc m_p form m_a
@@ -147,7 +157,7 @@ namespace Numeric
     /// Set m_p vector of function values directly from a std::vector. Size of p must be == m_p.size()
     void setP(const std::vector<double>& p);
 
-    int m_n;                 ///< polynomial order
+    size_t m_n;                 ///< polynomial order
     double m_startX,m_endX;  ///< set boundaries where the function is defined
     boost::shared_ptr< std::vector<double> > m_x; ///< x-vaues for use in the barycentric formula, m_n + 1 items
     boost::shared_ptr< std::vector<double> > m_w; ///< some weights used in the barycentric formula, m_n + 1 items

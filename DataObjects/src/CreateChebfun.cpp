@@ -43,8 +43,8 @@ void CreateChebfun::exec()
   Numeric::IFunction_sptr fun = Numeric::FunctionFactory::instance().createFitFunction(funStr);
 
   ChebfunWorkspace *cws = new ChebfunWorkspace;
-  cws->set(n,startX,endX);
-  cws->fun().fit(*fun);
+  cws->fun(0).set(n,startX,endX);
+  cws->fun(0).fit(*fun);
 
   wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
 }

@@ -20,10 +20,10 @@ SimulateParticle::SimulateParticle()
 /// Execute algorithm.
 void SimulateParticle::exec()
 {
-  API::WorkspaceProperty wsProp = get("OutputWorkspace").as<API::WorkspaceProperty>();
+  API::WorkspaceProperty& wsProp = get("XProj").as<API::WorkspaceProperty>();
   DataObjects::ChebfunWorkspace *cws = new DataObjects::ChebfunWorkspace;
-  cws->set(10,-3.3,3.3);
-  cws->fun().fit(sin);
+  cws->fun(0).set(10,-3.3,3.3);
+  cws->fun(0).fit(sin);
 
   wsProp = boost::shared_ptr<DataObjects::ChebfunWorkspace>(cws);
 }

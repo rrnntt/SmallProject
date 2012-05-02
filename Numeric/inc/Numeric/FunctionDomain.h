@@ -25,6 +25,20 @@ public:
   virtual size_t size() const  = 0;
   /// Reset the the domain so it can be reused. Implement this method for domains with a state.
   virtual void reset() const {}
+  template<class T>
+  T& as()
+  {
+    T* p = dynamic_cast<T*>(this);
+    if ( !p ) throw std::runtime_error("Cannot convert FunctionDomain to " + typeid(T).name());
+    return *p;
+  }
+  template<class T>
+  const T& as() const
+  {
+    const T* p = dynamic_cast<const T*>(this);
+    if ( !p ) throw std::runtime_error(std::string("Cannot convert FunctionDomain to ") + typeid(T).name());
+    return *p;
+  }
 };
 
 /// typedef for a shared pointer

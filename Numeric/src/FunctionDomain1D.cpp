@@ -8,6 +8,32 @@ namespace Numeric
 {
 
 /**
+ * Create a sub-domain with point in a given interval.
+ * @param start :: Start of the interval.
+ * @param end :: End of the interval.
+ */
+boost::shared_ptr<FunctionDomain1D> FunctionDomain1D::createSubDomain(double start, double end) const
+{
+  if ( m_n < 2 ) return FunctionDomain1D_sptr();
+  const double lowerBound = m_data[0];
+  const double upperBound = m_data[m_n - 1];
+  if ( start > upperBound || end < lowerBound ) return FunctionDomain1D_sptr();
+  std::vector<double> vec;
+  for(size_t i = 0; i < m_n; ++i)
+  {
+    const double& x = m_data[i];
+    if ( x < start ) continue;
+    if ( x > end ) break;
+    vec.push_back( x );
+  }
+
+  if ( vec.empty() ) return FunctionDomain1D_sptr();
+
+  return FunctionDomain1D_sptr(new FunctionDomain1DVector( vec ));
+}
+
+
+/**
   * Create a domain form a vector.
   * @param xvalues :: Points
   */

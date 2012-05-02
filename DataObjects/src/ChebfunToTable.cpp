@@ -4,6 +4,7 @@
 #include "DataObjects/TableColumn.h"
 
 #include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/WorkspaceProperty.h"
@@ -35,11 +36,23 @@ void ChebfunToTable::exec()
   {
     throw std::runtime_error("InputWorkspace property is not a ChebfunWorkspace");
   }
-  int n = get("N").to<int>();
+
+  Numeric::FunctionDomain1D_sptr domain;
+
+  size_t n = get("N").to<int>();
+
   if (n < 2)
-  {
-    n = cws->fun().n();
+  {// if n has default value (0) use the x-points of the chebfuns
+    domain = cws->createDomainFromXPoints();
+    n = domain->size();
   }
+  else
+  {// otherwise create a regular comb
+    domain = cws->createDomain( n );
+  }
+
+  Numeric::FunctionValues values( *domain );
+  cws->function(*domain, values);
 
   auto tws = DataObjects::TableWorkspace_ptr(dynamic_cast<DataObjects::TableWorkspace*>(
     API::WorkspaceFactory::instance().create("TableWorkspace"))
@@ -55,20 +68,10 @@ void ChebfunToTable::exec()
   yColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
   auto& y = yColumn->data();
   
-  Numeric::chebfun& fun = cws->fun();
-  if (n == fun.n())
+  for(size_t i = 0; i < domain->size(); ++i)
   {
-    x.assign(fun.xpoints().rbegin(),fun.xpoints().rend());
-    y.assign(fun.ypoints().rbegin(),fun.ypoints().rend());
-  }
-  else
-  {
-    Numeric::FunctionDomain1DVector domain(fun.startX(),fun.endX(),n);
-    for(size_t i = 0; i < domain.size(); ++i)
-    {
-      x[i] = domain[i];
-      y[i] = fun.valueB(x[i]);
-    }
+    x[i] = (*domain)[i];
+    y[i] = values.getCalculated(i);
   }
 
   API::WorkspaceProperty outProp = get("OutputWorkspace").as<API::WorkspaceProperty>();

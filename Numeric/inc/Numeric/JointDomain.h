@@ -28,6 +28,8 @@ protected:
   std::vector< FunctionDomain_sptr > m_domains;
 };
 
+typedef boost::shared_ptr<JointDomain> JointDomain_sptr;
+
 } // namespace Numeric
 
 #endif /*NUMERIC_JOINTDOMAIN_H_*/
