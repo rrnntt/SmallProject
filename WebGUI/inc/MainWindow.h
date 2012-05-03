@@ -1,11 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtGUI/QMainWindow>
-
-class QMdiArea;
-class QMdiSubWindow;
-class QAction;
+#include <QtWebKit/QWebView>
+#include <QtGui/QMainWindow>
 
 /**
 * The main application window
@@ -19,8 +16,9 @@ public:
 protected:
   void closeEvent(QCloseEvent*);
 protected slots:
+  void linkClicked(const QUrl& url);
 private:
-  QMdiArea* m_mdiArea;
+  QWebView* m_wView;
 };
 
 #endif /*MAINWINDOW_H*/

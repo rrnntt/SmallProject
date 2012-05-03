@@ -48,7 +48,7 @@ void EvalChebfun::exec()
 
   for(size_t i = 0; i < x.size(); ++i)
   {
-    y[i] = cws->fun()(x[i]);
+    y[i] = cws->fun(0)(x[i]);
   }
 }
 

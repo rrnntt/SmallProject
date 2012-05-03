@@ -33,7 +33,7 @@ void CopyChebfun::exec()
   API::WorkspaceProperty outWS = get("OutputWorkspace").as<API::WorkspaceProperty>();
 
   ChebfunWorkspace *cws = new ChebfunWorkspace;
-  cws->fun() = inws->fun();
+  cws->fun(0) = inws->fun(0);
 
   outWS = boost::shared_ptr<ChebfunWorkspace>(cws);
 

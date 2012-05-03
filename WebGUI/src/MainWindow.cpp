@@ -3,15 +3,8 @@
 
 #include "API/Framework.h"
 
-#include <QtGui/QMdiArea>
-#include <QtGui/QMdiSubWindow>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QAction>
-#include <QtGui/QFileDialog>
-#include <QtWebKit/QWebView>
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
+#include <QtCore/QUrl>
+#include <QtGui/QPushButton>
 
 #include <iostream>
 
@@ -20,10 +13,12 @@ MainWindow::MainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
   //setGeometry(900,900,300,200);
-  //m_mdiArea = new QMdiArea(this);
-  auto wView = new QWebView(this);
-  wView->load(QUrl("http://www.google.com/"));
-  setCentralWidget(wView);
+  m_wView = new QWebView(this);
+  m_wView->load(QUrl("file:///C:/Users/Homer/Desktop/Work/SmallProject/WebGUI/http/index.html"));
+  setCentralWidget(m_wView);
+
+  m_wView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  connect(m_wView,SIGNAL(linkClicked(const QUrl&)),this,SLOT(linkClicked(const QUrl&)));
 
 }
 
@@ -36,3 +31,12 @@ void MainWindow::closeEvent(QCloseEvent*)
 {
 }
 
+void MainWindow::linkClicked(const QUrl& url)
+{
+  QString str = url.toString();
+  if ( !str.startsWith("cmd:") )
+  {
+    m_wView->load(url);
+  }
+  std::cerr << "Link clicked " + url.toString().toStdString() << std::endl;
+}
