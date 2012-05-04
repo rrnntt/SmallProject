@@ -88,18 +88,51 @@ Numeric::JointDomain_sptr ChebfunWorkspace::createJointDomain() const
   return Numeric::JointDomain_sptr( jointDomain );
 }
 
+/**
+ * Check if this workspace has the same base as another one. Having the same base means
+ * that the two workspaces have the same number of chebfuns and the chebfuns with the same
+ * indices have shared x-points.
+ * @param other :: A workspace to compare with.
+ */
+bool ChebfunWorkspace::haveSameBase(const ChebfunWorkspace& other) const
+{
+  if ( nfuns() != other.nfuns() ) return false;
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    if ( !fun(i).haveSameBase(other.fun(i))) return false;
+  }
+  return true;
+}
 
 /**
- * Add another workspace
+ * Add another workspace.
+ * @param other :: A workspace to add.
  */
 ChebfunWorkspace& ChebfunWorkspace::operator+=(const ChebfunWorkspace& cws)
 {
-  auto jd1 = createJointDomain();
-  auto jd2 = cws.createJointDomain();
-  size_t i2 = 0;
-  for(size_t i1 = 0; i1 < jd1->getNParts(); ++i1)
-  {
-    auto& jd = jd1->getDomain(i1).as<Numeric::FunctionDomain1D>();
+  if ( haveSameBase( cws ) )
+  {// have shared x-points - very easy
+    for(size_t i = 0; i < nfuns(); ++i)
+    {
+      fun(i) += cws.fun(i);
+    }
+  }
+  else
+  {// general case - more complicated
+    auto jd1 = createJointDomain();
+    auto jd2 = cws.createJointDomain();
+    size_t i2 = 0;
+    Numeric::FunctionDomain1D_sptr subd;
+    for(size_t i1 = 0; i1 < jd1->getNParts(); ++i1)
+    {
+      auto& d1d1 = jd1->getDomain(i1).as<Numeric::FunctionDomain1D>();
+      const double start = d1d1.startX();
+      const double end = d1d1.endX();
+      auto& d1d2 = jd2->getDomain(i2).as<Numeric::FunctionDomain1D>();
+      double from = d1d2.startX();
+      double to = d1d2.endX();
+      
+    }
   }
   return *this;
 }

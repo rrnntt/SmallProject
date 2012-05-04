@@ -28,7 +28,10 @@ public:
   double endX()const{return m_fun.back()->endX();}
   /// Number of chebfuns in the workspace
   size_t nfuns() const {return m_fun.size();}
+  /// Return reference to i-th chebfun
   Numeric::chebfun& fun(size_t i) {return *(m_fun[i]);}
+  /// Return reference to i-th chebfun, const version
+  const Numeric::chebfun& fun(size_t i) const {return *(m_fun[i]);}
   /// Creates a domain for the region on which the workspace is defined.
   Numeric::FunctionDomain1D_sptr createDomainFromXPoints() const;
   /// Creates a domain for the region on which the workspace is defined.
@@ -37,7 +40,9 @@ public:
   Numeric::JointDomain_sptr createJointDomain() const;
   /// Evaluate chebfuns on a given domain
   void function(const Numeric::FunctionDomain1D& domain, Numeric::FunctionValues& values)const ;
-  /// Performs a binary opera
+  /// Check if this workspace has the same base as another one
+  bool haveSameBase(const ChebfunWorkspace& other) const;
+  /// Performs a binary operation
   void binaryOperation(const ChebfunWorkspace& cws, const char op);
      /* Binary operators */
   ChebfunWorkspace& operator+=(const ChebfunWorkspace& cws);

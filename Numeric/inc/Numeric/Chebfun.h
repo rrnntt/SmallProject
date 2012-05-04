@@ -20,6 +20,8 @@ namespace Numeric
     chebfun(size_t n = -1, const double& startX = -1,const double& endX = 1);
     chebfun(const chebfun& other);
     chebfun& operator=(const chebfun& other);
+    /// Check if two chenfuns have shared x-points.
+    bool haveSameBase(const chebfun& other) const {return m_x == other.m_x;}
     /// Order of the polynomial
     size_t n()const{return m_n;}
     void set(size_t n,const double& startX = -1,const double& endX = 1);

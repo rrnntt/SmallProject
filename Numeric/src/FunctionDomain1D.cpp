@@ -32,6 +32,27 @@ boost::shared_ptr<FunctionDomain1D> FunctionDomain1D::createSubDomain(double sta
   return FunctionDomain1D_sptr(new FunctionDomain1DVector( vec ));
 }
 
+/**
+ * Create a map of domains intersecting with this one.
+ * @param jointDomain :: A domain to compare with
+ */
+DomainMap FunctionDomain1D::createDomainMap(const JointDomain& jointDomain) const
+{
+  DomainMap map;
+  const double start = startX();
+  const double end = endX();
+  const size_t n = jointDomain.getNParts();
+  for(size_t i = 0; i < n; ++i)
+  {
+    auto& domain = jointDomain.getDomain(i).as<FunctionDomain1D>();
+    const double from = domain.startX();
+    const double to = domain.endX();
+    if ( from > end || to < start ) continue;
+    map.push_back(DomainRef(i,createSubDomain(from,to)));
+  }
+  return map;
+}
+
 
 /**
   * Create a domain form a vector.

@@ -5,11 +5,15 @@
 // Includes
 //----------------------------------------------------------------------
 #include "Numeric/FunctionDomain.h"
+#include "Numeric/JointDomain.h"
 
 #include <vector>
 
 namespace Numeric
 {
+  
+class JointDomain;
+
 /** Base class that represents the domain of a function.
     A domain is a generalisation of x (argument) and y (value) arrays.
     A domain consists at least of a list of function arguments for which a function should 
@@ -27,8 +31,14 @@ public:
   double operator[](size_t i) const {return m_data[i];}
   /// Get a pointer to i-th value
   const double* getPointerAt(size_t i) const {return m_data + i;}
+  /// Get the beginning of the interval. No checks on emptiness
+  double startX() const {return m_data[0];}
+  /// Get the end of the interval. No checks on emptiness
+  double endX() const {return m_data[m_n - 1];}
   /// Create a sub-domain
   boost::shared_ptr<FunctionDomain1D> createSubDomain(double start, double end) const;
+  /// Create a map of domains intersecting with this
+  DomainMap createDomainMap(const JointDomain&) const;
 protected:
   /// Protected constructor, shouldn't be created directly. Use FunctionDomain1DView instead.
   FunctionDomain1D(const double* x, size_t n):m_data(x),m_n(n){}

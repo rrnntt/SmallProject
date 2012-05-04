@@ -7,6 +7,7 @@
 #include "Numeric/DllExport.h"
 
 #include <boost/shared_ptr.hpp>
+#include <vector>
 
 namespace Numeric
 {
@@ -25,6 +26,7 @@ public:
   virtual size_t size() const  = 0;
   /// Reset the the domain so it can be reused. Implement this method for domains with a state.
   virtual void reset() const {}
+  /// Cast domain to a particular type
   template<class T>
   T& as()
   {
@@ -32,17 +34,35 @@ public:
     if ( !p ) throw std::runtime_error("Cannot convert FunctionDomain to " + typeid(T).name());
     return *p;
   }
+  /// Cast domain to a particular const type
   template<class T>
   const T& as() const
   {
     const T* p = dynamic_cast<const T*>(this);
-    if ( !p ) throw std::runtime_error(std::string("Cannot convert FunctionDomain to ") + typeid(T).name());
+    const std::string typeName(typeid(T).name());
+    std::string ttt = "Cannot convert FunctionDomain to ";
+    ttt += typeName;
+    if ( !p ) throw std::runtime_error(ttt);
     return *p;
   }
 };
 
 /// typedef for a shared pointer
 typedef boost::shared_ptr<FunctionDomain> FunctionDomain_sptr;
+
+
+struct DomainRef
+{
+  size_t i;
+  FunctionDomain_sptr domain;
+  DomainRef():i(),domain(){}
+  DomainRef(size_t j, FunctionDomain_sptr d):i(j),domain(d){}
+};
+
+/**
+ * 
+ */
+typedef std::vector<DomainRef> DomainMap;
 
 } // namespace Numeric
 
