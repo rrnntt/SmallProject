@@ -1,10 +1,12 @@
 #include "MainWindow.h"
+#include "WebPluginFactory.h"
 //#include "Modeling/OSGWidget.h"
 
 #include "API/Framework.h"
 
 #include <QtCore/QUrl>
 #include <QtGui/QPushButton>
+#include <QtWebKit/QWebSettings>
 
 #include <iostream>
 
@@ -18,7 +20,10 @@ MainWindow::MainWindow()
   setCentralWidget(m_wView);
 
   m_wView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  m_wView->page()->setPluginFactory(new WebPluginFactory(this));
   connect(m_wView,SIGNAL(linkClicked(const QUrl&)),this,SLOT(linkClicked(const QUrl&)));
+  
+  QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled,true);
 
 }
 

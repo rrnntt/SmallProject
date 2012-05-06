@@ -48,7 +48,7 @@ dictionary = {'Namespace':namespace_name,
 # define the output file names
 root = '../'
 template_dir = 'templates/'
-if namespace_name == 'GUI':
+if namespace_name.endswith('GUI'):
 	header_folder = namespace_name+'/inc'
 else:
 	header_folder = namespace_name+'/inc/'+namespace_name
