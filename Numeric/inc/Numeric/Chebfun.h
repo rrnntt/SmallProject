@@ -144,6 +144,9 @@ namespace Numeric
     
     chebfun& operator/=(const chebfun& f);
 
+    /// 
+    void apply(char op, const chebfun& f, const FunctionDomain1D& domain);
+
     /// Creates a domain for the region on which the workspace is defined.
     Numeric::FunctionDomain1D_sptr createDomainFromXPoints() const;
     /// Creates a domain for the region on which the workspace is defined.

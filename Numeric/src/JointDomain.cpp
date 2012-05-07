@@ -3,6 +3,8 @@
 //----------------------------------------------------------------------
 #include "Numeric/JointDomain.h"
 
+#include <algorithm>
+
 namespace Numeric
 {
   /// Return the number of points in the domain
@@ -28,5 +30,25 @@ namespace Numeric
   {
     m_domains.push_back(domain);
   }
+
+  /**
+   * Create a map of domains intersecting with this
+   * @param jointDomain :: A domain to compare with
+   */
+  DomainMap JointDomain::createDomainMap(const JointDomain& jointDomain) const
+  {
+    DomainMap map;
+    for(auto d = m_domains.begin(); d != m_domains.end(); ++d)
+    {
+      DomainMap m = (**d).createDomainMap( jointDomain );
+      for(auto it = m.begin(); it != m.end(); ++it)
+      {
+        it->i1 = static_cast<size_t>(it - m.begin());
+        map.push_back( *it );
+      }
+    }
+    return map;
+  }
+
   
 } // namespace Numeric

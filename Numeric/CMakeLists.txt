@@ -13,6 +13,7 @@ set( INC_FILES
    inc/Numeric/CostFuncFitting.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
+   inc/Numeric/DomainMap.h
    inc/Numeric/FuncMinimizerFactory.h
    inc/Numeric/FunctionDomain.h
    inc/Numeric/FunctionDomain1D.h
@@ -54,6 +55,7 @@ set( SRC_FILES
   src/CostFunctionFactory.cpp
   src/CostFuncFitting.cpp
   src/Distribution.cpp
+  src/DomainMap.cpp
   src/FuncMinimizerFactory.cpp
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp
@@ -106,6 +108,7 @@ set( SRC_FILES
   test/DistributionTest.cpp
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp
+  test/FunctionDomain1DTest.cpp
   test/FunctionFactoryTest.cpp
   test/FunctionPropertyTest.cpp
   test/FuncMinimizerFactoryTest.cpp

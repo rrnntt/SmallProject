@@ -46,6 +46,9 @@ public:
   void binaryOperation(const ChebfunWorkspace& cws, const char op);
      /* Binary operators */
   ChebfunWorkspace& operator+=(const ChebfunWorkspace& cws);
+  ChebfunWorkspace& operator-=(const ChebfunWorkspace& cws);
+  ChebfunWorkspace& operator*=(const ChebfunWorkspace& cws);
+  ChebfunWorkspace& operator/=(const ChebfunWorkspace& cws);
 protected:
   std::vector<Numeric::chebfun_ptr> m_fun;
 };

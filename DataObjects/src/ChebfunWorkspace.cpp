@@ -121,17 +121,92 @@ ChebfunWorkspace& ChebfunWorkspace::operator+=(const ChebfunWorkspace& cws)
   {// general case - more complicated
     auto jd1 = createJointDomain();
     auto jd2 = cws.createJointDomain();
-    size_t i2 = 0;
-    Numeric::FunctionDomain1D_sptr subd;
-    for(size_t i1 = 0; i1 < jd1->getNParts(); ++i1)
+    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    for(auto r = map.begin(); r != map.end(); ++r)
     {
-      auto& d1d1 = jd1->getDomain(i1).as<Numeric::FunctionDomain1D>();
-      const double start = d1d1.startX();
-      const double end = d1d1.endX();
-      auto& d1d2 = jd2->getDomain(i2).as<Numeric::FunctionDomain1D>();
-      double from = d1d2.startX();
-      double to = d1d2.endX();
-      
+
+      fun( r->i1 ).apply( '+', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+    }
+  }
+  return *this;
+}
+
+/**
+ * Add another workspace.
+ * @param other :: A workspace to add.
+ */
+ChebfunWorkspace& ChebfunWorkspace::operator-=(const ChebfunWorkspace& cws)
+{
+  if ( haveSameBase( cws ) )
+  {// have shared x-points - very easy
+    for(size_t i = 0; i < nfuns(); ++i)
+    {
+      fun(i) -= cws.fun(i);
+    }
+  }
+  else
+  {// general case - more complicated
+    auto jd1 = createJointDomain();
+    auto jd2 = cws.createJointDomain();
+    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    for(auto r = map.begin(); r != map.end(); ++r)
+    {
+
+      fun( r->i1 ).apply( '-', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+    }
+  }
+  return *this;
+}
+
+/**
+ * Add another workspace.
+ * @param other :: A workspace to add.
+ */
+ChebfunWorkspace& ChebfunWorkspace::operator*=(const ChebfunWorkspace& cws)
+{
+  if ( haveSameBase( cws ) )
+  {// have shared x-points - very easy
+    for(size_t i = 0; i < nfuns(); ++i)
+    {
+      fun(i) *= cws.fun(i);
+    }
+  }
+  else
+  {// general case - more complicated
+    auto jd1 = createJointDomain();
+    auto jd2 = cws.createJointDomain();
+    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    for(auto r = map.begin(); r != map.end(); ++r)
+    {
+
+      fun( r->i1 ).apply( '*', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+    }
+  }
+  return *this;
+}
+
+/**
+ * Add another workspace.
+ * @param other :: A workspace to add.
+ */
+ChebfunWorkspace& ChebfunWorkspace::operator/=(const ChebfunWorkspace& cws)
+{
+  if ( haveSameBase( cws ) )
+  {// have shared x-points - very easy
+    for(size_t i = 0; i < nfuns(); ++i)
+    {
+      fun(i) /= cws.fun(i);
+    }
+  }
+  else
+  {// general case - more complicated
+    auto jd1 = createJointDomain();
+    auto jd2 = cws.createJointDomain();
+    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    for(auto r = map.begin(); r != map.end(); ++r)
+    {
+
+      fun( r->i1 ).apply( '/', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
     }
   }
   return *this;

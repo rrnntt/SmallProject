@@ -599,6 +599,27 @@ namespace Numeric
     return Numeric::FunctionDomain1D_sptr( new Numeric::FunctionDomain1DVector(startX(), endX(), n) );
   }
 
+  /**
+   * Modify this chebfun by applying operator op to avlues of this chebfun and chebfun f on domain domain.
+   */
+  void chebfun::apply(char op, const chebfun& f, const FunctionDomain1D& domain)
+  {
+    const double start = domain.startX();
+    const double end = domain.endX();
+    for(size_t i = 0; i < m_x->size(); ++i)
+    {
+      double xx = (*m_x)[i];
+      if ( xx < start || xx > end ) continue;
+      const double v = f(xx);
+      switch( op )
+      {
+      case '+': m_p[i] += v; break;
+      case '-': m_p[i] -= v; break;
+      case '*': m_p[i] *= v; break;
+      case '/': m_p[i] /= v; break;
+      };
+    }
+  }
 
 
 } // Numeric

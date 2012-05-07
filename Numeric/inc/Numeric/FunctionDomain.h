@@ -5,12 +5,16 @@
 // Includes
 //----------------------------------------------------------------------
 #include "Numeric/DllExport.h"
+#include "Numeric/DomainMap.h"
 
 #include <boost/shared_ptr.hpp>
 #include <vector>
 
 namespace Numeric
 {
+
+class JointDomain;
+
 /** Base class that represents the domain of a function.
     A domain is a generalisation of x (argument) and y (value) arrays.
     A domain consists at least of a list of function arguments for which a function should 
@@ -26,12 +30,17 @@ public:
   virtual size_t size() const  = 0;
   /// Reset the the domain so it can be reused. Implement this method for domains with a state.
   virtual void reset() const {}
+  /// Create a map of domains intersecting with this
+  virtual DomainMap createDomainMap(const JointDomain&) const;
   /// Cast domain to a particular type
   template<class T>
   T& as()
   {
     T* p = dynamic_cast<T*>(this);
-    if ( !p ) throw std::runtime_error("Cannot convert FunctionDomain to " + typeid(T).name());
+    const std::string typeName(typeid(T).name());
+    std::string ttt = "Cannot convert FunctionDomain to ";
+    ttt += typeName;
+    if ( !p ) throw std::runtime_error(ttt);
     return *p;
   }
   /// Cast domain to a particular const type
@@ -50,19 +59,6 @@ public:
 /// typedef for a shared pointer
 typedef boost::shared_ptr<FunctionDomain> FunctionDomain_sptr;
 
-
-struct DomainRef
-{
-  size_t i;
-  FunctionDomain_sptr domain;
-  DomainRef():i(),domain(){}
-  DomainRef(size_t j, FunctionDomain_sptr d):i(j),domain(d){}
-};
-
-/**
- * 
- */
-typedef std::vector<DomainRef> DomainMap;
 
 } // namespace Numeric
 

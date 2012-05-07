@@ -24,6 +24,8 @@ public:
   /// Return i-th domain
   virtual const FunctionDomain& getDomain(size_t i) const;
   void addDomain(FunctionDomain_sptr domain);
+  /// Create a map of domains intersecting with this
+  DomainMap createDomainMap(const JointDomain&) const;
 protected:
   std::vector< FunctionDomain_sptr > m_domains;
 };
