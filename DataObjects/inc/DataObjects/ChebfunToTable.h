@@ -18,6 +18,6 @@ protected:
   void exec();
 };
 
-} // DATAOBJECTS
+} // DataObjects
 
 #endif // DATAOBJECTS_CHEBFUNTOTABLE_H

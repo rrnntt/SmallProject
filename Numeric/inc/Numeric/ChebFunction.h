@@ -1,27 +1,28 @@
-#ifndef DATAOBJECTS_CHEBFUNWORKSPACE_H
-#define DATAOBJECTS_CHEBFUNWORKSPACE_H
+#ifndef NUMERIC_CHEBFUNCTION_H
+#define NUMERIC_CHEBFUNCTION_H
 
-#include "DataObjects/DllExport.h"
-#include "API/Workspace.h"
+#include "Numeric/DllExport.h"
 #include "Numeric/Chebfun.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 #include "Numeric/JointDomain.h"
+#include "Numeric/IFunction1D.h"
+#include "Numeric/ParamFunction.h"
 
 #include <vector>
 
-namespace DataObjects
+namespace Numeric
 {
 
-/**
- * 
- */
-class DATAOBJECTS_EXPORT ChebfunWorkspace: public API::Workspace
+class NUMERIC_EXPORT ChebFunction: public IFunction1D, public ParamFunction
 {
 public:
-  ChebfunWorkspace();
-  ~ChebfunWorkspace(){}
-  virtual std::string id()const {return "ChebfunWorkspace";}
+  ChebFunction();
+  ~ChebFunction(){}
+  /// Returns the function's name
+  virtual std::string name()const {return "ChebFunction";}
+  /// Function you want to fit to.
+  virtual void function1D(double* out, const double* xValues, const size_t nData)const;
   /// Start of the domain
   double startX()const {return m_fun.front()->startX();}
   /// End of the domain
@@ -39,23 +40,24 @@ public:
   /// Creates a domain for the region on which the workspace is defined.
   Numeric::JointDomain_sptr createJointDomain() const;
   /// Evaluate chebfuns on a given domain
-  void function(const Numeric::FunctionDomain1D& domain, Numeric::FunctionValues& values)const ;
+  void eval(const FunctionDomain1D& domain, FunctionValues& values)const ;
   /// Check if this workspace has the same base as another one
-  bool haveSameBase(const ChebfunWorkspace& other) const;
+  bool haveSameBase(const ChebFunction& other) const;
   /// Performs a binary operation
-  void binaryOperation(const ChebfunWorkspace& cws, const char op);
+  void binaryOperation(const ChebFunction& cws, const char op);
      /* Binary operators */
-  ChebfunWorkspace& operator+=(const ChebfunWorkspace& cws);
-  ChebfunWorkspace& operator-=(const ChebfunWorkspace& cws);
-  ChebfunWorkspace& operator*=(const ChebfunWorkspace& cws);
-  ChebfunWorkspace& operator/=(const ChebfunWorkspace& cws);
+  ChebFunction& operator+=(const ChebFunction& cws);
+  ChebFunction& operator-=(const ChebFunction& cws);
+  ChebFunction& operator*=(const ChebFunction& cws);
+  ChebFunction& operator/=(const ChebFunction& cws);
 protected:
-  std::vector<Numeric::chebfun_ptr> m_fun;
+  std::vector<chebfun_ptr> m_fun;
 };
 
 /// typedef shared pointer
-typedef boost::shared_ptr<ChebfunWorkspace> ChebfunWorkspace_sptr;
-typedef boost::shared_ptr<const ChebfunWorkspace> ChebfunWorkspace_const_sptr;
+typedef boost::shared_ptr<ChebFunction> ChebFunction_sptr;
+typedef boost::shared_ptr<const ChebFunction> ChebFunction_const_sptr;
 
-} // namespace DataObjects
-#endif // DATAOBJECTS_CHEBFUNWORKSPACE_H
+} // NUMERIC
+
+#endif // NUMERIC_CHEBFUNCTION_H

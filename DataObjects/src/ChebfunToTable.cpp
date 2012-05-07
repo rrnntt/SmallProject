@@ -1,5 +1,6 @@
 #include "DataObjects/ChebfunToTable.h"
-#include "DataObjects/ChebfunWorkspace.h"
+#include "Numeric/ChebfunWorkspace.h"
+
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/TableColumn.h"
 
@@ -31,7 +32,7 @@ void ChebfunToTable::exec()
 {
   API::WorkspaceProperty wsProp = get("InputWorkspace").as<API::WorkspaceProperty>();
   std::string wsName = static_cast<std::string>(wsProp);
-  auto cws = wsProp.to<ChebfunWorkspace>();
+  auto cws = wsProp.to<Numeric::ChebfunWorkspace>();
   if (!cws)
   {
     throw std::runtime_error("InputWorkspace property is not a ChebfunWorkspace");

@@ -5,6 +5,7 @@
 
 set( INC_FILES 
    inc/Numeric/Chebfun.h
+   inc/Numeric/ChebFunction.h
    inc/Numeric/Chebyshev.h
    inc/Numeric/CompositeDomain.h
    inc/Numeric/CompositeFunction.h
@@ -46,9 +47,16 @@ set( INC_FILES
    inc/Numeric/UserFunction1D.h
    inc/Numeric/V3D.h
    inc/Numeric/Vector.h
+# Algorithms
+   inc/Numeric/AddChebfun.h
+   inc/Numeric/ChebfunWorkspace.h
+   inc/Numeric/CopyChebfun.h
+   inc/Numeric/CreateChebfun.h
+
    )
 set( SRC_FILES 
   src/Chebfun.cpp
+  src/ChebFunction.cpp
   src/Chebyshev.cpp
   src/CompositeFunction.cpp
   src/ConstraintFactory.cpp
@@ -80,6 +88,11 @@ set( SRC_FILES
   src/V3D.cpp
   src/PhysModel.cpp
   src/PhysBody.cpp
+# Algorithms
+   src/AddChebfun.cpp
+   src/ChebfunWorkspace.cpp
+   src/CopyChebfun.cpp
+   src/CreateChebfun.cpp
   )
 add_library( Numeric SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ${THIRD_PARTY_INCLUDE_DIR})
@@ -102,6 +115,7 @@ ${GSL_LIBS}
 set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
+  test/ChebFunctionTest.cpp
   test/ChebfunTest.cpp
   #test/ConjugateFRMinimizerTest.cpp
   test/CostFuncFittingTest.cpp
@@ -121,6 +135,10 @@ set( SRC_FILES
   test/SomeFunctionTest.cpp
   test/UserFunction1DTest.cpp
   test/VectorTest.cpp
+# Algorithms
+  test/AddChebfunTest.cpp
+  test/ChebfunWorkspaceTest.cpp
+  test/CreateChebfunTest.cpp
 )
 
 add_executable(NumericTest ${SRC_FILES} ${INC_FILES})

@@ -1,5 +1,5 @@
 #include "DataObjects/UniformChebfun.h"
-#include "DataObjects/ChebfunWorkspace.h"
+#include "NUmeric/ChebfunWorkspace.h"
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/TableColumn.h"
 
@@ -38,14 +38,14 @@ void UniformChebfun::exec()
   auto yColumn = static_cast<DataObjects::TableColumn<double>*>(tws->getColumn(yColumnName).get());
   auto& y = yColumn->data();
 
-  ChebfunWorkspace *cws = new ChebfunWorkspace;
+  Numeric::ChebfunWorkspace *cws = new Numeric::ChebfunWorkspace;
   const size_t n = x.size();
   double start = x.front();
   double end = x.back();
 
   cws->fun(0).uniformFit(start,end,y);
 
-  outProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+  outProp = boost::shared_ptr<Numeric::ChebfunWorkspace>(cws);
 
 }
 

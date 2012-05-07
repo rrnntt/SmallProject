@@ -1,14 +1,14 @@
 #ifndef DATAOBJECTS_ADDCHEBFUN_H
 #define DATAOBJECTS_ADDCHEBFUN_H
 
-#include "DataObjects/DllExport.h"
+#include "Numeric/DllExport.h"
 
 #include "API/Algorithm.h"
 
-namespace DataObjects
+namespace Numeric
 {
 
-class DATAOBJECTS_EXPORT AddChebfun: public API::Algorithm
+class NUMERIC_EXPORT AddChebfun: public API::Algorithm
 {
 public:
   AddChebfun();
@@ -18,6 +18,6 @@ protected:
   void exec();
 };
 
-} // DATAOBJECTS
+} // NUMERIC
 
 #endif // DATAOBJECTS_ADDCHEBFUN_H

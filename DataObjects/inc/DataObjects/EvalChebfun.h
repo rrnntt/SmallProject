@@ -16,6 +16,6 @@ protected:
   virtual void exec();
 };
 
-} // DATAOBJECTS
+} // DataObjects
 
 #endif // DATAOBJECTS_EVALCHEBFUN_H

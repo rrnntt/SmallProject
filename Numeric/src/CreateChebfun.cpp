@@ -1,5 +1,5 @@
-#include "DataObjects/CreateChebfun.h"
-#include "DataObjects/ChebfunWorkspace.h"
+#include "Numeric/CreateChebfun.h"
+#include "Numeric/ChebfunWorkspace.h"
 
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/IFunction.h"
@@ -9,7 +9,7 @@
 
 #include "Kernel/CommonProperties.h"
 
-namespace DataObjects
+namespace Numeric
 {
 
 DECLARE_ALGORITHM(CreateChebfun);
@@ -49,4 +49,4 @@ void CreateChebfun::exec()
   wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
 }
 
-} // namespace DataObjects
+} // namespace Numeric

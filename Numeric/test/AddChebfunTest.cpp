@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include "DataObjects/AddChebfun.h"
+#include "Numeric/AddChebfun.h"
 
-using namespace DataObjects;
+using namespace Numeric;
 
 TEST(DataObjects_AddChebfun_Test, Test)
 {

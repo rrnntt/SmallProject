@@ -1,5 +1,5 @@
-#include "DataObjects/CopyChebfun.h"
-#include "DataObjects/ChebfunWorkspace.h"
+#include "Numeric/CopyChebfun.h"
+#include "Numeric/ChebfunWorkspace.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/WorkspaceProperty.h"
@@ -7,7 +7,7 @@
 
 #include "Kernel/CommonProperties.h"
 
-namespace DataObjects
+namespace Numeric
 {
 
   DECLARE_ALGORITHM(CopyChebfun);
@@ -39,4 +39,4 @@ void CopyChebfun::exec()
 
 }
 
-} // DataObjects
+} // Numeric

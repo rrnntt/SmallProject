@@ -1,5 +1,5 @@
 #include "DataObjects/EvalChebfun.h"
-#include "DataObjects/ChebfunWorkspace.h"
+#include "Numeric/ChebfunWorkspace.h"
 #include "DataObjects/TableWorkspace.h"
 #include "DataObjects/TableColumn.h"
 
@@ -29,7 +29,7 @@ void EvalChebfun::exec()
   auto tws = tableProp.to<TableWorkspace>();
 
   API::WorkspaceProperty chebProp = get("Chebfun").as<API::WorkspaceProperty>();
-  auto cws = chebProp.to<ChebfunWorkspace>();
+  auto cws = chebProp.to<Numeric::ChebfunWorkspace>();
 
   std::string xColumnName = get("XColumn");
   auto xColumn = static_cast<DataObjects::TableColumn<double>*>(tws->getColumn(xColumnName).get());

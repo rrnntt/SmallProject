@@ -1,20 +1,41 @@
-#include "DataObjects/ChebfunWorkspace.h"
-#include "API/WorkspaceFactory.h"
+#include "Numeric/ChebFunction.h"
 
-#include <algorithm>
-
-namespace DataObjects
+namespace Numeric
 {
 
-DECLARE_WORKSPACE(ChebfunWorkspace);
-
-ChebfunWorkspace::ChebfunWorkspace():
+ChebFunction::ChebFunction():
 m_fun(1,Numeric::chebfun_ptr(new Numeric::chebfun))
 {
 }
 
+/// Function you want to fit to.
+void ChebFunction::function1D(double* out, const double* xValues, const size_t nData)const
+{
+  const double start = startX();
+  const double end   = endX();
+
+  size_t fi = 0;
+  for(size_t i = 0; i < nData; ++i)
+  {
+    const double x = xValues[i];
+    if ( x < start ) continue;
+    if ( x > end ) break;
+    Numeric::chebfun* f = m_fun[fi].get();
+    while( x > f->endX() )
+    {
+      ++fi;
+      if ( fi == m_fun.size() )
+      {
+        break;
+      }
+      f = m_fun[fi].get();
+    }
+    out[i] = f->valueB( x );
+  }
+}
+
 /// Creates a domain for the region on which the workspace is defined.
-Numeric::FunctionDomain1D_sptr ChebfunWorkspace::createDomainFromXPoints() const
+Numeric::FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
 {
   std::vector<double> x;
   size_t npts = 0;
@@ -41,7 +62,7 @@ Numeric::FunctionDomain1D_sptr ChebfunWorkspace::createDomainFromXPoints() const
 /**
  * Creates a regular n-point domain for the region on which the workspace is defined.
  */
-Numeric::FunctionDomain1D_sptr ChebfunWorkspace::createDomain(size_t n) const
+Numeric::FunctionDomain1D_sptr ChebFunction::createDomain(size_t n) const
 {
   return Numeric::FunctionDomain1D_sptr( new Numeric::FunctionDomain1DVector(startX(), endX(), n) );
 }
@@ -51,7 +72,7 @@ Numeric::FunctionDomain1D_sptr ChebfunWorkspace::createDomain(size_t n) const
  * @param domain :: The domain
  * @param values :: The output values.
  */
-void ChebfunWorkspace::function(const Numeric::FunctionDomain1D& domain, Numeric::FunctionValues& values)const 
+void ChebFunction::eval(const Numeric::FunctionDomain1D& domain, Numeric::FunctionValues& values)const 
 {
   const double start = startX();
   const double end   = endX();
@@ -78,7 +99,7 @@ void ChebfunWorkspace::function(const Numeric::FunctionDomain1D& domain, Numeric
 }
 
 /// Creates a domain for the region on which the workspace is defined.
-Numeric::JointDomain_sptr ChebfunWorkspace::createJointDomain() const
+Numeric::JointDomain_sptr ChebFunction::createJointDomain() const
 {
   auto jointDomain = new Numeric::JointDomain;
   for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
@@ -94,7 +115,7 @@ Numeric::JointDomain_sptr ChebfunWorkspace::createJointDomain() const
  * indices have shared x-points.
  * @param other :: A workspace to compare with.
  */
-bool ChebfunWorkspace::haveSameBase(const ChebfunWorkspace& other) const
+bool ChebFunction::haveSameBase(const ChebFunction& other) const
 {
   if ( nfuns() != other.nfuns() ) return false;
   for(size_t i = 0; i < nfuns(); ++i)
@@ -108,7 +129,7 @@ bool ChebfunWorkspace::haveSameBase(const ChebfunWorkspace& other) const
  * Add another workspace.
  * @param other :: A workspace to add.
  */
-ChebfunWorkspace& ChebfunWorkspace::operator+=(const ChebfunWorkspace& cws)
+ChebFunction& ChebFunction::operator+=(const ChebFunction& cws)
 {
   if ( haveSameBase( cws ) )
   {// have shared x-points - very easy
@@ -135,7 +156,7 @@ ChebfunWorkspace& ChebfunWorkspace::operator+=(const ChebfunWorkspace& cws)
  * Add another workspace.
  * @param other :: A workspace to add.
  */
-ChebfunWorkspace& ChebfunWorkspace::operator-=(const ChebfunWorkspace& cws)
+ChebFunction& ChebFunction::operator-=(const ChebFunction& cws)
 {
   if ( haveSameBase( cws ) )
   {// have shared x-points - very easy
@@ -162,7 +183,7 @@ ChebfunWorkspace& ChebfunWorkspace::operator-=(const ChebfunWorkspace& cws)
  * Add another workspace.
  * @param other :: A workspace to add.
  */
-ChebfunWorkspace& ChebfunWorkspace::operator*=(const ChebfunWorkspace& cws)
+ChebFunction& ChebFunction::operator*=(const ChebFunction& cws)
 {
   if ( haveSameBase( cws ) )
   {// have shared x-points - very easy
@@ -189,7 +210,7 @@ ChebfunWorkspace& ChebfunWorkspace::operator*=(const ChebfunWorkspace& cws)
  * Add another workspace.
  * @param other :: A workspace to add.
  */
-ChebfunWorkspace& ChebfunWorkspace::operator/=(const ChebfunWorkspace& cws)
+ChebFunction& ChebFunction::operator/=(const ChebFunction& cws)
 {
   if ( haveSameBase( cws ) )
   {// have shared x-points - very easy
@@ -212,5 +233,4 @@ ChebfunWorkspace& ChebfunWorkspace::operator/=(const ChebfunWorkspace& cws)
   return *this;
 }
 
-
-} // namespace DataObjects
+} // Numeric

@@ -9,18 +9,14 @@ set( INC_FILES
    inc/DataObjects/ColumnVector.h
    inc/DataObjects/CompoundColumn.h
    inc/DataObjects/ColumnFactory.h
-   inc/DataObjects/CopyChebfun.h
    inc/DataObjects/NumericColumn.h
    inc/DataObjects/StringColumn.h
    inc/DataObjects/TableColumn.h
    inc/DataObjects/TableWorkspace.h
    inc/DataObjects/Unit.h
 # Algorithms
-   inc/DataObjects/AddChebfun.h
-   inc/DataObjects/ChebfunToTable.h
-   inc/DataObjects/ChebfunWorkspace.h
    inc/DataObjects/CalculateColumnValues.h
-   inc/DataObjects/CreateChebfun.h
+   inc/DataObjects/ChebfunToTable.h
    inc/DataObjects/CreateUniformRandomData.h
    inc/DataObjects/CreateDistribution.h
    inc/DataObjects/EvalChebfun.h
@@ -36,12 +32,8 @@ set( SRC_FILES
    src/TableWorkspace.cpp
    src/Unit.cpp
 # Algorithms
-   src/AddChebfun.cpp
-   src/ChebfunToTable.cpp
-   src/ChebfunWorkspace.cpp
    src/CalculateColumnValues.cpp
-   src/CopyChebfun.cpp
-   src/CreateChebfun.cpp
+   src/ChebfunToTable.cpp
    src/CreateUniformRandomData.cpp
    src/CreateDistribution.cpp
    src/EvalChebfun.cpp
@@ -59,9 +51,6 @@ target_link_libraries(DataObjects Kernel API Formula Numeric)
 
 set( SRC_FILES 
   test/main.cpp
-  test/AddChebfunTest.cpp
-  test/ChebfunWorkspaceTest.cpp
-  test/CreateChebfunTest.cpp
   test/CalculateColumnValuesTest.cpp
   test/TableTest.cpp
 )

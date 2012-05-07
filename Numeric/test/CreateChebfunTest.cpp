@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "DataObjects/CreateChebfun.h"
+#include "Numeric/CreateChebfun.h"
 
 #include <iostream>
 
