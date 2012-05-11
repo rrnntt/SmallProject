@@ -41,6 +41,28 @@ public:
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
 };
 
+/**
+ * The identity operator.
+ */
+class NUMERIC_EXPORT ChebIdentity: public ChebOperator
+{
+public:
+  /// Create operator matrix
+  /// @param base :: The base of the result function
+  void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+};
+
+/**
+ * A composite operator.
+ */
+class NUMERIC_EXPORT ChebCompositeOperator: public ChebOperator
+{
+public:
+  ~ChebCompositeOperator();
+protected:
+  std::vector<ChebOperator*> m_operators;
+};
+
 } // NUMERIC
 
 #endif // NUMERIC_CHEBOPERATOR_H

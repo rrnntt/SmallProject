@@ -95,4 +95,30 @@ void ChebDiff::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   }
 }
 
+//--------------------------------------------------------
+
+/** Create operator matrix.
+ *  @param base :: The base of the result function
+ */
+void ChebIdentity::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
+{
+  const size_t n = base->n + 1;
+  L.resize(n, n);
+  L.identity();
+}
+
+//--------------------------------------------------------
+
+/**
+ * Destructor.
+ */
+ChebCompositeOperator::~ChebCompositeOperator()
+{
+  for(auto it = m_operators.begin(); it != m_operators.end(); ++it)
+  {
+    delete *it;
+  }
+}
+
+
 } // Numeric
