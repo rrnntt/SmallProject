@@ -4,7 +4,7 @@ namespace Numeric
 {
 
 ChebFunction::ChebFunction():
-m_fun(1,Numeric::chebfun_ptr(new Numeric::chebfun))
+m_fun(1,Numeric::chebfun_sptr(new Numeric::chebfun))
 {
 }
 
@@ -39,7 +39,7 @@ Numeric::FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
 {
   std::vector<double> x;
   size_t npts = 0;
-  std::for_each(m_fun.begin(),m_fun.end(),[&npts](Numeric::chebfun_ptr f){
+  std::for_each(m_fun.begin(),m_fun.end(),[&npts](Numeric::chebfun_sptr f){
     npts += f->n();
   });
   ++npts;

@@ -17,6 +17,27 @@
 
 namespace Numeric
 {
+  /**
+   * Calculate the m_x array as zeroes of the m_n-th order chebyshev polynomial.
+   * If the array is shared x values will change for all chebfuns
+   */
+  void ChebfunBase::calcX()
+  {
+    x.resize(n+1);
+    w.resize(n+1);
+    double x0 = (startX + endX)/2;
+    double b  = (endX - startX)/2;
+    for(size_t i = 0; i < x.size(); ++i)
+    {
+      size_t j = n - i;
+      x[j] = x0 + b * cos( M_PI*i/n );
+      w[j] = 1.;
+      if ( j % 2 != 0 ) w[j] = -1.;
+      if ( j == 0 || j == n ) w[j] /= 2;
+      //std::cerr<<"x["<<j<<"]="<<x[j]<<' ' << '\n';
+    }
+  }
+
   chebfun::chebfun(size_t n, const double& startX,const double& endX)
   {
     if (n >= 0)
@@ -29,7 +50,7 @@ namespace Numeric
     * Create chebfun with x array shared with other
     */
   chebfun::chebfun(const chebfun& other):
-  m_n(other.m_n),m_startX(other.m_startX),m_endX(other.m_endX),m_x(other.m_x),m_w(other.m_w)
+  m_base(other.m_base)
   {
     m_p.assign(other.m_p.begin(),other.m_p.end());
     m_a.assign(other.m_a.begin(),other.m_a.end());
@@ -40,11 +61,7 @@ namespace Numeric
     */
   chebfun& chebfun::operator=(const chebfun& other)
   {
-    m_n = other.m_n;
-    m_startX = other.m_startX;
-    m_endX = other.m_endX;
-    m_x = other.m_x;
-    m_w = other.m_w;
+    m_base = other.m_base;
     m_p.assign(other.m_p.begin(),other.m_p.end());
     m_a.assign(other.m_a.begin(),other.m_a.end());
     return *this;
@@ -55,59 +72,39 @@ namespace Numeric
     */
   void chebfun::set(size_t n,const double& startX,const double& endX)
   {
-    m_startX = startX;
-    m_endX = endX;
-    if (!m_x || m_x.unique())
-    {
-      m_n = n;
-      m_a.resize(n+1);
-      calcX();
-    }
-    else
-    {
-      throw std::runtime_error("Cannot resize shared chebfun x vector");
-    }
+    m_base.reset( new ChebfunBase(n, startX, endX) );
+    m_p.resize( n + 1 );
+    invalidateA();
   }
 
-  void chebfun::setStartX(const double& d)
+  /**
+   * Set the y points from a vector
+   * @param y :: Vector with y- points. y.size() must be eq n() + 1
+   */
+  void chebfun::setP(const std::vector<double>& y)
   {
-    if (!m_x || m_x.unique())
-    {
-      m_startX = d;
-      calcX();
-    }
-    else
-    {
-      throw std::runtime_error("Cannot reset start x in shared chebfun");
-    }
+    const size_t n = y.size();
+    if (m_p.size() != n) throw std::runtime_error("chebfun::setP: Wrong size " + 
+      boost::lexical_cast<std::string>(m_p.size()) + " " + boost::lexical_cast<std::string>(n)
+      );
+    m_p.assign( y.begin(), y.end() );
+    invalidateA();
   }
 
-  void chebfun::setEndX(const double& d)
-  {
-    if (!m_x || m_x.unique())
-    {
-      m_endX = d;
-      calcX();
-    }
-    else
-    {
-      throw std::runtime_error("Cannot reset end x in shared chebfun");
-    }
-  }
 
-  void chebfun::setRange(const double& s,const double& e)
+  /**
+   * Set the y points from a GSL vector
+   * @param y :: Vector with y- points. y.size() must be eq n() + 1
+   */
+  void chebfun::setP(const GSLVector& y)
   {
-    if (!m_x || m_x.unique())
+    if ( y.size() != n() + 1 ) throw std::runtime_error("Cannot set y-points: different sizes.");
+    for(size_t i = 0; i < y.size(); ++i)
     {
-      m_startX = s;
-      m_endX = e;
-      calcX();
+      m_p[i] = y[i];
     }
-    else
-    {
-      throw std::runtime_error("Cannot reset x bounds in shared chebfun");
-    }
-}
+    invalidateA();
+  }
 
   /**
     * Calculate the function value as a T form expansion at point x
@@ -115,14 +112,18 @@ namespace Numeric
     */
   double chebfun::valueT(const double& x)const
   {
-    double c = 2./(m_endX - m_startX);
-    double a = 1. - c * m_endX;
+    if ( m_a.empty() )
+    {
+      calcA();
+    }
+    double c = 2./( endX() - startX() );
+    double a = 1. - c * endX();
     // scale to interval -1 < x < 1
     double xx = a + c * x;
     double b2 = 0.;
     double b1 = 0.;
     double b;
-    for(size_t j = m_n; j > 0; --j)
+    for(size_t j = n(); j > 0; --j)
     {
       b = b1*xx*2 - b2 + m_a[j];
       b2 = b1;
@@ -137,14 +138,18 @@ namespace Numeric
     */
   double chebfun::valueU(const double& x)const
   {
-    double c = 2./(m_endX - m_startX);
-    double a = 1. - c * m_endX;
+    if ( m_a.empty() )
+    {
+      calcA();
+    }
+    double c = 2./(endX() - startX());
+    double a = 1. - c * endX();
     // scale to interval -1 < x < 1
     double xx = a + c * x;
     double b2 = 0.;
     double b1 = 0.;
     double b;
-    for(size_t j = m_n; j > 0; --j)
+    for(size_t j = n(); j > 0; --j)
     {
       b = b1*xx*2 - b2 + m_a[j];
       b2 = b1;
@@ -159,14 +164,18 @@ namespace Numeric
     */
   double chebfun::derivT(const double& x)const
   {
-    double c = 2./(m_endX - m_startX);
-    double a = 1. - c * m_endX;
+    if ( m_a.empty() )
+    {
+      calcA();
+    }
+    double c = 2./(endX() - startX());
+    double a = 1. - c * endX();
     // scale to interval -1 < x < 1
     double xx = a + c * x;
     double b2 = 0.;
     double b1 = 0.;
     double b;
-    for(size_t j = m_n - 1; j > 0; --j)
+    for(size_t j = n() - 1; j > 0; --j)
     {
       b = b1*xx*2 - b2 + m_a[j + 1]*(j+1);
       b2 = b1;
@@ -181,9 +190,14 @@ namespace Numeric
     */
   double chebfun::derivT2(const double& x)const
   {
-    double n2 = double(m_n)*m_n;
+    if ( m_a.empty() )
+    {
+      calcA();
+    }
+    size_t n1 = n();
+    double n2 = double(n1)*n1;
     double res = n2*(n2-1)/3;
-    if ( m_n % 2 != 0 ) res = -res;
+    if ( n1 % 2 != 0 ) res = -res;
     return res;
 
     //double c = 2./(m_endX - m_startX);
@@ -210,50 +224,23 @@ namespace Numeric
   }
 
   /**
-   * Calculate the m_x array as zeroes of the m_n-th order chebyshev polynomial.
-   * If the array is shared x values will change for all chebfuns
-   */
-  void chebfun::calcX()
-  {
-    if (!m_x || !m_w)
-    {
-      m_x.reset(new std::vector<double>);
-      m_w.reset(new std::vector<double>);
-    }
-
-    m_x->resize(m_n+1);
-    m_w->resize(m_n+1);
-    m_p.resize(m_n+1);
-    double x0 = (m_startX + m_endX)/2;
-    double b  = (m_endX - m_startX)/2;
-    for(size_t i = 0; i < m_x->size(); ++i)
-    {
-      size_t j = m_x->size() - 1 - i;
-      (*m_x)[i] = x0 + b * cos( M_PI*i/m_n );
-      (*m_w)[i] = 1.;
-      if ( i % 2 != 0 ) (*m_w)[i] = -1.;
-      if ( i == 0 || i == m_n ) (*m_w)[i] /= 2;
-      //std::cerr<<"x["<<i<<"]="<<m_x[i]<<'\n';
-    }
-  }
-
-  /**
    * Calculate the value using teh barycenteric interpolation formula
    */
   double chebfun::valueB(const double& x)const
   {
-    std::vector<double>::const_iterator it = 
-      std::find(m_x->begin(),m_x->end(),x);
-    if (it != m_x->end())
+    auto & X = m_base->x;
+    auto & w = m_base->w;
+    std::vector<double>::const_iterator it = std::find( X.begin(), X.end(), x );
+    if (it != X.end())
     {
-      std::vector<double>::difference_type i = std::distance(std::vector<double>::const_iterator(m_x->begin()),it);
+      std::vector<double>::difference_type i = std::distance(std::vector<double>::const_iterator(X.begin()),it);
       return m_p[i];
     }
     double res = 0;
     double weight = 0;
-    for(size_t i=0;i<m_x->size();++i)
+    for(size_t i=0;i<X.size();++i)
     {
-      double W = (*m_w)[i]/(x - (*m_x)[i]);
+      double W = w[i]/(x - X[i]);
       weight += W;
       res += W * m_p[i];
       //std::cerr << i << ' ' << (*m_w)[i] << ' ' << W << ' ' << W * m_p[i] << std::endl;
@@ -334,19 +321,20 @@ namespace Numeric
   /**
    * Calculate the chebyshev expansion coefficients from the points m_x
    */
-  void chebfun::calcA()
+  void chebfun::calcA() const
   {
-    size_t n = m_n + 1;
-    m_a.resize(n);
+    size_t m_n = n();
+    size_t nn = m_n + 1;
+    m_a.resize(nn);
 
     //// This is a correct and direct transform from m_p to m_a
     //// DO NOT DELETE !!!
-    //for(int i=0;i<n;++i)
+    //for(int i = 0; i < nn; ++i)
     //{
     //  double t = 0.;
-    //  for(int j=0;j<=m_n;j++)
+    //  for(int j = 0; j <= m_n; j++)
     //  {
-    //    double p = m_p[j];
+    //    double p = m_p[m_n - j];
     //    if (j== 0 || j == m_n) p /= 2;
     //    t += cos(M_PI*i*(double(j))/m_n)*p;
     //  }
@@ -357,8 +345,8 @@ namespace Numeric
 
     // This is a magic trick which uses real fft to do the above cosine transform
     std::vector<double> tmp(m_n*2);
-    std::copy(m_p.begin(),m_p.end(),tmp.begin());
-    std::reverse_copy(m_p.begin()+1,m_p.end()-1,tmp.begin()+m_n+1);
+    std::reverse_copy(m_p.begin(),m_p.end(),tmp.begin());
+    std::copy(m_p.begin()+1,m_p.end()-1,tmp.begin()+m_n+1);
 
     gsl_fft_real_workspace * workspace = gsl_fft_real_workspace_alloc(2*m_n);
     gsl_fft_real_wavetable * wavetable = gsl_fft_real_wavetable_alloc(2*m_n);
@@ -367,44 +355,46 @@ namespace Numeric
     gsl_fft_real_workspace_free (workspace);
 
     HalfComplex fc(&tmp[0],tmp.size());
-    for(size_t i=0;i<n;++i)
+    for(size_t i=0; i < nn; ++i)
     {
       double a = fc.real(i)/m_n;
       if (i == 0) a /= 2;
       m_a[i] = a;
-    }
+    }//*/
     // End of the magic trick
   }
 
   void chebfun::calcP()
   {
+    if ( m_a.empty() )
+    {
+      throw std::runtime_error("chebfun: cannot calculate P from A - A is empty.");
+    }
     if (m_p.size() != m_a.size())
     {
       m_p.resize(m_a.size());
     }
+    auto& x = m_base->x;
     for(size_t i = 0; i < m_a.size(); ++i)
     {
-      m_p[i] = valueT((*m_x)[i]);
+      m_p[i] = valueT( x[i] );
     }
   }
 
   /// make this chebfun a derivative of the argument
   void chebfun::fromDerivative(const chebfun& fun)
   {
-    m_n = fun.m_n;
-    m_x = fun.m_x; // shared
-    m_w = fun.m_w; // shared
-    m_startX = fun.m_startX;
-    m_endX = fun.m_endX;
-    double dx = 1e-10*(m_endX - m_startX);
-    std::vector<double> tmp(m_n+1);
-    m_p.resize(m_n+1);
+    m_base = fun.m_base;
+    double dx = 1e-10*(endX() - startX());
+    std::vector<double> tmp(n() + 1);
+    m_p.resize(n() + 1);
+    auto& x = m_base->x;
     for(size_t i = 0; i < m_p.size(); ++i)
     {
-      tmp[i] = (fun.valueB((*m_x)[i] + dx) - fun.m_p[i]) / dx;
+      tmp[i] = (fun.valueB(x[i] + dx) - fun.m_p[i]) / dx;
     }
-    std::copy(tmp.begin(),tmp.end(),m_p.begin());
-    calcA(); // ?
+    std::copy(tmp.begin(), tmp.end(), m_p.begin());
+    invalidateA();
   }
 
   double chebfun_integration_function(double x,void* this_chebfun)
@@ -422,43 +412,41 @@ namespace Numeric
 
   double chebfun::integrate(int pwr)
   {
-    gsl_integration_glfixed_table * quad = gsl_integration_glfixed_table_alloc(m_n);
+    gsl_integration_glfixed_table * quad = gsl_integration_glfixed_table_alloc( n() );
     gsl_function fun;
     fun.function = pwr == 1 ? chebfun_integration_function : chebfun_integration_function2;
     fun.params = this;
-    double res = gsl_integration_glfixed (&fun, m_startX,m_endX, quad);
+    double res = gsl_integration_glfixed (&fun, startX() ,endX(), quad);
     gsl_integration_glfixed_table_free(quad);
     return res;
   }
 
   void chebfun::fit(const IFunction& ifun)
   {
-    m_p.resize(m_x->size());
-    calcX();
-    FunctionDomain1DView domain(m_x->data(),m_x->size());
+    auto& x = m_base->x;
+    FunctionDomain1DView domain(x.data(),x.size());
     FunctionValues values(domain);
     ifun.function(domain,values);
-    for(size_t i=0;i<m_x->size();++i)
+    for(size_t i=0; i < x.size(); ++i)
     {
       m_p[i] = values.getCalculated(i);
     }
-    calcA();
+    invalidateA();
   }
 
   void chebfun::fit(AFunction f)
   {
-    m_p.resize(m_x->size());
-    calcX();
-    for(size_t i=0;i<m_x->size();++i)
+    auto& x = m_base->x;
+    for(size_t i = 0; i < x.size(); ++i)
     {
-      m_p[i] = f((*m_x)[i]);
+      m_p[i] = f( x[i] );
     }
-    calcA();
+    invalidateA();
   }
 
   chebfun& chebfun::operator+=(const chebfun& f)
   {
-    if (m_x == f.m_x)
+    if ( haveSameBase(f) )
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -467,18 +455,19 @@ namespace Numeric
     }
     else
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] += f((*m_x)[i]);
+        m_p[i] += f( x[i] );
       }
     }
-    calcA();
+    invalidateA();
     return *this;
   }
 
   chebfun& chebfun::operator-=(const chebfun& f)
   {
-    if (m_x == f.m_x)
+    if ( haveSameBase(f) )
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -487,18 +476,19 @@ namespace Numeric
     }
     else
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] -= f((*m_x)[i]);
+        m_p[i] -= f( x[i] );
       }
     }
-    calcA();
+    invalidateA();
     return *this;
   }
 
   chebfun& chebfun::operator*=(const chebfun& f)
   {
-    if (m_x == f.m_x)
+    if ( haveSameBase(f) )
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -507,18 +497,19 @@ namespace Numeric
     }
     else
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] *= f((*m_x)[i]);
+        m_p[i] *= f( x[i] );
       }
     }
-    calcA();
+    invalidateA();
     return *this;
   }
 
   chebfun& chebfun::operator/=(const chebfun& f)
   {
-    if (m_x == f.m_x)
+    if ( haveSameBase(f) )
     {
       for(size_t i = 0; i < m_p.size(); ++i)
       {
@@ -527,27 +518,14 @@ namespace Numeric
     }
     else
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] /= f((*m_x)[i]);
+        m_p[i] /= f( x[i] );
       }
     }
-    calcA();
+    invalidateA();
     return *this;
-  }
-
-  /**
-   * Assign m_p directly from p.
-   * @param p :: Values to assign to m_p. Sizes of vectors must match exactly.
-   */
-  void chebfun::setP(const std::vector<double>& p)
-  {
-    const size_t n = p.size();
-    if (m_p.size() != n) throw std::runtime_error("chebfun::setP: Wrong size " + 
-      boost::lexical_cast<std::string>(m_p.size()) + " " + boost::lexical_cast<std::string>(n)
-      );
-    m_p.assign(p.begin(),p.end());
-    calcA();
   }
 
   /**
@@ -568,24 +546,25 @@ namespace Numeric
     set(3*p.size(), start, end);
     const double D = end - start;
 
-    for(size_t i = 0; i < m_x->size(); ++i)
+    auto& x = m_base->x;
+    for(size_t i = 0; i < x.size(); ++i)
     {
-      double xx = (*m_x)[i];
-      double xx1 = cos(PI*(xx - start) / D);
+      double xx = x[i];
+      double xx1 = - cos(PI*(xx - start) / D);
       m_p[i] = cheb(xx1);
       //std::cerr << xx << ' ' << xx1 << ' ' << cheb(xx1) -  p[n - 1 - i] << std::endl;
     }
-    calcA();
+    invalidateA();
   }
 
   /// Creates a domain for the region on which the workspace is defined.
   Numeric::FunctionDomain1D_sptr chebfun::createDomainFromXPoints() const
   {
     std::vector<double> x;
-    x.resize( m_n + 1 );
+    x.resize( n() + 1 );
 
     auto xf = xpoints();
-    std::copy(xf.rbegin(), xf.rend(), x.begin() );
+    std::copy(xf.begin(), xf.end(), x.begin() );
     auto domain = new Numeric::FunctionDomain1DVector( x );
 
     return Numeric::FunctionDomain1D_sptr( domain );
@@ -606,9 +585,10 @@ namespace Numeric
   {
     const double start = domain.startX();
     const double end = domain.endX();
-    for(size_t i = 0; i < m_x->size(); ++i)
+    auto& x = m_base->x;
+    for(size_t i = 0; i < x.size(); ++i)
     {
-      double xx = (*m_x)[i];
+      double xx = x[i];
       if ( xx < start || xx > end ) continue;
       const double v = f(xx);
       switch( op )

@@ -6,6 +6,7 @@
 set( INC_FILES 
    inc/Numeric/Chebfun.h
    inc/Numeric/ChebFunction.h
+   inc/Numeric/ChebOperator.h
    inc/Numeric/Chebyshev.h
    inc/Numeric/CompositeDomain.h
    inc/Numeric/CompositeFunction.h
@@ -33,6 +34,7 @@ set( INC_FILES
    inc/Numeric/IPeakFunction.h
    inc/Numeric/Jacobian.h
    inc/Numeric/JointDomain.h
+   inc/Numeric/JointDomainFunction.h
    inc/Numeric/LeastSquares.h
    inc/Numeric/LevenbergMarquardt.h
    inc/Numeric/MultiDomainFunction.h
@@ -57,6 +59,7 @@ set( INC_FILES
 set( SRC_FILES 
   src/Chebfun.cpp
   src/ChebFunction.cpp
+  src/ChebOperator.cpp
   src/Chebyshev.cpp
   src/CompositeFunction.cpp
   src/ConstraintFactory.cpp
@@ -75,6 +78,7 @@ set( SRC_FILES
   src/IFunction1D.cpp
   src/IPeakFunction.cpp
   src/JointDomain.cpp
+  src/JointDomainFunction.cpp
   src/LeastSquares.cpp
   src/LevenbergMarquardt.cpp
   src/MultiDomainFunction.cpp
@@ -116,6 +120,7 @@ set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/ChebFunctionTest.cpp
+  test/ChebOperatorTest.cpp
   test/ChebfunTest.cpp
   #test/ConjugateFRMinimizerTest.cpp
   test/CostFuncFittingTest.cpp
@@ -126,6 +131,7 @@ set( SRC_FILES
   test/FunctionFactoryTest.cpp
   test/FunctionPropertyTest.cpp
   test/FuncMinimizerFactoryTest.cpp
+  test/JointDomainFunctionTest.cpp
   test/IFuncMinimizerTest.cpp
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp

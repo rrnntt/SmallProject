@@ -51,7 +51,7 @@ public:
   ChebFunction& operator*=(const ChebFunction& cws);
   ChebFunction& operator/=(const ChebFunction& cws);
 protected:
-  std::vector<chebfun_ptr> m_fun;
+  std::vector<chebfun_sptr> m_fun;
 };
 
 /// typedef shared pointer

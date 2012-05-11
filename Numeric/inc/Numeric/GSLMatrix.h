@@ -271,6 +271,22 @@ namespace Numeric
       gsl_linalg_LU_invert( LU.gsl(), p, gsl() );
       gsl_permutation_free( p );
     }
+
+    /**
+     * Multiply this matrix by vector x and store result in y. y = M * x
+     * @param x :: Vector to multiply with
+     * @param y :: The result vector.
+     */
+    void multiply(const GSLVector& x, GSLVector& y)
+    {
+      if ( x.size() != size2() )
+      {
+        throw std::runtime_error("Matrix-vector multiplication: dimension mismatch");
+      }
+      y.resize( size1() );
+      gsl_blas_dgemv( CblasNoTrans, 1.0, gsl(), x.gsl(), 0.0, y.gsl() );
+    }
+
   };
 
   inline GSLMatrixMult2 operator*(const GSLMatrix& m1, const GSLMatrix& m2)

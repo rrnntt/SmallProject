@@ -16,10 +16,6 @@ public:
   TestCheb(int n = -1, const double& startX = -1,const double& endX = 1):
       chebfun(n,startX,endX){}
   TestCheb(const TestCheb& other):chebfun(other){}
-  bool hasSameX(TestCheb& fun)
-  {
-    return this->m_x == fun.m_x;
-  }
 
   void setPs(const double* p, size_t n)
   {
@@ -33,6 +29,17 @@ public:
     calcA();
   }
 };
+
+TEST(ChebfunTest, XPointsTest)
+{
+  chebfun cheb(5,-1.5,1.5);
+  auto& x = cheb.xpoints();
+  EXPECT_EQ( x[0], -1.5 );
+  EXPECT_EQ( x[5], 1.5 );
+  EXPECT_EQ( x.size(), 6 );
+  EXPECT_EQ( cheb.startX(), -1.5 );
+  EXPECT_EQ( cheb.endX(), 1.5 );
+}
 
 TEST(ChebfunTest, FitTest)
 {
@@ -49,6 +56,39 @@ TEST(ChebfunTest, FitTest)
   for(size_t i = 0; i < x.size(); ++i)
   {
     EXPECT_NEAR(y.getCalculated(i),cheb(x[i]),1e-4);
+  }
+
+  auto& xp = cheb.xpoints();
+  auto& yp = cheb.ypoints();
+  for(size_t i = 0; i < xp.size(); ++i)
+  {
+    const double xx = xp[i];
+    EXPECT_EQ( yp[i], cheb( xx ) );
+    //std::cerr << xx << ' ' << yp[i] << ' ' << cheb.valueT( xx ) << std::endl;
+  }
+
+  chebfun cheb1(15,-1.5,1.5);
+  cheb1.fit(user);
+  auto& a = cheb1.coeffs();
+  double a0 = 10;
+  for(size_t i = 0; i < a.size(); ++i)
+  {
+    if ( i % 2 == 0 )
+    {
+      EXPECT_NEAR(0.0, a[i], 1e-14);
+    }
+    else
+    {
+      EXPECT_LT( fabs(a[i]/a0), 0.12 );
+      a0 = a[i];
+    }
+    //std::cerr << i << ' ' << a[i] << std::endl;
+  }
+  for(size_t i = 0; i < x.size(); ++i)
+  {
+    EXPECT_NEAR(y.getCalculated(i),cheb1(x[i]),1e-14);
+    EXPECT_NEAR(cheb1.valueT( x[i] ),cheb1(x[i]),1e-13);
+    //std::cerr << y.getCalculated(i) << ' ' << cheb1(x[i]) << ' ' <<  << std::endl;
   }
 }
 
@@ -70,13 +110,13 @@ TEST(ChebfunTest, CopyTest)
     EXPECT_EQ(cheb1(x[i]),cheb(x[i]));
   }
 
-  EXPECT_TRUE( cheb1.hasSameX(cheb) );
+  EXPECT_TRUE( cheb1.haveSameBase(cheb) );
   EXPECT_EQ( cheb.n(),cheb1.n());
   
   TestCheb cheb2;
 
   cheb2 = cheb1;
-  EXPECT_TRUE( cheb2.hasSameX(cheb) );
+  EXPECT_TRUE( cheb2.haveSameBase(cheb) );
   EXPECT_EQ(cheb2.n(),cheb1.n());
   for(size_t i = 0; i < x.size(); ++i)
   {
@@ -85,7 +125,7 @@ TEST(ChebfunTest, CopyTest)
   }
 
   cheb2 += cheb1;
-  EXPECT_TRUE( cheb2.hasSameX(cheb) );
+  EXPECT_TRUE( cheb2.haveSameBase(cheb) );
   EXPECT_EQ(cheb2.n(),cheb1.n());
   for(size_t i = 0; i < x.size(); ++i)
   {
@@ -94,7 +134,7 @@ TEST(ChebfunTest, CopyTest)
   }
 
   cheb2 -= cheb1;
-  EXPECT_TRUE( cheb2.hasSameX(cheb) );
+  EXPECT_TRUE( cheb2.haveSameBase(cheb) );
   EXPECT_EQ(cheb2.n(),cheb1.n());
   for(size_t i = 0; i < x.size(); ++i)
   {
@@ -103,7 +143,7 @@ TEST(ChebfunTest, CopyTest)
   }
 
   cheb2 *= cheb1;
-  EXPECT_TRUE( cheb2.hasSameX(cheb) );
+  EXPECT_TRUE( cheb2.haveSameBase(cheb) );
   EXPECT_EQ(cheb2.n(),cheb1.n());
   for(size_t i = 0; i < x.size(); ++i)
   {
@@ -112,7 +152,7 @@ TEST(ChebfunTest, CopyTest)
   }
 
   cheb2 /= cheb1;
-  EXPECT_TRUE( cheb2.hasSameX(cheb) );
+  EXPECT_TRUE( cheb2.haveSameBase(cheb) );
   EXPECT_EQ(cheb2.n(),cheb1.n());
   for(size_t i = 0; i < x.size(); ++i)
   {
@@ -122,10 +162,10 @@ TEST(ChebfunTest, CopyTest)
 
   TestCheb cheb3(5,-1.5,1.5);
   cheb3.fit(user);
-  EXPECT_FALSE( cheb3.hasSameX(cheb) );
+  EXPECT_FALSE( cheb3.haveSameBase(cheb) );
 
   cheb3 += cheb1;
-  EXPECT_FALSE( cheb3.hasSameX(cheb) );
+  EXPECT_FALSE( cheb3.haveSameBase(cheb) );
   EXPECT_NE(cheb3.n(),cheb1.n());
   for(size_t i = 0; i < x.size(); ++i)
   {
@@ -149,7 +189,7 @@ TEST(ChebfunTest, UniformFitTest)
   for(size_t i = 0; i < x.size(); ++i)
   {
     double xx = x[i];
-    double xx1 = cos(PI*(xx + 1.5)/(3.0));
+    double xx1 = -cos(PI*(xx + 1.5)/(3.0));
     //std::cerr << xx << ' ' << xx1 << ' ' << cheb(xx1) - y.getCalculated(i) << std::endl;
     EXPECT_NEAR(cheb(xx1),y.getCalculated(i),1e-15);
   }

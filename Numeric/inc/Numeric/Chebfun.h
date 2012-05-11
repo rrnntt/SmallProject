@@ -4,6 +4,7 @@
 #include "Numeric/DllExport.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
+#include "Numeric/GSLVector.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -14,27 +15,52 @@ namespace Numeric
 {
   class IFunction;
 
+  /**
+   * A base of a chebfun - its domain. Can be shared between chebfuns.
+   */
+  struct NUMERIC_EXPORT ChebfunBase
+  {
+    ChebfunBase(size_t k, double s, double e):n(k),startX(s),endX(e){calcX();}
+    size_t n;              ///< polynomial order
+    double startX, endX;   ///< set boundaries where the function is defined
+    size_t size() const {return x.size();} ///< number of x-points == n + 1
+    std::vector<double> x;   ///< x-vaues for use in the barycentric formula, n + 1 items
+    std::vector<double> w;   ///< weights used in the barycentric formula, n + 1 items
+    void calcX();  ///< Calclulate x and w based on values of n, startX, and endX
+  };
+
+  typedef boost::shared_ptr<ChebfunBase> ChebfunBase_sptr;
+  typedef boost::shared_ptr<const ChebfunBase> ChebfunBase_const_sptr;
+
+  /**
+   * A chebfun
+   */
   class NUMERIC_EXPORT chebfun
   {
   public:
     chebfun(size_t n = -1, const double& startX = -1,const double& endX = 1);
     chebfun(const chebfun& other);
     chebfun& operator=(const chebfun& other);
+    ChebfunBase_const_sptr getBase() const {return m_base;}
     /// Check if two chenfuns have shared x-points.
-    bool haveSameBase(const chebfun& other) const {return m_x == other.m_x;}
+    bool haveSameBase(const chebfun& other) const {return m_base == other.m_base;}
+    /// Is the chebfun valid and set
+    bool isValid() const {return static_cast<bool>(m_base);}
     /// Order of the polynomial
-    size_t n()const{return m_n;}
+    size_t n()const{return m_base->n;}
     void set(size_t n,const double& startX = -1,const double& endX = 1);
-    double startX()const{return m_startX;}
-    void setStartX(const double& d);
-    double endX()const{return m_endX;}
-    void setEndX(const double& d);
-    void setRange(const double& s,const double& e);
-    double& param(size_t i){return m_a.at(i);}
+    double startX()const{return m_base->startX;}
+    double endX()const{return m_base->endX;}
     /// Get the vector of x-points, size n() + 1
-    const std::vector<double>& xpoints()const{return *m_x;}
+    const std::vector<double>& xpoints()const{return m_base->x;}
     /// Get the vector of y-points, size n() + 1
     const std::vector<double>& ypoints()const{return m_p;}
+    /// Get the vector of y-points, size n() + 1
+    const std::vector<double>& coeffs()const{if (m_a.empty()) calcA(); return m_a;}
+    /// Set the y points from a std vector
+    void setP(const std::vector<double>& y);
+    /// Set the y points from a GSL vector
+    void setP(const GSLVector& y);
     void fit(const IFunction& ifun);
     void fit(AFunction f);
     void uniformFit(double start, double end, const std::vector<double>& p);
@@ -74,9 +100,10 @@ namespace Numeric
     chebfun& operator+=(int v){return *this+=double(v);}
     chebfun& operator+=(AFunction f)
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] += f((*m_x)[i]);
+        m_p[i] += f( x[i] );
       }
       calcA();
       return *this;
@@ -94,9 +121,10 @@ namespace Numeric
     chebfun& operator-=(int v){return *this-=double(v);}
     chebfun& operator-=(AFunction f)
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] -= f((*m_x)[i]);
+        m_p[i] -= f( x[i] );
       }
       calcA();
       return *this;
@@ -114,9 +142,10 @@ namespace Numeric
     chebfun& operator*=(int v){return *this*=double(v);}
     chebfun& operator*=(AFunction f)
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] *= f((*m_x)[i]);
+        m_p[i] *= f( x[i] );
       }
       calcA();
       return *this;
@@ -134,9 +163,10 @@ namespace Numeric
     chebfun& operator/=(int v){return *this/=double(v);}
     chebfun& operator/=(AFunction f)
     {
+      auto& x = m_base->x;
       for(size_t i = 0; i < m_p.size(); ++i)
       {
-        m_p[i] /= f((*m_x)[i]);
+        m_p[i] /= f( x[i] );
       }
       calcA();
       return *this;
@@ -155,23 +185,18 @@ namespace Numeric
     double integrate(int pwr = 1);
 
     void calcP(); ///< calc m_p form m_a
+    void calcA() const; ///< calc m_a from m_p
   protected:
 
-    void calcX();
-    void calcA(); ///< calc m_a from m_p
-    /// Set m_p vector of function values directly from a std::vector. Size of p must be == m_p.size()
-    void setP(const std::vector<double>& p);
+    void invalidateA() { m_a.clear(); }
 
-    size_t m_n;                 ///< polynomial order
-    double m_startX,m_endX;  ///< set boundaries where the function is defined
-    boost::shared_ptr< std::vector<double> > m_x; ///< x-vaues for use in the barycentric formula, m_n + 1 items
-    boost::shared_ptr< std::vector<double> > m_w; ///< some weights used in the barycentric formula, m_n + 1 items
+    boost::shared_ptr< ChebfunBase > m_base; ///< The base of a chebfun holding x-values and weights
     std::vector<double> m_p; ///< function values at m_x points, m_n + 1 items
-    std::vector<double> m_a; ///< polynomial coefficients, m_n + 1 items
+    mutable std::vector<double> m_a; ///< polynomial coefficients, m_n + 1 items
   };
 
-  typedef boost::shared_ptr<chebfun> chebfun_ptr;
-  typedef boost::shared_ptr<const chebfun> chebfun_const_ptr;
+  typedef boost::shared_ptr<chebfun> chebfun_sptr;
+  typedef boost::shared_ptr<const chebfun> chebfun_const_sptr;
 
 } // Numeric
 

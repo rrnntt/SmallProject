@@ -30,6 +30,15 @@ public:
       gsl_vector_memcpy(m_vector, v.gsl());
     }
 
+    GSLVector(const std::vector<double>& v)
+    {
+      m_vector = gsl_vector_alloc(v.size());
+      for(size_t i = 0; i < v.size(); ++i)
+      {
+        gsl_vector_set( m_vector, i, v[i] );
+      }
+    }
+
     GSLVector& operator=(const GSLVector& v)
     {
       if (m_vector && size() != v.size())
@@ -80,6 +89,13 @@ public:
     }
     /// get an element
     double get(size_t i) const
+    {
+      if (i < m_vector->size) return gsl_vector_get(m_vector,i);
+      throw std::out_of_range("GSLVector index is out of range.");
+    }
+
+    /// get an element
+    double operator[](size_t i) const
     {
       if (i < m_vector->size) return gsl_vector_get(m_vector,i);
       throw std::out_of_range("GSLVector index is out of range.");
