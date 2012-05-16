@@ -5,6 +5,8 @@
 
 #include <gsl/gsl_vector.h>
 #include <stdexcept>
+#include <iostream>
+#include <iomanip>
 
 namespace Numeric
 {
@@ -126,6 +128,17 @@ public:
     }
 
 };
+
+  inline std::ostream& operator<<(std::ostream& ostr, const GSLVector& v)
+  {
+    ostr << std::scientific << std::setprecision(6);
+    for(size_t j = 0; j < v.size(); ++j)
+    {
+      ostr << std::setw(13) << v.get(j) << ' ';
+    }
+    ostr << std::endl;
+    return ostr;
+  }
 
 } // NUMERIC
 

@@ -160,6 +160,12 @@ namespace Numeric
       gsl_matrix_set_zero( m_matrix );
     }
 
+    /// Swap the contents of two matrices.
+    void swap(GSLMatrix& M)
+    {
+      std::swap(m_matrix, M.m_matrix);
+    }
+
     // add a matrix to this
     GSLMatrix& operator+=(const GSLMatrix& M)
     {
@@ -270,6 +276,23 @@ namespace Numeric
       gsl_linalg_LU_decomp( LU.gsl(), p, &s );
       gsl_linalg_LU_invert( LU.gsl(), p, gsl() );
       gsl_permutation_free( p );
+    }
+
+    /// Calculate the determinant.
+    double det()
+    {
+      if (size1() != size2())
+      {
+        throw std::runtime_error("Matrix inverse: the matrix must be square.");
+      }
+      size_t n = size1();
+      int s;
+      GSLMatrix LU(*this);
+      gsl_permutation * p = gsl_permutation_alloc( n );
+      gsl_linalg_LU_decomp( LU.gsl(), p, &s );
+      double d = gsl_linalg_LU_det( LU.gsl(), s ); 
+      gsl_permutation_free( p );
+      return d;
     }
 
     /**
