@@ -21,4 +21,14 @@ namespace API
     }
   }
 
+  /// Send a progress report to the listeners
+  void Algorithm::sendProgress(size_t current, size_t maximum)
+  {
+    for(auto it = m_listeners.begin(); it != m_listeners.end(); ++it)
+    {
+      (**it).algorithmProgress(this, current, maximum);
+    }
+  }
+
+
 } // API

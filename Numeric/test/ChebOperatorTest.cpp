@@ -125,3 +125,9 @@ TEST(Numeric_ChebOperator_Test, SolveTest)
     //std::cerr << c(x[i]) << ' ' << cos(x[i]) << std::endl;
   }
 }
+
+TEST(Numeric_ChebOperator_Test, CreateTest)
+{
+  auto oper = ChebOperator::create( "diff2 + diff + 1" );
+  oper->log();
+}

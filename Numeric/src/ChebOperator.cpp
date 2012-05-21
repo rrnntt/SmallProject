@@ -1,4 +1,8 @@
 #include "Numeric/ChebOperator.h"
+#include "Numeric/UserFunction1D.h"
+#include "Kernel/EParser.h"
+
+#include <stdexcept>
 
 namespace Numeric
 {
@@ -170,6 +174,65 @@ void ChebOperator::solve(chebfun& y, const BoundaryConditions& bc)
   y.setP( u );
 }
 
+/**
+ * Create an operator from a string.
+ */
+ChebOperator* ChebOperator::create( const std::string& str )
+{
+  Kernel::EParser parser;
+  parser.parse( str );
+  return create( parser );
+}
+
+/**
+ * Create an operator from a EParser.
+ * @param parser :: A parser with description of an operator
+ */
+ChebOperator* ChebOperator::create( const Kernel::EParser& parser )
+{
+  const std::string op = parser.name();
+  if ( op == "diff" )
+  {
+    return new ChebDiff;
+  }
+  else if ( op == "diff2" )
+  {
+    return new ChebDiff2;
+  }
+  else if ( op == "1" )
+  {
+    return new ChebIdentity;
+  }
+  else if ( op == "*" )
+  {
+    auto comp = new ChebCompositeOperator;
+    for(size_t i = 0; i < parser.size(); ++i)
+    {
+      comp->addRight( create( parser[i] ) );
+    }
+    return comp;
+  }
+  else if ( op == "+" )
+  {
+    auto plus = new ChebPlus;
+    for(size_t i = 0; i < parser.size(); ++i)
+    {
+      std::string op = parser[i].operator_name();
+      if ( op.empty() ) op = "+";
+      plus->add( op[0], create( parser[i] ) );
+    }
+    return plus;
+  }
+  else
+  {
+    boost::shared_ptr<UserFunction1D> fun( new UserFunction1D );
+    fun->setAttributeValue( "Function", parser.str() );
+    return new ChebTimes( fun );
+  }
+
+  throw std::invalid_argument("Error in operator description.");
+}
+
 //--------------------------------------------------------
 /** Create operator matrix.
  *  @param base :: The base of the result function
@@ -204,6 +267,20 @@ void ChebDiff::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   }
 }
 
+/// Print out the operator for debugging
+/// @param padding :: Padding with spaces that must start all new lines in the log
+void ChebDiff::log(const std::string& padding)
+{
+  std::cerr << padding << "diff" << std::endl;
+}
+
+/// Print out the operator for debugging
+/// @param padding :: Padding with spaces that must start all new lines in the log
+void ChebDiff2::log(const std::string& padding)
+{
+  std::cerr << padding << "diff2" << std::endl;
+}
+
 //--------------------------------------------------------
 
 /** Create operator matrix.
@@ -214,6 +291,13 @@ void ChebIdentity::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   const size_t n = base->n + 1;
   L.resize(n, n);
   L.identity();
+}
+
+/// Print out the operator for debugging
+/// @param padding :: Padding with spaces that must start all new lines in the log
+void ChebIdentity::log(const std::string& padding)
+{
+  std::cerr << padding << "1" << std::endl;
 }
 
 //--------------------------------------------------------
@@ -276,6 +360,19 @@ void ChebCompositeOperator::createMatrix(ChebfunBase_const_sptr base, GSLMatrix&
   }
 }
 
+/// Print out the operator for debugging
+/// @param padding :: Padding with spaces that must start all new lines in the log
+void ChebCompositeOperator::log(const std::string& padding)
+{
+  std::cerr << padding << "*" << std::endl;
+  auto op = m_operators.begin();
+  for(; op != m_operators.end(); ++op)
+  {
+    (**op).log( padding + "  " );
+  }
+}
+
+
 //--------------------------------------------------------
 
 /**
@@ -316,20 +413,30 @@ void ChebPlus::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   }
 }
 
+/// Print out the operator for debugging
+/// @param padding :: Padding with spaces that must start all new lines in the log
+void ChebPlus::log(const std::string& padding)
+{
+  std::cerr << padding << "+" << std::endl;
+  auto op = m_operators.begin();
+  for(; op != m_operators.end(); ++op)
+  {
+    (**op).log( padding + "  " );
+  }
+}
+
 //--------------------------------------------------------
 
 /// Constructor
 ChebTimes::ChebTimes(double factor):
-m_constant(factor),
-m_isFun(false)
+m_constant(factor)
 {
 }
 
 /// Constructor
-ChebTimes::ChebTimes(const chebfun& fun):
+ChebTimes::ChebTimes(IFunction1D_sptr fun):
 m_constant(0),
-m_fun(fun),
-m_isFun(true)
+m_fun(fun)
 {
 }
 
@@ -344,11 +451,14 @@ void ChebTimes::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   L.resize(n, n);
   L.zero();
   auto& x = base->x;
-  if ( m_isFun )
+  if ( m_fun )
   {
+    FunctionDomain1DVector domain( x );
+    FunctionValues values( domain );
+    m_fun->function( domain, values );
     for( size_t i = 0; i < n; ++i )
     {
-      L.set( i, i, m_fun(x[i]) );
+      L.set( i, i, values.getCalculated(i) );
     }
   }
   else
@@ -358,6 +468,22 @@ void ChebTimes::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
       L.set( i, i, m_constant );
     }
   }
+}
+
+/// Print out the operator for debugging
+/// @param padding :: Padding with spaces that must start all new lines in the log
+void ChebTimes::log(const std::string& padding)
+{
+  std::cerr << padding; 
+  if ( m_fun )
+  {
+    std::cerr << m_fun->getAttribute("Formula").asString();
+  }
+  else
+  {
+    std::cerr << m_constant;
+  }
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------

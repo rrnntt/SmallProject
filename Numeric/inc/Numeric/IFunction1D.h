@@ -41,7 +41,7 @@ protected:
 
 };
 
-typedef boost::shared_ptr<IFunction1D> IFunction1D_ptr;
+typedef boost::shared_ptr<IFunction1D> IFunction1D_sptr;
 
 } // namespace Numeric
 

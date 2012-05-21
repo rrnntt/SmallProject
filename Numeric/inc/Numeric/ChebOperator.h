@@ -4,9 +4,16 @@
 #include "Numeric/DllExport.h"
 #include "Numeric/ChebFunction.h"
 #include "Numeric/GSLMatrix.h"
+#include "Numeric/IFunction1D.h"
 
 #include <map>
 #include <list>
+#include <string>
+
+namespace Kernel
+{
+  class EParser;
+}
 
 namespace Numeric
 {
@@ -38,7 +45,7 @@ protected:
 };
 
 /**
- * Cauchy boundary conditions: boundary value + first derivative
+ * Dirichlet boundary conditions: values on the left or both boundaries
  */
 class NUMERIC_EXPORT Dirichlet: public BoundaryConditions
 {
@@ -73,7 +80,14 @@ public:
   virtual void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L) = 0;
   /// Solve the equation L.y = 0 where L is the matrix of this operator
   void solve(chebfun& y, const BoundaryConditions& bc);
+  /// Create an operator from a string.
+  static ChebOperator* create( const std::string& str );
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "") = 0;
 protected:
+  /// Create an operator from a EParser.
+  static ChebOperator* create( const Kernel::EParser& parser );
   /// Cached operator matrices for different chebfun bases
   std::map< ChebfunBase_const_sptr, GSLMatrix* > m_matrixCache;
 };
@@ -87,6 +101,9 @@ public:
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "");
 };
 
 /**
@@ -98,6 +115,9 @@ public:
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "");
 };
 
 /**
@@ -115,6 +135,9 @@ public:
   /// @param base :: The base of the result function
   /// @param L :: The output matrix
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "");
 protected:
   std::list<ChebOperator*> m_operators;
 };
@@ -131,6 +154,9 @@ public:
   /// @param base :: The base of the result function
   /// @param L :: The output matrix
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "");
 protected:
   using ChebCompositeOperator::addRight;
   using ChebCompositeOperator::addLeft;
@@ -148,6 +174,9 @@ public:
     addRight( new ChebDiff );
     addRight( new ChebDiff );
   }
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "");
 };
 
 /**
@@ -159,17 +188,18 @@ public:
   /// Constructor
   ChebTimes(double factor);
   /// Constructor
-  ChebTimes(const chebfun& fun);
+  ChebTimes(IFunction1D_sptr fun);
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Print out the operator for debugging
+  /// @param padding :: Padding with spaces that must start all new lines in the log
+  virtual void log(const std::string& padding = "");
 protected:
   /// the constant
   double m_constant;
   /// the function
-  chebfun m_fun;
-  /// switch between the constant and the function
-  bool m_isFun;
+  IFunction1D_sptr m_fun;
 };
 
 } // NUMERIC
