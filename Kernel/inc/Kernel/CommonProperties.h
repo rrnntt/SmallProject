@@ -8,6 +8,7 @@
 #include "Kernel/Property.h"
 
 #include <sstream>
+#include <vector>
 
 namespace Kernel
 {
@@ -57,10 +58,13 @@ namespace Kernel
   public:
     StringProperty() : m_value() {}
     StringProperty(const std::string& value) : m_value(value) {}
+    StringProperty(const std::vector<std::string>& values, const std::string& defValue = "");
     virtual Property& operator=(const std::string& str);
     virtual operator std::string() const;
+    std::vector<std::string> getValues() const {return m_values;}
   protected:
     std::string m_value;
+    std::vector<std::string> m_values;
   };
 
 } // namespace Kernel

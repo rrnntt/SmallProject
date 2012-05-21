@@ -24,7 +24,7 @@ protected slots:
 protected:
 
     boost::shared_ptr<API::Algorithm> m_algorithm;
-    QMap<std::string,QLineEdit*> m_propertyMap;
+    QMap<std::string, QWidget*> m_propertyMap;
 
 };
 

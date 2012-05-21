@@ -2,6 +2,7 @@
 
 #include "API/Algorithm.h"
 #include "API/AlgorithmFactory.h"
+#include "Kernel/CommonProperties.h"
 
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -10,6 +11,7 @@
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <QComboBox>
 
 #include <iostream>
 #include <stdexcept>
@@ -33,11 +35,36 @@ AlgorithmDialog::AlgorithmDialog(QWidget *parent,const std::string& algName) :
   std::vector<std::string> propertyNames = m_algorithm->getPropertyNames();
   for(auto name = propertyNames.begin(); name != propertyNames.end(); ++name,++row)
   {
-    QLineEdit* le = new QLineEdit(this);
-    m_propertyMap.insert(*name,le);
+    auto& prop = m_algorithm->get(*name);
+    QWidget* edit = NULL;
+    auto strProp = dynamic_cast<Kernel::StringProperty*>( &prop );
+    if ( strProp )
+    {
+      auto keys = strProp->getValues();
+      if ( !keys.empty() )
+      {
+        QComboBox* chb = new QComboBox(this);
+        QStringList lst;
+        for(auto key = keys.begin(); key != keys.end(); ++key)
+        {
+          lst << QString::fromStdString( *key );
+        }
+        chb->addItems( lst );
+        edit = chb;
+      }
+      else
+      {
+        edit = new QLineEdit(this);
+      }
+    }
+    else
+    {
+      edit = new QLineEdit(this);
+    }
+    m_propertyMap.insert(*name,edit);
     QLabel* lbl = new QLabel(QString::fromStdString(*name),this);
     propLayout->addWidget(lbl,row,0);
-    propLayout->addWidget(le,row,1);
+    propLayout->addWidget(edit,row,1);
   }
 
   // setup button layout
@@ -59,7 +86,15 @@ void AlgorithmDialog::accept()
   {
     for(auto prop = m_propertyMap.begin(); prop != m_propertyMap.end(); ++prop)
     {
-      m_algorithm->get(prop.key()) = prop.value()->text().toStdString();
+      QWidget* edit = prop.value();
+      if ( dynamic_cast<QLineEdit*>( edit ) )
+      {
+        m_algorithm->get(prop.key()) = dynamic_cast<QLineEdit*>( edit )->text().toStdString();
+      }
+      else if ( dynamic_cast<QComboBox*>( edit ) )
+      {
+        m_algorithm->get(prop.key()) = dynamic_cast<QComboBox*>( edit )->currentText().toStdString();
+      }
     }
   }
   catch(std::exception& e)

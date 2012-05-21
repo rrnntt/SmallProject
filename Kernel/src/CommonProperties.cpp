@@ -1,6 +1,7 @@
 #include "Kernel/CommonProperties.h"
 
 #include <stdexcept>
+#include <algorithm>
 
 namespace Kernel
 {
@@ -57,6 +58,22 @@ namespace Kernel
     return *this;
   }
 
+  StringProperty::StringProperty(const std::vector<std::string>& values, const std::string& defValue):
+  m_values(values)
+  {
+    if ( defValue.empty() )
+    {
+      if ( !values.empty() && !defValue.empty() )
+      {
+        auto it = std::find(values.begin(), values.end(), defValue);
+        if ( it != values.end() )
+        {
+          m_value = defValue;
+        }
+      }
+    }
+  }
+
   StringProperty::operator std::string() const
   {
     return m_value;
@@ -64,9 +81,23 @@ namespace Kernel
 
   Property& StringProperty::operator=(const std::string& str)
   {
-    m_value = str;
+    if ( !m_values.empty() )
+    {
+      auto it = std::find(m_values.begin(), m_values.end(), str);
+      if ( it != m_values.end() )
+      {
+        m_value = str;
+      }
+      else
+      {
+        throw std::invalid_argument("String property value " + str + " is invalid.");
+      }
+    }
+    else
+    {
+      m_value = str;
+    }
     return *this;
   }
-
 
 } // namespace Kernel

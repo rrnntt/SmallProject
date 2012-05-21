@@ -44,6 +44,7 @@ set( INC_FILES
    inc/Numeric/PhysBody.h
    inc/Numeric/PhysModel.h
 #   inc/Numeric/SeriesFunction.h
+   inc/Numeric/SolveODE.h
    inc/Numeric/SomeFunction.h
    inc/Numeric/StdJacobian.h
    inc/Numeric/UserFunction1D.h
@@ -86,6 +87,7 @@ set( SRC_FILES
   src/ParameterReference.cpp
   src/ParameterTie.cpp
 #  src/SeriesFunction.cpp
+  src/SolveODE.cpp
   src/SomeFunction.cpp
   src/UserFunction1D.cpp
   src/Vector.cpp
@@ -138,6 +140,7 @@ set( SRC_FILES
   test/ParamFunctionTest.cpp
   test/SeriesFunctionTest.cpp
   #test/SimplexMinimizerTest.cpp
+  test/SolveODETest.cpp
   test/SomeFunctionTest.cpp
   test/UserFunction1DTest.cpp
   test/VectorTest.cpp
