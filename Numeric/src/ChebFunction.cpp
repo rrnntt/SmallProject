@@ -50,7 +50,7 @@ Numeric::FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
   {
     auto xf = (**f).xpoints();
     // there are no gaps between chebfuns
-    std::copy(xf.rbegin(), xf.rend() - 1, x.begin() + i);
+    std::copy(xf.begin(), xf.end() - 1, x.begin() + i);
     i += xf.size() - 1;
   }
   x.back() = this->endX();

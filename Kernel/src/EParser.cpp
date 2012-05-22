@@ -986,4 +986,17 @@ const EParser* EParser::findParentOf(const EParser* p) const
   return nullptr;
 }
 
+/// Ensure the top function is a ','
+void EParser::toList()
+{
+  if ( name() != "," )
+  {
+    auto ep = new EParser;
+    ep->moveTerms(this);
+    m_terms.push_back( ep );
+    ep->m_funct = m_funct;
+    m_funct = ",";
+  }
+}
+
 } // Kernel

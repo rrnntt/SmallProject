@@ -61,16 +61,28 @@ namespace Kernel
   StringProperty::StringProperty(const std::vector<std::string>& values, const std::string& defValue):
   m_values(values)
   {
-    if ( defValue.empty() )
+    if ( !values.empty() )
     {
-      if ( !values.empty() && !defValue.empty() )
+      if ( !defValue.empty() )
       {
         auto it = std::find(values.begin(), values.end(), defValue);
         if ( it != values.end() )
         {
           m_value = defValue;
         }
+        else
+        {
+          m_value = values[0];
+        }
       }
+      else
+      {
+        m_value = values[0];
+      }
+    }
+    else
+    {
+      m_value = defValue;
     }
   }
 

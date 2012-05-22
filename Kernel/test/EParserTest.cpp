@@ -253,6 +253,7 @@ TEST(EParserTest, EParserOperators)
   parser.parse(str);
   //parser.log();
   EXPECT_EQ(parser.str(),"x=y,z=+x");
+  EXPECT_EQ( parser.name(), "," );
 }
 
 TEST(EParserTest, EParserFunctions) 
@@ -295,4 +296,17 @@ TEST(EParserTest, EParserUnary)
   parser.parse("-fun(x+y)");
   EXPECT_EQ(parser.str(),"-fun(x+y)");
 
+}
+
+TEST(EParserTest, ToList) 
+{
+  EParser parser;
+  parser.parse("a,b,c");
+  EXPECT_EQ( parser.name(), "," );
+
+  EParser parser1;
+  parser1.parse("abc(x)");
+  parser1.toList();
+  EXPECT_EQ( parser1.name(), "," );
+  EXPECT_EQ( parser1.str(), ",(abc(x))" );
 }

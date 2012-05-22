@@ -322,6 +322,9 @@ namespace Kernel
     const EParser& parentOf(const EParser& p) const;
     EParser& parentOf(const EParser& p);
 
+    /// Ensure the top function is a ','
+    void toList();
+
   protected:
 
     void parse(const std::string& str, std::string::const_iterator start,std::string::const_iterator end);
