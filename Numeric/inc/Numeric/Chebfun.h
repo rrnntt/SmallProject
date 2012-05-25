@@ -26,6 +26,7 @@ namespace Numeric
     size_t size() const {return x.size();} ///< number of x-points == n + 1
     std::vector<double> x;   ///< x-vaues for use in the barycentric formula, n + 1 items
     std::vector<double> w;   ///< weights used in the barycentric formula, n + 1 items
+    std::vector<double> iw;   ///< weights for integration
     void calcX();  ///< Calclulate x and w based on values of n, startX, and endX
   };
 
@@ -183,6 +184,7 @@ namespace Numeric
     Numeric::FunctionDomain1D_sptr createDomain(size_t n) const;
 
     double integrate(int pwr = 1);
+    double integr();
 
     void calcP(); ///< calc m_p form m_a
     void calcA() const; ///< calc m_a from m_p

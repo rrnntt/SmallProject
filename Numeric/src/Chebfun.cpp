@@ -25,16 +25,27 @@ namespace Numeric
   {
     x.resize(n+1);
     w.resize(n+1);
+    iw.resize(n+1);
     double x0 = (startX + endX)/2;
     double b  = (endX - startX)/2;
+    const double ifactor = M_PI/n;
     for(size_t i = 0; i < x.size(); ++i)
     {
       size_t j = n - i;
-      x[j] = x0 + b * cos( M_PI*i/n );
+      double c = cos( M_PI*i/n );
+      x[j] = x0 + b * c;
       w[j] = 1.;
       if ( j % 2 != 0 ) w[j] = -1.;
       if ( j == 0 || j == n ) w[j] /= 2;
       //std::cerr<<"x["<<j<<"]="<<x[j]<<' ' << '\n';
+      if ( i % 2 == 0)
+      {
+        iw[i] = 2.0 / ( 1.0 - double( i * i ) );
+      }
+      else
+      {
+        iw[i] = 0.0;
+      }
     }
   }
 
@@ -419,6 +430,20 @@ namespace Numeric
     double res = gsl_integration_glfixed (&fun, startX() ,endX(), quad);
     gsl_integration_glfixed_table_free(quad);
     return res;
+  }
+
+  double chebfun::integr()
+  {
+    double res = 0.0;
+    const size_t n = m_base->n;
+    auto& iw = m_base->iw;
+    auto& a = coeffs();
+    for(size_t i = 0; i < n; i+=2)
+    {
+      const double T = 2.0 / ( 1.0 - double( i * i ) );
+      res += a[i] * iw[i];
+    }
+    return res * (endX() - startX()) / 2;
   }
 
   void chebfun::fit(const IFunction& ifun)

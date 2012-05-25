@@ -61,10 +61,10 @@ void UserFunction1D::setFormula()
   parser.parse(m_formula);
   auto vars = parser.getVariables();
   Kernel::NumberParser num;
-  if (vars.count("x") == 0)
-  {
-    throw std::invalid_argument("Formula must contain the x variable");
-  }
+  //if (vars.count("x") == 0)
+  //{
+  //  throw std::invalid_argument("Formula must contain the x variable:\n"+m_formula);
+  //}
   for(auto var = vars.begin(); var != vars.end(); ++var)
   {
     const std::string& varName = *var;

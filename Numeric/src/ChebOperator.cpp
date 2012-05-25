@@ -226,7 +226,7 @@ ChebOperator* ChebOperator::create( const Kernel::EParser& parser )
   else
   {
     boost::shared_ptr<UserFunction1D> fun( new UserFunction1D );
-    fun->setAttributeValue( "Function", parser.str() );
+    fun->setAttributeValue( "Formula", parser.str() );
     return new ChebTimes( fun );
   }
 

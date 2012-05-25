@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "gtest/gtest.h"
 #include "Numeric/Chebfun.h"
 #include "Numeric/UserFunction1D.h"
@@ -207,4 +208,20 @@ TEST(ChebfunTest, UniformFitTest)
     //std::cerr << xx << ' ' << ucheb(xx) - y.getCalculated(i) << std::endl;
     EXPECT_NEAR(ucheb(xx),y.getCalculated(i),2e-15);
   }
+}
+
+TEST(ChebfunTest, IntegrateTest)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","sin(x)");
+  
+  TestCheb cheb(15,0,M_PI);
+  cheb.fit(user);
+  EXPECT_NEAR( cheb.integr(), 2.0, 1e-15 );
+  //std::cerr << cheb.integr() << std::endl;
+  
+  TestCheb cheb1(15,0,3*M_PI/4);
+  cheb1.fit(user);
+  EXPECT_NEAR( cheb1.integr(), cos(0.0) - cos(3*M_PI/4), 1e-15 );
+  //std::cerr << cheb1.integr() << ' ' << ( cos(0.0) - cos(3*M_PI/4)) << ' ' << cheb1.integrate() << std::endl;
 }
