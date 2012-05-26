@@ -5,6 +5,7 @@
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 #include "Numeric/GSLVector.h"
+#include "Numeric/GSLMatrix.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -62,6 +63,8 @@ namespace Numeric
     void setP(const std::vector<double>& y);
     /// Set the y points from a GSL vector
     void setP(const GSLVector& y);
+    /// Set the y points from a column of a GSL matrix
+    void setP(const GSLMatrix& M, size_t col);
     void fit(const IFunction& ifun);
     void fit(AFunction f);
     void uniformFit(double start, double end, const std::vector<double>& p);

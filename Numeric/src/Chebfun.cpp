@@ -118,6 +118,22 @@ namespace Numeric
   }
 
   /**
+   * Set the y points from a column of a GSL matrix
+   * @param M :: Matrix with columns containing y-points.
+   * @param col :: Column index to copy from.
+   */
+  void chebfun::setP(const GSLMatrix& M, size_t col)
+  {
+    const size_t N = M.size2();
+    if ( N != n() + 1 ) throw std::runtime_error("Cannot set y-points: different sizes.");
+    for(size_t i = 0; i < N; ++i)
+    {
+      m_p[i] = M.get( i, col );
+    }
+    invalidateA();
+  }
+
+  /**
     * Calculate the function value as a T form expansion at point x
     * @param x :: Argument of the function
     */

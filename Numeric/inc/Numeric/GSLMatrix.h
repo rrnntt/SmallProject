@@ -7,6 +7,7 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_linalg.h>
+#include <gsl/gsl_eigen.h>
 
 #include <vector>
 #include <stdexcept>
@@ -310,7 +311,25 @@ namespace Numeric
       gsl_blas_dgemv( CblasNoTrans, 1.0, gsl(), x.gsl(), 0.0, y.gsl() );
     }
 
-  };
+    /**
+     * Diagonalize the matrix.
+     * @param ev :: Returned eigenvalues.
+     * @param ef :: Returned eigenfunctions.
+     */
+    void diag(GSLVector& ev, GSLMatrix& ef)
+    {
+      if ( size1() != size2() )
+      {
+        throw std::runtime_error("Matrix must be square for diag");
+      }
+      ev.resize( size1() );
+      ef.resize( size1(), size1() );
+      auto ws = gsl_eigen_symmv_alloc( size1() );
+      gsl_eigen_symmv( gsl(), ev.gsl(), ef.gsl(), ws  );
+      gsl_eigen_symmv_free( ws );
+    }
+
+  };// class GSLMatrix
 
   inline GSLMatrixMult2 operator*(const GSLMatrix& m1, const GSLMatrix& m2)
   {
