@@ -59,6 +59,8 @@ namespace Numeric
     const std::vector<double>& ypoints()const{return m_p;}
     /// Get the vector of y-points, size n() + 1
     const std::vector<double>& coeffs()const{if (m_a.empty()) calcA(); return m_a;}
+    /// Get the vector of y-points, size n() + 1
+    std::vector<double>& coeffs(){if (m_a.empty()) calcA(); return m_a;}
     /// Set the y points from a std vector
     void setP(const std::vector<double>& y);
     /// Set the y points from a GSL vector
@@ -102,7 +104,7 @@ namespace Numeric
     chebfun& operator+=(double v)
     {
       std::transform(m_p.begin(),m_p.end(),m_p.begin(),std::bind1st(std::plus<double>(),v));
-      calcA();
+      invalidateA();
       return *this;
     }
     chebfun& operator+=(int v){return *this+=double(v);}
@@ -113,7 +115,7 @@ namespace Numeric
       {
         m_p[i] += f( x[i] );
       }
-      calcA();
+      invalidateA();
       return *this;
     }
     
@@ -123,7 +125,7 @@ namespace Numeric
     chebfun& operator-=(double v)
     {
       std::transform(m_p.begin(),m_p.end(),m_p.begin(),std::bind2nd(std::minus<double>(),v));
-      calcA();
+      invalidateA();
       return *this;
     }
     chebfun& operator-=(int v){return *this-=double(v);}
@@ -134,7 +136,7 @@ namespace Numeric
       {
         m_p[i] -= f( x[i] );
       }
-      calcA();
+      invalidateA();
       return *this;
     }
     
@@ -144,7 +146,7 @@ namespace Numeric
     chebfun& operator*=(double v)
     {
       std::transform(m_p.begin(),m_p.end(),m_p.begin(),std::bind2nd(std::multiplies<double>(),v));
-      calcA();
+      invalidateA();
       return *this;
     }
     chebfun& operator*=(int v){return *this*=double(v);}
@@ -155,7 +157,7 @@ namespace Numeric
       {
         m_p[i] *= f( x[i] );
       }
-      calcA();
+      invalidateA();
       return *this;
     }
     
@@ -165,7 +167,7 @@ namespace Numeric
     chebfun& operator/=(double v)
     {
       std::transform(m_p.begin(),m_p.end(),m_p.begin(),std::bind2nd(std::divides<double>(),v));
-      calcA();
+      invalidateA();
       return *this;
     }
     chebfun& operator/=(int v){return *this/=double(v);}
@@ -176,7 +178,7 @@ namespace Numeric
       {
         m_p[i] /= f( x[i] );
       }
-      calcA();
+      invalidateA();
       return *this;
     }
     
@@ -192,6 +194,16 @@ namespace Numeric
 
     double integrate(int pwr = 1);
     double integr();
+
+    void square()
+    {
+      for(size_t i = 0; i < m_p.size(); ++i)
+      {
+        double& d = m_p[i];
+        d *= d;
+      }
+      invalidateA();
+    }
 
     void calcP(); ///< calc m_p form m_a
     void calcA() const; ///< calc m_a from m_p

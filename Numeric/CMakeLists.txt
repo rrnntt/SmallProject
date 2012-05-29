@@ -45,6 +45,7 @@ set( INC_FILES
    inc/Numeric/PhysModel.h
 #   inc/Numeric/SeriesFunction.h
    inc/Numeric/Schrodinger0.h
+   inc/Numeric/Schrodinger.h
    inc/Numeric/SolveODE.h
    inc/Numeric/SomeFunction.h
    inc/Numeric/StdJacobian.h
@@ -92,6 +93,7 @@ set( SRC_FILES
   src/ParameterTie.cpp
 #  src/SeriesFunction.cpp
   src/Schrodinger0.cpp
+  src/Schrodinger.cpp
   src/SolveODE.cpp
   src/SomeFunction.cpp
   src/UserFunction1D.cpp
@@ -142,6 +144,7 @@ set( SRC_FILES
   test/FunctionPropertyTest.cpp
   test/FuncMinimizerFactoryTest.cpp
   test/JointDomainFunctionTest.cpp
+  test/GSLMatrixTest.cpp
   test/IFuncMinimizerTest.cpp
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
