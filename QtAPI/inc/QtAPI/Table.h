@@ -2,7 +2,7 @@
 #define QtAPI_TABLE_H
 
 #include "QtAPI/DllExport.h"
-#include "DataObjects/TableWorkspace.h"
+#include "API/TableWorkspace.h"
 #include "API/WorkspaceManager.h"
 
 #include <QtGui/QTableView>
@@ -20,8 +20,8 @@ class QTAPI_EXPORT Table: public QTableView
 {
   Q_OBJECT
 public:
-  Table(DataObjects::TableWorkspace_ptr ws,QWidget* parent = NULL);
-  DataObjects::TableWorkspace_ptr getWorkspace() const;
+  Table(API::TableWorkspace_ptr ws,QWidget* parent = NULL);
+  API::TableWorkspace_ptr getWorkspace() const;
 signals:
   void showMenu(QMenu*);
 public slots:
@@ -65,7 +65,7 @@ class TableModel: public QAbstractItemModel, public Kernel::NotificationObserver
 {
   Q_OBJECT
 public:
-  TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent);
+  TableModel(API::TableWorkspace_ptr ws,QObject* parent);
   ~TableModel();
   virtual int	columnCount ( const QModelIndex & parent = QModelIndex() ) const ;
   virtual QVariant	data ( const QModelIndex & index, int role = Qt::DisplayRole ) const ;
@@ -82,7 +82,7 @@ public:
   bool insertColumnBefore( int column, const std::string& type, const std::string& name );
   bool removeColumnNumbers(const QList<int>& names);
   void setRowCount(int n);
-  DataObjects::TableWorkspace_ptr getWorkspace() const{return m_workspace;}
+  API::TableWorkspace_ptr getWorkspace() const{return m_workspace;}
   void setPlotRole(int col,int role);
 signals:
   void workspaceDeleted();
@@ -96,7 +96,7 @@ protected:
   void resetWorkspace();
   bool isValid() const;
 
-  DataObjects::TableWorkspace_ptr m_workspace;
+  API::TableWorkspace_ptr m_workspace;
   mutable int m_rowCount;
   mutable int m_columnCount;
   mutable bool m_invalid;

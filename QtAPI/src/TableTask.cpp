@@ -38,7 +38,7 @@ void TableTask::showTableDialog()
 
 QPointer<Table> TableTask::newTable() const
 {
-  DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+  API::TableWorkspace_ptr ws( dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory  ::instance().create("TableWorkspace")
     ));
   QString name = "Table_" + QString::number(API::WorkspaceManager::instance().size() + 1);// TODO: not robust
@@ -64,7 +64,7 @@ void TableTask::loadAsciiTable()const
     {
       QFileInfo file(fileName);
       QString name = file.baseName();
-      DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+      API::TableWorkspace_ptr ws( dynamic_cast<API::TableWorkspace*>(
         API::WorkspaceFactory::instance().create("TableWorkspace")  ));
       ws->loadAscii(fileName.toStdString());
       API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
@@ -82,7 +82,7 @@ void TableTask::loadAsciiTable()const
  * Open a Table sub-window for a table workspace.
  * @param tws :: Shared pointer to a TableWorkspace to be displayed in a Table.
  */
-void TableTask::showTable(boost::shared_ptr<DataObjects::TableWorkspace> tws)
+void TableTask::showTable(boost::shared_ptr<API::TableWorkspace> tws)
 {
   SubWindow* wnd = WindowManager::instance().createSubWindow(new Table(tws));
   wnd->setWindowTitle(QString::fromStdString(tws->name()));
@@ -96,7 +96,7 @@ void TableTask::showTable(const QString& wsName)
 {
   try
   {
-    auto tws = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
+    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(
       API::WorkspaceManager::instance().retrieve(wsName.toStdString()));
     if (!tws)
     {

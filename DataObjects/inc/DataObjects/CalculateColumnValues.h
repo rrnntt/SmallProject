@@ -4,10 +4,13 @@
 #include "DataObjects/DllExport.h"
 #include "API/Algorithm.h"
 
+namespace API
+{
+  class TableWorkspace;
+}
+
 namespace DataObjects
 {
-
-  class TableWorkspace;
 
 class DATAOBJECTS_EXPORT CalculateColumnValues: public API::Algorithm
 {
@@ -17,7 +20,7 @@ public:
   virtual std::string name() const {return "CalculateColumnValues";}
 protected:
   virtual void exec();
-  boost::shared_ptr<TableWorkspace> getTableWorkspace();
+  boost::shared_ptr<API::TableWorkspace> getTableWorkspace();
 };
 
 } // namespace DataObjects

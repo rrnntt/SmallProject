@@ -2,7 +2,7 @@
 #include "QtAPI/Table.h"
 #include "ui_AddTableColumnDialog.h"
 
-#include "DataObjects/ColumnFactory.h"
+#include "API/ColumnFactory.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -37,7 +37,7 @@ void AddTableColumnDialog::changeEvent(QEvent *e)
 
 void AddTableColumnDialog::init()
 {
-  std::vector<std::string> keys = DataObjects::ColumnFactory::instance().keys();
+  std::vector<std::string> keys = API::ColumnFactory::instance().keys();
   QStringList columnTypes;
   std::for_each(keys.begin(),keys.end(),[&columnTypes](std::string& key){
     columnTypes << QString::fromStdString(key);

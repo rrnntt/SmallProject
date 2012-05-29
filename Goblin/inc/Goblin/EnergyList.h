@@ -3,12 +3,12 @@
 
 #include "Goblin/DllExport.h"
 #include "Goblin/vjkg.h"
-#include "DataObjects/TableWorkspace.h"
+#include "API/TableWorkspace.h"
 
 namespace Goblin
 {
 
-class GOBLIN_EXPORT EnergyList: public DataObjects::TableWorkspace
+class GOBLIN_EXPORT EnergyList: public API::TableWorkspace
 {
 public:
   EnergyList();

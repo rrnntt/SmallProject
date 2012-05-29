@@ -4,7 +4,7 @@
 #include "QtAPI/SubWindow.h"
 
 #include "API/WorkspaceManager.h"
-#include "DataObjects/NumericColumn.h"
+#include "API/NumericColumn.h"
 
 #include <QtGui/QHeaderView>
 #include <QtGui/QContextMenuEvent>
@@ -21,7 +21,7 @@
 namespace QtAPI
 {
 
-Table::Table(DataObjects::TableWorkspace_ptr ws,QWidget* parent):
+Table::Table(API::TableWorkspace_ptr ws,QWidget* parent):
 QTableView(parent)
 {
   TableModel* model = new TableModel(ws,this);
@@ -211,7 +211,7 @@ void Table::showTableDialog()
   qobject_cast<TableModel*>(model())->showTableDialog();
 }
 
-DataObjects::TableWorkspace_ptr Table::getWorkspace() const
+API::TableWorkspace_ptr Table::getWorkspace() const
 {
   return tableModel()->getWorkspace();
 }
@@ -241,32 +241,32 @@ void Table::setRole(int role)
 
 void Table::setRoleUnset()
 {
-  setRole(DataObjects::NumericColumn::Unset);
+  setRole(API::NumericColumn::Unset);
 }
 
 void Table::setRoleX()
 {
-  setRole(DataObjects::NumericColumn::X);
+  setRole(API::NumericColumn::X);
 }
 
 void Table::setRoleY()
 {
-  setRole(DataObjects::NumericColumn::Y);
+  setRole(API::NumericColumn::Y);
 }
 
 void Table::setRoleZ()
 {
-  setRole(DataObjects::NumericColumn::Z);
+  setRole(API::NumericColumn::Z);
 }
 
 void Table::setRoleXError()
 {
-  setRole(DataObjects::NumericColumn::xError);
+  setRole(API::NumericColumn::xError);
 }
 
 void Table::setRoleYError()
 {
-  setRole(DataObjects::NumericColumn::yError);
+  setRole(API::NumericColumn::yError);
 }
 
 void Table::workspaceDeleted()
@@ -285,7 +285,7 @@ void Table::workspaceDeleted()
 
 /* --- TableModel --- */
 
-TableModel::TableModel(DataObjects::TableWorkspace_ptr ws,QObject* parent):
+TableModel::TableModel(API::TableWorkspace_ptr ws,QObject* parent):
 QAbstractItemModel(parent),
 m_workspace(ws),
 m_rowCount(static_cast<int>(ws->rowCount())),
@@ -333,7 +333,7 @@ QVariant	TableModel::data ( const QModelIndex & index, int role ) const
   {
     try
     {
-      DataObjects::Column_ptr c = m_workspace->getColumn(index.column());
+      API::Column_ptr c = m_workspace->getColumn(index.column());
       return QVariant::fromValue(QString::fromStdString(c->asString(index.row())));
     }
     catch(...)
@@ -361,25 +361,25 @@ QVariant TableModel::headerData( int section, Qt::Orientation orientation, int r
     auto colNum = column->asNumeric();
     if (colNum)
     {
-      DataObjects::NumericColumn::PlotRole role = colNum->getPlotRole();
-      if (colNum && role != DataObjects::NumericColumn::Unset)
+      API::NumericColumn::PlotRole role = colNum->getPlotRole();
+      if (colNum && role != API::NumericColumn::Unset)
       {
         columnLabel += "[";
         switch(role)
         {
-        case DataObjects::NumericColumn::X:
+        case API::NumericColumn::X:
           columnLabel += "X";
           break;
-        case DataObjects::NumericColumn::Y:
+        case API::NumericColumn::Y:
           columnLabel += "Y";
           break;
-        case DataObjects::NumericColumn::Z:
+        case API::NumericColumn::Z:
           columnLabel += "Z";
           break;
-        case DataObjects::NumericColumn::xError:
+        case API::NumericColumn::xError:
           columnLabel += "xErr";
           break;
-        case DataObjects::NumericColumn::yError:
+        case API::NumericColumn::yError:
           columnLabel += "yErr";
           break;
         }
@@ -537,7 +537,7 @@ void TableModel::setPlotRole(int col,int role)
       auto colNum = column->asNumeric();
       if (colNum)
       {
-        colNum->setPlotRole(static_cast<DataObjects::NumericColumn::PlotRole>(role));
+        colNum->setPlotRole(static_cast<API::NumericColumn::PlotRole>(role));
       }
     }
   }

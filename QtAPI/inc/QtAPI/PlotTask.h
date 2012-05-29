@@ -8,7 +8,7 @@
 
 class QActionGroup;
 
-namespace DataObjects
+namespace API
 {
   class TableWorkspace;
 }
@@ -34,14 +34,14 @@ public:
     const std::string& columnY,
     const std::string& columnE = "") const;
 
-  QPointer<Plot> showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
+  QPointer<Plot> showPlot(boost::shared_ptr<API::TableWorkspace> tws,
     const std::string& columnX,
     const std::string& columnY,
     const std::string& columnE = "") const;
-  QPointer<Plot> showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
+  QPointer<Plot> showPlot(boost::shared_ptr<API::TableWorkspace> tws,
     std::vector<std::string>& columnNames) const;
 
-  void addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWorkspace> tws,
+  void addTableToPlot(Plot* plot, boost::shared_ptr<API::TableWorkspace> tws,
     std::vector<std::string>& columnNames) const;
 
 protected slots:

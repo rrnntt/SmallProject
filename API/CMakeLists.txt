@@ -14,6 +14,15 @@ set( INC_FILES
    inc/API/WorkspaceFactory.h
    inc/API/WorkspaceManager.h
    inc/API/WorkspaceProperty.h
+   inc/API/Column.h
+   inc/API/ColumnVector.h
+   inc/API/CompoundColumn.h
+   inc/API/ColumnFactory.h
+   inc/API/NumericColumn.h
+   inc/API/StringColumn.h
+   inc/API/TableColumn.h
+   inc/API/TableWorkspace.h
+   inc/API/Unit.h
    )
 set( SRC_FILES 
    src/Algorithm.cpp
@@ -24,6 +33,14 @@ set( SRC_FILES
    src/WorkspaceFactory.cpp
    src/WorkspaceManager.cpp
    src/WorkspaceProperty.cpp
+   src/Column.cpp
+   src/ColumnVector.cpp
+   src/NumericColumn.cpp
+   src/ColumnFactory.cpp
+   src/StringColumn.cpp
+   src/TableColumn.cpp
+   src/TableWorkspace.cpp
+   src/Unit.cpp
   )
 add_library( API SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ${THIRD_PARTY_INCLUDE_DIR})
@@ -37,6 +54,7 @@ target_link_libraries(API Kernel)
 
 set( SRC_FILES 
   test/main.cpp
+  test/TableTest.cpp
   test/WorkspacePropertyTest.cpp
 )
 

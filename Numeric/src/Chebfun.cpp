@@ -6,7 +6,7 @@
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_integration.h>
-//#include <gsl/gsl_fft_halfcomplex.h>
+#include <gsl/gsl_fft_halfcomplex.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -387,25 +387,42 @@ namespace Numeric
       double a = fc.real(i)/m_n;
       if (i == 0) a /= 2;
       m_a[i] = a;
+      //std::cerr << fc.real(i) << ',' << fc.imag(i) << std::endl;
     }//*/
     // End of the magic trick
   }
 
   void chebfun::calcP()
   {
-    if ( m_a.empty() )
+    if ( m_a.empty() || m_p.size() != m_a.size() )
     {
       throw std::runtime_error("chebfun: cannot calculate P from A - A is empty.");
     }
-    if (m_p.size() != m_a.size())
+    //auto& x = m_base->x;
+    //for(size_t i = 0; i < m_a.size(); ++i)
+    //{
+    //  m_p[i] = valueT( x[i] );
+    //}
+    size_t m_n = n();
+    size_t nn = m_n + 1;
+    std::vector<double> tmp(m_n*2);
+    HalfComplex fc(&tmp[0],tmp.size());
+    for(size_t i=0; i < nn; ++i)
     {
-      m_p.resize(m_a.size());
+      double a = m_a[i] /2;// * m_n;
+      if (i == 0) a *= 2;
+      fc.set( i, a, 0.0 );
     }
-    auto& x = m_base->x;
-    for(size_t i = 0; i < m_a.size(); ++i)
-    {
-      m_p[i] = valueT( x[i] );
-    }
+    gsl_fft_real_workspace * workspace = gsl_fft_real_workspace_alloc(2*m_n);
+    gsl_fft_halfcomplex_wavetable * wavetable = gsl_fft_halfcomplex_wavetable_alloc(2*m_n);
+
+    gsl_fft_halfcomplex_transform (tmp.data(), 1, 2*m_n, wavetable, workspace);
+
+    gsl_fft_halfcomplex_wavetable_free (wavetable);
+    gsl_fft_real_workspace_free (workspace);
+
+    std::reverse_copy( tmp.begin(), tmp.begin() + nn, m_p.begin() );
+
   }
 
   /// make this chebfun a derivative of the argument

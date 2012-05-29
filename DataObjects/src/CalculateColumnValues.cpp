@@ -1,5 +1,6 @@
 #include "DataObjects/CalculateColumnValues.h"
-#include "DataObjects/TableWorkspace.h"
+#include "API/TableWorkspace.h"
+#include "API/NumericColumn.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/WorkspaceProperty.h"
@@ -7,6 +8,7 @@
 #include "Kernel/CommonProperties.h"
 
 #include "Formula/Expression.h"
+#include "Formula/Scalar.h"
 
 namespace DataObjects
 {
@@ -23,7 +25,7 @@ CalculateColumnValues::CalculateColumnValues()
 /**
  * Retrieve the input table workspace from its property and validate it.
  */
-boost::shared_ptr<TableWorkspace> CalculateColumnValues::getTableWorkspace()
+boost::shared_ptr<API::TableWorkspace> CalculateColumnValues::getTableWorkspace()
 {
     API::WorkspaceProperty wsProp = get("Workspace").as<API::WorkspaceProperty>();
     std::string wsName = static_cast<std::string>(wsProp);
@@ -31,7 +33,7 @@ boost::shared_ptr<TableWorkspace> CalculateColumnValues::getTableWorkspace()
     {// TODO: this must be done by a validator
       throw std::runtime_error("Property Workspace was not set");
     }
-    auto tws = wsProp.to<TableWorkspace>();
+    auto tws = wsProp.to<API::TableWorkspace>();
 
     if (!tws)
     {
@@ -47,10 +49,61 @@ boost::shared_ptr<TableWorkspace> CalculateColumnValues::getTableWorkspace()
 
 void CalculateColumnValues::exec()
 {
-  TableWorkspace_ptr tws = getTableWorkspace();
+  API::TableWorkspace_ptr tws = getTableWorkspace();
   std::string columnName = get("Column");
   std::string formula = get("Formula");
-  tws->fillColumn(columnName,formula);
+  //tws->fillColumn(columnName,formula);
+  // exception is thrown if the column doesn't exist
+  boost::shared_ptr<API::NumericColumn> numColumn = boost::dynamic_pointer_cast<API::NumericColumn>(
+    tws->getColumn(columnName)
+    );
+  if ( !numColumn)
+  {
+    throw std::runtime_error("Cannot fill non-numeric column using Expression");
+  }
+
+  Formula::Namespace_ptr ns(new Formula::Namespace);
+  double row = 0.0;
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"row");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"i");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(2*acos(0.0))),"pi");
+  ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(exp(1.0))),"e");
+  
+  // define vars referencing values in all num columns
+  std::vector<double> columnVars(tws->columnCount());
+  std::vector<size_t> columnIndex;
+  //for(auto col = m_columns.begin(); col != m_columns.end(); ++col)
+  for(size_t col = 0; col < tws->columnCount(); ++col)
+  {
+    boost::shared_ptr<API::NumericColumn> nc = boost::dynamic_pointer_cast<API::NumericColumn>(
+      tws->getColumn(col));
+    if (nc)
+    {
+      ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&columnVars[col])),tws->getColumn(col)->name());
+      columnIndex.push_back(col);
+    }
+  }
+
+  try
+  {
+    Formula::Expression e(ns,formula);
+    size_t n = tws->rowCount();
+    for(size_t i = 0; i < n; ++i)
+    {
+      row = static_cast<double>(i);
+      // update the variables
+      for(auto col = columnIndex.begin(); col != columnIndex.end(); ++col)
+      {
+        columnVars[*col] = tws->getColumn(*col)->asNumeric()->getDouble(row);
+      }
+      double value = e.eval().as<Formula::Scalar>();
+      numColumn->setDouble(i,value);
+    }
+  }
+  catch(std::exception& ex)
+  {
+    throw std::runtime_error(std::string("fillColumn failed: ") + ex.what() );
+  }
 }
 
 } // namespace DataObjects

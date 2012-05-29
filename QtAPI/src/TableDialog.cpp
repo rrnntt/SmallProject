@@ -2,9 +2,10 @@
 #include "QtAPI/AddTableColumnDialog.h"
 #include "ui_TableDialog.h"
 
-#include "DataObjects/TableWorkspace.h"
-#include "DataObjects/NumericColumn.h"
+#include "API/TableWorkspace.h"
+#include "API/NumericColumn.h"
 #include "API/AlgorithmFactory.h"
+#include "API/WorkspaceProperty.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -23,7 +24,7 @@ namespace QtAPI
 
 const int veryBigRowCount = 100000;
 
-TableDialog::TableDialog(QWidget *parent,boost::shared_ptr<DataObjects::TableWorkspace> ws) :
+TableDialog::TableDialog(QWidget *parent,boost::shared_ptr<API::TableWorkspace> ws) :
     QDialog(parent),
     ui(new Ui::TableDialog),
     m_workspace(ws)
@@ -268,7 +269,7 @@ void TableDialog::applyDistribution()
     QMessageBox::critical(parentWidget(),"Error","Column " + QString::fromStdString(column->name()) + " is not numeric");
     return;
   }
-  auto numeric = boost::dynamic_pointer_cast<DataObjects::NumericColumn>(column);
+  auto numeric = boost::dynamic_pointer_cast<API::NumericColumn>(column);
   size_t n = column->size();
   QString distrName = ui->cbDistribution->currentText();
   if (distrName == "Serial numbers")
@@ -336,7 +337,12 @@ void TableDialog::applyFormula()
   if (expStr.empty()) return;
   try
   {
-    m_workspace->fillColumn(column->name(),expStr);
+    //m_workspace->fillColumn(column->name(),expStr);
+    auto alg = API::AlgorithmFactory::instance().createAlgorithm("CalculateColumnValues");
+    alg->get("Workspace").as<API::WorkspaceProperty>() = m_workspace;
+    alg->get("Column") = column->name();
+    alg->get("Formula") = expStr;
+    alg->execute();
   }
   catch(std::exception& e)
   {

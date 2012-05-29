@@ -1,8 +1,8 @@
 #include "Goblin/EnergyList.h"
-#include "DataObjects/TableColumn.h"
+#include "API/TableColumn.h"
 #include "API/WorkspaceFactory.h"
 
-using namespace DataObjects;
+using namespace API;
 
 namespace Goblin
 {

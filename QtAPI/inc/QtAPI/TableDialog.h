@@ -11,7 +11,7 @@ namespace Ui {
     class TableDialog;
 }
 
-namespace DataObjects
+namespace API
 {
   class TableWorkspace;
 }
@@ -22,7 +22,7 @@ namespace QtAPI
 class QTAPI_EXPORT TableDialog: public QDialog {
     Q_OBJECT
 public:
-  TableDialog(QWidget *parent,boost::shared_ptr<DataObjects::TableWorkspace> ws);
+  TableDialog(QWidget *parent,boost::shared_ptr<API::TableWorkspace> ws);
     ~TableDialog();
 
 protected:
@@ -46,7 +46,7 @@ protected slots:
 
 private:
   Ui::TableDialog *ui;
-  boost::shared_ptr<DataObjects::TableWorkspace> m_workspace;
+  boost::shared_ptr<API::TableWorkspace> m_workspace;
 };
 
 } // QtAPI

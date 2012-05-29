@@ -225,3 +225,25 @@ TEST(ChebfunTest, IntegrateTest)
   EXPECT_NEAR( cheb1.integr(), cos(0.0) - cos(3*M_PI/4), 1e-15 );
   //std::cerr << cheb1.integr() << ' ' << ( cos(0.0) - cos(3*M_PI/4)) << ' ' << cheb1.integrate() << std::endl;
 }
+
+TEST(ChebfunTest, CalcATest)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","sin(x-0.3)");
+  
+  TestCheb cheb(15,0,M_PI/4);
+  cheb.fit(user);
+
+  auto& a = cheb.coeffs();
+  // copy of the y-points
+  auto p0 = cheb.ypoints();
+
+  cheb.calcP();
+  // current y-points
+  auto& p = cheb.ypoints();
+
+  for(size_t i = 0; i < p.size(); ++i)
+  {
+    EXPECT_NEAR( p[i] , p0[i], 1e-15 );
+  }
+}

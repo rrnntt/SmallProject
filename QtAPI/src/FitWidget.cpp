@@ -11,9 +11,9 @@
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 
-#include "DataObjects/TableWorkspace.h"
-#include "DataObjects/NumericColumn.h"
-#include "DataObjects/StringColumn.h"
+#include "API/TableWorkspace.h"
+#include "API/NumericColumn.h"
+#include "API/StringColumn.h"
 
 #include "API/WorkspaceFactory.h"
 
@@ -256,7 +256,7 @@ void FitWidget::fillWorkspaces()
   m_form->cbWorkspace->blockSignals(true);
   if (m_form->cbWorkspace->count() > 0)
     m_form->cbWorkspace->clear();
-  auto wss = API::WorkspaceManager::instance().getAllOf<DataObjects::TableWorkspace>();
+  auto wss = API::WorkspaceManager::instance().getAllOf<API::TableWorkspace>();
   QStringList qNames;
   std::cerr << "Names:\n";
   for(auto ws = wss.begin(); ws != wss.end(); ++ws)
@@ -279,7 +279,7 @@ void FitWidget::fillColumns(int)
   try
   {
     auto ws = API::WorkspaceManager::instance().retrieve(m_form->cbWorkspace->currentText().toStdString());
-    auto tws = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(ws);
+    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
     if (!tws) return;
     QStringList colNames;
     std::string xColumn;
@@ -293,15 +293,15 @@ void FitWidget::fillColumns(int)
       if (num)
       {
         colNames << QString::fromStdString(col->name());
-        if (xColumn.empty() && num->getPlotRole() == DataObjects::NumericColumn::X)
+        if (xColumn.empty() && num->getPlotRole() == API::NumericColumn::X)
         {
           xColumn = col->name();
         }
-        if (yColumn.empty() && num->getPlotRole() == DataObjects::NumericColumn::Y)
+        if (yColumn.empty() && num->getPlotRole() == API::NumericColumn::Y)
         {
           yColumn = col->name();
         }
-        if (errColumn.empty() && num->getPlotRole() == DataObjects::NumericColumn::yError)
+        if (errColumn.empty() && num->getPlotRole() == API::NumericColumn::yError)
         {
           errColumn = col->name();
         }
@@ -362,7 +362,7 @@ void FitWidget::fit()
   try
   {
     auto ws = API::WorkspaceManager::instance().retrieve(wsName);
-    auto tws = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(ws);
+    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
     if (!tws) throw std::runtime_error("Table workspace not found");
     std::string xColumn = m_form->cbXColumn->currentText().toStdString();
     if (xColumn.empty()) throw std::runtime_error("X column was not set");
@@ -373,7 +373,7 @@ void FitWidget::fit()
     if (!xCol) throw std::runtime_error("Column " + xColumn + " must be numeric");
     auto yCol = tws->getColumn(yColumn)->asNumeric();
     if (!yCol) throw std::runtime_error("Column " + yColumn + " must be numeric");
-    DataObjects::NumericColumn* errCol = nullptr;
+    API::NumericColumn* errCol = nullptr;
     if (!errColumn.empty())
     {
       errCol = tws->getColumn(errColumn)->asNumeric();
@@ -410,15 +410,15 @@ void FitWidget::fit()
     updateEditor();
 
     // create a table with parameters
-    auto parsTable = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
+    auto parsTable = boost::dynamic_pointer_cast<API::TableWorkspace>(
       API::Workspace_ptr(API::WorkspaceFactory::instance().create("TableWorkspace"))
       );
     parsTable->addColumn("string","Name");
     parsTable->addColumn("double","Value");
     parsTable->setRowCount(fun->nParams());
-    auto nameColumn = static_cast<DataObjects::StringColumn*>(parsTable->getColumn(0).get());
+    auto nameColumn = static_cast<API::StringColumn*>(parsTable->getColumn(0).get());
     auto& names = nameColumn->data();
-    auto valueColumn = static_cast<DataObjects::TableColumn<double>*>(parsTable->getColumn(1).get());
+    auto valueColumn = static_cast<API::TableColumn<double>*>(parsTable->getColumn(1).get());
     auto& vals = valueColumn->data();
     for(size_t i = 0; i < fun->nParams(); ++i)
     {
@@ -428,7 +428,7 @@ void FitWidget::fit()
     API::WorkspaceManager::instance().addOrReplace(wsName+"_Parameters",parsTable);
 
     // create a table with comparison data
-    auto diffTable = boost::dynamic_pointer_cast<DataObjects::TableWorkspace>(
+    auto diffTable = boost::dynamic_pointer_cast<API::TableWorkspace>(
       API::Workspace_ptr(API::WorkspaceFactory::instance().create("TableWorkspace"))
       );
     diffTable->addColumn("double",xColumn);
@@ -436,13 +436,13 @@ void FitWidget::fit()
     diffTable->addColumn("double","Calc");
     diffTable->addColumn("double","Diff");
     diffTable->setRowCount(x.size());
-    auto diffXColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn(xColumn).get());
+    auto diffXColumn = static_cast<API::TableColumn<double>*>(diffTable->getColumn(xColumn).get());
     auto& xs = diffXColumn->data();
-    auto diffYColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn(yColumn).get());
+    auto diffYColumn = static_cast<API::TableColumn<double>*>(diffTable->getColumn(yColumn).get());
     auto& ys = diffYColumn->data();
-    auto diffCalcColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn("Calc").get());
+    auto diffCalcColumn = static_cast<API::TableColumn<double>*>(diffTable->getColumn("Calc").get());
     auto& cals = diffCalcColumn->data();
-    auto diffDiffColumn = static_cast<DataObjects::TableColumn<double>*>(diffTable->getColumn("Diff").get());
+    auto diffDiffColumn = static_cast<API::TableColumn<double>*>(diffTable->getColumn("Diff").get());
     auto& diffs = diffDiffColumn->data();
     assert(x.size() == xs.size());
     
@@ -453,10 +453,10 @@ void FitWidget::fit()
       cals[i] = values->getCalculated(i);
       diffs[i] = ys[i] - cals[i];
     }
-    diffXColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::X);
-    diffYColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
-    diffCalcColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
-    diffDiffColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::Y);
+    diffXColumn->asNumeric()->setPlotRole(API::NumericColumn::X);
+    diffYColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
+    diffCalcColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
+    diffDiffColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
     API::WorkspaceManager::instance().addOrReplace(wsName+"_Calc",diffTable);
   }
   catch(std::exception& e)

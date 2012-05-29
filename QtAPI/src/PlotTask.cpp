@@ -7,8 +7,8 @@
 #include "QtAPI/PlotDialog.h"
 #include "QtAPI/PlotCurve.h"
 
-#include "DataObjects/TableWorkspace.h"
-#include "DataObjects/NumericColumn.h"
+#include "API/TableWorkspace.h"
+#include "API/NumericColumn.h"
 
 #include <QtGui/QMenu>
 #include <QtGui/QActionGroup>
@@ -103,7 +103,7 @@ QPointer<Plot> PlotTask::showPlot(const Table* table,
   return showPlot(table->getWorkspace(),columnX,columnY,columnE);
 }
 
-QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
+QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<API::TableWorkspace> tws,
   const std::string& columnX,
   const std::string& columnY,
   const std::string& columnE) const
@@ -133,19 +133,19 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
 /**
  * Show plot and draw curves for columns in columnNames. The columns must have Y roles assigned.
  */
-QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace> tws,
+QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<API::TableWorkspace> tws,
   std::vector<std::string>& columnNames) const
 {
   // find first column with th X role
   std::vector<std::string> allNames = m_table->getWorkspace()->getColumnNames();
-  DataObjects::NumericColumn* columnX = nullptr;
+  API::NumericColumn* columnX = nullptr;
   std::string columnXName;
   for(auto columnName = allNames.begin(); columnName != allNames.end(); ++columnName)
   {
     auto column = m_table->getWorkspace()->getColumn(*columnName);
     auto colNum = column->asNumeric();
     if (!colNum) continue;
-    if (colNum->getPlotRole() == DataObjects::NumericColumn::X)
+    if (colNum->getPlotRole() == API::NumericColumn::X)
     {
       columnX = colNum;
       columnXName = *columnName;
@@ -166,7 +166,7 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
     auto column = m_table->getWorkspace()->getColumn(*columnName);
     auto columnY = column->asNumeric();
     if (!columnY) continue;
-    if (columnY->getPlotRole() != DataObjects::NumericColumn::Y)
+    if (columnY->getPlotRole() != API::NumericColumn::Y)
     {
       errorMessage("Column "+*columnName+" does not have the Y plot role. Skipping.");
       continue;
@@ -197,19 +197,19 @@ QPointer<Plot> PlotTask::showPlot(boost::shared_ptr<DataObjects::TableWorkspace>
   return plot;
 }
 
-void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWorkspace> tws,
+void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<API::TableWorkspace> tws,
   std::vector<std::string>& columnNames) const
 {
   // find first column with th X role
   std::vector<std::string> allNames = tws->getColumnNames();
-  DataObjects::NumericColumn* columnX = nullptr;
+  API::NumericColumn* columnX = nullptr;
   std::string columnXName;
   for(auto columnName = allNames.begin(); columnName != allNames.end(); ++columnName)
   {
     auto column = tws->getColumn(*columnName);
     auto colNum = column->asNumeric();
     if (!colNum) continue;
-    if (colNum->getPlotRole() == DataObjects::NumericColumn::X)
+    if (colNum->getPlotRole() == API::NumericColumn::X)
     {
       columnX = colNum;
       columnXName = *columnName;
@@ -227,7 +227,7 @@ void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<DataObjects::TableWo
     auto column = tws->getColumn(*columnName);
     auto columnY = column->asNumeric();
     if (!columnY) continue;
-    if (columnY->getPlotRole() != DataObjects::NumericColumn::Y)
+    if (columnY->getPlotRole() != API::NumericColumn::Y)
     {
       errorMessage("Column "+*columnName+" does not have the Y plot role. Skipping.");
       continue;
@@ -277,7 +277,7 @@ void PlotTask::showTablePlot()
       auto colNum = column->asNumeric();
       if (!colNum) continue;
       columnNames.push_back(column->name());
-      if (colNum->getPlotRole() == DataObjects::NumericColumn::Y)
+      if (colNum->getPlotRole() == API::NumericColumn::Y)
       {
         haveRoles = true;
       }

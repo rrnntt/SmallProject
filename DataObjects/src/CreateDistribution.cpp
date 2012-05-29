@@ -1,6 +1,6 @@
 #include "DataObjects/CreateDistribution.h"
-#include "DataObjects/TableWorkspace.h"
-#include "DataObjects/NumericColumn.h"
+#include "API/TableWorkspace.h"
+#include "API/NumericColumn.h"
 
 #include "Numeric/Distribution.h"
 
@@ -34,7 +34,7 @@ namespace DataObjects
     {// TODO: this must be done by a validator
       throw std::runtime_error("Property Workspace was not set");
     }
-    auto tws = wsProp.to<TableWorkspace>();
+    auto tws = wsProp.to<API::TableWorkspace>();
 
     if (!tws)
     {
@@ -51,7 +51,7 @@ namespace DataObjects
 
     std::string colName = get("Column");
 
-    Column_ptr column;
+    API::Column_ptr column;
     if (colName.empty())
     {
       column = tws->getColumn(0);
@@ -63,7 +63,7 @@ namespace DataObjects
       throw std::runtime_error("Column " + colName + " is not numeric");
     }
 
-    auto numColumn = boost::dynamic_pointer_cast<NumericColumn>(column);
+    auto numColumn = boost::dynamic_pointer_cast<API::NumericColumn>(column);
     size_t n = column->size();
 
     // random number generator

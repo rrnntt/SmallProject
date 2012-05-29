@@ -1,10 +1,10 @@
 #include "Goblin/LineList.h"
-#include "DataObjects/TableColumn.h"
+#include "API/TableColumn.h"
 #include "API/WorkspaceFactory.h"
 
 #include <sstream>
 
-using namespace DataObjects;
+using namespace API;
 
 namespace Goblin
 {

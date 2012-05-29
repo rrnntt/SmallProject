@@ -101,7 +101,7 @@ void GoblinTask::loadEnergyList()
     {
       QFileInfo file(fileName);
       QString name = file.baseName();
-      DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+      API::TableWorkspace_ptr ws( dynamic_cast<API::TableWorkspace*>(
         API::WorkspaceFactory::instance().create("EnergyList")  ));
       ws->loadAscii(fileName.toStdString());
       API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
@@ -124,7 +124,7 @@ void GoblinTask::loadLineList()
     {
       QFileInfo file(fileName);
       QString name = file.baseName();
-      DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+      API::TableWorkspace_ptr ws( dynamic_cast<API::TableWorkspace*>(
         API::WorkspaceFactory::instance().create("LineList")  ));
       ws->loadAscii(fileName.toStdString());
       API::WorkspaceManager::instance().addOrReplace(name.toStdString(),ws);
@@ -152,7 +152,7 @@ void GoblinTask::createEnergyList()
   {
     try
     {
-      DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+      API::TableWorkspace_ptr ws( dynamic_cast<API::TableWorkspace*>(
         API::WorkspaceFactory::instance().create("EnergyList")  ));
       API::WorkspaceManager::instance().addOrReplace(name,ws);
       QtAPI::SubWindow* wnd = QtAPI::WindowManager::instance().createSubWindow(new QtAPI::Table(ws));
