@@ -63,6 +63,8 @@ namespace Numeric
     void setP(const std::vector<double>& y);
     /// Set the y points from a GSL vector
     void setP(const GSLVector& y);
+    /// Set the a-coeffs from a std vector
+    void setA(const std::vector<double>& a);
     /// Set the y points from a column of a GSL matrix
     void setP(const GSLMatrix& M, size_t col);
     void fit(const IFunction& ifun);
@@ -82,6 +84,8 @@ namespace Numeric
     double operator()(const double& x)const{return valueB(x);}
     /// make this chebfun a derivative of the argument
     void fromDerivative(const chebfun& fun);
+    /// make this chebfun a second derivative of the argument
+    void fromDerivative2(const chebfun& fun);
 
     chebfun& operator=(AFunction f)
     {

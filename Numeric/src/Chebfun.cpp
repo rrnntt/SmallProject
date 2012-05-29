@@ -394,9 +394,18 @@ namespace Numeric
 
   void chebfun::calcP()
   {
-    if ( m_a.empty() || m_p.size() != m_a.size() )
+    if ( m_a.empty() )
     {
       throw std::runtime_error("chebfun: cannot calculate P from A - A is empty.");
+    }
+    if ( n() + 1 != m_a.size() )
+    {
+      throw std::runtime_error("chebfun: cannot calculate P from A - different sizes: "+
+        boost::lexical_cast<std::string>(n()+1)+" != " + boost::lexical_cast<std::string>(m_a.size()));
+    }
+    if ( m_p.size() != m_a.size() )
+    {
+      m_p.resize( m_a.size() );
     }
     //auto& x = m_base->x;
     //for(size_t i = 0; i < m_a.size(); ++i)
@@ -429,16 +438,65 @@ namespace Numeric
   void chebfun::fromDerivative(const chebfun& fun)
   {
     m_base = fun.m_base;
-    double dx = 1e-10*(endX() - startX());
-    std::vector<double> tmp(n() + 1);
-    m_p.resize(n() + 1);
-    auto& x = m_base->x;
-    for(size_t i = 0; i < m_p.size(); ++i)
+    //double dx = 1e-10*(endX() - startX());
+    //std::vector<double> tmp(n() + 1);
+    //m_p.resize(n() + 1);
+    //auto& x = m_base->x;
+    //for(size_t i = 0; i < m_p.size(); ++i)
+    //{
+    //  tmp[i] = (fun.valueB(x[i] + dx) - fun.m_p[i]) / dx;
+    //}
+    //std::copy(tmp.begin(), tmp.end(), m_p.begin());
+    //invalidateA();
+    m_a.resize( n() + 1 );
+    auto& a = fun.coeffs();
+    const size_t nn = n();
+    m_a[nn] = 0.0;
+    m_a[nn - 1] = 2 * nn * a[nn];
+    for(size_t k = nn - 1; k >= 2; --k)
     {
-      tmp[i] = (fun.valueB(x[i] + dx) - fun.m_p[i]) / dx;
+      m_a[k - 1] = m_a[k + 1] + 2 * k * a[k];
     }
-    std::copy(tmp.begin(), tmp.end(), m_p.begin());
-    invalidateA();
+    m_a[0] = m_a[2] / 2 + a[1];
+    const double Dx = (endX() - startX())/2;
+    for(size_t i = 0; i < m_a.size(); ++i)
+    {
+      m_a[i] /= Dx;
+    }
+    calcP();
+  }
+
+  /// make this chebfun a second derivative of the argument
+  void chebfun::fromDerivative2(const chebfun& fun)
+  {
+    m_base = fun.m_base;
+    const size_t nn = n();
+    m_a.resize( nn + 1 );
+    auto& a = fun.coeffs();
+
+    std::vector<double> b( nn + 1 );
+    b[nn] = 0.0;
+    b[nn - 1] = 2 * nn * a[nn];
+    for(size_t k = nn - 1; k >= 2; --k)
+    {
+      b[k - 1] = b[k + 1] + 2 * k * a[k];
+    }
+    b[0] = b[2] / 2 + a[1];
+
+    m_a[nn] = 0.0;
+    m_a[nn - 1] = 2 * nn * b[nn];
+    for(size_t k = nn - 1; k >= 2; --k)
+    {
+      m_a[k - 1] = m_a[k + 1] + 2 * k * b[k];
+    }
+    m_a[0] = m_a[2] / 2 + b[1];
+    double Dx = (endX() - startX())/2;
+    Dx *= Dx;
+    for(size_t i = 0; i < m_a.size(); ++i)
+    {
+      m_a[i] /= Dx;
+    }
+    calcP();
   }
 
   double chebfun_integration_function(double x,void* this_chebfun)
@@ -659,5 +717,17 @@ namespace Numeric
     }
   }
 
+
+  /// Set the a-coeffs from a std vector
+  void chebfun::setA(const std::vector<double>& a)
+  {
+    const size_t n = a.size();
+    if (m_p.size() != n) throw std::runtime_error("chebfun::setA: Wrong size " + 
+      boost::lexical_cast<std::string>(m_p.size()) + " " + boost::lexical_cast<std::string>(n)
+      );
+    m_a.resize( n );
+    m_a.assign( a.begin(), a.end() );
+    calcP();
+  }
 
 } // Numeric

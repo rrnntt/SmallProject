@@ -231,10 +231,10 @@ TEST(ChebfunTest, CalcATest)
   UserFunction1D user;
   user.setAttributeValue("Formula","sin(x-0.3)");
   
-  TestCheb cheb(15,0,M_PI/4);
+  TestCheb cheb(15,0,3*M_PI/4);
   cheb.fit(user);
 
-  auto& a = cheb.coeffs();
+  auto a = cheb.coeffs();
   // copy of the y-points
   auto p0 = cheb.ypoints();
 
@@ -245,5 +245,53 @@ TEST(ChebfunTest, CalcATest)
   for(size_t i = 0; i < p.size(); ++i)
   {
     EXPECT_NEAR( p[i] , p0[i], 1e-15 );
+    a[i] *= 2;
+  }
+  cheb.setA( a );
+  for(size_t i = 0; i < p.size(); ++i)
+  {
+    EXPECT_NEAR( p[i] , 2 * p0[i], 1e-15 );
+  }
+}
+
+TEST(ChebfunTest, FromDerivativeTest)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","sin(x-0.2)");
+  
+  TestCheb cheb(15,0,M_PI/1.5);
+  cheb.fit(user);
+
+  chebfun der;
+  der.fromDerivative( cheb );
+  auto& x = cheb.xpoints();
+
+  EXPECT_TRUE( der.haveSameBase( cheb ) );
+
+  for(size_t i = 0; i < x.size(); ++i)
+  {
+    EXPECT_NEAR( der.ypoints()[i], cos( x[i] - 0.2 ), 1e-13 );
+    //std::cerr << x[i] << ' ' << der.ypoints()[i] << ' ' << cos( x[i] - 0.2 ) << std::endl;
+  }
+}
+
+TEST(ChebfunTest, FromDerivative2Test)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","sin(x-0.2)");
+  
+  TestCheb cheb(15,0,M_PI/1.5);
+  cheb.fit(user);
+
+  chebfun der;
+  der.fromDerivative2( cheb );
+  auto& x = cheb.xpoints();
+
+  EXPECT_TRUE( der.haveSameBase( cheb ) );
+
+  for(size_t i = 0; i < x.size(); ++i)
+  {
+    EXPECT_NEAR( der.ypoints()[i], -sin( x[i] - 0.2 ), 1e-11 );
+    //std::cerr << x[i] << ' ' << der.ypoints()[i] << ' ' << -sin( x[i] - 0.2 ) << std::endl;
   }
 }
