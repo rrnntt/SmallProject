@@ -56,6 +56,9 @@ set( INC_FILES
    inc/Numeric/ChebfunWorkspace.h
    inc/Numeric/CopyChebfun.h
    inc/Numeric/CreateChebfun.h
+   inc/Numeric/ChebfunToTable.h
+   inc/Numeric/EvalChebfun.h
+   inc/Numeric/UniformChebfun.h
 
    )
 set( SRC_FILES 
@@ -101,6 +104,9 @@ set( SRC_FILES
    src/ChebfunWorkspace.cpp
    src/CopyChebfun.cpp
    src/CreateChebfun.cpp
+   src/ChebfunToTable.cpp
+   src/EvalChebfun.cpp
+   src/UniformChebfun.cpp
   )
 add_library( Numeric SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ${THIRD_PARTY_INCLUDE_DIR})

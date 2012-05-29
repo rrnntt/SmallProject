@@ -28,6 +28,7 @@ Schrodinger0::Schrodinger0()
   declare("EndX",new Kernel::DoubleProperty);
   declare("N",new Kernel::IntProperty);
   declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Output));
+  declare("Table",new API::WorkspaceProperty(Kernel::Property::Output));
 }
 
 /// Execute algorithm.
@@ -70,11 +71,24 @@ void Schrodinger0::exec()
       dmin = tmp;
       imin = i;
     }
+    std::cerr << i << ' ' << tmp << std::endl;
   }
 
+  imin = 29;
   y.setP( v, imin );
 
   wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+
+  //auto tws = DataObjects::TableWorkspace_ptr(dynamic_cast<DataObjects::TableWorkspace*>(
+  //  API::WorkspaceFactory::instance().create("TableWorkspace"))
+  //  );
+
+  //tws->addColumn("double","X");
+  //tws->addColumn("double","Y");
+  //tws->setRowCount(n);
+  //auto xColumn = static_cast<DataObjects::TableColumn<double>*>(tws->getColumn("X").get());
+  //xColumn->asNumeric()->setPlotRole(DataObjects::NumericColumn::X);
+  //auto& x = xColumn->data();
 }
 
 } // namespace Numeric
