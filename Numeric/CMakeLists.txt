@@ -4,6 +4,7 @@
 #project(Numeric)
 
 set( INC_FILES 
+   inc/Numeric/BFGS_Minimizer.h
    inc/Numeric/Chebfun.h
    inc/Numeric/ChebFunction.h
    inc/Numeric/ChebOperator.h
@@ -15,6 +16,7 @@ set( INC_FILES
    inc/Numeric/CostFuncFitting.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
+   inc/Numeric/DerivMinimizer.h
    inc/Numeric/DomainMap.h
    inc/Numeric/FuncMinimizerFactory.h
    inc/Numeric/FunctionDomain.h
@@ -63,6 +65,7 @@ set( INC_FILES
 
    )
 set( SRC_FILES 
+  src/BFGS_Minimizer.cpp
   src/Chebfun.cpp
   src/ChebFunction.cpp
   src/ChebOperator.cpp
@@ -72,6 +75,7 @@ set( SRC_FILES
   src/CostFunctionFactory.cpp
   src/CostFuncFitting.cpp
   src/Distribution.cpp
+  src/DerivMinimizer.cpp
   src/DomainMap.cpp
   src/FuncMinimizerFactory.cpp
   src/FunctionDomain.cpp

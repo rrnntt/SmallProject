@@ -2,6 +2,7 @@
 #include "Numeric/ChebfunWorkspace.h"
 #include "Numeric/ChebOperator.h"
 #include "Numeric/ICostFunction.h"
+#include "Numeric/BFGS_Minimizer.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/WorkspaceProperty.h"
@@ -58,17 +59,8 @@ public:
   virtual double val() const
   {
     m_poly.calcP();
-    chebfun f(m_poly);
-    auto& x = f.xpoints();
-    std::vector<double> y(x.size());
-    const double c = (m_poly.startX() + m_poly.endX())/2;
-    for(size_t i = 0; i < x.size(); ++i)
-    {
-      const double xx = x[i] - c;
-      y[i] = exp(-m_sig*xx*xx);
-    }
-    f.setP( y );
-    f *= m_poly;
+    chebfun f;
+    calc( f );
 
     chebfun ff(m_poly);
     m_oper.apply(f, ff);
@@ -106,6 +98,23 @@ public:
   {
     double v = val();
     deriv( der );
+    return v;
+  }
+
+  /// Calculate the function
+  void calc(chebfun& f) const
+  {
+    f.setBase( m_poly );
+    auto& x = f.xpoints();
+    std::vector<double> y(x.size());
+    const double c = (m_poly.startX() + m_poly.endX())/2;
+    for(size_t i = 0; i < x.size(); ++i)
+    {
+      const double xx = x[i] - c;
+      y[i] = exp(-m_sig*xx*xx);
+    }
+    f.setP( y );
+    f *= m_poly;
   }
 
 protected:
@@ -147,35 +156,23 @@ void Schrodinger0::exec()
   std::string opStr = get("Operator");
   auto oper = ChebOperator::create( opStr );
 
+  auto schrod = new Schrodinger0_Function(n, startX, endX, *oper);
+  ICostFunction_sptr costFunction( schrod );
+  BFGS_Minimizer s;
+  s.initialize(costFunction);
+  s.minimize();
+
   ChebfunWorkspace *cws = new ChebfunWorkspace;
   auto& y = cws->fun(0);
-  y.set(n,startX,endX);
-
-  GSLMatrix L;
-  //size_t n = y.n() + 1;
-  oper->createMatrix( y.getBase(), L );
-
-  GSLVector d;
-  GSLMatrix v;
-  L.diag( d, v );
-
-  size_t imin = 0;
-  double dmin = d[0];
-  for(size_t i = 1; i < d.size(); ++i)
-  {
-    const double tmp = d[i];
-    if ( tmp < dmin )
-    {
-      dmin = tmp;
-      imin = i;
-    }
-    std::cerr << i << ' ' << tmp << std::endl;
-  }
-
-  //imin = 29;
-  y.setP( v, imin );
+  schrod->calc( y );
+  y /= sqrt( y.norm2() );
+  std::cerr << "Energy: " << schrod->val() << std::endl;
 
   wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+
+  chebfun test( y );
+  oper->apply(y, test);
+  //test /= y;
 
   auto tws = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory::instance().create("TableWorkspace"))
@@ -191,17 +188,24 @@ void Schrodinger0::exec()
     xc[j] = y.xpoints()[j];
   }
 
-  for(size_t i = 0; i < n; ++i)
+  std::string colName = "Y";
+  tws->addColumn("double",colName);
+  auto yColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(colName).get());
+  yColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
+  auto& yc = yColumn->data();
+  for(size_t j = 0; j < n; ++j)
   {
-    std::string colName = "Y" + boost::lexical_cast<std::string>( i );
-    tws->addColumn("double",colName);
-    auto yColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(colName).get());
-    yColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
-    auto& yc = yColumn->data();
-    for(size_t j = 0; j < n; ++j)
-    {
-      yc[j] = v.get(j, i);
-    }
+    yc[j] = y.ypoints()[j];
+  }
+
+  colName = "Test";
+  tws->addColumn("double",colName);
+  yColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(colName).get());
+  yColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
+  auto& tc = yColumn->data();
+  for(size_t j = 0; j < n; ++j)
+  {
+    tc[j] = test.ypoints()[j];
   }
 
   get("Table").as<API::WorkspaceProperty>() = tws;

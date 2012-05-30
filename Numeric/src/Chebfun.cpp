@@ -531,10 +531,17 @@ namespace Numeric
     auto& a = coeffs();
     for(size_t i = 0; i < n; i+=2)
     {
-      const double T = 2.0 / ( 1.0 - double( i * i ) );
       res += a[i] * iw[i];
     }
     return res * (endX() - startX()) / 2;
+  }
+
+  double chebfun::norm2()
+  {
+    chebfun tmp;
+    tmp = *this;
+    tmp *= *this;
+    return tmp.integr();
   }
 
   void chebfun::fit(const IFunction& ifun)
