@@ -6,6 +6,7 @@
 set( INC_FILES 
    inc/Numeric/BFGS_Minimizer.h
    inc/Numeric/Chebfun.h
+   inc/Numeric/Chebfun2DSpline.h
    inc/Numeric/ChebFunction.h
    inc/Numeric/ChebOperator.h
    inc/Numeric/Chebyshev.h
@@ -46,6 +47,7 @@ set( INC_FILES
    inc/Numeric/PhysBody.h
    inc/Numeric/PhysModel.h
 #   inc/Numeric/SeriesFunction.h
+   inc/Numeric/SchrodScale.h
    inc/Numeric/Schrodinger0.h
    inc/Numeric/Schrodinger.h
    inc/Numeric/SolveODE.h
@@ -67,6 +69,7 @@ set( INC_FILES
 set( SRC_FILES 
   src/BFGS_Minimizer.cpp
   src/Chebfun.cpp
+  src/Chebfun2DSpline.cpp
   src/ChebFunction.cpp
   src/ChebOperator.cpp
   src/Chebyshev.cpp
@@ -96,6 +99,7 @@ set( SRC_FILES
   src/ParameterReference.cpp
   src/ParameterTie.cpp
 #  src/SeriesFunction.cpp
+  src/SchrodScale.cpp
   src/Schrodinger0.cpp
   src/Schrodinger.cpp
   src/SolveODE.cpp
@@ -138,6 +142,7 @@ set( SRC_FILES
   test/ChebFunctionTest.cpp
   test/ChebOperatorTest.cpp
   test/ChebfunTest.cpp
+  test/Chebfun2DSplineTest.cpp
   #test/ConjugateFRMinimizerTest.cpp
   test/CostFuncFittingTest.cpp
   test/DistributionTest.cpp
@@ -153,6 +158,7 @@ set( SRC_FILES
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp
+  test/SchrodScaleTest.cpp
   test/Schrodinger0Test.cpp
   test/SeriesFunctionTest.cpp
   #test/SimplexMinimizerTest.cpp

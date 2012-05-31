@@ -33,29 +33,31 @@ m_defaultCurveStyle(Lines)
     @param name Column name.
     @return True if the column was successfully created.
 */
-bool TableWorkspace::addColumn(const std::string& type, const std::string& name)
+Column_ptr TableWorkspace::addColumn(const std::string& type, const std::string& name)
 {
+  Column_ptr column;
     if (type.empty())
     {
         g_log.error("Empty string passed as type argument of createColumn.");
-        return false;
+        return Column_ptr();
     }
     if (name.empty())
     {
         g_log.error("Empty string passed as name argument of createColumn.");
-        return false;
+        return Column_ptr();
     }
     // Check that there is no column with the same name.
     column_it ci = std::find_if(m_columns.begin(),m_columns.end(),FindName(name));
     if (ci != m_columns.end())
         {
             g_log.error("Column with name "+name+" already exists.\n");
-            return false;
+            return Column_ptr();
         }
     try
     {
         Column* c = ColumnFactory::instance().createColumn(type);
-        m_columns.push_back(boost::shared_ptr<Column>(c));
+        column.reset( c );
+        m_columns.push_back( column );
         c->setName(name);
         resizeColumn(c,rowCount());
     }
@@ -63,9 +65,9 @@ bool TableWorkspace::addColumn(const std::string& type, const std::string& name)
     {
         g_log.error("Column of type "+type+" and name "+name+" has not been created.\n");
         g_log.error(e.what());
-        return false;
+        return Column_ptr();
     }
-    return true;
+    return column;
 }
 
 /** If count is greater than the current number of rows extra rows are added to the bottom of the table.
@@ -499,6 +501,29 @@ bool TableWorkspace::hasColumn(const std::string& colName) const
 {
     column_const_it ci = std::find_if(m_columns.begin(),m_columns.end(),FindName(colName));
     return ci != m_columns.end();
+}
+
+/**
+ * Add a column of type "double" and optionally set its plot role.
+ * @param name :: Column name
+ * @param plotRole :: NumericColumn::PlotRole: one of X, Y, Z, xError, yError. Default is Unset.
+ */
+Column_ptr TableWorkspace::addDoubleColumn(const std::string& name, int plotRole)
+{
+  auto column = addColumn("double",name);
+  auto xColumn = static_cast<API::TableColumn<double>*>(column.get());
+  xColumn->asNumeric()->setPlotRole(static_cast<API::NumericColumn::PlotRole>(plotRole));
+  return column;
+}
+
+/**
+ * Return reference to the data of a "double" column
+ */
+std::vector<double>& TableWorkspace::getDoubleData(const std::string& name)
+{
+  auto xColumn = static_cast<API::TableColumn<double>*>(getColumn(name).get());
+  if ( !xColumn ) throw std::runtime_error("Column " + name + " is not double");
+  return xColumn->data();
 }
 
 } // API

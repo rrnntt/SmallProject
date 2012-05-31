@@ -36,7 +36,7 @@ namespace API
 
     TableWorkspace();
     virtual std::string id()const {return "TableWorkspace";}
-    bool addColumn(const std::string& type, const std::string& name);
+    Column_ptr addColumn(const std::string& type, const std::string& name);
     /// Removes a column.
     void removeColumn( const std::string& name);
     /// Number of columns in the workspace.
@@ -74,6 +74,10 @@ namespace API
     void removeAllColumns();
     int getCurveStyle() const {return m_defaultCurveStyle;}
     void setCurveStyle(int s) {m_defaultCurveStyle = s;}
+    /// Add a column of type "double".
+    Column_ptr addDoubleColumn(const std::string& name, int plotRole = 0);
+    /// Return reference to the data of a "double" column
+    std::vector<double>& getDoubleData(const std::string& name) ;
 
   private:
 

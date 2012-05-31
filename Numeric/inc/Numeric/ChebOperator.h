@@ -64,6 +64,21 @@ protected:
 };
 
 /**
+ * Dirichlet boundary conditions: values on the left or both boundaries
+ */
+class NUMERIC_EXPORT ThroughPoint: public BoundaryConditions
+{
+public:
+  /// Constructor
+  ThroughPoint(double x, double y);
+  /// Apply the conditions to an equation
+  virtual void apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs) const;
+protected:
+  double m_x;
+  double m_y;
+};
+
+/**
  * A base class for a linear operator acting on a chebfun.
  */
 class NUMERIC_EXPORT ChebOperator

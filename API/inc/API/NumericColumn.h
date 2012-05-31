@@ -14,7 +14,7 @@ class API_EXPORT NumericColumn
 {
 public:
   NumericColumn():m_plotRole(Unset){}
-  enum PlotRole {Unset,X,Y,Z,xError,yError};
+  enum PlotRole { Unset = 0, X, Y, Z, xError, yError };
   virtual double getDouble(int index)const = 0;
   virtual void setDouble(int index, double value) = 0;
 //protected:

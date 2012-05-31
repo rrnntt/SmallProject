@@ -45,6 +45,7 @@ namespace Numeric
     chebfun& operator=(const chebfun& other);
     ChebfunBase_const_sptr getBase() const {return m_base;}
     void setBase(const chebfun& other){m_base = other.m_base; m_p.resize( n() + 1 ); invalidateA();}
+    void setBase(ChebfunBase_sptr base){m_base = base; m_p.resize( n() + 1 ); invalidateA();}
     /// Check if two chenfuns have shared x-points.
     bool haveSameBase(const chebfun& other) const {return m_base == other.m_base;}
     /// Is the chebfun valid and set

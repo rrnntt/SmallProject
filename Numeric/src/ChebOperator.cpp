@@ -95,6 +95,36 @@ void Dirichlet::apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs)
   }
 }
 
+/// Constructor
+ThroughPoint::ThroughPoint(double x, double y):
+m_x(x),m_y(y)
+{
+}
+
+/// Apply the conditions to an equation
+void ThroughPoint::apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs) const
+{
+  const size_t n = L.size1();
+  assert( n == L.size2() );
+  assert( n == rhs.size() );
+  auto& x = base->x;
+  double dx = fabs( base->endX - base->startX );
+  for(size_t i = 0; i < n; ++i)
+  {
+    double d = fabs( x[i] - m_x );
+    if ( d > dx )
+    {
+      size_t j = i - 1;
+      double tmp = L.get(j, j);
+      L.set(j, j, tmp + 1.0);
+      rhs.set(j, m_y);
+      std::cerr << "Trough " << x[j] << std::endl;
+      break;
+    }
+    dx = d;
+  }
+}
+
 //--------------------------------------------------------
 /**
  * Constructor.
