@@ -29,6 +29,8 @@ public:
   ChebfunBase_sptr getXBase() {return m_xBase;}
   /// Get the base of the y-functions
   ChebfunBase_sptr getYBase() {return m_yBase;}
+  /// evaluate the function
+  double operator()(const double& x, const double& y)const;
 
   void fit( AFunction2D fun );
 protected:
@@ -42,6 +44,8 @@ protected:
   std::vector<double> m_yLines;
   ChebfunBase_sptr m_xBase;
   ChebfunBase_sptr m_yBase;
+  mutable chebfun m_xLineFun;
+  mutable chebfun m_yLineFun;
 };
 
 } // NUMERIC
