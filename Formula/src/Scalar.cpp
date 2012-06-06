@@ -428,6 +428,7 @@ public:
   {
     double arg = m_argv[0]().as<Scalar>();
     m_return.setValue(exp(arg));
+    //std::cerr << "exp " << arg << ' ' << m_return << std::endl;
     return m_return;
   }
 };

@@ -25,7 +25,7 @@ CreateChebfun::CreateChebfun()
 
 void CreateChebfun::exec()
 {
-  API::WorkspaceProperty wsProp = get("OutputWorkspace").as<API::WorkspaceProperty>();
+  API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
   std::string wsName = static_cast<std::string>(wsProp);
 
   double startX = get("StartX").to<double>();

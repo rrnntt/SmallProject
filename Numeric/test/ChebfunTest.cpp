@@ -226,6 +226,30 @@ TEST(ChebfunTest, IntegrateTest)
   //std::cerr << cheb1.integr() << ' ' << ( cos(0.0) - cos(3*M_PI/4)) << ' ' << cheb1.integrate() << std::endl;
 }
 
+TEST(ChebfunTest, IntegrateGaussTest)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","exp(-1*x^2)");
+  
+  chebfun cheb(100,-10.0,10.0);
+  cheb.fit(user);
+  auto& a = cheb.coeffs();
+  for(size_t i = 0; i < a.size(); ++i)
+  {
+    std::cerr << i << ' ' << a[i] << std::endl;
+  }
+
+  auto& x = cheb.xpoints();
+  auto& y = cheb.ypoints();
+  //for(size_t i = 0; i < x.size(); ++i)
+  //{
+  //  double xi = x[i];
+  //  std::cerr << xi << ' ' << exp(-xi*xi) << ' ' << y[i] << std::endl;
+  //}
+  //EXPECT_NEAR( cheb.integr(), 2.0, 1e-15 );
+  std::cerr << cheb.integr() - sqrt(M_PI) << std::endl;
+}
+  
 TEST(ChebfunTest, CalcATest)
 {
   UserFunction1D user;

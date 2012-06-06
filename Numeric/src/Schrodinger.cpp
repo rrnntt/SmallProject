@@ -65,21 +65,36 @@ void Schrodinger::exec()
   GSLMatrix v;
   L.diag( d, v );
 
-  size_t imin = 0;
-  double dmin = d[0];
-  for(size_t i = 1; i < d.size(); ++i)
+  std::vector<size_t> indx(L.size1());
   {
-    const double tmp = d[i];
-    if ( tmp < dmin )
-    {
-      dmin = tmp;
-      imin = i;
-    }
-    std::cerr << i << ' ' << tmp << std::endl;
+    size_t i = 0;
+    std::generate(indx.begin(), indx.end(), [&i]()->size_t{++i;return i-1;});
   }
 
+  std::sort(indx.begin(), indx.end(), [&d](size_t x1,size_t x2)->bool{
+    const double& d1 = d[x1];
+    const double& d2 = d[x2];
+    if ( d1 < 0 && d2 >= 0 ) return false;
+    if ( d2 < 0 && d1 >= 0 ) return true;
+    if ( d1 < 0 && d2 < 0 ) return d2 < d1;
+    return d1 < d2;
+  });
+
+  //size_t imin = 0;
+  //double dmin = d[0];
+  //for(size_t i = 1; i < d.size(); ++i)
+  //{
+  //  const double tmp = d[i];
+  //  if ( tmp < dmin )
+  //  {
+  //    dmin = tmp;
+  //    imin = i;
+  //  }
+  //  std::cerr << i << ' ' << tmp << std::endl;
+  //}
+
   //imin = 29;
-  y.setP( v, imin );
+  y.setP( v, indx[0] );
 
   wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
 
@@ -92,9 +107,13 @@ void Schrodinger::exec()
   auto xColumn = static_cast<API::TableColumn<double>*>(tws->getColumn("X").get());
   xColumn->asNumeric()->setPlotRole(API::NumericColumn::X);
   auto& xc = xColumn->data();
+
+  tws->addDoubleColumn("Energy");
+  auto& ec = tws->getDoubleData("Energy");
   for(size_t j = 0; j < n; ++j)
   {
     xc[j] = y.xpoints()[j];
+    ec[j] = d[indx[j]];
   }
 
   for(size_t i = 0; i < n; ++i)
@@ -104,9 +123,10 @@ void Schrodinger::exec()
     auto yColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(colName).get());
     yColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
     auto& yc = yColumn->data();
+    size_t k = indx[i];
     for(size_t j = 0; j < n; ++j)
     {
-      yc[j] = v.get(j, i);
+      yc[j] = v.get(j, k);
     }
   }
 

@@ -166,7 +166,7 @@ void Schrodinger0::exec()
   auto& y = cws->fun(0);
   schrod->calc( y );
   y /= sqrt( y.norm2() );
-  std::cerr << "Energy: " << schrod->val() << std::endl;
+  std::cerr << "Energy: " << schrod->val() << ' ' << schrod->getParameter(0) << std::endl;
 
   wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
 
