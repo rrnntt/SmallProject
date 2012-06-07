@@ -296,6 +296,18 @@ TEST(EParserTest, EParserUnary)
   parser.parse("-fun(x+y)");
   EXPECT_EQ(parser.str(),"-fun(x+y)");
 
+  parser.parse("-x^2");
+  EXPECT_EQ(parser.str(),"-x^2");
+  parser.log();
+
+  //parser.parse("-x*x");
+  //EXPECT_EQ(parser.str(),"-x*x");
+  //parser.log();
+
+  //parser.parse("-x+x");
+  //EXPECT_EQ(parser.str(),"-x+x");
+  //parser.log();
+
 }
 
 TEST(EParserTest, ToList) 

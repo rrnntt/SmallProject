@@ -99,3 +99,14 @@ TEST(ExpressionTest,orderedString)
     std::cerr << e2.orderedString() << std::endl;
     EXPECT_EQ(e1.orderedString(),e2.orderedString());
 }
+
+TEST(ExpressionTest,eval_scalar_expression)
+{
+    Formula::Namespace_ptr ns(new Formula::Namespace());
+    ns->addVariable("Scalar","x","1");
+
+    Expression ex(ns,"exp(-x^2)");
+    ex.logPrint();
+    //EXPECT_EQ(e.eval().toString(),"False");
+    std::cerr << ex.eval().toString() << ' ' << exp(-1.0) << std::endl;
+}
