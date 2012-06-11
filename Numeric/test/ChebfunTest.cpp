@@ -319,3 +319,19 @@ TEST(ChebfunTest, FromDerivative2Test)
     //std::cerr << x[i] << ' ' << der.ypoints()[i] << ' ' << -sin( x[i] - 0.2 ) << std::endl;
   }
 }
+
+TEST(ChebfunTest, RootsTest)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","x^2-2*x-5");
+  
+  chebfun cheb( 2, -10.0, 10.0 );
+  cheb.fit( user );
+  std::vector<double> r;
+  cheb.roots(r);
+
+  for(size_t i = 0; i < r.size(); ++i)
+  {
+    std::cerr << "root " << i << " is " << r[i] << std::endl;
+  }
+}

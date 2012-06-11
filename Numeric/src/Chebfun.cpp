@@ -7,6 +7,7 @@
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_fft_halfcomplex.h>
+#include <gsl/gsl_eigen.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -735,6 +736,78 @@ namespace Numeric
     m_a.resize( n );
     m_a.assign( a.begin(), a.end() );
     calcP();
+  }
+
+  /**
+   * Find all roots of this chebfun.
+   * @param r :: A vector to store the roots. The vector is resize
+   *  to the number of real roots.
+   */
+  void chebfun::roots(std::vector<double>& r) const
+  {
+    // build the companion matrix
+    auto& a = coeffs();
+    const size_t N = n();
+    const size_t N2 = 2*N;
+    GSLMatrix C( N2, N2 );
+    C.zero();
+    const double an = a.back();
+    const size_t lasti = N2 - 1;
+    for(size_t i = 0; i < N; ++i)
+    {
+      std::cerr << i << ' ' << a[i] << std::endl;
+      if ( i > 0 )
+      {
+        C.set( i, i - 1, 1.0 );
+      }
+      C.set( N + i, N + i - 1, 1.0 );
+      C.set( i, lasti, - a[N - i] / an );
+      C.set( N + i, lasti, - a[i] / an );
+    }
+    std::cerr << N << ' ' << a[N] << std::endl;
+    std::cerr << "an = " << an << std::endl;
+    std::cerr << C << std::endl;
+
+    gsl_vector_complex* eval = gsl_vector_complex_alloc( N2 );
+    auto workspace = gsl_eigen_nonsymm_alloc( N2 );
+    gsl_eigen_nonsymm( C.gsl(), eval, workspace );
+    gsl_eigen_nonsymm_free( workspace );
+
+    const double Dx = endX() - startX();
+    bool isFirst = true;
+    double firstIm = 0;
+    for(size_t i = 0; i < N2; ++i )
+    {
+      auto val = gsl_vector_complex_get( eval, i );
+      double re = GSL_REAL( val );
+      double im = GSL_IMAG( val );
+      double ab = re*re + im*im;
+      std::cerr << re << ' ' << im << ' ' 
+        << re*re + im*im << std::endl;
+      if ( fabs( ab - 1.0 ) > 1e-10 ) 
+      {
+        isFirst = true;
+        continue;
+      }
+      if ( isFirst )
+      {
+        isFirst = false;
+        firstIm = im;
+      }
+      else
+      {
+        if ( im + firstIm < 1e-10 )
+        {
+          r.push_back( 2*re );
+        }
+        else
+        {
+          r.push_back( re );
+        }
+        isFirst = true;
+      }
+    }
+    gsl_vector_complex_free( eval );
   }
 
 } // Numeric
