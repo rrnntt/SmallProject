@@ -621,38 +621,11 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
         {
           EParser* ep = addTerm(str,term->getParser(1)); // TermParser
           ep->m_op = term->getParser(0)->match();    // List of CharParser
-          if ( i == 0 )
+          if ( i == 0 && un->hasMatch())
           {
             secondOp = ep->m_op;
           }
         }
-      }
-      if (un->hasMatch())
-      {
-        std::string op = un->match();
-        auto i1 = secondOp.find_first_not_of(g_spaces);
-        auto i2 = secondOp.find_last_not_of(g_spaces);
-        if ( i1 != std::string::npos && i2 != std::string::npos && i2 >= i1 )
-        {
-          secondOp = secondOp.substr(i1, i2 - i1 + 1);
-        }
-        else
-        {
-          throw std::runtime_error("Error in binary operator");
-        }
-        if ( operators()->precedence( op ) == operators()->precedence( secondOp ) )
-        {
-          ep->m_op = un->match();
-          secondOp = "";
-        }
-        //else
-        //{
-        //  m_funct = op;
-        //}
-      }
-      else
-      {
-        secondOp = "";
       }
     }
 
@@ -661,10 +634,20 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
     if ( !secondOp.empty() && !un->isEmpty() )
     {
       //std::cerr << "OK " << un->match() << ' ' << secondOp << ' ' << std::string(start,end) << ' ' << this->name() << std::endl;
-      EParser* ep = new EParser;
-      ep->m_terms.push_back( m_terms[0] );
-      m_terms[0] = ep;
-      ep->m_funct = un->match();
+      std::string op = un->match();
+      //secondOp = name();
+      if ( operators()->precedence( op ) == operators()->precedence( name() ) )
+      {
+        m_terms[0]->m_op = un->match();
+      }
+      else
+      {
+        EParser* ep = new EParser;
+        ep->moveTerms( this );
+        ep->m_funct = m_funct;
+        m_funct = un->match();
+        m_terms.push_back( ep );
+      }
     }
   }
   else

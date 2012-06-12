@@ -208,6 +208,9 @@ namespace Numeric
       invalidateA();
     }
 
+    /// Finds all roots of the chebfun
+    void roots(std::vector<double>& r)const;
+
     void calcP(); ///< calc m_p form m_a
     void calcA() const; ///< calc m_a from m_p
   protected:

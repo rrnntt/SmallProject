@@ -7,6 +7,7 @@
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_fft_halfcomplex.h>
+#include <gsl/gsl_eigen.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -736,5 +737,11 @@ namespace Numeric
     m_a.assign( a.begin(), a.end() );
     calcP();
   }
+
+  /// Finds all roots of the chebfun
+  void chebfun::roots(std::vector<double>& r)const
+  {
+  }
+
 
 } // Numeric

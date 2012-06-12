@@ -297,16 +297,16 @@ TEST(EParserTest, EParserUnary)
   EXPECT_EQ(parser.str(),"-fun(x+y)");
 
   parser.parse("-x^2");
-  EXPECT_EQ(parser.str(),"-x^2");
-  parser.log();
+  EXPECT_EQ(parser.str(),"-(x^2)");
 
-  //parser.parse("-x*x");
-  //EXPECT_EQ(parser.str(),"-x*x");
-  //parser.log();
+  parser.parse("-(x^2)");
+  EXPECT_EQ(parser.str(),"-(x^2)");
 
-  //parser.parse("-x+x");
-  //EXPECT_EQ(parser.str(),"-x+x");
-  //parser.log();
+  parser.parse("-x*x");
+  EXPECT_EQ(parser.str(),"-(x*x)");
+
+  parser.parse("-x+x");
+  EXPECT_EQ(parser.str(),"-x+x");
 
 }
 
