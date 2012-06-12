@@ -278,6 +278,27 @@ TEST(ChebfunTest, CalcATest)
   }
 }
 
+TEST(ChebfunTest, CalcA1Test)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","4*x^3-3*x");
+  
+  chebfun cheb(5,-1,1);
+  cheb.fit(user);
+
+  auto a = cheb.coeffs();
+
+  EXPECT_NEAR( a[0] , 0, 1e-15 );
+  EXPECT_NEAR( a[1] , 0, 1e-15 );
+  EXPECT_NEAR( a[2] , 0, 1e-15 );
+  EXPECT_NEAR( a[3] , 1, 1e-15 );
+  EXPECT_NEAR( a[4] , 0, 1e-15 );
+  //for(size_t i = 0; i < a.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << a[i] << std::endl;
+  //}
+}
+
 TEST(ChebfunTest, FromDerivativeTest)
 {
   UserFunction1D user;
@@ -323,9 +344,9 @@ TEST(ChebfunTest, FromDerivative2Test)
 TEST(ChebfunTest, RootsTest)
 {
   UserFunction1D user;
-  user.setAttributeValue("Formula","x^2-2*x-5");
+  user.setAttributeValue("Formula","x^2-0.25");
   
-  chebfun cheb( 2, -10.0, 10.0 );
+  chebfun cheb( 2, -1.0, 1.0 );
   cheb.fit( user );
   std::vector<double> r;
   cheb.roots(r);

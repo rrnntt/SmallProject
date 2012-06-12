@@ -369,6 +369,7 @@ namespace Numeric
     //  m_a[i] = 2*t/m_n;
     //  if (i == 0) m_a[0] /= 2;
     //}
+    //return;
     //// End of the correct and direct transform from m_p to m_a
 
     // This is a magic trick which uses real fft to do the above cosine transform
@@ -751,7 +752,7 @@ namespace Numeric
     const size_t N2 = 2*N;
     GSLMatrix C( N2, N2 );
     C.zero();
-    const double an = a.back();
+    const double an = a[N];
     const size_t lasti = N2 - 1;
     for(size_t i = 0; i < N; ++i)
     {
@@ -770,8 +771,11 @@ namespace Numeric
 
     gsl_vector_complex* eval = gsl_vector_complex_alloc( N2 );
     auto workspace = gsl_eigen_nonsymm_alloc( N2 );
-    gsl_eigen_nonsymm( C.gsl(), eval, workspace );
+    std::cerr << "status " << gsl_eigen_nonsymm( C.gsl(), eval, workspace ) << std::endl;
+    std::cerr << "n roots " << workspace->n_evals << std::endl;
     gsl_eigen_nonsymm_free( workspace );
+
+    std::cerr << C << std::endl;
 
     const double Dx = endX() - startX();
     bool isFirst = true;
@@ -798,7 +802,8 @@ namespace Numeric
       {
         if ( im + firstIm < 1e-10 )
         {
-          r.push_back( 2*re );
+          double x = re;
+          r.push_back( x );
         }
         else
         {
