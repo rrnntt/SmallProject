@@ -15,6 +15,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+#include <limits>
 
 namespace Numeric
 {
@@ -752,15 +753,26 @@ namespace Numeric
   {
     // build the companion matrix
     auto& a = coeffs();
-    const size_t N = n();
+    size_t N = n();
+    // ensure that the highest order coeff is > epsilon
+    const double epsilon = std::numeric_limits<double>::epsilon() * 10;
+    //std::cerr << "epsilon=" << epsilon << std::endl;
+    while( N > 0 && fabs( a[N] ) < epsilon )
+    {
+      --N;
+    }
+
+    if ( N == 0 ) return; // function is a constant
+
     const size_t N2 = 2*N;
     GSLMatrix C( N2, N2 );
     C.zero();
     const double an = a[N];
+
     const size_t lasti = N2 - 1;
     for(size_t i = 0; i < N; ++i)
     {
-      std::cerr << i << ' ' << a[i] << std::endl;
+      //std::cerr << i << ' ' << a[i] << std::endl;
       if ( i > 0 )
       {
         C.set( i, i - 1, 1.0 );
@@ -771,6 +783,7 @@ namespace Numeric
       if ( i == 0 ) tmp *= 2;
       C.set( N + i, lasti, tmp );
     }
+    std::cerr << N << ' ' << a[N] << std::endl;
 
     gsl_vector_complex* eval = gsl_vector_complex_alloc( N2 );
     auto workspace = gsl_eigen_nonsymm_alloc( N2 );
@@ -791,7 +804,7 @@ namespace Numeric
         isFirst = true;
         continue;
       }
-      std::cerr << re << ' ' << im << ' ' << re*re + im*im << std::endl;
+      //std::cerr << re << ' ' << im << ' ' << re*re + im*im << std::endl;
       if ( isFirst )
       {
         isFirst = false;
@@ -801,12 +814,8 @@ namespace Numeric
       {
         if ( im + firstIm < 1e-10 )
         {
-          double x = re;
+          double x = startX() + ( re + 1.0 ) / 2.0 * Dx;
           r.push_back( x );
-        }
-        else
-        {
-          r.push_back( re );
         }
         isFirst = true;
       }
