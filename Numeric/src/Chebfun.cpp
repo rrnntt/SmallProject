@@ -367,8 +367,10 @@ namespace Numeric
     //    t += cos(M_PI*i*(double(j))/m_n)*p;
     //  }
     //  m_a[i] = 2*t/m_n;
-    //  if (i == 0) m_a[0] /= 2;
+    //  //if (i == 0) m_a[0] /= 2;
     //}
+    //m_a[0] /= 2;
+    //m_a[m_n] /= 2;
     //return;
     //// End of the correct and direct transform from m_p to m_a
 
@@ -387,10 +389,12 @@ namespace Numeric
     for(size_t i=0; i < nn; ++i)
     {
       double a = fc.real(i)/m_n;
-      if (i == 0) a /= 2;
+      //if (i == 0) a /= 2;
       m_a[i] = a;
       //std::cerr << fc.real(i) << ',' << fc.imag(i) << std::endl;
     }//*/
+    m_a[0] /= 2;
+    m_a[m_n] /= 2;
     // End of the magic trick
   }
 
@@ -763,19 +767,15 @@ namespace Numeric
       }
       C.set( N + i, N + i - 1, 1.0 );
       C.set( i, lasti, - a[N - i] / an );
-      C.set( N + i, lasti, - a[i] / an );
+      double tmp = - a[i] / an;
+      if ( i == 0 ) tmp *= 2;
+      C.set( N + i, lasti, tmp );
     }
-    std::cerr << N << ' ' << a[N] << std::endl;
-    std::cerr << "an = " << an << std::endl;
-    std::cerr << C << std::endl;
 
     gsl_vector_complex* eval = gsl_vector_complex_alloc( N2 );
     auto workspace = gsl_eigen_nonsymm_alloc( N2 );
-    std::cerr << "status " << gsl_eigen_nonsymm( C.gsl(), eval, workspace ) << std::endl;
-    std::cerr << "n roots " << workspace->n_evals << std::endl;
+    gsl_eigen_nonsymm( C.gsl(), eval, workspace );
     gsl_eigen_nonsymm_free( workspace );
-
-    std::cerr << C << std::endl;
 
     const double Dx = endX() - startX();
     bool isFirst = true;
@@ -786,13 +786,12 @@ namespace Numeric
       double re = GSL_REAL( val );
       double im = GSL_IMAG( val );
       double ab = re*re + im*im;
-      std::cerr << re << ' ' << im << ' ' 
-        << re*re + im*im << std::endl;
       if ( fabs( ab - 1.0 ) > 1e-10 ) 
       {
         isFirst = true;
         continue;
       }
+      std::cerr << re << ' ' << im << ' ' << re*re + im*im << std::endl;
       if ( isFirst )
       {
         isFirst = false;

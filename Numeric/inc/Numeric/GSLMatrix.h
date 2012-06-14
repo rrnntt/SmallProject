@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
+#include <cstdarg>
 
 
 namespace Numeric
@@ -327,6 +328,51 @@ namespace Numeric
       auto ws = gsl_eigen_symmv_alloc( size1() );
       gsl_eigen_symmv( gsl(), ev.gsl(), ef.gsl(), ws  );
       gsl_eigen_symmv_free( ws );
+    }
+
+    /**
+     * Diagonalize the matrix as non-symmetric.
+     * @param ev :: Returned complex eigenvalues. Vectors size == 2 * size1(). Real parts are
+     *  in even positions, imaginary are in odd.
+     */
+    void diagNonSymm(std::vector<double>& ev)
+    {
+      if ( size1() != size2() )
+      {
+        throw std::runtime_error("Matrix must be square for diag");
+      }
+      size_t n = size1();
+      gsl_vector_complex* eval = gsl_vector_complex_alloc( n );
+      auto workspace = gsl_eigen_nonsymm_alloc( n );
+      gsl_eigen_nonsymm( gsl(), eval, workspace );
+      gsl_eigen_nonsymm_free( workspace );
+      ev.resize( 2 * n );
+      for(size_t i = 0; i < n; ++i )
+      {
+        auto val = gsl_vector_complex_get( eval, i );
+        ev[2*i] = GSL_REAL( val );
+        ev[2*i + 1] = GSL_IMAG( val );
+      }
+    }
+
+    /**
+     * Set a row of a small matrix. Number of variadic arguments must be == size2()
+     * @param row :: Row index.
+     */
+    void setRow(size_t row, ...)
+    {
+      if ( !m_matrix ) return;
+      if (row >= m_matrix->size1)
+      {
+        throw std::out_of_range("GSLMatrix row index is out of range.");
+      }
+      va_list args;
+      va_start(args, row);
+      for(size_t col = 0; col < size2(); ++col)
+      {
+        double value = va_arg(args, double);
+        gsl_matrix_set( gsl(), row, col, value );
+      }
     }
 
   };// class GSLMatrix

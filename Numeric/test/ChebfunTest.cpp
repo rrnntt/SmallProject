@@ -299,6 +299,46 @@ TEST(ChebfunTest, CalcA1Test)
   //}
 }
 
+TEST(ChebfunTest, CalcA2Test)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","2*x^2-1");
+  
+  chebfun cheb(5,-1,1);
+  cheb.fit(user);
+
+  auto a = cheb.coeffs();
+
+  EXPECT_NEAR( a[0] , 0, 1e-15 );
+  EXPECT_NEAR( a[1] , 0, 1e-15 );
+  EXPECT_NEAR( a[2] , 1, 1e-15 );
+  EXPECT_NEAR( a[3] , 0, 1e-15 );
+  EXPECT_NEAR( a[4] , 0, 1e-15 );
+  //for(size_t i = 0; i < a.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << a[i] << std::endl;
+  //}
+}
+
+TEST(ChebfunTest, CalcA3Test)
+{
+  UserFunction1D user;
+  user.setAttributeValue("Formula","x^2");
+  
+  chebfun cheb(2,-1,1);
+  cheb.fit(user);
+
+  auto a = cheb.coeffs();
+
+  EXPECT_NEAR( a[0] , 0.5, 1e-15 );
+  EXPECT_NEAR( a[1] , 0, 1e-15 );
+  EXPECT_NEAR( a[2] , 0.5, 1e-15 );
+  //for(size_t i = 0; i < a.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << a[i] << std::endl;
+  //}
+}
+
 TEST(ChebfunTest, FromDerivativeTest)
 {
   UserFunction1D user;
@@ -344,9 +384,9 @@ TEST(ChebfunTest, FromDerivative2Test)
 TEST(ChebfunTest, RootsTest)
 {
   UserFunction1D user;
-  user.setAttributeValue("Formula","x^2-0.25");
+  user.setAttributeValue("Formula","sin(4*x)");
   
-  chebfun cheb( 2, -1.0, 1.0 );
+  chebfun cheb( 10, -1.0, 1.0 );
   cheb.fit( user );
   std::vector<double> r;
   cheb.roots(r);
@@ -355,4 +395,22 @@ TEST(ChebfunTest, RootsTest)
   {
     std::cerr << "root " << i << " is " << r[i] << std::endl;
   }
+
+  //GSLMatrix TT(2,2);
+  //TT.setRow(0, 0.0, -1.0 );
+  //TT.setRow(1, 1.0, -0.5 );
+
+  //std::cerr << "TT=\n" << TT << std::endl;
+
+  //std::vector<double> ev;
+  //TT.diagNonSymm( ev );
+  //for(size_t i = 0; i < ev.size() / 2; ++i)
+  //{
+  //  double re = ev[2*i];
+  //  double im = ev[2*i + 1];
+  //  std::cerr << ev[2*i] << ' ' << ev[2*i + 1] 
+  //  << " (" << ev[2*i]*ev[2*i] + ev[2*i+1]*ev[2*i+1] << ")" << std::endl;
+  //  double theta = atan( im / re ) / 2;
+  //  std::cerr << cos(theta) << ',' << sin(theta) << std::endl;
+  //}
 }
