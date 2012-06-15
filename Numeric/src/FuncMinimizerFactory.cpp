@@ -1,5 +1,5 @@
 #include "Numeric/FuncMinimizerFactory.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace Numeric
 {
@@ -17,11 +17,11 @@ namespace Numeric
  */
 FuncMinimizerFactory& FuncMinimizerFactory::instance()
 {
-  API::Singleton* s = API::Framework::instance().getSingleton("FuncMinimizerFactory");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("FuncMinimizerFactory");
   if (s == nullptr)
   {
     FuncMinimizerFactory *f = new FuncMinimizerFactory();
-    API::Framework::instance().registerSingleton("FuncMinimizerFactory",f);
+    Kernel::Framework::instance().registerSingleton("FuncMinimizerFactory",f);
     return *f;
   }
   else

@@ -5,7 +5,6 @@
 #include "Numeric/Distribution.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/WorkspaceFactory.h"
 
 #include "Kernel/CommonProperties.h"
@@ -19,22 +18,16 @@ namespace DataObjects
 
   CreateDistribution::CreateDistribution()
   {
-    declare("Workspace",new API::WorkspaceProperty(Kernel::Property::InOut));
-    declare("Column",new Kernel::StringProperty);
-    declare("Distribution",new Kernel::StringProperty);
-    declare("Mean",new Kernel::DoubleProperty);
-    declare("Sigma",new Kernel::DoubleProperty);
+    declareClass("Workspace","WorkspaceManager");
+    declareString("Column");
+    declareString("Distribution");
+    declareDouble("Mean");
+    declareDouble("Sigma");
   }
 
   void CreateDistribution::exec()
   {
-    API::WorkspaceProperty wsProp = get("Workspace").as<API::WorkspaceProperty>();
-    std::string wsName = static_cast<std::string>(wsProp);
-    if (wsName.empty())
-    {// TODO: this must be done by a validator
-      throw std::runtime_error("Property Workspace was not set");
-    }
-    auto tws = wsProp.to<API::TableWorkspace>();
+    API::TableWorkspace_ptr tws = getClass("Workspace");
 
     if (!tws)
     {
@@ -46,8 +39,8 @@ namespace DataObjects
       throw std::runtime_error("Empty table found");
     }
 
-    double mean = get("Mean").to<double>();
-    double sigma = get("Sigma").to<double>();
+    double mean = get("Mean");
+    double sigma = get("Sigma");
 
     std::string colName = get("Column");
 
@@ -86,7 +79,7 @@ namespace DataObjects
     {
       for(size_t i = 0; i < n; ++i)
       {
-        numColumn->setDouble(i,distribution->random());
+        numColumn->setDouble((int)i,distribution->random());
       }
       delete distribution;
     }

@@ -1,17 +1,17 @@
-#ifndef API_FRAMEWORK_H
-#define API_FRAMEWORK_H
+#ifndef KERNEL_FRAMEWORK_H
+#define KERNEL_FRAMEWORK_H
 
-#include "API/DllExport.h"
-#include "API/Singleton.h"
+#include "Kernel/DllExport.h"
+#include "Kernel/Singleton.h"
 #include "Kernel/LibraryManager.h"
 
 //#include <boost/ptr_container/ptr_map.hpp>
 #include <map>
 
-namespace API
+namespace Kernel
 {
 
-class API_EXPORT Framework
+class KERNEL_EXPORT Framework
 {
 public:
   ~Framework();
@@ -32,6 +32,6 @@ protected:
   std::string m_binDirectory;
 };
 
-} // API
+} // Kernel
 
-#endif // API_FRAMEWORK_H
+#endif // KERNEL_FRAMEWORK_H

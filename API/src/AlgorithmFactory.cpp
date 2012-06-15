@@ -1,5 +1,5 @@
 #include "API/AlgorithmFactory.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace API
 {
@@ -10,11 +10,11 @@ AlgorithmFactory::AlgorithmFactory()
 
 AlgorithmFactory& AlgorithmFactory::instance()
 {
-  Singleton* s = Framework::instance().getSingleton("AlgorithmFactory");
+  Singleton* s = Kernel::Framework::instance().getSingleton("AlgorithmFactory");
   if (s == nullptr)
   {
     AlgorithmFactory *f = new AlgorithmFactory();
-    Framework::instance().registerSingleton("AlgorithmFactory",f);
+    Kernel::Framework::instance().registerSingleton("AlgorithmFactory",f);
     return *f;
   }
   else

@@ -3,7 +3,6 @@
 #include "API/TableWorkspace.h"
 #include "API/NumericColumn.h"
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/WorkspaceFactory.h"
 #include "Kernel/CommonProperties.h"
 
@@ -17,21 +16,15 @@ namespace DataObjects
 
   CreateUniformRandomData::CreateUniformRandomData()
   {
-    declare("Workspace",new API::WorkspaceProperty(Kernel::Property::InOut));
-    declare("MinValue",new Kernel::DoubleProperty);
-    declare("MaxValue",new Kernel::DoubleProperty);
-    declare("Column",new Kernel::StringProperty);
+    declareClass("Workspace","WorkspaceManager");
+    declareDouble("MinValue");
+    declareDouble("MaxValue");
+    declareString("Column");
   }
 
   void CreateUniformRandomData::exec()
   {
-    API::WorkspaceProperty wsProp = get("Workspace").as<API::WorkspaceProperty>();
-    std::string wsName = static_cast<std::string>(wsProp);
-    if (wsName.empty())
-    {// TODO: this must be done by a validator
-      throw std::runtime_error("Property Workspace was not set");
-    }
-    auto tws = wsProp.to<API::TableWorkspace>();
+    API::TableWorkspace_ptr tws = getClass("Workspace");
 
     if (!tws)
     {
@@ -43,8 +36,8 @@ namespace DataObjects
       throw std::runtime_error("Empty table found");
     }
 
-    double minValue = get("MinValue").to<double>();
-    double maxValue = get("MaxValue").to<double>();
+    double minValue = get("MinValue");
+    double maxValue = get("MaxValue");
 
     if (minValue == maxValue)
     {
@@ -77,7 +70,7 @@ namespace DataObjects
     size_t n = column->size();
     for(size_t i = 0; i < n; ++i)
     {
-      numColumn->setDouble(i,distribution(rand_gen));
+      numColumn->setDouble((int)i,distribution(rand_gen));
     }
 
   }

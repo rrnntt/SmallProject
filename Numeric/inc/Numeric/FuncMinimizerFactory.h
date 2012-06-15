@@ -3,7 +3,7 @@
 
 #include "Numeric/DllExport.h"
 #include "Numeric/IFuncMinimizer.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 #include "Kernel/DynamicFactory.h"
 
 namespace Numeric
@@ -12,7 +12,7 @@ namespace Numeric
 /**
  * A factory for dynamically creating instances of IFuncMinimizer.
  */
-class NUMERIC_EXPORT FuncMinimizerFactory: public Kernel::DynamicFactory<IFuncMinimizer>, protected API::Singleton
+class NUMERIC_EXPORT FuncMinimizerFactory: public Kernel::DynamicFactory<IFuncMinimizer>, protected Kernel::Singleton
 {
 public:
   virtual std::string name() const {return "FuncMinimizerFactory";}

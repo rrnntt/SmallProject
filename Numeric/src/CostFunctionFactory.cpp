@@ -1,5 +1,5 @@
 #include "Numeric/CostFunctionFactory.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace Numeric
 {
@@ -17,11 +17,11 @@ CostFunctionFactory::CostFunctionFactory():Kernel::DynamicFactory<ICostFunction>
  */
 CostFunctionFactory& CostFunctionFactory::instance()
 {
-  API::Singleton* s = API::Framework::instance().getSingleton("CostFunctionFactory");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("CostFunctionFactory");
   if (s == nullptr)
   {
     CostFunctionFactory *f = new CostFunctionFactory();
-    API::Framework::instance().registerSingleton("CostFunctionFactory",f);
+    Kernel::Framework::instance().registerSingleton("CostFunctionFactory",f);
     return *f;
   }
   else

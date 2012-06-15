@@ -8,7 +8,6 @@
 #include "Numeric/FunctionValues.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/WorkspaceFactory.h"
 
 #include "Kernel/CommonProperties.h"
@@ -23,24 +22,18 @@ namespace Numeric
  */
 ChebfunToTable::ChebfunToTable()
 {
-  declare("InputWorkspace",new API::WorkspaceProperty(Kernel::Property::Input));
-  declare("OutputWorkspace",new API::WorkspaceProperty(Kernel::Property::Output));
-  declare("N",new Kernel::IntProperty);
+  declareClass("InputWorkspace","WorkspaceManager");
+  declareClass("OutputWorkspace","WorkspaceManager");
+  declareInt("N");
 }
 
 void ChebfunToTable::exec()
 {
-  API::WorkspaceProperty wsProp = get("InputWorkspace").as<API::WorkspaceProperty>();
-  std::string wsName = static_cast<std::string>(wsProp);
-  auto cws = wsProp.to<Numeric::ChebfunWorkspace>();
-  if (!cws)
-  {
-    throw std::runtime_error("InputWorkspace property is not a ChebfunWorkspace");
-  }
+  ChebfunWorkspace_sptr cws = getClass("InputWorkspace");
 
   Numeric::FunctionDomain1D_sptr domain;
 
-  size_t n = get("N").to<int>();
+  size_t n = (int)get("N");
 
   if (n < 2)
   {// if n has default value (0) use the x-points of the chebfuns
@@ -75,8 +68,7 @@ void ChebfunToTable::exec()
     y[i] = values.getCalculated(i);
   }
 
-  API::WorkspaceProperty outProp = get("OutputWorkspace").as<API::WorkspaceProperty>();
-  outProp = tws;
+  setProperty("OutputWorkspace",tws);
 }
 
 } // Numeric

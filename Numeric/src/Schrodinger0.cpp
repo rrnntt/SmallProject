@@ -5,7 +5,6 @@
 #include "Numeric/BFGS_Minimizer.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/TableWorkspace.h"
 #include "API/TableColumn.h"
 #include "API/NumericColumn.h"
@@ -130,25 +129,25 @@ DECLARE_ALGORITHM(Schrodinger0);
 /// Constructor. Declare algorithm properties.
 Schrodinger0::Schrodinger0()
 {
-  declare("Operator",new Kernel::StringProperty);
-  declare("StartX",new Kernel::DoubleProperty);
-  declare("EndX",new Kernel::DoubleProperty);
-  declare("N",new Kernel::IntProperty);
-  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Output));
-  declare("Table",new API::WorkspaceProperty(Kernel::Property::Output));
+  declareString("Operator");
+  declareDouble("StartX");
+  declareDouble("EndX");
+  declareInt("N");
+  declareClass("Chebfun","WorkspaceManager");
+  declareClass("Table","WorkspaceManager");
 }
 
 /// Execute algorithm.
 void Schrodinger0::exec()
 {
-  API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
-  double startX = get("StartX").to<double>();
-  double endX = get("EndX").to<double>();
+  //API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
+  double startX = get("StartX");
+  double endX = get("EndX");
   if (endX <= startX)
   {
     throw std::invalid_argument("StartX must be <= EndX");
   }
-  int n = get("N").to<int>();
+  int n = get("N");
   if (n < 2)
   {
     throw std::invalid_argument("N must be > 1");
@@ -168,7 +167,7 @@ void Schrodinger0::exec()
   y /= sqrt( y.norm2() );
   std::cerr << "Energy: " << schrod->val() << ' ' << schrod->getParameter(0) << std::endl;
 
-  wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+  setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 
   chebfun test( y );
   oper->apply(y, test);
@@ -208,7 +207,7 @@ void Schrodinger0::exec()
     tc[j] = test.ypoints()[j];
   }
 
-  get("Table").as<API::WorkspaceProperty>() = tws;
+  setProperty("Table", tws);
 }
 
 } // namespace Numeric

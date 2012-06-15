@@ -3,13 +3,13 @@
 
 #include "API/DllExport.h"
 #include "API/Column.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 #include "Kernel/DynamicFactory.h"
 
 namespace API
 {
 
-class API_EXPORT ColumnFactory: public Kernel::DynamicFactory<Column>, protected API::Singleton
+class API_EXPORT ColumnFactory: public Kernel::DynamicFactory<Column>, protected Kernel::Singleton
 {
 public:
   virtual std::string name() const {return "ColumnFactory";}

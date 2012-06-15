@@ -2,7 +2,6 @@
 #include "Numeric/ChebfunWorkspace.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/WorkspaceFactory.h"
 
 #include "Kernel/CommonProperties.h"
@@ -17,25 +16,18 @@ namespace Numeric
  */
 CopyChebfun::CopyChebfun()
 {
-  declare("InputWorkspace",new API::WorkspaceProperty(Kernel::Property::Input));
-  declare("OutputWorkspace",new API::WorkspaceProperty(Kernel::Property::Output));
+  declareClass("InputWorkspace","WorkspaceManager");
+  declareClass("OutputWorkspace","WorkspaceManager");
 }
 
 void CopyChebfun::exec()
 {
-  API::WorkspaceProperty inWS = get("InputWorkspace").as<API::WorkspaceProperty>();
-  auto inws = inWS.to<ChebfunWorkspace>();
-  if (!inws)
-  {
-    throw std::runtime_error("InputWorkspace property is not a ChebfunWorkspace");
-  }
-
-  API::WorkspaceProperty outWS = get("OutputWorkspace").as<API::WorkspaceProperty>();
+  ChebfunWorkspace_sptr inws = getClass("InputWorkspace");
 
   ChebfunWorkspace *cws = new ChebfunWorkspace;
   cws->fun(0) = inws->fun(0);
 
-  outWS = boost::shared_ptr<ChebfunWorkspace>(cws);
+  setProperty("OutputWorkspace", boost::shared_ptr<ChebfunWorkspace>(cws) );
 
 }
 

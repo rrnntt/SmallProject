@@ -3,7 +3,6 @@
 #include "Numeric/ChebOperator.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/TableWorkspace.h"
 #include "API/TableColumn.h"
 #include "API/NumericColumn.h"
@@ -22,30 +21,30 @@ DECLARE_ALGORITHM(Schrodinger);
 /// Constructor. Declare algorithm properties.
 Schrodinger::Schrodinger()
 {
-  declare("Operator",new Kernel::StringProperty);
+  declareString("Operator");
   std::vector<std::string> boundary;
   //boundary.push_back("Dirichlet");
   //boundary.push_back("Cauchy");
   //declare("BoundaryConditions",new Kernel::StringProperty(boundary));
-  declare("BoundaryValues",new Kernel::StringProperty);
-  declare("StartX",new Kernel::DoubleProperty);
-  declare("EndX",new Kernel::DoubleProperty);
-  declare("N",new Kernel::IntProperty);
-  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Output));
-  declare("Table",new API::WorkspaceProperty(Kernel::Property::Output));
+  declareString("BoundaryValues");
+  declareDouble("StartX");
+  declareDouble("EndX");
+  declareInt("N");
+  declareClass("Chebfun","WorkspaceManager");
+  declareClass("Table","WorkspaceManager");
 }
 
 /// Execute algorithm.
 void Schrodinger::exec()
 {
-  API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
-  double startX = get("StartX").to<double>();
-  double endX = get("EndX").to<double>();
+  //API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
+  double startX = get("StartX");
+  double endX = get("EndX");
   if (endX <= startX)
   {
     throw std::invalid_argument("StartX must be <= EndX");
   }
-  int n = get("N").to<int>();
+  int n = get("N");
   if (n < 2)
   {
     throw std::invalid_argument("N must be > 1");
@@ -96,7 +95,7 @@ void Schrodinger::exec()
   //imin = 29;
   y.setP( v, indx[0] );
 
-  wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+  setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 
   auto tws = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory::instance().create("TableWorkspace"))
@@ -130,7 +129,7 @@ void Schrodinger::exec()
     }
   }
 
-  get("Table").as<API::WorkspaceProperty>() = tws;
+  setProperty("Table", tws);
 }
 
 } // namespace Numeric

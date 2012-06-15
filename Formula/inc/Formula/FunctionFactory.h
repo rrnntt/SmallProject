@@ -4,12 +4,12 @@
 #include "Formula/DllExport.h"
 #include "Formula/Function.h"
 #include "Kernel/DynamicFactory.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 namespace Formula
 {
 
-class FORMULA_EXPORT FunctionFactory: public Kernel::DynamicFactory<Function>, protected API::Singleton
+class FORMULA_EXPORT FunctionFactory: public Kernel::DynamicFactory<Function>, protected Kernel::Singleton
 {
 public:
   /// constructor

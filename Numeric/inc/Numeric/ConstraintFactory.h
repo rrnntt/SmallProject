@@ -7,7 +7,7 @@
 #include <vector>
 #include "Numeric/DllExport.h"
 #include "Kernel/DynamicFactory.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 namespace Kernel
 {
@@ -24,7 +24,7 @@ namespace Numeric
   class IFunction;
 
 
-  class NUMERIC_EXPORT ConstraintFactory : public Kernel::DynamicFactory<IConstraint>, protected API::Singleton
+  class NUMERIC_EXPORT ConstraintFactory : public Kernel::DynamicFactory<IConstraint>, protected Kernel::Singleton
   {
   public:
     virtual std::string name() const {return "ConstraintFactory";}

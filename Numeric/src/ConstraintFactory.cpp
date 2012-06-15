@@ -3,7 +3,7 @@
 #include "Numeric/IConstraint.h"
 #include "Kernel/Logger.h"
 #include "Kernel/EParser.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace Numeric
 {
@@ -14,11 +14,11 @@ namespace Numeric
 
     ConstraintFactory& ConstraintFactory::instance()
     {
-      API::Singleton* s = API::Framework::instance().getSingleton("WorkspaceFactory");
+      Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("WorkspaceFactory");
       if (s == nullptr)
       {
         ConstraintFactory *f = new ConstraintFactory();
-        API::Framework::instance().registerSingleton("FunctionFactory",f);
+        Kernel::Framework::instance().registerSingleton("FunctionFactory",f);
         return *f;
       }
       else

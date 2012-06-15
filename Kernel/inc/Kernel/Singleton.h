@@ -1,14 +1,14 @@
-#ifndef API_SINGLETON_H
-#define API_SINGLETON_H
+#ifndef KERNEL_SINGLETON_H
+#define KERNEL_SINGLETON_H
 
-#include "API/DllExport.h"
+#include "Kernel/DllExport.h"
 
 #include <string>
 
-namespace API
+namespace Kernel
 {
 
-class API_EXPORT Singleton
+class KERNEL_EXPORT Singleton
 {
 public:
   virtual ~Singleton(){}
@@ -32,6 +32,6 @@ C* returnSingleton(Singleton* s)
   }
 }
 
-} // API
+} // Kernel
 
-#endif // API_SINGLETON_H
+#endif // KERNEL_SINGLETON_H

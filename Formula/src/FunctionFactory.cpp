@@ -1,5 +1,5 @@
 #include "Formula/FunctionFactory.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace Formula
 {
@@ -9,11 +9,11 @@ namespace Formula
 
   FunctionFactory& FunctionFactory::instance()
   {
-    API::Singleton* s = API::Framework::instance().getSingleton("Formula::FunctionFactory");
+    Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("Formula::FunctionFactory");
     if (s == nullptr)
     {
       FunctionFactory *vf = new FunctionFactory();
-      API::Framework::instance().registerSingleton("Formula::FunctionFactory",vf);
+      Kernel::Framework::instance().registerSingleton("Formula::FunctionFactory",vf);
       return *vf;
     }
     else

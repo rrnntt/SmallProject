@@ -2,7 +2,6 @@
 #include "Numeric/ChebfunWorkspace.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/WorkspaceFactory.h"
 
 #include "Kernel/CommonProperties.h"
@@ -17,26 +16,16 @@ namespace Numeric
  */
 AddChebfun::AddChebfun()
 {
-  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::InOut));
-  declare("Other",new API::WorkspaceProperty(Kernel::Property::Input));
-  declare("Operator",new Kernel::StringProperty);
+  declareClass("Chebfun","WorkspaceManager");
+  declareClass("Other","WorkspaceManager");
+  declareString("Operator");
 }
 
 void AddChebfun::exec()
 {
-  API::WorkspaceProperty cheb = get("Chebfun").as<API::WorkspaceProperty>();
-  auto cws = cheb.to<ChebfunWorkspace>();
-  if (!cws)
-  {
-    throw std::runtime_error("Chebfun property is not a ChebfunWorkspace");
-  }
+  ChebfunWorkspace_sptr cws = getClass("Chebfun");
 
-  API::WorkspaceProperty other = get("Other").as<API::WorkspaceProperty>();
-  auto cws1 = other.to<ChebfunWorkspace>();
-  if (!cws1)
-  {
-    throw std::runtime_error("Other property is not a ChebfunWorkspace");
-  }
+  ChebfunWorkspace_sptr cws1 = getClass("Other");
 
   std::string op = get("Operator");
   if (op.empty()) op = "+";

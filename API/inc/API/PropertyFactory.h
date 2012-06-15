@@ -5,12 +5,12 @@
 #include "Kernel/Property.h"
 #include "API/DllExport.h"
 #include "API/Workspace.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 namespace API
 {
 
-class API_EXPORT PropertyFactory: public Kernel::DynamicFactory<Kernel::Property>, protected Singleton
+class API_EXPORT PropertyFactory: public Kernel::DynamicFactory<Kernel::Property>, protected Kernel::Singleton
 {
   PropertyFactory();
 public:

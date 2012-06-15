@@ -13,6 +13,7 @@ set( INC_FILES
    inc/Kernel/GeometryTypes.h
    inc/Kernel/LibraryManager.h
    inc/Kernel/LibraryWrapper.h
+   inc/Kernel/PropertyClassFactory.h
    inc/Kernel/DynamicFactory.h
    inc/Kernel/Logger.h
    inc/Kernel/Notification.h
@@ -20,8 +21,11 @@ set( INC_FILES
    inc/Kernel/Operators.h
    inc/Kernel/ParsedExpressionString.h
    inc/Kernel/Property.h
+   inc/Kernel/PropertyClass.h
    inc/Kernel/PropertyManager.h
    inc/Kernel/Str.h
+   inc/Kernel/Singleton.h
+   inc/Kernel/Framework.h
    )
 set( SRC_FILES 
   src/CommonProperties.cpp
@@ -35,8 +39,10 @@ set( SRC_FILES
   src/Operators.cpp
   src/ParsedExpressionString.cpp
   src/Property.cpp
+  src/PropertyClass.cpp
   src/PropertyManager.cpp
   src/Str.cpp
+  src/Framework.cpp
   )
 add_library( Kernel SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc)
@@ -59,6 +65,8 @@ set( SRC_FILES
   test/GeometryTypesTest.cpp
   test/ParsedExpressionStringTest.cpp
   test/PropertyTest.cpp
+  test/PropertyClassTest.cpp
+  test/PropertyManagerTest.cpp
 )
 
 add_executable(KernelTest ${SRC_FILES} ${INC_FILES})

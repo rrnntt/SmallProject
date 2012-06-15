@@ -5,7 +5,6 @@
 #include "Numeric/IFunction.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 
 #include "Kernel/CommonProperties.h"
 
@@ -16,25 +15,25 @@ DECLARE_ALGORITHM(CreateChebfun);
 
 CreateChebfun::CreateChebfun()
 {
-  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Output));
-  declare("StartX",new Kernel::DoubleProperty);
-  declare("EndX",new Kernel::DoubleProperty);
-  declare("N",new Kernel::IntProperty);
-  declare("Function",new Kernel::StringProperty);
+  declareClass("Chebfun","WorkspaceManager");
+  declareDouble("StartX");
+  declareDouble("EndX");
+  declareInt("N");
+  declareString("Function");
 }
 
 void CreateChebfun::exec()
 {
-  API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
-  std::string wsName = static_cast<std::string>(wsProp);
+  //API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
+  //std::string wsName = static_cast<std::string>(wsProp);
 
-  double startX = get("StartX").to<double>();
-  double endX = get("EndX").to<double>();
+  double startX = get("StartX");
+  double endX = get("EndX");
   if (endX <= startX)
   {
     throw std::invalid_argument("StartX must be <= EndX");
   }
-  int n = get("N").to<int>();
+  int n = get("N");
   if (n < 2)
   {
     throw std::invalid_argument("N must be > 1");
@@ -46,7 +45,7 @@ void CreateChebfun::exec()
   cws->fun(0).set(n,startX,endX);
   cws->fun(0).fit(*fun);
 
-  wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+  setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 }
 
 } // namespace Numeric

@@ -4,12 +4,12 @@
 #include "Kernel/DynamicFactory.h"
 #include "API/DllExport.h"
 #include "API/Algorithm.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 namespace API
 {
 
-class API_EXPORT AlgorithmFactory: public Kernel::DynamicFactory<Algorithm>, protected Singleton
+class API_EXPORT AlgorithmFactory: public Kernel::DynamicFactory<Algorithm>, protected Kernel::Singleton
 {
   AlgorithmFactory();
 public:

@@ -3,7 +3,6 @@
 #include "API/NumericColumn.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 
 #include "Kernel/CommonProperties.h"
 
@@ -17,34 +16,34 @@ DECLARE_ALGORITHM(CalculateColumnValues);
 
 CalculateColumnValues::CalculateColumnValues()
 {
-  declare("Workspace",new API::WorkspaceProperty(Kernel::Property::InOut));
-  declare("Column",new Kernel::StringProperty);
-  declare("Formula",new Kernel::StringProperty);
+  declareClass("Workspace","WorkspaceManager");//(Kernel::Property::InOut));
+  declareString("Column");
+  declareString("Formula");
 }
 
 /**
- * Retrieve the input table workspace from its property and validate it.
- */
+* Retrieve the input table workspace from its property and validate it.
+*/
 boost::shared_ptr<API::TableWorkspace> CalculateColumnValues::getTableWorkspace()
 {
-    API::WorkspaceProperty wsProp = get("Workspace").as<API::WorkspaceProperty>();
-    std::string wsName = static_cast<std::string>(wsProp);
-    if (wsName.empty())
-    {// TODO: this must be done by a validator
-      throw std::runtime_error("Property Workspace was not set");
-    }
-    auto tws = wsProp.to<API::TableWorkspace>();
+  API::TableWorkspace_ptr tws = getClass("Workspace");
+  //std::string wsName = static_cast<std::string>(wsProp);
+  //if (wsName.empty())
+  //{// TODO: this must be done by a validator
+  //  throw std::runtime_error("Property Workspace was not set");
+  //}
+  //auto tws = wsProp.to<API::TableWorkspace>();
 
-    if (!tws)
-    {
-      throw std::runtime_error("Workspace property is not a TableWorkspace");
-    }
+  if (!tws)
+  {
+    throw std::runtime_error("Workspace property is not a TableWorkspace");
+  }
 
-    if (tws->columnCount() == 0)
-    {
-      throw std::runtime_error("Empty table found");
-    }
-    return tws;
+  if (tws->columnCount() == 0)
+  {
+    throw std::runtime_error("Empty table found");
+  }
+  return tws;
 }
 
 void CalculateColumnValues::exec()
@@ -68,7 +67,7 @@ void CalculateColumnValues::exec()
   ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(&row)),"i");
   ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(2*acos(0.0))),"pi");
   ns->addVariable(Formula::Variable_ptr(new Formula::Scalar(exp(1.0))),"e");
-  
+
   // define vars referencing values in all num columns
   std::vector<double> columnVars(tws->columnCount());
   std::vector<size_t> columnIndex;

@@ -1,14 +1,14 @@
 #include "gtest/gtest.h"
 #include "API/TableWorkspace.h"
 #include "API/WorkspaceFactory.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <iostream>
 
 using namespace API;
 
 TEST(TableTest, LoadAscii) {
-  std::string dir = API::Framework::instance().testDirectory() + "DataObjects/";
+  std::string dir = Kernel::Framework::instance().testDirectory() + "DataObjects/";
 
   TableWorkspace tws;
   tws.loadAscii(dir + "Table.txt");

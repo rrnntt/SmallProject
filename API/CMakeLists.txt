@@ -7,13 +7,11 @@ set( INC_FILES
    inc/API/Algorithm.h
    inc/API/AlgorithmFactory.h
    inc/API/DllExport.h
-   inc/API/Framework.h
    inc/API/PropertyFactory.h
-   inc/API/Singleton.h
    inc/API/Workspace.h
    inc/API/WorkspaceFactory.h
    inc/API/WorkspaceManager.h
-   inc/API/WorkspaceProperty.h
+   #inc/API/WorkspaceProperty.h
    inc/API/Column.h
    inc/API/ColumnVector.h
    inc/API/CompoundColumn.h
@@ -27,12 +25,11 @@ set( INC_FILES
 set( SRC_FILES 
    src/Algorithm.cpp
    src/AlgorithmFactory.cpp
-   src/Framework.cpp
    src/PropertyFactory.cpp
    src/Workspace.cpp
    src/WorkspaceFactory.cpp
    src/WorkspaceManager.cpp
-   src/WorkspaceProperty.cpp
+   #src/WorkspaceProperty.cpp
    src/Column.cpp
    src/ColumnVector.cpp
    src/NumericColumn.cpp
@@ -55,7 +52,7 @@ target_link_libraries(API Kernel)
 set( SRC_FILES 
   test/main.cpp
   test/TableTest.cpp
-  test/WorkspacePropertyTest.cpp
+  #test/WorkspacePropertyTest.cpp
 )
 
 add_executable(APITest ${SRC_FILES})

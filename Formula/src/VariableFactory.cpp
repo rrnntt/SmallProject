@@ -1,5 +1,5 @@
 #include "Formula/VariableFactory.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace Formula
 {
@@ -28,11 +28,11 @@ namespace Formula
   {
     try
     {
-      API::Singleton* s = API::Framework::instance().getSingleton("VariableFactory");
+      Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("VariableFactory");
       if (s == nullptr)
       {
         VariableFactory *vf = new VariableFactory();
-        API::Framework::instance().registerSingleton("VariableFactory",vf);
+        Kernel::Framework::instance().registerSingleton("VariableFactory",vf);
         return *vf;
       }
       else

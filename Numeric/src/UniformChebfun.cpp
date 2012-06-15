@@ -4,7 +4,6 @@
 #include "API/TableColumn.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 
 #include "Kernel/CommonProperties.h"
 
@@ -17,18 +16,15 @@ DECLARE_ALGORITHM(UniformChebfun);
 
 UniformChebfun::UniformChebfun()
 {
-  declare("InputTable",new API::WorkspaceProperty(Kernel::Property::Input));
-  declare("OutputChebfun",new API::WorkspaceProperty(Kernel::Property::Output));
-  declare("XColumn",new Kernel::StringProperty);
-  declare("YColumn",new Kernel::StringProperty);
+  declareClass("InputTable","WorkspaceManager");
+  declareClass("OutputChebfun","WorkspaceManager");
+  declareString("XColumn");
+  declareString("YColumn");
 }
 
 void UniformChebfun::exec()
 {
-  API::WorkspaceProperty inProp = get("InputTable").as<API::WorkspaceProperty>();
-  auto tws = inProp.to<API::TableWorkspace>();
-
-  API::WorkspaceProperty& outProp = get("OutputChebfun").as<API::WorkspaceProperty>();
+  API::TableWorkspace_ptr tws = getClass("InputTable");
 
   std::string xColumnName = get("XColumn");
   auto xColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(xColumnName).get());
@@ -45,7 +41,7 @@ void UniformChebfun::exec()
 
   cws->fun(0).uniformFit(start,end,y);
 
-  outProp = boost::shared_ptr<Numeric::ChebfunWorkspace>(cws);
+  setProperty("OutputChebfun", boost::shared_ptr<Numeric::ChebfunWorkspace>(cws));
 
 }
 

@@ -5,7 +5,6 @@
 #include "Numeric/ChebFunction.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 #include "API/TableWorkspace.h"
 #include "API/TableColumn.h"
 #include "API/NumericColumn.h"
@@ -21,7 +20,7 @@ DECLARE_ALGORITHM(SchrodScale);
 /// Constructor. Declare algorithm properties.
 SchrodScale::SchrodScale()
 {
-  declare("Table",new API::WorkspaceProperty(Kernel::Property::Output));
+  declareClass("Table","WorkspaceManager");
 }
 
 /// Execute algorithm.
@@ -85,7 +84,7 @@ void SchrodScale::exec()
     ydata[i] = y.ypoints()[i];
   }
 
-  get("Table").as<API::WorkspaceProperty>() = tws;
+  setProperty("Table", tws);
 }
 
 } // namespace Numeric

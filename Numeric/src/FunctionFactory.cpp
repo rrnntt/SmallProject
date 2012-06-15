@@ -5,7 +5,7 @@
 #include "Numeric/ConstraintFactory.h"
 #include "Numeric/IConstraint.h"
 #include "Kernel/EParser.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <sstream>
 
@@ -14,11 +14,11 @@ namespace Numeric
 
     FunctionFactory& FunctionFactory::instance()
     {
-      Singleton* s = API::Framework::instance().getSingleton("Numeric::FunctionFactory");
+      Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("Numeric::FunctionFactory");
       if (s == nullptr)
       {
         FunctionFactory *f = new FunctionFactory();
-        API::Framework::instance().registerSingleton("Numeric::FunctionFactory",f);
+        Kernel::Framework::instance().registerSingleton("Numeric::FunctionFactory",f);
         return *f;
       }
       else

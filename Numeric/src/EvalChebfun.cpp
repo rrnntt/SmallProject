@@ -4,7 +4,6 @@
 #include "API/TableColumn.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 
 #include "Kernel/CommonProperties.h"
 
@@ -16,20 +15,18 @@ DECLARE_ALGORITHM(EvalChebfun);
 /// Constructor. Declare algorithm properties.
 EvalChebfun::EvalChebfun()
 {
-  declare("Table",new API::WorkspaceProperty(Kernel::Property::InOut));
-  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Input));
-  declare("XColumn",new Kernel::StringProperty);
-  declare("YColumn",new Kernel::StringProperty);
+  declareClass("Table","WorkspaceManager");
+  declareClass("Chebfun","WorkspaceManager");
+  declareString("XColumn");
+  declareString("YColumn");
 }
 
 /// Execute algorithm.
 void EvalChebfun::exec()
 {
-  API::WorkspaceProperty tableProp = get("Table").as<API::WorkspaceProperty>();
-  auto tws = tableProp.to<API::TableWorkspace>();
+  API::TableWorkspace_ptr tws = getClass("Table");
 
-  API::WorkspaceProperty chebProp = get("Chebfun").as<API::WorkspaceProperty>();
-  auto cws = chebProp.to<Numeric::ChebfunWorkspace>();
+  ChebfunWorkspace_sptr cws = getClass("Chebfun");
 
   std::string xColumnName = get("XColumn");
   auto xColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(xColumnName).get());

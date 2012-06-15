@@ -8,7 +8,7 @@
 #include "Numeric/DllExport.h"
 #include "Kernel/DynamicFactory.h"
 #include "Kernel/Logger.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -34,7 +34,7 @@ namespace Numeric
     It is implemented as a singleton class.
 */
 
-  class NUMERIC_EXPORT FunctionFactory : public Kernel::DynamicFactory<IFunction>, protected API::Singleton
+  class NUMERIC_EXPORT FunctionFactory : public Kernel::DynamicFactory<IFunction>, protected Kernel::Singleton
   {
   public:
     virtual std::string name() const {return "Numeric::FunctionFactory";}

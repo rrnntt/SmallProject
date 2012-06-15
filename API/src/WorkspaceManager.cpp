@@ -1,5 +1,5 @@
 #include "API/WorkspaceManager.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <iostream>
 namespace API
@@ -11,11 +11,11 @@ WorkspaceManager::WorkspaceManager(const std::string& name):Kernel::DataService<
 
 WorkspaceManager& WorkspaceManager::instance()
 {
-  API::Singleton* s = API::Framework::instance().getSingleton("WorkspaceManager");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("WorkspaceManager");
   if (s == nullptr)
   {
     WorkspaceManager *f = new WorkspaceManager("WorkspaceManager");
-    API::Framework::instance().registerSingleton("WorkspaceManager",f);
+    Kernel::Framework::instance().registerSingleton("WorkspaceManager",f);
     return *f;
   }
   else
@@ -44,6 +44,15 @@ void WorkspaceManager::addOrReplace(const std::string& WorkspaceName,Workspace_p
 {
   Kernel::DataService<Workspace>::addOrReplace(WorkspaceName,ws);
   ws->setName(WorkspaceName);
+}
+
+/**
+ * Implement Kernel::PropertyClassFactory method
+ * @param value :: A workspace name which must be in this manager
+ */
+boost::shared_ptr<Kernel::PropertyClass> WorkspaceManager::createProperty(const std::string& value) const
+{
+  return retrieve( value );
 }
 
 } // API

@@ -3,7 +3,6 @@
 #include "Numeric/ChebOperator.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 
 #include "Kernel/CommonProperties.h"
 #include "Kernel/EParser.h"
@@ -18,31 +17,31 @@ DECLARE_ALGORITHM(SolveODE);
 /// Constructor. Declare algorithm properties.
 SolveODE::SolveODE()
 {
-  declare("Operator",new Kernel::StringProperty);
+  declareString("Operator");
   std::vector<std::string> boundary;
   boundary.push_back("Dirichlet");
   boundary.push_back("Cauchy");
-  declare("BoundaryConditions",new Kernel::StringProperty(boundary));
-  declare("BoundaryValues",new Kernel::StringProperty);
-  declare("StartX",new Kernel::DoubleProperty);
-  declare("EndX",new Kernel::DoubleProperty);
-  declare("N",new Kernel::IntProperty);
-  declare("Chebfun",new API::WorkspaceProperty(Kernel::Property::Output));
+  declareString("BoundaryConditions");
+  declareString("BoundaryValues");
+  declareDouble("StartX");
+  declareDouble("EndX");
+  declareInt("N");
+  declareClass("Chebfun","WorkspaceManager");
 }
 
 /// Execute algorithm.
 void SolveODE::exec()
 {
-  API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
-  std::string wsName = static_cast<std::string>(wsProp);
+  //API::WorkspaceProperty wsProp = get("Chebfun").as<API::WorkspaceProperty>();
+  //std::string wsName = static_cast<std::string>(wsProp);
 
-  double startX = get("StartX").to<double>();
-  double endX = get("EndX").to<double>();
+  double startX = get("StartX");
+  double endX = get("EndX");
   if (endX <= startX)
   {
     throw std::invalid_argument("StartX must be <= EndX");
   }
-  int n = get("N").to<int>();
+  int n = get("N");
   if (n < 2)
   {
     throw std::invalid_argument("N must be > 1");
@@ -101,7 +100,7 @@ void SolveODE::exec()
   oper->log();
   oper->solve(cws->fun(0), *bc);
 
-  wsProp = boost::shared_ptr<ChebfunWorkspace>(cws);
+  setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 }
 
 } // namespace Numeric

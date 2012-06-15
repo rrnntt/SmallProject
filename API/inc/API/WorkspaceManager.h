@@ -3,13 +3,14 @@
 
 #include "API/DllExport.h"
 #include "API/Workspace.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 #include "Kernel/DataService.h"
+#include "Kernel/PropertyClassFactory.h"
 
 namespace API
 {
 
-class API_EXPORT WorkspaceManager: public Kernel::DataService<Workspace>, protected Singleton
+class API_EXPORT WorkspaceManager: public Kernel::DataService<Workspace>, protected Kernel::Singleton, public Kernel::PropertyClassFactory
 {
 public:
   virtual std::string name() const {return "WorkspaceManager";}
@@ -20,6 +21,7 @@ public:
   void addOrReplace(const std::string& WorkspaceName,Workspace_ptr ws);
   template<class WS>
   std::vector<boost::shared_ptr<WS> > getAllOf() const;
+  boost::shared_ptr<Kernel::PropertyClass> createProperty(const std::string& value) const;
 
 protected:
   WorkspaceManager(const std::string& name);

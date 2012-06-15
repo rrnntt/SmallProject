@@ -1,11 +1,11 @@
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <boost/filesystem.hpp>
 #include <iostream>
 
 using namespace boost::filesystem;
 
-namespace API
+namespace Kernel
 {
     struct APIStuff
   {
@@ -122,4 +122,4 @@ const std::string Framework::testDirectory() const
   return m_binDirectory + "../../../TestData/";
 }
 
-} // API
+} // Kernel

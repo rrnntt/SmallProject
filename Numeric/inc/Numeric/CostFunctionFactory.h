@@ -3,7 +3,7 @@
 
 #include "Numeric/DllExport.h"
 #include "Numeric/ICostFunction.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 #include "Kernel/DynamicFactory.h"
 
 namespace Numeric
@@ -12,7 +12,7 @@ namespace Numeric
 /**
  * A factory for dynamically creating instances of ICostFunction.
  */
-class NUMERIC_EXPORT CostFunctionFactory: public Kernel::DynamicFactory<ICostFunction>, protected API::Singleton
+class NUMERIC_EXPORT CostFunctionFactory: public Kernel::DynamicFactory<ICostFunction>, protected Kernel::Singleton
 {
 public:
   virtual std::string name() const {return "CostFunctionFactory";}
