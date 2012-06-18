@@ -1,6 +1,6 @@
 #include "QtAPI/CurveManager.h"
 
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace QtAPI
 {
@@ -11,11 +11,11 @@ CurveManager::CurveManager()
 
 CurveManager& CurveManager::instance()
 {
-  Singleton* s = API::Framework::instance().getSingleton("CurveManager");
+  Singleton* s = Kernel::Framework::instance().getSingleton("CurveManager");
   if (s == nullptr)
   {
     CurveManager *f = new CurveManager();
-    API::Framework::instance().registerSingleton("CurveManager",f);
+    Kernel::Framework::instance().registerSingleton("CurveManager",f);
     return *f;
   }
   else

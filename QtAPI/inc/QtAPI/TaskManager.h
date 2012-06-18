@@ -4,14 +4,14 @@
 #include "QtAPI/DllExport.h"
 #include "QtAPI/Task.h"
 #include "Kernel/DataService.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 #include <set>
 
 namespace QtAPI
 {
 
-class QTAPI_EXPORT TaskManager: public Kernel::DataService<Task>, protected API::Singleton
+class QTAPI_EXPORT TaskManager: public Kernel::DataService<Task>, protected Kernel::Singleton
 {
 public:
   virtual std::string name() const {return "TaskManager";}

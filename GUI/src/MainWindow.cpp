@@ -5,7 +5,7 @@
 #include "WorkspaceExplorer.h"
 #include "FitBrowser.h"
 
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include "QtAPI/FileTask.h"
 #include "QtAPI/TaskManager.h"
@@ -55,7 +55,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent*)
 {
-  API::Framework::instance().unRegisterSingleton("WindowManager",false);
+  Kernel::Framework::instance().unRegisterSingleton("WindowManager",false);
 }
 
 QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)

@@ -37,7 +37,7 @@ AlgorithmDialog::AlgorithmDialog(QWidget *parent,const std::string& algName) :
   {
     auto& prop = m_algorithm->get(*name);
     QWidget* edit = NULL;
-    auto strProp = dynamic_cast<Kernel::StringProperty*>( &prop );
+    auto strProp = dynamic_cast<const Kernel::StringProperty*>( &prop );
     if ( strProp )
     {
       auto keys = strProp->getValues();
@@ -89,11 +89,11 @@ void AlgorithmDialog::accept()
       QWidget* edit = prop.value();
       if ( dynamic_cast<QLineEdit*>( edit ) )
       {
-        m_algorithm->get(prop.key()) = dynamic_cast<QLineEdit*>( edit )->text().toStdString();
+        m_algorithm->setProperty(prop.key(), dynamic_cast<QLineEdit*>( edit )->text().toStdString());
       }
       else if ( dynamic_cast<QComboBox*>( edit ) )
       {
-        m_algorithm->get(prop.key()) = dynamic_cast<QComboBox*>( edit )->currentText().toStdString();
+        m_algorithm->setProperty(prop.key(), dynamic_cast<QComboBox*>( edit )->currentText().toStdString());
       }
     }
   }

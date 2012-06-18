@@ -1,6 +1,6 @@
 #include "QtAPI/WindowManager.h"
 #include "QtAPI/TaskManager.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <QtGui/QMenuBar>
 #include <QtCore/QMap>
@@ -19,13 +19,13 @@ m_idSeed(1)
  */
 void WindowManager::createWindowManager(WindowManager* manager)
 {
-  API::Framework::instance().registerSingleton("WindowManager",manager);
-  API::Framework::instance().openAllLibraries();// it needs a better place to be called from
+  Kernel::Framework::instance().registerSingleton("WindowManager",manager);
+  Kernel::Framework::instance().openAllLibraries();// it needs a better place to be called from
 }
 
 WindowManager& WindowManager::instance()
 {
-  Singleton* s = API::Framework::instance().getSingleton("WindowManager");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("WindowManager");
   if (s == nullptr)
   {
     // call createWindowManager(...) first

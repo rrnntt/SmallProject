@@ -2,7 +2,7 @@
 #define QTAPI_CURVEMANAGER_H
 
 #include "QtAPI/DllExport.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 #include "QtAPI/PlotCurve.h"
 
 #include <QObject>
@@ -12,7 +12,7 @@
 namespace QtAPI
 {
 
-class QTAPI_EXPORT CurveManager: public QObject, protected API::Singleton
+class QTAPI_EXPORT CurveManager: public QObject, protected Kernel::Singleton
 {
   Q_OBJECT
 public:

@@ -5,7 +5,7 @@
 #include "API/TableWorkspace.h"
 #include "API/NumericColumn.h"
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
+//#include "Kernel/WorkspaceProperty.h"
 
 // qwt includes
 #include "qwt_scale_div.h"
@@ -287,28 +287,28 @@ void TableDialog::applyDistribution()
     if (distrName == "Uniform")
     {
       alg = API::AlgorithmFactory::instance().createAlgorithm("CreateUniformRandomData");
-      alg->get("Workspace") = m_workspace->name();
-      alg->get("MinValue") = ui->leDistrParam1->text().toStdString();
-      alg->get("MaxValue") = ui->leDistrParam2->text().toStdString();
-      alg->get("Column") = column->name();
+      alg->setProperty("Workspace", m_workspace);
+      alg->setProperty("MinValue", ui->leDistrParam1->text().toStdString());
+      alg->setProperty("MaxValue", ui->leDistrParam2->text().toStdString());
+      alg->setProperty("Column", column->name());
     }
     else if (distrName == "Poisson")
     {
       alg = API::AlgorithmFactory::instance().createAlgorithm("CreateDistribution");
-      alg->get("Workspace") = m_workspace->name();
-      alg->get("Column") = column->name();
-      alg->get("Distribution") = "poisson";
-      alg->get("Mean") = ui->leDistrParam1->text().toStdString();
-      alg->get("Sigma") = ui->leDistrParam2->text().toStdString();
+      alg->setProperty("Workspace", m_workspace);
+      alg->setProperty("Column", column->name());
+      alg->setProperty("Distribution", "poisson");
+      alg->setProperty("Mean", ui->leDistrParam1->text().toStdString());
+      alg->setProperty("Sigma", ui->leDistrParam2->text().toStdString());
     }
     else if (distrName == "Normal")
     {
       alg = API::AlgorithmFactory::instance().createAlgorithm("CreateDistribution");
-      alg->get("Workspace") = m_workspace->name();
-      alg->get("Column") = column->name();
-      alg->get("Distribution") = "normal";
-      alg->get("Mean") = ui->leDistrParam1->text().toStdString();
-      alg->get("Sigma") = ui->leDistrParam2->text().toStdString();
+      alg->setProperty("Workspace", m_workspace);
+      alg->setProperty("Column", column->name());
+      alg->setProperty("Distribution", "normal");
+      alg->setProperty("Mean", ui->leDistrParam1->text().toStdString());
+      alg->setProperty("Sigma", ui->leDistrParam2->text().toStdString());
     }
 
     if (!alg) return;
@@ -339,9 +339,9 @@ void TableDialog::applyFormula()
   {
     //m_workspace->fillColumn(column->name(),expStr);
     auto alg = API::AlgorithmFactory::instance().createAlgorithm("CalculateColumnValues");
-    alg->get("Workspace").as<API::WorkspaceProperty>() = m_workspace;
-    alg->get("Column") = column->name();
-    alg->get("Formula") = expStr;
+    alg->setProperty("Workspace", m_workspace);
+    alg->setProperty("Column", column->name());
+    alg->setProperty("Formula", expStr);
     alg->execute();
   }
   catch(std::exception& e)

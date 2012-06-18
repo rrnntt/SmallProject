@@ -63,7 +63,7 @@ TEST(PropertyTest, Property)
   str = *p;
   EXPECT_EQ(str,"3.14");
 
-  d = static_cast<double>(i);
+  d = (int)i;
   EXPECT_EQ(static_cast<double>(d),10.0);
 
   DoubleProperty d1 = *p;

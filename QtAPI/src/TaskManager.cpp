@@ -4,7 +4,7 @@
 #include "QtAPI/PlotTask.h"
 #include "QtAPI/TaskFactory.h"
 
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <QMessageBox>
 
@@ -24,11 +24,11 @@ TaskManager::TaskManager(const std::string& name):Kernel::DataService<Task>(name
 
 TaskManager& TaskManager::instance()
 {
-  API::Singleton* s = API::Framework::instance().getSingleton("TaskManager");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("TaskManager");
   if (s == nullptr)
   {
     TaskManager *f = new TaskManager("TaskManager");
-    API::Framework::instance().registerSingleton("TaskManager",f);
+    Kernel::Framework::instance().registerSingleton("TaskManager",f);
     return *f;
   }
   else

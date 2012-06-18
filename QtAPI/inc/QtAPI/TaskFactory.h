@@ -5,12 +5,12 @@
 #include "QtAPI/Task.h"
 #include "QtAPI/TaskManager.h"
 #include "Kernel/DynamicFactory.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 namespace QtAPI
 {
 
-class QTAPI_EXPORT TaskFactory: public Kernel::DynamicFactory<Task>, protected API::Singleton
+class QTAPI_EXPORT TaskFactory: public Kernel::DynamicFactory<Task>, protected Kernel::Singleton
 {
 public:
   TaskFactory();

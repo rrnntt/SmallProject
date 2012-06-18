@@ -16,9 +16,9 @@ DECLARE_ALGORITHM(CreateChebfun);
 CreateChebfun::CreateChebfun()
 {
   declareClass("Chebfun","WorkspaceManager");
-  declareDouble("StartX");
-  declareDouble("EndX");
-  declareInt("N");
+  declareDouble("StartX",-1.0);
+  declareDouble("EndX",1.0);
+  declareInt("N",24);
   declareString("Function");
 }
 

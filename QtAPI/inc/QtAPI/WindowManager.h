@@ -3,7 +3,7 @@
 
 #include "QtAPI/DllExport.h"
 #include "QtAPI/SubWindow.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
@@ -15,7 +15,7 @@ namespace QtAPI
 
 class WindowManagerQObjectHelper;
 
-class QTAPI_EXPORT WindowManager: protected API::Singleton
+class QTAPI_EXPORT WindowManager: protected Kernel::Singleton
 {
 public:
   WindowManager();
