@@ -61,13 +61,11 @@ namespace Kernel
    */
   Property& ClassProperty::operator=(const std::string& str)
   {
-    auto factory = Framework::instance().getSingleton(m_valueFactoryType);
-    auto psFactory = dynamic_cast<PropertyClassFactory*>(factory);
-    if ( psFactory )
+    if ( !m_valueFactory )
     {
-      m_value = psFactory->createProperty( str );
+      throw std::runtime_error("Value factory isn't defined for class property");
     }
-
+    m_value = m_valueFactory->createProperty( str );
     return *this;
   }
 

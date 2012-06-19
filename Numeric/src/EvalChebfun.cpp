@@ -15,8 +15,8 @@ DECLARE_ALGORITHM(EvalChebfun);
 /// Constructor. Declare algorithm properties.
 EvalChebfun::EvalChebfun()
 {
-  declareClass("Table","WorkspaceManager");
-  declareClass("Chebfun","WorkspaceManager");
+  declareWorkspace("Table");
+  declareWorkspace("Chebfun");
   declareString("XColumn");
   declareString("YColumn");
 }

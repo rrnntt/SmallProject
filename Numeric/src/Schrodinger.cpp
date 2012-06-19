@@ -30,8 +30,8 @@ Schrodinger::Schrodinger()
   declareDouble("StartX");
   declareDouble("EndX");
   declareInt("N");
-  declareClass("Chebfun","WorkspaceManager");
-  declareClass("Table","WorkspaceManager");
+  declareWorkspace("Chebfun");
+  declareWorkspace("Table");
 }
 
 /// Execute algorithm.

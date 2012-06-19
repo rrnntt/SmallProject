@@ -26,7 +26,7 @@ SolveODE::SolveODE()
   declareDouble("StartX");
   declareDouble("EndX");
   declareInt("N");
-  declareClass("Chebfun","WorkspaceManager");
+  declareWorkspace("Chebfun");
 }
 
 /// Execute algorithm.

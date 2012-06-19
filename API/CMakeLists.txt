@@ -51,6 +51,7 @@ target_link_libraries(API Kernel)
 
 set( SRC_FILES 
   test/main.cpp
+  test/AlgorithmTest.cpp
   test/TableTest.cpp
   #test/WorkspacePropertyTest.cpp
 )

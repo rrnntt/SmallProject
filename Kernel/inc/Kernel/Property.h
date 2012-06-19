@@ -13,7 +13,11 @@
 
 namespace Kernel
 {
+  //------------------------------------------------------
+  //   Forward declarations
+  //------------------------------------------------------
   class PropertyClass;
+  class PropertyClassFactory;
 
   /** 
    * Base class for a property.
@@ -24,7 +28,7 @@ namespace Kernel
 
     enum Direction {Input, Output, InOut};
     /// Default constructor
-    Property():m_isDefault(true){}
+    Property(Direction dir = InOut):m_isDefault(true),m_direction(dir){}
     /// Virtual Destructor
     virtual ~Property(){}
 
@@ -34,6 +38,8 @@ namespace Kernel
 
     /// Is property default?
     bool isDefault() const {return m_isDefault;}
+    /// Get the direction of the property
+    Direction direction() const {return m_direction;}
 
     /// If this is a double property return its value
     operator double() const;
@@ -42,46 +48,30 @@ namespace Kernel
     /// If this is a bool property return its value
     operator bool() const;
 
-    template<class P>
-    P& as()
-    {
-      P* p = dynamic_cast<P*>(this);
-      if (!p)
-      {
-        throw std::runtime_error("Incompatible property types");
-      }
-      return *p;
-    }
-
-    /// Return underlying value of type T
-    template<typename T>
-    T to();
-
   protected:
 
     /// True if the property has its default value
     bool m_isDefault;
+    /// Property's direction
+    Direction m_direction;
 
     friend class PropertyManager;
   };
 
+  /**
+   * A template for common properties of simple types: double, int, bool and string.
+   */
   template<typename T>
   class PropertyType: public Property
   {
   public:
-    PropertyType():Property(),m_value(){}
-    PropertyType(const T& value) : m_value(value) {}
+    PropertyType(Direction dir = InOut):Property(dir),m_value(){}
+    PropertyType(const T& value, Direction dir = InOut) : Property(dir), m_value(value) {}
     virtual operator T() const  = 0;
     virtual Property& operator=(const T& value) = 0;
   protected:
     T m_value;
   };
-
-  template<typename T>
-  T Property::to()
-  {
-    return static_cast<T>(*dynamic_cast<PropertyType<T>* >(this));
-  }
 
   /**
    * Property of type PropertyClass
@@ -90,7 +80,7 @@ namespace Kernel
   {
   public:
     /// Constructor
-    ClassProperty(const std::string& type):Property(),m_valueFactoryType(type){}
+    ClassProperty(PropertyClassFactory* valueFactory, Direction dir = InOut):Property(dir),m_valueFactory(valueFactory){}
     /// Set a bare pointer
     void set(PropertyClass* barePointer);
     /// Set a shared pointer
@@ -101,8 +91,8 @@ namespace Kernel
     /// Property value
     boost::shared_ptr<PropertyClass> m_value;
 
-    /// Actual property type
-    const std::string m_valueFactoryType;
+    /// Pointer to the value factory
+    PropertyClassFactory* m_valueFactory;
 
     friend class PropertyManager;
   };

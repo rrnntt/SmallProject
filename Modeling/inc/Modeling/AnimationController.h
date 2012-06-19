@@ -2,7 +2,7 @@
 #define MODELING_ANIMATIONCONTROLLER_H
 
 #include "Modeling/DllExport.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 #include <osgAnimation/BasicAnimationManager>
 #include <osgAnimation/Bone>
@@ -10,7 +10,7 @@
 namespace Modeling
 {
 
-class MODELING_EXPORT AnimationController: protected API::Singleton
+class MODELING_EXPORT AnimationController: protected Kernel::Singleton
 {
 public:
   AnimationController();

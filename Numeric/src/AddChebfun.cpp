@@ -16,8 +16,8 @@ namespace Numeric
  */
 AddChebfun::AddChebfun()
 {
-  declareClass("Chebfun","WorkspaceManager");
-  declareClass("Other","WorkspaceManager");
+  declareWorkspace("Chebfun");
+  declareWorkspace("Other");
   declareString("Operator");
 }
 

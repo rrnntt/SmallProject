@@ -6,6 +6,7 @@
 //----------------------------------------------------------------------
 #include "Kernel/DllExport.h"
 #include "Kernel/Property.h"
+#include "Kernel/PropertyClassFactory.h"
 
 #include <vector>
 
@@ -50,11 +51,11 @@ namespace Kernel
     /* class property */
 
     /// Add a new class property
-    void declareClass(const std::string& name, const std::string& valueFactory);
+    void declareClass(const std::string& name, PropertyClassFactory* valueFactory, Property::Direction dir = Property::InOut);
     /// Set a value of a class property
     void setProperty(const std::string& name, PropertyClass* value);
     /// Set a value of a class property
-    void setProperty(const std::string& name, boost::shared_ptr<PropertyClass> value);
+    void setProperty(const std::string& name, boost::shared_ptr<PropertyClass> value) {setClassProperty( name, value );}
     template<class T>
     void setProperty(const std::string& name, boost::shared_ptr<T> value)
     {
@@ -67,6 +68,7 @@ namespace Kernel
     void declare(const std::string& name, Property* prop);
     /// Return a pointer to a property 
     Property* getPropertyPointer(const std::string& name) const;
+    virtual void setClassProperty(const std::string& name, boost::shared_ptr<PropertyClass> value);
 
     /// Property storage
     std::vector<Storage> m_properties;

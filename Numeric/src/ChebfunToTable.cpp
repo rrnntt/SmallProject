@@ -22,8 +22,8 @@ namespace Numeric
  */
 ChebfunToTable::ChebfunToTable()
 {
-  declareClass("InputWorkspace","WorkspaceManager");
-  declareClass("OutputWorkspace","WorkspaceManager");
+  declareWorkspace("InputWorkspace");
+  declareWorkspace("OutputWorkspace");
   declareInt("N");
 }
 

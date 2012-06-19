@@ -141,7 +141,7 @@ namespace Kernel
   {
     auto prop = getPropertyPointer(name);
     *prop = value;
-      prop->m_isDefault = false;
+     prop->m_isDefault = false;
   }
 
   /**
@@ -157,6 +157,7 @@ namespace Kernel
       throw std::runtime_error("Property " + name + " is not a class.");
     }
     prop->m_value.reset( value );
+    //value->store(); // store a workspace (or something) in a data storage
   }
 
   /**
@@ -164,7 +165,7 @@ namespace Kernel
    * @param name :: Property name
    * @param value :: New property value
    */
-  void PropertyManager::setProperty(const std::string& name, boost::shared_ptr<PropertyClass> value)
+  void PropertyManager::setClassProperty(const std::string& name, boost::shared_ptr<PropertyClass> value)
   {
     auto prop = dynamic_cast<ClassProperty*>( getPropertyPointer(name) );
     if ( !prop )
@@ -172,6 +173,7 @@ namespace Kernel
       throw std::runtime_error("Property " + name + " is not a class.");
     }
     prop->m_value = value;
+    //value->store(); // store a workspace (or something) in a data storage
   }
 
 
@@ -226,9 +228,9 @@ namespace Kernel
    * Add a new class property
    * @param name :: Property name
    */
-  void PropertyManager::declareClass(const std::string& name, const std::string& valueFactory)
+  void PropertyManager::declareClass(const std::string& name, PropertyClassFactory* valueFactory, Property::Direction dir)
   {
-    declare( name, new ClassProperty( valueFactory ) );
+    declare( name, new ClassProperty( valueFactory, dir ) );
   }
 
   ClassPropertyHelper PropertyManager::getClass(const std::string& name) const

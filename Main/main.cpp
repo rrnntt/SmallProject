@@ -1,4 +1,4 @@
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 #include "test_spirit.h"
 #include "test_parser.h"
 #include "test_problem.h"
@@ -7,7 +7,7 @@
 
 int main( int argc, char** argv )
 {
-  API::Framework::instance().parseCommandLine(argc,argv);
+  Kernel::Framework::instance().parseCommandLine(argc,argv);
   test_problem();
   return 0;
 }

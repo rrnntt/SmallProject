@@ -1,4 +1,5 @@
 #include "API/Algorithm.h"
+#include "API/WorkspaceManager.h"
 #include "Kernel/Logger.h"
 
 #include <stdexcept>
@@ -30,5 +31,28 @@ namespace API
     }
   }
 
+  /**
+   * Declare a workspace property.
+   */
+  void Algorithm::declareWorkspace(const std::string& propName, Kernel::Property::Direction dir)
+  {
+    declareClass( propName, &WorkspaceManager::instance(), dir );
+  }
+
+  /// Set a value of a workspace property
+  void Algorithm::setClassProperty(const std::string& name, boost::shared_ptr<Kernel::PropertyClass> value)
+  {
+    auto ws = boost::dynamic_pointer_cast<Workspace>( value );
+    if ( ws )
+    {
+      Workspace_ptr oldValue = getClass(name);
+      const std::string wsName = oldValue->name();
+      if ( !wsName.empty() )
+      {
+        WorkspaceManager::instance().addOrReplace( wsName, ws );
+      }
+    }
+    Kernel::PropertyManager::setClassProperty( name, value );
+  }
 
 } // API

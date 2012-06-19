@@ -5,6 +5,20 @@
 namespace API
 {
 
+namespace
+{
+  /**
+   * Dummy workspace class to represent output workspace property values during
+   * when the workspace name is set but the value (pointer) is undefined.
+   */
+  class DummyWorkspace: public Workspace
+  {
+  public:
+    /// Dummy id
+    std::string id()const {return "DummyWorkspace";}
+  };
+}
+
 WorkspaceManager::WorkspaceManager(const std::string& name):Kernel::DataService<Workspace>(name)
 {
 }
@@ -52,7 +66,13 @@ void WorkspaceManager::addOrReplace(const std::string& WorkspaceName,Workspace_p
  */
 boost::shared_ptr<Kernel::PropertyClass> WorkspaceManager::createProperty(const std::string& value) const
 {
-  return retrieve( value );
+  if ( this->doesExist( value ) )
+  {
+    return retrieve( value );
+  }
+  auto dummy = new DummyWorkspace;
+  dummy->setName( value );
+  return Workspace_ptr( dummy );
 }
 
 } // API

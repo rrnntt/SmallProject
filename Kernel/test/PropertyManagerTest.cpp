@@ -63,9 +63,10 @@ TEST(Kernel_PropertyManager_Test, SimpleTypes)
 
 TEST(Kernel_PropertyManager_Test, ClassProperty)
 {
-  Framework::instance().registerSingleton("TestClass", new TestClassFactory );
+  auto factory = new TestClassFactory;
+  Framework::instance().registerSingleton("TestClass", factory );
   PropertyManager mgr;
-  mgr.declareClass( "c", "TestClass" );
+  mgr.declareClass( "c", factory );
 
   auto tc = new TestClass;
   mgr.setProperty( "c", tc );

@@ -20,7 +20,7 @@ DECLARE_ALGORITHM(SchrodScale);
 /// Constructor. Declare algorithm properties.
 SchrodScale::SchrodScale()
 {
-  declareClass("Table","WorkspaceManager");
+  declareWorkspace("Table");
 }
 
 /// Execute algorithm.

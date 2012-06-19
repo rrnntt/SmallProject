@@ -18,7 +18,7 @@ namespace DataObjects
 
   CreateDistribution::CreateDistribution()
   {
-    declareClass("Workspace","WorkspaceManager");
+    declareWorkspace("Workspace");
     declareString("Column");
     declareString("Distribution");
     declareDouble("Mean");

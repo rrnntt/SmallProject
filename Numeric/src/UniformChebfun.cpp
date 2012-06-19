@@ -16,8 +16,8 @@ DECLARE_ALGORITHM(UniformChebfun);
 
 UniformChebfun::UniformChebfun()
 {
-  declareClass("InputTable","WorkspaceManager");
-  declareClass("OutputChebfun","WorkspaceManager");
+  declareWorkspace("InputTable");
+  declareWorkspace("OutputChebfun");
   declareString("XColumn");
   declareString("YColumn");
 }

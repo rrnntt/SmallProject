@@ -34,10 +34,13 @@ namespace API
     /// @param listener :: Pointer to a listener. The pointer must be valid during life-time
     /// of the algorithm. 
     void addListener(AlgorithmListener* listener){m_listeners.push_back(listener);}
+    /// Set a value of a class property
+    void setClassProperty(const std::string& name, boost::shared_ptr<Kernel::PropertyClass> value);
   protected:
     virtual void exec() = 0;
     /// Send a progress report to the listeners
     void sendProgress(size_t current, size_t maximum);
+    void declareWorkspace(const std::string& propName, Kernel::Property::Direction dir = Kernel::Property::InOut);
 
     std::vector<AlgorithmListener*> m_listeners;
     Kernel::Logger& g_log;

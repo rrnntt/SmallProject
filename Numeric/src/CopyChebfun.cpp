@@ -16,8 +16,8 @@ namespace Numeric
  */
 CopyChebfun::CopyChebfun()
 {
-  declareClass("InputWorkspace","WorkspaceManager");
-  declareClass("OutputWorkspace","WorkspaceManager");
+  declareWorkspace("InputWorkspace");
+  declareWorkspace("OutputWorkspace");
 }
 
 void CopyChebfun::exec()

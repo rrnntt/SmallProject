@@ -13,9 +13,15 @@ namespace Kernel
 class KERNEL_EXPORT PropertyClass
 {
 public:
+  /// Default constructor
   PropertyClass();
+  /// Virtual destructor
   virtual ~PropertyClass();
+  /// Return string representation
   virtual std::string asString() const = 0;
+  /// Implement if class instance must be stored somewhere. Called from PropertyManager::setProperty()
+  /// @param nm :: Name of this property in a PropertyManager
+  virtual void store(const std::string& nm) {(void)nm;}
 };
 
 } // KERNEL

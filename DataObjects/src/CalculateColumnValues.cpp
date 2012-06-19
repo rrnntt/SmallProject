@@ -16,7 +16,7 @@ DECLARE_ALGORITHM(CalculateColumnValues);
 
 CalculateColumnValues::CalculateColumnValues()
 {
-  declareClass("Workspace","WorkspaceManager");//(Kernel::Property::InOut));
+  declareWorkspace("Workspace");//(Kernel::Property::InOut));
   declareString("Column");
   declareString("Formula");
 }

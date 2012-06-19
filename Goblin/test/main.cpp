@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  API::Framework::instance().parseCommandLine(argc,argv);
+  Kernel::Framework::instance().parseCommandLine(argc,argv);
   return RUN_ALL_TESTS();
 }

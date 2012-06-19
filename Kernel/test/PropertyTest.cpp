@@ -34,7 +34,7 @@ TEST(PropertyTest, DoubleProperty)
   EXPECT_TRUE(pd != nullptr);
   EXPECT_EQ(double(*pd),1.23);
 
-  double d1 = p->to<double>();
+  double d1 = *p;
   EXPECT_EQ(d1,1.23);
 
 }
@@ -46,7 +46,7 @@ TEST(PropertyTest, IntProperty)
 
   Property* prop = &p;
 
-  int i = prop->to<int>();
+  int i = *prop;
   EXPECT_EQ(i,10);
 }
 
@@ -69,10 +69,8 @@ TEST(PropertyTest, Property)
   DoubleProperty d1 = *p;
   EXPECT_EQ(static_cast<double>(d1),10);
 
-  auto d2 = p->as<DoubleProperty>();
-  EXPECT_EQ(static_cast<double>(d2),10);
-
-  EXPECT_THROW(p->as<IntProperty>(),std::runtime_error);
+  double d2 = *p;
+  EXPECT_EQ(d2, 10);
 
 }
 

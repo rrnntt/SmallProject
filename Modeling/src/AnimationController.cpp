@@ -1,5 +1,5 @@
 #include "Modeling/AnimationController.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace Modeling
 {
@@ -11,11 +11,11 @@ _focus(0)
 
 AnimationController& AnimationController::instance()
 {
-  Singleton* s = API::Framework::instance().getSingleton("AnimationController");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("AnimationController");
   if (s == nullptr)
   {
     AnimationController *f = new AnimationController();
-    API::Framework::instance().registerSingleton("AnimationController",f);
+    Kernel::Framework::instance().registerSingleton("AnimationController",f);
     return *f;
   }
   else

@@ -16,7 +16,7 @@ namespace DataObjects
 
   CreateUniformRandomData::CreateUniformRandomData()
   {
-    declareClass("Workspace","WorkspaceManager");
+    declareWorkspace("Workspace");
     declareDouble("MinValue");
     declareDouble("MaxValue");
     declareString("Column");
