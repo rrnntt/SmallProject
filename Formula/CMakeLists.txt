@@ -18,6 +18,7 @@ set( INC_FILES
    inc/Formula/ScriptLine.h
    inc/Formula/ScriptModule.h
    inc/Formula/ScriptModuleFunction.h
+   inc/Formula/ScriptParser.h
    inc/Formula/Variable.h
    inc/Formula/VariableFactory.h
    )
@@ -33,6 +34,7 @@ set( SRC_FILES
   src/ScriptLine.cpp
   src/ScriptModule.cpp
   src/ScriptModuleFunction.cpp
+  src/ScriptParser.cpp
   src/Variable.cpp
   src/VariableFactory.cpp
   )
@@ -53,6 +55,8 @@ set( SRC_FILES
   test/DummyVarTest.cpp
   test/ExpressionTest.cpp
   test/ParserTest.cpp
+  test/ScriptParserTest.cpp
+  test/ScriptTest.cpp
   test/VariableTest.cpp
   test/VariableFactoryTest.cpp
 )
