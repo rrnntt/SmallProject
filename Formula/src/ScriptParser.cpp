@@ -8,6 +8,9 @@ namespace Formula
  */
 ScriptParser::ScriptParser()
 {
+  // lines parser: 
+  m_linesParser.addParser( new SyntaxParser, '+' );
+
 }
 
 /**
@@ -24,6 +27,9 @@ ScriptParser::~ScriptParser()
 void ScriptParser::parse(const std::string& str)
 {
   // first try syntax construct
+  m_linesParser.match( str );
+  std::cerr << m_linesParser.match() << std::endl;
+  m_linesParser.log();
 }
 
 //-----------------------------------------------------------------------------------
@@ -37,15 +43,9 @@ SyntaxParser::SyntaxParser()
   m_blockParser = new Kernel::BracketParser("{","}");
   addParser( m_blockParser );
 
-  // lines parser: 
-  m_linesParser = new Kernel::SeqParser;
-  auto singleLine = new Kernel::SeqParser;
-  singleLine->addParser(this->clone());
-  singleLine->addParser(new Kernel::CharParser(';'));
-  m_linesParser->addParser( singleLine, '+' );
-  addParser( m_linesParser );
-
   // 'if' parser: finds if-statements
+
+  // expression - it's what the other parsers couldn't parse
   m_expression = new Kernel::AllParser;
   addParser( m_expression );
 }

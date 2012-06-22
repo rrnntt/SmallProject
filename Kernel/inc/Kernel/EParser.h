@@ -28,6 +28,7 @@ namespace Kernel
     std::string match() const {return std::string(m_start,m_start + m_n);}
     std::string::const_iterator getStart()const{return m_start;}
     std::string::const_iterator getEnd()const{return m_start + m_n;}
+    virtual void log(const std::string& padding = "") const = 0;
   protected:
     /**
     * Tries to match string starting at start. If unsuccessful returns start. If successful returns
@@ -54,6 +55,12 @@ namespace Kernel
     CharParser(const std::string& chars):IParser(),m_chars(chars){}
     CharParser(const CharParser& chp):IParser(),m_chars(chp.m_chars){}
     IParser* clone() const{return new CharParser(*this);}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "CharParser[" << m_chars << "]:";
+      if ( hasMatch() ) std::cerr << match();
+      std::cerr << std::endl;
+    }
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     std::string m_chars; ///< alternative matches
@@ -69,6 +76,7 @@ namespace Kernel
     NotParser(const std::string& chars):IParser(),m_chars(chars){}
     NotParser(const NotParser& chp):IParser(),m_chars(chp.m_chars){}
     IParser* clone() const{return new NotParser(*this);}
+    void log(const std::string& padding = "") const {std::cerr << padding << "NotParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     std::string m_chars; ///< alternative matches
@@ -84,6 +92,7 @@ namespace Kernel
     StringParser(const std::string& str):IParser(),m_string(str){}
     StringParser(const StringParser& p):IParser(),m_string(p.m_string){}
     IParser* clone() const{return new StringParser(*this);}
+    void log(const std::string& padding = "") const {std::cerr << padding << "StringParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     std::string m_string; ///< string to matche
@@ -100,6 +109,7 @@ namespace Kernel
     NotStringParser(const NotStringParser& p):IParser(),m_string(p.m_string){}
     IParser* clone() const{return new NotStringParser(*this);}
     //bool matchEmpty()const{return true;}
+    void log(const std::string& padding = "") const {std::cerr << padding << "NotStringParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     std::string m_string; ///< doesn't match this string
@@ -113,6 +123,7 @@ namespace Kernel
     EmptyParser(const EmptyParser& chp){}
     IParser* clone() const{return new EmptyParser(*this);}
     bool matchEmpty()const{return true;}
+    void log(const std::string& padding = "") const {std::cerr << padding << "EmptyParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) 
     {
@@ -132,6 +143,7 @@ namespace Kernel
     AllParser():IParser(){}
     AllParser(const AllParser& chp){}
     IParser* clone() const{return new AllParser(*this);}
+    void log(const std::string& padding = "") const {std::cerr << padding << "AllParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) 
     {
@@ -156,6 +168,13 @@ namespace Kernel
     {
       return get<MultiParser>(i)->get<P>(j);
     }
+    void logChildren(const std::string& padding = "") const 
+    {
+      for(auto it=m_parsers.begin(); it != m_parsers.end(); ++it)
+      {
+        it->parser->log(padding + "  ");
+      }
+    }
   protected:
     IParser* addParser(IParser* parser);
     struct ParserHolder
@@ -174,6 +193,11 @@ namespace Kernel
     IParser* clone()const{return new SeqParser(*this);}
     using MultiParser::addParser;
     IParser* addParser(IParser* parser, char m);
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "SeqParser" << std::endl;
+      logChildren(padding);
+    }
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
   };
@@ -187,6 +211,11 @@ namespace Kernel
     ListParser(const ListParser& p);
     IParser* clone()const{return new ListParser(*this);}
     bool matchEmpty()const{return m_multiplicity == ZeroMany;}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "SeqParser" << std::endl;
+      logChildren(padding);
+    }
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     Mutiplicity m_multiplicity;
@@ -201,6 +230,11 @@ namespace Kernel
     IParser* clone()const{return new AltParser(*this);}
     using MultiParser::addParser;
     IParser* getParser()const{return m_goodParser;}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "AltParser" << std::endl;
+      logChildren(padding);
+    }
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     IParser* m_goodParser; ///< parser that had a match
@@ -213,6 +247,7 @@ namespace Kernel
     WordParser(const std::string& exclude = ""):IParser(),m_exclude(exclude){}
     WordParser(const WordParser& p);
     IParser* clone()const{return new WordParser(*this);}
+    void log(const std::string& padding = "") const {std::cerr << padding << "WordParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     std::string m_exclude;
@@ -225,6 +260,7 @@ namespace Kernel
     VarNameParser():IParser(){}
     VarNameParser(const VarNameParser& p){}
     IParser* clone()const{return new VarNameParser(*this);}
+    void log(const std::string& padding = "") const {std::cerr << padding << "VarNameParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
   };
@@ -236,6 +272,7 @@ namespace Kernel
     NumberParser():IParser(){}
     NumberParser(const NumberParser& p){}
     IParser* clone()const{return new NumberParser(*this);}
+    void log(const std::string& padding = "") const {std::cerr << padding << "NumberParser " << std::endl;}
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
   };
@@ -252,6 +289,11 @@ namespace Kernel
     //std::string::const_iterator getInnerEnd()const{return m_end - m_ket.size();}
     std::string::const_iterator getInnerEnd()const{return m_start + m_n - m_ket.size();}
     bool isInnerEmpty() const {return isEmpty() || m_n <= m_bra.size() + m_ket.size();}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "BracketParser" << std::endl;
+      logChildren(padding);
+    }
   protected:
     enum Part{Bra,Ket,Other};
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
@@ -270,6 +312,11 @@ namespace Kernel
     IParser* clone()const{return new NameBracketParser(*this);}
     std::string::const_iterator getInnerStart()const{return m_brackets->getInnerStart();}
     std::string::const_iterator getInnerEnd()const{return m_brackets->getInnerEnd();}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "NameBracketParser" << std::endl;
+      logChildren(padding);
+    }
   protected:
     VarNameParser* m_name;
     BracketParser* m_brackets;
@@ -282,6 +329,11 @@ namespace Kernel
     TermParser();
     TermParser(const TermParser& p);
     IParser* clone()const{return new TermParser(*this);}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "TermParser" << std::endl;
+      logChildren(padding);
+    }
   };
 
   //------------------------------------------------------------
