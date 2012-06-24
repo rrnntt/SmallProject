@@ -213,7 +213,7 @@ namespace Kernel
     bool matchEmpty()const{return m_multiplicity == ZeroMany;}
     void log(const std::string& padding = "") const 
     {
-      std::cerr << padding << "SeqParser" << std::endl;
+      std::cerr << padding << "ListParser" << std::endl;
       logChildren(padding);
     }
   protected:
