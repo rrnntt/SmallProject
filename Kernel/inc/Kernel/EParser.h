@@ -143,7 +143,12 @@ namespace Kernel
     AllParser():IParser(){}
     AllParser(const AllParser& chp){}
     IParser* clone() const{return new AllParser(*this);}
-    void log(const std::string& padding = "") const {std::cerr << padding << "AllParser " << std::endl;}
+    void log(const std::string& padding = "") const 
+    {
+      std::cerr << padding << "AllParser " ;
+      if ( hasMatch() ) std::cerr << match() ;
+      std::cerr << std::endl;
+    }
   protected:
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) 
     {
@@ -228,6 +233,7 @@ namespace Kernel
     AltParser():MultiParser(){}
     AltParser(const AltParser& p);
     IParser* clone()const{return new AltParser(*this);}
+    bool matchEmpty()const;
     using MultiParser::addParser;
     IParser* getParser()const{return m_goodParser;}
     void log(const std::string& padding = "") const 
@@ -286,12 +292,14 @@ namespace Kernel
     BracketParser(const BracketParser& p);
     IParser* clone()const{return new BracketParser(*this);}
     std::string::const_iterator getInnerStart()const{return m_start + m_bra.size();}
-    //std::string::const_iterator getInnerEnd()const{return m_end - m_ket.size();}
     std::string::const_iterator getInnerEnd()const{return m_start + m_n - m_ket.size();}
+    //IParser* getInnerParser()const{return getParser(0);}
     bool isInnerEmpty() const {return isEmpty() || m_n <= m_bra.size() + m_ket.size();}
     void log(const std::string& padding = "") const 
     {
-      std::cerr << padding << "BracketParser" << std::endl;
+      std::cerr << padding << "BracketParser ";
+      if ( hasMatch() ) std::cerr << match() ;
+      std::cerr << std::endl;
       logChildren(padding);
     }
   protected:

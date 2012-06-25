@@ -62,6 +62,28 @@ TEST(EParserTest, SeqList)
   EXPECT_EQ(seq.match(),"Helrslo");
 }
 
+TEST(EParserTest, ListParser) 
+{
+
+  auto line = new SeqParser;
+  line->addParser( new NotStringParser(";") );
+  line->addParser( new CharParser(";") );
+  ListParser lines(line, ListParser::OneMany);
+
+  std::string str("aa; bb ; ccc;");
+  lines.match(str);
+  std::cerr << "size=" << lines.size() << std::endl;
+  std::cerr << lines.match() << std::endl;
+  size_t n = lines.size();
+  for(size_t i = 0; i < n; ++i)
+  {
+    std::cerr << "=>" << lines.getParser(i)->match() << std::endl;
+  }
+
+  //EXPECT_TRUE(seq.hasMatch());
+  //EXPECT_EQ(seq.match(),"Helrslo");
+}
+
 TEST(EParserTest, Alt) 
 {
   std::string str2("Bye");

@@ -279,6 +279,11 @@ std::string::const_iterator AltParser::test(std::string::const_iterator start,st
   return start;
 }
 
+bool AltParser::matchEmpty()const
+{
+  return m_goodParser ? m_goodParser->matchEmpty() : false;
+}
+
 //-----------------------------------------------------
 WordParser::WordParser(const WordParser& p)
 {
