@@ -22,15 +22,21 @@ class Expression;
 class ScriptModule;
 class ScriptLineBlock;
 class ScriptFunction;
+class SyntaxParser;
 
+/**
+ * A base class for a script line.
+ */
 class FORMULA_EXPORT ScriptLine
 {
 public:
   virtual void eval() = 0;
 };
 
+/// Shared pointer to a script line
 typedef boost::shared_ptr<ScriptLine> ScriptLine_ptr;
 
+/// Variable definition script line
 class FORMULA_EXPORT ScriptLineDef: public ScriptLine
 {
 public:
@@ -41,6 +47,7 @@ public:
   void eval();
 };
 
+/// Evaluate an expression and assign the returned value to a variable
 class FORMULA_EXPORT ScriptLineSet: public ScriptLine
 {
 public:
@@ -53,12 +60,26 @@ private:
   boost::shared_ptr<Expression> m_expression;
 };
 
+/// Evaluate an expression
+class FORMULA_EXPORT ScriptLineExpression: public ScriptLine
+{
+public:
+  ScriptLineExpression(boost::shared_ptr<Namespace> ns, boost::shared_ptr<Expression> expression):
+      m_namespace(ns),m_expression(expression){}
+  void eval();
+private:
+  boost::shared_ptr<Namespace> m_namespace;
+  boost::shared_ptr<Expression> m_expression;
+};
+
+/// Interface to a class that can return a pointer to a script function
 class FORMULA_EXPORT ScriptFunctionGetter
 {
 public:
   virtual boost::shared_ptr<ScriptFunction> getFunction(const std::string& fnName) = 0;
 };
 
+/// Function call script line
 class FORMULA_EXPORT ScriptLineCall: public ScriptLine
 {
 public:
@@ -75,25 +96,36 @@ private:
   ArgMap m_arguments;
 };
 
-class FORMULA_EXPORT ScriptLineBlock: public ScriptFunctionGetter
+/**
+ * A block of script lines. 
+ */
+class FORMULA_EXPORT ScriptLineBlock:public ScriptLine, public ScriptFunctionGetter
 {
 public:
+  ScriptLineBlock();
   ScriptLineBlock(boost::shared_ptr<Namespace> ns,const std::string& name = "");
-  virtual void eval();
-  void addLine(const std::string& line);
-  void addLines(const std::string& line);
-  void addLine(const Kernel::EParser& parser);
-  void addLines(const Kernel::EParser& parser);
+  void eval();
+  /// Returns an empty pointer. Must be subclassed to work with functions
+  boost::shared_ptr<ScriptFunction> getFunction(const std::string& fnName){return boost::shared_ptr<ScriptFunction>();}
+
+  void addScript(const std::string& script);
+
   Namespace& getLocalNamespace(){return *m_local_namespace;}
   boost::shared_ptr<Namespace> getLocalNamespace_ptr(){return m_local_namespace;}
 protected:
+  ScriptLine* createLine(SyntaxParser* parser);
   ScriptLine* createLine(const Kernel::EParser& parser);
   boost::shared_ptr<Namespace> m_local_namespace;
   std::vector<ScriptLine_ptr> m_lines;
 };
 
+/// script block pointer
 typedef boost::shared_ptr<ScriptLineBlock> ScriptLineBlock_ptr;
 
+/**
+ * An anonymous script block. It can only be created inside a script function as
+ * the constructor takes an ScriptLineBlock pointer.
+ */
 class FORMULA_EXPORT ScriptAnonymousBlock: public ScriptLineBlock
 {
 public:
@@ -104,8 +136,10 @@ protected:
   ScriptLineBlock* m_parent;
 };
 
+/// Pointer to an anonymous script block
 typedef boost::shared_ptr<ScriptAnonymousBlock> ScriptAnonymousBlock_ptr;
 
+/// Script function
 class FORMULA_EXPORT ScriptFunction: public ScriptLineBlock
 {
 public:
@@ -126,33 +160,35 @@ protected:
 
 typedef boost::shared_ptr<ScriptFunction> ScriptFunction_ptr;
 
+/// An if statement
 class FORMULA_EXPORT ScriptLineIf: public ScriptLine
 {
 public:
   ScriptLineIf(boost::shared_ptr<Namespace> ns):m_namespace(ns){}
   void eval();
-  void addCondition(boost::shared_ptr<Expression> cond,ScriptAnonymousBlock_ptr block);
-  void addDefault(ScriptAnonymousBlock_ptr block);
+  void addCondition(boost::shared_ptr<Expression> cond, ScriptLine_ptr line);
+  void addDefault(ScriptLine_ptr block);
 private:
   boost::shared_ptr<Namespace> m_namespace;
   std::vector<boost::shared_ptr<Expression> > m_conditions;
-  std::vector<ScriptAnonymousBlock_ptr> m_blocks;
-  ScriptAnonymousBlock_ptr m_default_block;
+  std::vector<ScriptLine_ptr> m_blocks;
+  ScriptLine_ptr m_default_block;
 };
 
+/// A for-loop
 class FORMULA_EXPORT ScriptLineFor: public ScriptLine
 {
 public:
   ScriptLineFor(ScriptLine* init,
             boost::shared_ptr<Expression> end_cond,
             ScriptLine* next,
-            ScriptAnonymousBlock_ptr block);
+            ScriptLine_ptr block);
   void eval();
 private:
   ScriptLine_ptr m_init;
   boost::shared_ptr<Expression> m_end_condition;
   ScriptLine_ptr m_next;
-  ScriptAnonymousBlock_ptr m_block;
+  ScriptLine_ptr m_block;
 };
 
 } // Formula

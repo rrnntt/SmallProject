@@ -95,6 +95,12 @@ void SyntaxParser::init()
   line->addParser( m_blockParser );
 
   // 'if' parser: finds if-statements
+  m_ifParser = new IfParser;
+  line->addParser( m_ifParser );
+
+  // var parser: finds variable definitions
+  m_varParser = new VarParser;
+  line->addParser( m_varParser );
 
   // expression - it's what the other parsers couldn't parse
   m_expression = new Kernel::NotStringParser(";");
@@ -125,6 +131,25 @@ Kernel::IParser* SyntaxParser::expression() const
 {
   return m_expression->hasMatch() ? m_expression : nullptr;
 }
+
+/**
+ * Returns a pointer to a IfParser if there was a match to an if-block
+ * or nullptr otherwise
+ */
+IfParser* SyntaxParser::ifBlock() const
+{
+  return m_ifParser->hasMatch() ? m_ifParser : nullptr;
+}
+
+/**
+ * Returns a pointer to a VarParser if there was a match to a variable declaration
+ * or nullptr otherwise
+ */
+VarParser* SyntaxParser::defVar() const
+{
+  return m_varParser->hasMatch() ? m_varParser : nullptr;
+}
+
 
 //-----------------------------------------------------------------------------
 /**

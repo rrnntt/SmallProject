@@ -57,6 +57,7 @@ set( SRC_FILES
   test/ParserTest.cpp
   test/ScriptParserTest.cpp
   test/ScriptTest.cpp
+  test/ScriptLineTest.cpp
   test/VariableTest.cpp
   test/VariableFactoryTest.cpp
 )

@@ -78,7 +78,7 @@ namespace Formula
     std::vector<std::string> ops;
     ops.push_back(";");
     ops.push_back(",");
-    //ops.push_back(":");
+    ops.push_back(":=");
     ops.push_back("= != > >= < <=");
     ops.push_back("&");
     ops.push_back("|");

@@ -60,4 +60,39 @@ TEST(Formula_ScriptParser_Test, Test)
   parser.parse( script );
   //parser.parse( "ooo; b+1; ccc;" );
   EXPECT_EQ( parser.size(), 3 );
+  EXPECT_TRUE( parser.line(0)->block() );
+  EXPECT_FALSE( parser.line(1)->block() );
+  EXPECT_FALSE( parser.line(2)->block() );
+  EXPECT_TRUE( parser.line(1)->expression() );
+  EXPECT_TRUE( parser.line(2)->expression() );
+
+}
+
+TEST(Formula_ScriptParser_Test, Parser)
+{
+  ScriptParser parser;
+  std::string script = "Scalar x = 1; Scalar y; if ( x > y) {y = x; 2*2};";
+  parser.parse( script );
+  EXPECT_EQ( parser.size(), 3 );
+  for(size_t i = 0; i < parser.size(); ++i)
+  {
+    std::cerr << parser.line(i)->match() << std::endl;
+  }
+  auto defx = parser.line(0)->defVar();
+  EXPECT_TRUE( defx );
+  EXPECT_EQ( defx->type()->match(), "Scalar" );
+  EXPECT_EQ( defx->var()->match(), "x" );
+  EXPECT_EQ( defx->value()->match(), "1" );
+
+  defx = parser.line(1)->defVar();
+  EXPECT_TRUE( defx );
+  EXPECT_EQ( defx->type()->match(), "Scalar" );
+  EXPECT_EQ( defx->var()->match(), "y" );
+  EXPECT_FALSE( defx->value() );
+
+  auto ifp = parser.line(2)->ifBlock();
+  EXPECT_TRUE( ifp );
+  EXPECT_EQ( ifp->condition()->match(), "( x > y)" );
+  EXPECT_EQ( ifp->trueBlock()->match(), "{y = x; 2*2}" );
+  EXPECT_FALSE( ifp->elseBlock() );
 }

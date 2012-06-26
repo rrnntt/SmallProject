@@ -9,13 +9,19 @@
 namespace Formula
 {
 
+//---------------------------------------------------------
+//  Forward declarations
+//---------------------------------------------------------
+class IfParser;
+class VarParser;
+
 /**
  *  Parses syntax constructs: loops, ifs, etc.
  * It inherits from Kernel::SeqParser and has two members:
  *  the first is a AltParser with the contents of a script line,
  *  the second is a character ';' ending the line.
  */
-class SyntaxParser: public Kernel::SeqParser
+class FORMULA_EXPORT SyntaxParser: public Kernel::SeqParser
 {
 public:
   SyntaxParser();
@@ -28,6 +34,8 @@ public:
   }
   Kernel::BracketParser* block() const;
   Kernel::IParser* expression() const;
+  IfParser* ifBlock() const;
+  VarParser* defVar() const;
 private:
   /// initialize the instance
   void init();
@@ -35,6 +43,8 @@ private:
   Kernel::BracketParser* m_blockParser;
   /// Collects all if other parsers failed - it must be an expression
   Kernel::IParser* m_expression;
+  IfParser* m_ifParser;
+  VarParser* m_varParser;
 };
 
 /**

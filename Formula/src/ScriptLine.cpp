@@ -2,8 +2,10 @@
 #include "Formula/ScriptModule.h"
 #include "Formula/Expression.h"
 #include "Formula/Bool.h"
+#include "Formula/ScriptParser.h"
 
-//#include <QFile>
+#include <boost/lexical_cast.hpp>
+
 #include <algorithm>
 #include <stdexcept>
 
@@ -33,6 +35,18 @@ namespace Formula
     }
     //m_expression->logPrint();
     m_namespace->setVariable(m_var,m_expression->eval());
+  }
+
+  //-------------------------------------------------------------------------//
+
+  void ScriptLineExpression::eval()
+  {
+    if (!m_expression)
+    {
+      throw std::runtime_error("Expression failure");
+    }
+    //m_expression->logPrint();
+    m_expression->eval();
   }
 
 //-------------------------------------------------------------------------//
@@ -122,8 +136,18 @@ namespace Formula
   }
 
   //-------------------------------------------------------------------------//
-  //-------------------------------------------------------------------------//
 
+  /**
+   * Default constructor. 
+   */
+  ScriptLineBlock::ScriptLineBlock()
+  {
+    m_local_namespace = Namespace_ptr(new Namespace);
+  }
+
+  /**
+   * Create this block with the local namespace being a child of another namespace
+   */
   ScriptLineBlock::ScriptLineBlock(boost::shared_ptr<Namespace> ns,const std::string& name)
   {
     Namespace* local_namespace = new Namespace(*ns,name);
@@ -138,53 +162,110 @@ namespace Formula
     }
   }
 
-  void ScriptLineBlock::addLines(const std::string& lines)
+  /**
+    * Add a line of script to the function:
+    * Scalar x = 1;
+    * Scalar y = 2;
+    * Scalar z;
+    * z = x + y;
+    */
+  void ScriptLineBlock::addScript(const std::string& script)
   {
-    Kernel::EParser code;
-    code.parse(lines);
-    addLines(code);
-  }
-
-  void ScriptLineBlock::addLines(const Kernel::EParser& parser)
-  {
-    if (parser.name() == ";")
+    ScriptParser parser;
+    parser.parse( script );
+    const size_t n = parser.size();
+    for(size_t i = 0; i < n; ++i)
     {
-      for(int i=0;i<parser.size();++i)
+      auto line = createLine( parser.line( i ) );
+      if ( line )
       {
-        addLine(parser[i]);
+        m_lines.push_back(ScriptLine_ptr(line));
       }
-    }
-    else
-    {
-      addLine(parser);
+      else
+      {
+        throw std::runtime_error("Cannot create script line: " + boost::lexical_cast<std::string>(i));
+      }
     }
   }
 
   /**
-    * Add a line of script to the function:
-    * Scalar: x = 1
-    * Scalar: y = 2
-    * Scalar: z
-    * z = x + y
-    */
-  void ScriptLineBlock::addLine(const std::string& line)
+   * Create a script line from a syntax parser.
+   */
+  ScriptLine* ScriptLineBlock::createLine(SyntaxParser* parser)
   {
-    Kernel::EParser code;
-    code.parse(line);
-    addLine(code);
-  }
+    // create an anonymous block
+    auto blockParser = parser->block();
+    if ( blockParser )
+    {
+      auto block = new ScriptAnonymousBlock(this);
+      block->addScript( blockParser->match() );
+      return block;
+    }
 
-  void ScriptLineBlock::addLine(const Kernel::EParser& code)
-  {
-    ScriptLine* line = createLine(code);
-    if (line)
+    // create an expression
+    auto exprParser = parser->expression();
+    if ( exprParser )
     {
-      m_lines.push_back(ScriptLine_ptr(line));
+      Kernel::EParser expr;
+      expr.parse( exprParser->match() );
+      if ( expr.name() == ":=" )
+      {
+        if ( expr.size() != 2 )
+        {
+          throw std::runtime_error("ScriptLineBlock:: syntax error: " + expr.str() );
+        }
+        auto e = Expression_ptr(new Expression(m_local_namespace, expr[1]) );
+        auto setLine = new ScriptLineSet( m_local_namespace, expr[0].name(), e );
+        return setLine;
+      }
+      else
+      {
+        auto e = Expression_ptr(new Expression(m_local_namespace, expr) );
+        return new ScriptLineExpression( m_local_namespace, e );
+      }
     }
-    else
+
+    // declare a variable
+    auto varParser = parser->defVar();
+    if ( varParser )
     {
-      throw std::runtime_error("Cannot create script line: "+code.str());
+      std::string value = varParser->value() ? varParser->value()->match() : "";
+      auto line = new ScriptLineDef(m_local_namespace, varParser->type()->match(), varParser->var()->match(),  value);
+      return line;
     }
+
+    // an if-block
+    auto ifParser = parser->ifBlock();
+    if ( ifParser )
+    {
+      auto cond = ifParser->condition();
+      auto trueBlock = ifParser->trueBlock();
+      auto elseBlock = ifParser->elseBlock();
+      std::string condStr(cond->getInnerStart(), cond->getInnerEnd());
+      std::string trueScript(trueBlock->getInnerStart(), trueBlock->getInnerEnd());
+      // create the if line instance
+      auto ifLine = new ScriptLineIf(m_local_namespace);
+      // create the first condition expression
+      Kernel::EParser expr;
+      expr.parse( condStr );
+      auto e = Expression_ptr(new Expression(m_local_namespace, expr) );
+      // add first condition
+      auto block = new ScriptAnonymousBlock(this);
+      block->addScript( trueScript );
+      ifLine->addCondition(e, ScriptLine_ptr(block) );
+      // add the else block
+      std::string elseScript;
+      if ( elseBlock )
+      {
+        elseScript.assign(elseBlock->getInnerStart(), elseBlock->getInnerEnd());
+        auto block = new ScriptAnonymousBlock(this);
+        block->addScript( trueScript );
+        ifLine->addDefault( ScriptLine_ptr(block) );
+      }
+      return ifLine;
+    }
+
+    return nullptr;
   }
 
   ScriptLine* ScriptLineBlock::createLine(const Kernel::EParser& code)
@@ -222,13 +303,13 @@ namespace Formula
         {
           Expression* cond = new Expression(m_local_namespace,clause[0]);
           ScriptAnonymousBlock* block = new ScriptAnonymousBlock(this);
-          block->addLines(clause[1]);
+          //block->addLines(clause[1]);
           sif->addCondition(Expression_ptr(cond),ScriptAnonymousBlock_ptr(block));
         }
         else
         {
           ScriptAnonymousBlock* block = new ScriptAnonymousBlock(this);
-          block->addLines(clause);
+          //block->addLines(clause);
           sif->addDefault(ScriptAnonymousBlock_ptr(block));
         }
       }
@@ -244,7 +325,7 @@ namespace Formula
       ScriptLine* init = block->createLine(code[0]);
       Expression_ptr end_cond(new Expression(block->getLocalNamespace_ptr(),code[1]));
       ScriptLine* next = block->createLine(code[2]);
-      block->addLines(code[3]);
+      //block->addLines(code[3]);
       ScriptLineFor* sfor = new ScriptLineFor(init,end_cond,next,block);
       return sfor;
     }
@@ -348,13 +429,13 @@ namespace Formula
     }
   }
 
-  void ScriptLineIf::addCondition(boost::shared_ptr<Expression> cond,ScriptAnonymousBlock_ptr block)
+  void ScriptLineIf::addCondition(boost::shared_ptr<Expression> cond,ScriptLine_ptr block)
   {
     m_conditions.push_back(cond);
     m_blocks.push_back(block);
   }
 
-  void ScriptLineIf::addDefault(ScriptAnonymousBlock_ptr block)
+  void ScriptLineIf::addDefault(ScriptLine_ptr block)
   {
     m_default_block = block;
   }
@@ -363,7 +444,7 @@ namespace Formula
   ScriptLineFor::ScriptLineFor(ScriptLine* init,
                            boost::shared_ptr<Expression> end_cond,
                            ScriptLine* next,
-                           ScriptAnonymousBlock_ptr block)
+                           ScriptLine_ptr block)
   {
     m_init = ScriptLine_ptr(init);
     m_end_condition = end_cond;
