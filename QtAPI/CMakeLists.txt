@@ -4,6 +4,7 @@
 
 set( INC_FILES 
    inc/QtAPI/DllExport.h
+   inc/QtAPI/AlgorithmInputHistory.h
    inc/QtAPI/ColorBox.h
    inc/QtAPI/FunctionCurve.h
    inc/QtAPI/Plot.h
@@ -34,6 +35,7 @@ set( INC_FILES
    inc/QtAPI/WindowManager.h
    )
 set( SRC_FILES 
+  src/AlgorithmInputHistory.cpp
   src/ColorBox.cpp
   src/FunctionCurve.cpp
   src/Plot.cpp

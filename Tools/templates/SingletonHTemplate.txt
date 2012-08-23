@@ -2,12 +2,12 @@
 #define ${NAMESPACE}_${CLASSNAME}_H
 
 #include "${Namespace}/DllExport.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 
 namespace ${Namespace}
 {
 
-class ${NAMESPACE}_EXPORT ${ClassName}: protected API::Singleton
+class ${NAMESPACE}_EXPORT ${ClassName}: protected Kernel::Singleton
 {
 public:
   virtual std::string name() const {return "${ClassName}";}

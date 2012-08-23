@@ -35,9 +35,9 @@ void ViewTask::setMainWindow(MainWindow* wnd)
 {
   m_mainWindow = wnd;
   m_menu->addAction(m_mainWindow->m_algorithmExplorer->toggleViewAction());
-  m_mainWindow->m_algorithmExplorer->hide();
+  //m_mainWindow->m_algorithmExplorer->hide();
   m_menu->addAction(m_mainWindow->m_workspaceExplorer->toggleViewAction());
-  m_mainWindow->m_workspaceExplorer->hide();
+  //m_mainWindow->m_workspaceExplorer->hide();
   m_menu->addAction(m_mainWindow->m_fitBrowser->toggleViewAction());
   m_mainWindow->m_fitBrowser->hide();
 }

@@ -7,6 +7,8 @@
 MyApplication::MyApplication(int argc, char** argv):
 QApplication(argc,argv)
 {
+  setOrganizationName( "MySoft" );
+  setApplicationName( "Goblin" );
 }
 
 /**

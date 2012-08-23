@@ -1,5 +1,5 @@
 #include "${Namespace}/${ClassName}.h"
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 namespace ${Namespace}
 {
@@ -13,15 +13,15 @@ ${ClassName}::${ClassName}()
 
 /**
  * Return reference to the instance of the singleton. On first call the singleton 
- * is registered with API::Framework.
+ * is registered with Kernel::Framework.
  */
 ${ClassName}& ${ClassName}::instance()
 {
-  API::Singleton* s = API::Framework::instance().getSingleton("${ClassName}");
+  Kernel::Singleton* s = Kernel::Framework::instance().getSingleton("${ClassName}");
   if (s == nullptr)
   {
     ${ClassName} *f = new ${ClassName}();
-    API::Framework::instance().registerSingleton("${ClassName}",f);
+    Kernel::Framework::instance().registerSingleton("${ClassName}",f);
     return *f;
   }
   else

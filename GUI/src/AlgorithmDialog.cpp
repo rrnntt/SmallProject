@@ -1,5 +1,6 @@
 #include "AlgorithmDialog.h"
 
+#include "QtAPI/AlgorithmInputHistory.h"
 #include "API/Algorithm.h"
 #include "API/AlgorithmFactory.h"
 #include "Kernel/CommonProperties.h"
@@ -31,6 +32,7 @@ AlgorithmDialog::AlgorithmDialog(QWidget *parent,const std::string& algName) :
     QMessageBox::critical(parent,"Error","Algorithm " + QString::fromStdString(algName) + " not found.");
     return;
   }
+  // create widgets for setting properties
   int row = 0;
   std::vector<std::string> propertyNames = m_algorithm->getPropertyNames();
   for(auto name = propertyNames.begin(); name != propertyNames.end(); ++name,++row)
@@ -50,16 +52,34 @@ AlgorithmDialog::AlgorithmDialog(QWidget *parent,const std::string& algName) :
           lst << QString::fromStdString( *key );
         }
         chb->addItems( lst );
+        QString value = QtAPI::AlgorithmInputHistory::instance().getPropertyValue(algName, *name);
+        if ( !value.isEmpty() )
+        {
+          int i = chb->findText( value );
+          if ( i >= 0 ) chb->setCurrentIndex( i );
+        }
         edit = chb;
       }
       else
       {
-        edit = new QLineEdit(this);
+        QLineEdit* le = new QLineEdit(this);
+        QString value = QtAPI::AlgorithmInputHistory::instance().getPropertyValue(algName, *name);
+        if ( !value.isEmpty() )
+        {
+          le->setText( value );
+        }
+        edit = le;
       }
     }
     else
     {
-      edit = new QLineEdit(this);
+        QLineEdit* le = new QLineEdit(this);
+        QString value = QtAPI::AlgorithmInputHistory::instance().getPropertyValue(algName, *name);
+        if ( !value.isEmpty() )
+        {
+          le->setText( value );
+        }
+        edit = le;
     }
     m_propertyMap.insert(*name,edit);
     QLabel* lbl = new QLabel(QString::fromStdString(*name),this);
@@ -84,16 +104,23 @@ void AlgorithmDialog::accept()
   if (!m_algorithm) return;
   try
   {
+    QString algName = QString::fromStdString( m_algorithm->name() );
     for(auto prop = m_propertyMap.begin(); prop != m_propertyMap.end(); ++prop)
     {
       QWidget* edit = prop.value();
+      QString propValue;
       if ( dynamic_cast<QLineEdit*>( edit ) )
       {
-        m_algorithm->setProperty(prop.key(), dynamic_cast<QLineEdit*>( edit )->text().toStdString());
+        propValue = dynamic_cast<QLineEdit*>( edit )->text();
       }
       else if ( dynamic_cast<QComboBox*>( edit ) )
       {
-        m_algorithm->setProperty(prop.key(), dynamic_cast<QComboBox*>( edit )->currentText().toStdString());
+        propValue = dynamic_cast<QComboBox*>( edit )->currentText();
+      }
+      m_algorithm->setProperty(prop.key(), propValue.toStdString());
+      if ( !propValue.isEmpty() )
+      {
+        QtAPI::AlgorithmInputHistory::instance().savePropertyValue( algName, QString::fromStdString(prop.key()), propValue );
       }
     }
   }
