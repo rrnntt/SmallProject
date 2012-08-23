@@ -25,6 +25,7 @@ set( INC_FILES
    inc/Kernel/PropertyManager.h
    inc/Kernel/Str.h
    inc/Kernel/Singleton.h
+   inc/Kernel/System.h
    inc/Kernel/Framework.h
    )
 set( SRC_FILES 
