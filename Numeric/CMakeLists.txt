@@ -15,6 +15,7 @@ set( INC_FILES
    inc/Numeric/ConstraintFactory.h
    inc/Numeric/CostFunctionFactory.h
    inc/Numeric/CostFuncFitting.h
+   inc/Numeric/Constants.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
    inc/Numeric/DerivMinimizer.h
@@ -47,6 +48,7 @@ set( INC_FILES
    inc/Numeric/PhysBody.h
    inc/Numeric/PhysModel.h
 #   inc/Numeric/SeriesFunction.h
+   inc/Numeric/ScaledChebfun.h
    inc/Numeric/SchrodScale.h
    inc/Numeric/Schrodinger0.h
    inc/Numeric/Schrodinger.h
@@ -77,6 +79,7 @@ set( SRC_FILES
   src/ConstraintFactory.cpp
   src/CostFunctionFactory.cpp
   src/CostFuncFitting.cpp
+  src/Constants.cpp
   src/Distribution.cpp
   src/DerivMinimizer.cpp
   src/DomainMap.cpp
@@ -98,6 +101,7 @@ set( SRC_FILES
   src/ParamFunction.cpp
   src/ParameterReference.cpp
   src/ParameterTie.cpp
+  src/ScaledChebfun.cpp
 #  src/SeriesFunction.cpp
   src/SchrodScale.cpp
   src/Schrodinger0.cpp
@@ -158,6 +162,7 @@ set( SRC_FILES
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp
+  test/ScaledChebfunTest.cpp
   test/SchrodScaleTest.cpp
   test/Schrodinger0Test.cpp
   test/SeriesFunctionTest.cpp

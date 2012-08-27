@@ -4,10 +4,12 @@
 #pragma warning( disable: 4251 )
 #pragma warning( disable: 4250 )
 
+#include "Kernel/System.h"
+
 #ifdef IN_NUMERIC
-#define NUMERIC_EXPORT __declspec( dllexport )
+#define NUMERIC_EXPORT DLLEXPORT
 #else
-#define NUMERIC_EXPORT __declspec( dllimport )
+#define NUMERIC_EXPORT DLLIMPORT
 #endif
 
 #define UNUSED_ARG(x) (void)x

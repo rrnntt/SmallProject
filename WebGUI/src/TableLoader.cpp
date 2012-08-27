@@ -5,7 +5,7 @@
 /**
  * Constructor.
  */
-TableLoader::TableLoader(QNetworkAccessManager* manager, const QUrl& url, DataObjects::TableWorkspace_ptr ws):
+TableLoader::TableLoader(QNetworkAccessManager* manager, const QUrl& url, API::TableWorkspace_ptr ws):
 DataLoader(manager,url),
 m_workspace(ws)
 {

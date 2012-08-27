@@ -40,13 +40,13 @@ namespace Numeric
   class NUMERIC_EXPORT chebfun
   {
   public:
-    chebfun(size_t n = -1, const double& startX = -1,const double& endX = 1);
+    chebfun(size_t n = 0, const double& startX = -1,const double& endX = 1);
     chebfun(const chebfun& other);
     chebfun& operator=(const chebfun& other);
     ChebfunBase_const_sptr getBase() const {return m_base;}
     void setBase(const chebfun& other){m_base = other.m_base; m_p.resize( n() + 1 ); invalidateA();}
     void setBase(ChebfunBase_sptr base){m_base = base; m_p.resize( n() + 1 ); invalidateA();}
-    /// Check if two chenfuns have shared x-points.
+    /// Check if two chebfuns have shared x-points.
     bool haveSameBase(const chebfun& other) const {return m_base == other.m_base;}
     /// Is the chebfun valid and set
     bool isValid() const {return static_cast<bool>(m_base);}

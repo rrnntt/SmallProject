@@ -4,8 +4,19 @@ namespace Numeric
 {
 
 ChebFunction::ChebFunction():
-m_fun(1,Numeric::chebfun_sptr(new Numeric::chebfun))
+m_fun(1,Storage(new Numeric::chebfun))
 {
+}
+
+/**
+ * Destructor - clean up.
+ */
+ChebFunction::~ChebFunction()
+{
+  for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
+  {
+    delete f->fun;
+  }
 }
 
 /// Function you want to fit to.
@@ -20,7 +31,7 @@ void ChebFunction::function1D(double* out, const double* xValues, const size_t n
     const double x = xValues[i];
     if ( x < start ) continue;
     if ( x > end ) break;
-    Numeric::chebfun* f = m_fun[fi].get();
+    chebfun* f = m_fun[fi].fun;
     while( x > f->endX() )
     {
       ++fi;
@@ -28,19 +39,19 @@ void ChebFunction::function1D(double* out, const double* xValues, const size_t n
       {
         break;
       }
-      f = m_fun[fi].get();
+      f = m_fun[fi].fun;
     }
     out[i] = f->valueB( x );
   }
 }
 
 /// Creates a domain for the region on which the workspace is defined.
-Numeric::FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
+FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
 {
   std::vector<double> x;
   size_t npts = 0;
-  std::for_each(m_fun.begin(),m_fun.end(),[&npts](Numeric::chebfun_sptr f){
-    npts += f->n();
+  std::for_each(m_fun.begin(),m_fun.end(),[&npts](const Storage& s){
+    npts += s.fun->n();
   });
   ++npts;
   x.resize( npts );
@@ -48,23 +59,23 @@ Numeric::FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
   size_t i = 0; // running index
   for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
   {
-    auto xf = (**f).xpoints();
+    auto xf = f->fun->xpoints();
     // there are no gaps between chebfuns
     std::copy(xf.begin(), xf.end() - 1, x.begin() + i);
     i += xf.size() - 1;
   }
   x.back() = this->endX();
-  auto domain = new Numeric::FunctionDomain1DVector( x );
+  auto domain = new FunctionDomain1DVector( x );
 
-  return Numeric::FunctionDomain1D_sptr( domain );
+  return FunctionDomain1D_sptr( domain );
 }
 
 /**
  * Creates a regular n-point domain for the region on which the workspace is defined.
  */
-Numeric::FunctionDomain1D_sptr ChebFunction::createDomain(size_t n) const
+FunctionDomain1D_sptr ChebFunction::createDomain(size_t n) const
 {
-  return Numeric::FunctionDomain1D_sptr( new Numeric::FunctionDomain1DVector(startX(), endX(), n) );
+  return Numeric::FunctionDomain1D_sptr( new FunctionDomain1DVector(startX(), endX(), n) );
 }
 
 /**
@@ -72,7 +83,7 @@ Numeric::FunctionDomain1D_sptr ChebFunction::createDomain(size_t n) const
  * @param domain :: The domain
  * @param values :: The output values.
  */
-void ChebFunction::eval(const Numeric::FunctionDomain1D& domain, Numeric::FunctionValues& values)const 
+void ChebFunction::eval(const FunctionDomain1D& domain, FunctionValues& values)const 
 {
   const double start = startX();
   const double end   = endX();
@@ -84,7 +95,7 @@ void ChebFunction::eval(const Numeric::FunctionDomain1D& domain, Numeric::Functi
     const double x = domain[i];
     if ( x < start ) continue;
     if ( x > end ) break;
-    Numeric::chebfun* f = m_fun[fi].get();
+    chebfun* f = m_fun[fi].fun;
     while( x > f->endX() )
     {
       ++fi;
@@ -92,7 +103,7 @@ void ChebFunction::eval(const Numeric::FunctionDomain1D& domain, Numeric::Functi
       {
         break;
       }
-      f = m_fun[fi].get();
+      f = m_fun[fi].fun;
     }
     values.setCalculated( i, f->valueB( x ) );
   }
@@ -101,12 +112,12 @@ void ChebFunction::eval(const Numeric::FunctionDomain1D& domain, Numeric::Functi
 /// Creates a domain for the region on which the workspace is defined.
 Numeric::JointDomain_sptr ChebFunction::createJointDomain() const
 {
-  auto jointDomain = new Numeric::JointDomain;
+  auto jointDomain = new JointDomain;
   for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
   {
-    jointDomain->addDomain((**f).createDomainFromXPoints());
+    jointDomain->addDomain(f->fun->createDomainFromXPoints());
   }
-  return Numeric::JointDomain_sptr( jointDomain );
+  return JointDomain_sptr( jointDomain );
 }
 
 /**
@@ -142,11 +153,11 @@ ChebFunction& ChebFunction::operator+=(const ChebFunction& cws)
   {// general case - more complicated
     auto jd1 = createJointDomain();
     auto jd2 = cws.createJointDomain();
-    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    DomainMap map = jd1->createDomainMap( *jd2 );
     for(auto r = map.begin(); r != map.end(); ++r)
     {
 
-      fun( r->i1 ).apply( '+', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+      fun( r->i1 ).apply( '+', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
     }
   }
   return *this;
@@ -169,11 +180,11 @@ ChebFunction& ChebFunction::operator-=(const ChebFunction& cws)
   {// general case - more complicated
     auto jd1 = createJointDomain();
     auto jd2 = cws.createJointDomain();
-    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    DomainMap map = jd1->createDomainMap( *jd2 );
     for(auto r = map.begin(); r != map.end(); ++r)
     {
 
-      fun( r->i1 ).apply( '-', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+      fun( r->i1 ).apply( '-', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
     }
   }
   return *this;
@@ -196,11 +207,11 @@ ChebFunction& ChebFunction::operator*=(const ChebFunction& cws)
   {// general case - more complicated
     auto jd1 = createJointDomain();
     auto jd2 = cws.createJointDomain();
-    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    DomainMap map = jd1->createDomainMap( *jd2 );
     for(auto r = map.begin(); r != map.end(); ++r)
     {
 
-      fun( r->i1 ).apply( '*', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+      fun( r->i1 ).apply( '*', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
     }
   }
   return *this;
@@ -223,14 +234,25 @@ ChebFunction& ChebFunction::operator/=(const ChebFunction& cws)
   {// general case - more complicated
     auto jd1 = createJointDomain();
     auto jd2 = cws.createJointDomain();
-    Numeric::DomainMap map = jd1->createDomainMap( *jd2 );
+    DomainMap map = jd1->createDomainMap( *jd2 );
     for(auto r = map.begin(); r != map.end(); ++r)
     {
 
-      fun( r->i1 ).apply( '/', cws.fun( r->i2 ), r->domain->as<Numeric::FunctionDomain1D>() );
+      fun( r->i1 ).apply( '/', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
     }
   }
   return *this;
 }
+
+/**
+ * Evaluate a chebfun
+ * @param s :: Storage object containing the chebfun to be evaluated
+ * @param x :: Point at which to evaluate the chebfun
+ */
+double ChebFunction::eval(Storage& s, double x) const
+{
+  return (*s.fun)( x );
+}
+
 
 } // Numeric

@@ -2,7 +2,7 @@
 #include "WebPluginFactory.h"
 //#include "Modeling/OSGWidget.h"
 
-#include "API/Framework.h"
+#include "Kernel/Framework.h"
 
 #include <QtCore/QUrl>
 #include <QtGui/QPushButton>

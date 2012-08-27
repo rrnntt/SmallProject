@@ -3,18 +3,18 @@
 
 #include "DataLoader.h"
 
-#include "DataObjects/TableWorkspace.h"
+#include "API/TableWorkspace.h"
 
 class TableLoader: public DataLoader
 {
 public:
-  TableLoader(QNetworkAccessManager* manager, const QUrl& url, DataObjects::TableWorkspace_ptr ws);
+  TableLoader(QNetworkAccessManager* manager, const QUrl& url, API::TableWorkspace_ptr ws);
   ~TableLoader();
 protected:
   /// Do the loading
   void load( const QByteArray& data);
   /// The workspace to fill the data in
-  DataObjects::TableWorkspace_ptr m_workspace;
+  API::TableWorkspace_ptr m_workspace;
 };
 
 #endif // WEBGUI_TABLELOADER_H

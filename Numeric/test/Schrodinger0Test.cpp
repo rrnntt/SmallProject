@@ -11,5 +11,5 @@ TEST(Numeric_Schrodinger0_Test, Test)
   alg.setProperty("EndX", "1");
   alg.setProperty("N", 5);
   //alg.get("Chebfun") = "c";
-  alg.execute();
+  //alg.execute();
 }

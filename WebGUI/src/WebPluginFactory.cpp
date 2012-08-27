@@ -2,7 +2,7 @@
 #include "TableLoader.h"
 
 #include "API/WorkspaceFactory.h"
-#include "DataObjects/TableWorkspace.h"
+#include "API/TableWorkspace.h"
 #include "QtAPI/Table.h"
 #include "QtAPI/Plot.h"
 
@@ -95,7 +95,7 @@ QtAPI::Table* WebPluginFactory::createTable(const QUrl & url, const QStringList 
   {
     tableName = argumentValues[argumentNames.indexOf("TableName")];
   }
-  DataObjects::TableWorkspace_ptr ws( dynamic_cast<DataObjects::TableWorkspace*>(
+  API::TableWorkspace_ptr ws( dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory  ::instance().create("TableWorkspace")
     ));
   if ( tableName.isEmpty() )
