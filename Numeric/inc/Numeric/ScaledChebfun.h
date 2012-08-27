@@ -25,7 +25,7 @@ namespace Numeric
     s(-inf) = c( -1 )
     s(x0) = c( 1 )
 
-    A ScaledChebfun is defined on [x0, x1] is the same as a chebfun on the same interval.
+    A ScaledChebfun defined on [x0, x1] is the same as a chebfun on the same interval.
 
 
  */
@@ -54,7 +54,8 @@ public:
   double value(double x) const;
   /// Fit to a c++ function
   void fit(AFunction f);
-
+  /// Fit to an IFunction
+  void fit(const IFunction& ifun);
 protected:
   /// Transform the argument
   double transform(double x) const;
@@ -73,6 +74,8 @@ protected:
   double m_startX;
   /// Right bound
   double m_endX;
+
+  friend class ChebOperator;
 };
 
 } // NUMERIC

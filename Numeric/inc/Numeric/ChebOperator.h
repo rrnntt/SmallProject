@@ -2,7 +2,8 @@
 #define NUMERIC_CHEBOPERATOR_H
 
 #include "Numeric/DllExport.h"
-#include "Numeric/ChebFunction.h"
+#include "Numeric/Chebfun.h"
+#include "Numeric/ScaledChebfun.h"
 #include "Numeric/GSLMatrix.h"
 #include "Numeric/IFunction1D.h"
 
@@ -86,15 +87,24 @@ class NUMERIC_EXPORT ChebOperator
 public:
   ChebOperator();
   virtual ~ChebOperator();
+  /// Create operator matrix for an normal chebfun.
+  /// @param base :: The base of the result function
+  virtual void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L) = 0;
+  /// Create operator matrix for a scaled chebfun.
+  /// @param fun :: The result function
+  virtual void createMatrix(const ScaledChebfun& fun, GSLMatrix& L) = 0;
   /// Apply this operator to a chebfun.
   /// @param arg :: Function to apply the operator to.
   /// @param res :: Function - result of the operation.
   virtual void apply(const chebfun& arg, chebfun& res);
-  /// Create operator matrix
-  /// @param base :: The base of the result function
-  virtual void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L) = 0;
+  /// Apply this operator to a scaled chebfun.
+  /// @param arg :: Function to apply the operator to.
+  /// @param res :: Function - result of the operation.
+  virtual void apply(const ScaledChebfun& arg, ScaledChebfun& res);
   /// Solve the equation L.y = 0 where L is the matrix of this operator
   void solve(chebfun& y, const BoundaryConditions& bc);
+  /// Solve the equation L.y = 0 where L is the matrix of this operator
+  void solve(ScaledChebfun& y, const BoundaryConditions& bc);
   /// Create an operator from a string.
   static ChebOperator* create( const std::string& str );
   /// Print out the operator for debugging
@@ -103,6 +113,12 @@ public:
 protected:
   /// Create an operator from a EParser.
   static ChebOperator* create( const Kernel::EParser& parser );
+  /// Get access to the plain chebfun of a ScaledChebfun
+  const chebfun& getPlainChebfun(const ScaledChebfun& fun) const {return fun.m_fun;}
+  /// Get access to protected ScaledChebfun::transform method
+  double getScaledTransform(const ScaledChebfun& fun, double x) const {return fun.transform(x);}
+  /// Get access to protected ScaledChebfun::invTransform method
+  double getScaledInvTransform(const ScaledChebfun& fun, double x) const {return fun.invTransform(x);}
   /// Cached operator matrices for different chebfun bases
   std::map< ChebfunBase_const_sptr, GSLMatrix* > m_matrixCache;
 };
@@ -116,6 +132,9 @@ public:
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Create operator matrix for a scaled chebfun.
+  /// @param fun :: The result function
+  void createMatrix(const ScaledChebfun& fun, GSLMatrix& L);
   /// Print out the operator for debugging
   /// @param padding :: Padding with spaces that must start all new lines in the log
   virtual void log(const std::string& padding = "");
@@ -130,6 +149,9 @@ public:
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Create operator matrix for a scaled chebfun.
+  /// @param fun :: The result function
+  void createMatrix(const ScaledChebfun& fun, GSLMatrix& L);
   /// Print out the operator for debugging
   /// @param padding :: Padding with spaces that must start all new lines in the log
   virtual void log(const std::string& padding = "");
@@ -150,6 +172,9 @@ public:
   /// @param base :: The base of the result function
   /// @param L :: The output matrix
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Create operator matrix for a scaled chebfun.
+  /// @param fun :: The result function
+  void createMatrix(const ScaledChebfun& fun, GSLMatrix& L);
   /// Print out the operator for debugging
   /// @param padding :: Padding with spaces that must start all new lines in the log
   virtual void log(const std::string& padding = "");
@@ -169,6 +194,9 @@ public:
   /// @param base :: The base of the result function
   /// @param L :: The output matrix
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Create operator matrix for a scaled chebfun.
+  /// @param fun :: The result function
+  void createMatrix(const ScaledChebfun& fun, GSLMatrix& L);
   /// Print out the operator for debugging
   /// @param padding :: Padding with spaces that must start all new lines in the log
   virtual void log(const std::string& padding = "");
@@ -207,6 +235,9 @@ public:
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
+  /// Create operator matrix for a scaled chebfun.
+  /// @param fun :: The result function
+  void createMatrix(const ScaledChebfun& fun, GSLMatrix& L);
   /// Print out the operator for debugging
   /// @param padding :: Padding with spaces that must start all new lines in the log
   virtual void log(const std::string& padding = "");

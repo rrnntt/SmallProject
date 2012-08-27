@@ -183,6 +183,34 @@ void ChebOperator::apply(const chebfun& arg, chebfun& res)
   res.setP( y );
 }
 
+/// Apply this operator to a scaled chebfun.
+/// @param arg :: Function to apply the operator to.
+/// @param res :: Function - result of the operation.
+void ChebOperator::apply(const ScaledChebfun& arg, ScaledChebfun& res)
+{
+  if ( !arg.haveSameBase( res ) )
+  {
+    throw std::invalid_argument("ChebOperator: arg and res scaled chebfuns must have same base");
+  }
+  auto base = res.getBase();
+  GSLMatrix* L;
+  if ( m_matrixCache.count( base ) != 0 )
+  {
+    L = m_matrixCache[base];
+  }
+  else
+  {
+    L = new GSLMatrix;
+    createMatrix( res, *L );
+    m_matrixCache[base] = L;
+  }
+
+  GSLVector x( arg.m_fun.ypoints() );
+  GSLVector y;
+  L->multiply( x, y );
+  res.m_fun.setP( y );
+}
+
 /**
  * Solve the equation L.y = 0 where L is the matrix of this operator
  * @param y :: The solution
@@ -202,6 +230,16 @@ void ChebOperator::solve(chebfun& y, const BoundaryConditions& bc)
   L.solve(rhs, u);
 
   y.setP( u );
+}
+
+/**
+ * Solve the equation L.y = 0 where L is the matrix of this operator
+ * @param y :: The solution
+ * @param bc :: The boundary conditions
+ */
+void ChebOperator::solve(ScaledChebfun& y, const BoundaryConditions& bc)
+{
+  throw std::runtime_error("ChebOperator::solve not implemented for ScaledChebfun");
 }
 
 /**
@@ -297,6 +335,16 @@ void ChebDiff::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   }
 }
 
+/**
+ * Create operator matrix for a scaled chebfun.
+ * @param fun :: The result function
+ * @param L :: The created matrix
+ */
+void ChebDiff::createMatrix(const ScaledChebfun& fun, GSLMatrix& L)
+{
+  throw std::runtime_error("ChebDiff not implemented for ScaledChebfun");
+}
+
 /// Print out the operator for debugging
 /// @param padding :: Padding with spaces that must start all new lines in the log
 void ChebDiff::log(const std::string& padding)
@@ -321,6 +369,16 @@ void ChebIdentity::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   const size_t n = base->n + 1;
   L.resize(n, n);
   L.identity();
+}
+
+/**
+ * Create operator matrix for a scaled chebfun.
+ * @param fun :: The result function
+ * @param L :: The created matrix
+ */
+void ChebIdentity::createMatrix(const ScaledChebfun& fun, GSLMatrix& L)
+{ 
+  createMatrix( getPlainChebfun(fun).getBase(), L );
 }
 
 /// Print out the operator for debugging
@@ -390,6 +448,33 @@ void ChebCompositeOperator::createMatrix(ChebfunBase_const_sptr base, GSLMatrix&
   }
 }
 
+/**
+ * Create operator matrix for a scaled chebfun.
+ * @param fun :: The result function
+ * @param L :: The created matrix
+ */
+void ChebCompositeOperator::createMatrix(const ScaledChebfun& fun, GSLMatrix& L)
+{
+  const size_t n = getPlainChebfun(fun).getBase()->n + 1;
+  L.resize(n, n);
+  if ( m_operators.empty() )
+  {
+    L.identity();
+    return;
+  }
+  auto op = m_operators.begin();
+  (**op).createMatrix( fun, L );
+  ++op;
+  for(; op != m_operators.end(); ++op)
+  {
+    GSLMatrix M(n,n);
+    (**op).createMatrix( fun, M );
+    GSLMatrix R(n,n);
+    R = L * M;
+    L.swap( R );
+  }
+}
+
 /// Print out the operator for debugging
 /// @param padding :: Padding with spaces that must start all new lines in the log
 void ChebCompositeOperator::log(const std::string& padding)
@@ -432,6 +517,32 @@ void ChebPlus::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
   {
     GSLMatrix M(n,n);
     (**op).createMatrix( base, M );
+    if ( m_ops[i] == '+' )
+    {
+      L += M;
+    }
+    else
+    {
+      L -= M;
+    }
+  }
+}
+
+/**
+ * Create operator matrix for a scaled chebfun.
+ * @param fun :: The result function
+ * @param L :: The created matrix
+ */
+void ChebPlus::createMatrix(const ScaledChebfun& fun, GSLMatrix& L)
+{
+  const size_t n = getPlainChebfun(fun).getBase()->n + 1;
+  L.resize(n, n);
+  L.zero();
+  size_t i = 0;
+  for(auto op = m_operators.begin(); op != m_operators.end(); ++op, ++i)
+  {
+    GSLMatrix M(n,n);
+    (**op).createMatrix( fun, M );
     if ( m_ops[i] == '+' )
     {
       L += M;
@@ -497,6 +608,39 @@ void ChebTimes::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
     {
       L.set( i, i, m_constant );
     }
+  }
+}
+
+/// Create operator matrix for a scaled chebfun.
+/// @param fun :: The result function
+void ChebTimes::createMatrix(const ScaledChebfun& fun, GSLMatrix& L)
+{
+  auto base = getPlainChebfun(fun).getBase();
+  if ( m_fun && fun.hasScaling() )
+  {
+    const size_t n = fun.n() + 1;
+    L.resize(n, n);
+    L.zero();
+    // copy the scaled x values
+    std::vector<double> x = base->x;
+    assert(x.size() == n);
+    // transform to the unscaled domain
+    for( size_t i = 0; i < n; ++i )
+    {
+      x[i] = getScaledInvTransform( fun, x[i] );
+    }
+    // calculate the operator's values at the unscaled points and assign to the diagonal
+    FunctionDomain1DVector domain( x );
+    FunctionValues values( domain );
+    m_fun->function( domain, values );
+    for( size_t i = 0; i < n; ++i )
+    {
+      L.set( i, i, values.getCalculated(i) );
+    }
+  }
+  else
+  {
+    createMatrix( base, L );
   }
 }
 

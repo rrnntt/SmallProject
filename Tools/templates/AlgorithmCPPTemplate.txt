@@ -1,7 +1,6 @@
 #include "${Namespace}/${ClassName}.h"
 
 #include "API/AlgorithmFactory.h"
-#include "API/WorkspaceProperty.h"
 
 #include "Kernel/CommonProperties.h"
 

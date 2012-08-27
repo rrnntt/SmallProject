@@ -5,6 +5,7 @@
 set( INC_FILES 
    inc/Goblin/DllExport.h
    inc/Goblin/ComDiffDialog.h
+   inc/Goblin/Diatom.h
    inc/Goblin/EnergyList.h
    inc/Goblin/GoblinTask.h
    inc/Goblin/GoblinPlotPicker.h
@@ -16,6 +17,7 @@ set( INC_FILES
    )
 set( SRC_FILES
   src/ComDiffDialog.cpp 
+  src/Diatom.cpp
   src/EnergyList.cpp
   src/GoblinTask.cpp
   src/GoblinPlotPicker.cpp
@@ -60,6 +62,7 @@ set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
   test/ComDiffTest.cpp
+  test/DiatomTest.cpp
   test/EnergyListTest.cpp
 )
 

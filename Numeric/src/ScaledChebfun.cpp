@@ -1,4 +1,5 @@
 #include "Numeric/ScaledChebfun.h"
+#include "Numeric/IFunction.h"
 
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
@@ -171,5 +172,31 @@ void ScaledChebfun::fit(AFunction f)
   }
   m_fun.setP( y );
 }
+
+/// Fit to an IFunction
+void ScaledChebfun::fit(const IFunction& ifun)
+{
+  if ( !hasScaling() )
+  {
+    m_fun.fit( ifun );
+    return;
+  }
+  auto& x = getBase()->x;
+  std::vector<double> xx(x.size());
+  for(size_t i = 0; i < xx.size(); ++i)
+  {
+    xx[i] = invTransform( x[i] );
+  }
+  FunctionDomain1DView domain(xx.data(),xx.size());
+  FunctionValues values(domain);
+  ifun.function(domain,values);
+  std::vector<double> y(xx.size());
+  for(size_t i=0; i < x.size(); ++i)
+  {
+    y[i] = values.getCalculated(i);
+  }
+  m_fun.setP( y );
+}
+
 
 } // Numeric

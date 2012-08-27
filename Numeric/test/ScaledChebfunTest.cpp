@@ -1,11 +1,13 @@
 #include "gtest/gtest.h"
 #include "Numeric/ScaledChebfun.h"
 #include "Numeric/Constants.h"
+#include "Numeric/FunctionDomain1D.h"
 
 #include <iostream>
 
 using namespace Numeric;
 
+/*========================================================================*/
 class TestScaledChebfun: public ScaledChebfun
 {
 public:
@@ -14,6 +16,13 @@ public:
   {}
   using ScaledChebfun::transform;
 };
+
+double gauss(double x)
+{
+  return exp(-x*x);
+}
+
+/*========================================================================*/
 
 TEST(Numeric_ScaledChebfun_Test, InfinityTest)
 {
@@ -99,5 +108,48 @@ TEST(Numeric_ScaledChebfun_Test, TransformTest)
   EXPECT_EQ( fun_inf.transform( -2 ), -1 );
   EXPECT_NEAR( fun_inf.transform( 3 ), 0.666666, 1e-6 );
   EXPECT_EQ( fun_inf.transform( inf ), 1 );
+
+}
+
+TEST(Numeric_ScaledChebfun_Test, FitAFunctionTest)
+{
+  ScaledChebfun a(15, 0, 2*pi);
+  a.fit( sin );
+  FunctionDomain1DVector x(0, 2*pi, 10);
+  for(size_t i = 0; i < x.size(); ++i)
+  {
+    //std::cerr << x[i] << ' ' << sin( x[i] ) - a.value( x[i] ) << std::endl;
+    EXPECT_NEAR(  a.value( x[i] ), sin( x[i] ), 1e-10 );
+  }
+
+  ScaledChebfun b(100, 0, inf);
+  b.fit( gauss );
+  FunctionDomain1DVector x1(0, 100, 10);
+  for(size_t i = 0; i < x1.size(); ++i)
+  {
+    //std::cerr << x1[i] << ' ' << gauss( x1[i] ) - b.value( x1[i] ) << std::endl;
+    EXPECT_NEAR(  b.value( x1[i] ), gauss( x1[i] ), 1e-14 );
+  }
+  FunctionDomain1DVector x2(0, 1, 10);
+  for(size_t i = 0; i < x2.size(); ++i)
+  {
+    //std::cerr << x2[i] << ' ' << gauss( x2[i] ) - b.value( x2[i] ) << std::endl;
+    EXPECT_NEAR(  b.value( x2[i] ), gauss( x2[i] ), 1e-14 );
+  }
+
+  ScaledChebfun c(100, minf, 0);
+  c.fit( gauss );
+  FunctionDomain1DVector x3(-100, 0, 10);
+  for(size_t i = 0; i < x3.size(); ++i)
+  {
+    //std::cerr << x3[i] << ' ' << gauss( x3[i] ) - c.value( x3[i] ) << std::endl;
+    EXPECT_NEAR(  c.value( x3[i] ), gauss( x3[i] ), 1e-14 );
+  }
+  FunctionDomain1DVector x4(-1, 0, 10);
+  for(size_t i = 0; i < x4.size(); ++i)
+  {
+    //std::cerr << x4[i] << ' ' << gauss( x4[i] ) - c.value( x4[i] ) << std::endl;
+    EXPECT_NEAR(  c.value( x4[i] ), gauss( x4[i] ), 1e-14 );
+  }
 
 }
