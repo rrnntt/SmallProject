@@ -46,10 +46,13 @@ namespace API
     if ( ws )
     {
       Workspace_ptr oldValue = getClass(name);
-      const std::string wsName = oldValue->name();
-      if ( !wsName.empty() )
+      if ( oldValue )
       {
-        WorkspaceManager::instance().addOrReplace( wsName, ws );
+        const std::string wsName = oldValue->name();
+        if ( !wsName.empty() )
+        {
+          WorkspaceManager::instance().addOrReplace( wsName, ws );
+        }
       }
     }
     Kernel::PropertyManager::setClassProperty( name, value );

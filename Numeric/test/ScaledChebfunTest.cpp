@@ -22,6 +22,13 @@ double gauss(double x)
   return exp(-x*x);
 }
 
+double xgauss(double x)
+{
+  if ( fabs( x ) == inf ) return 0.0;
+  const double t = x - 5.0;
+  return x*exp(-0.1*t*t);
+}
+
 /*========================================================================*/
 
 TEST(Numeric_ScaledChebfun_Test, InfinityTest)
@@ -150,6 +157,30 @@ TEST(Numeric_ScaledChebfun_Test, FitAFunctionTest)
   {
     //std::cerr << x4[i] << ' ' << gauss( x4[i] ) - c.value( x4[i] ) << std::endl;
     EXPECT_NEAR(  c.value( x4[i] ), gauss( x4[i] ), 1e-14 );
+  }
+
+  ScaledChebfun d(220, 0, inf);
+  d.fit( xgauss );
+  FunctionDomain1DVector x5(0, 30, 20);
+  for(size_t i = 0; i < x5.size(); ++i)
+  {
+    double xx = x5[i];
+    std::cerr << xx << ' ' << xgauss( xx )  - d.value( xx ) << std::endl;
+    //EXPECT_NEAR(  d.value( xx ), xgauss( xx ), 1e-14 );
+  }
+  FunctionDomain1DVector x6(0, 1, 10);
+  for(size_t i = 0; i < x6.size(); ++i)
+  {
+    double xx = x6[i];
+    std::cerr << xx << ' ' << xgauss( xx )  - d.value( xx ) << std::endl;
+    //EXPECT_NEAR(  d.value( xx ), xgauss( xx ), 1e-14 );
+  }
+  FunctionDomain1DVector x7(30, 100, 10);
+  for(size_t i = 0; i < x7.size(); ++i)
+  {
+    double xx = x7[i];
+    std::cerr << xx << ' ' << xgauss( xx ) - d.value( xx ) << std::endl;
+    //EXPECT_NEAR(  d.value( xx ), xgauss( xx ), 1e-14 );
   }
 
 }
