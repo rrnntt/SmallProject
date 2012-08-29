@@ -52,10 +52,30 @@ public:
   bool haveSameBase(const ScaledChebfun& other) const;
   /// Calculate function value at point x
   double value(double x) const;
+  /// evaluate the function
+  double operator()(const double& x)const{return value(x);}
   /// Fit to a c++ function
   void fit(AFunction f);
   /// Fit to an IFunction
   void fit(const IFunction& ifun);
+
+  /*=== Operations on ScaledChebfun ===*/
+
+  /* Assignment */
+  /// Assign values from another function to this
+  ScaledChebfun& operator=(const ScaledChebfun& fun);
+  /// Assign values from another function to this
+  ScaledChebfun& operator=(AFunction fun);
+  /// Assign values from another function to this
+  ScaledChebfun& operator=(const IFunction& fun);
+  /// Set this function equal to a constant
+  ScaledChebfun& operator=(double value);
+
+  /* Add */
+  /// Add values from another function
+  ScaledChebfun& operator+=(const ScaledChebfun& fun);
+  /// Add values from another function
+  ScaledChebfun& operator+=(AFunction fun);
 protected:
   /// Transform the argument
   double transform(double x) const;
@@ -63,6 +83,10 @@ protected:
   double invTransform(double t) const;
   /// Throw an invalid_argument exception after checking arguments to set(...)
   void throwInvalidArgumetns() const;
+  /// Throw a runtime_error exception if ScaledChebfuns have different bases
+  void throwDifferentBaseInOperation(const std::string& op) const;
+  /// Fill a vector with unscaled x-values
+  void fillXValues(std::vector<double>& x) const;
   /// Get the base of the underlying chebfun
   ChebfunBase_const_sptr getBase() const {return m_fun.getBase();}
 

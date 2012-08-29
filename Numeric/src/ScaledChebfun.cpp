@@ -154,6 +154,20 @@ double ScaledChebfun::value(double x) const
 }
 
 /**
+ * Fill a vector with unscaled x-values. First or last value can be infinite.
+ * @param x : A vector to fill.
+ */
+void ScaledChebfun::fillXValues(std::vector<double>& x) const
+{
+  auto& xx = getBase()->x;
+  x.resize(xx.size());
+  for(size_t i = 0; i < xx.size(); ++i)
+  {
+    x[i] = invTransform( xx[i] );
+  }
+}
+
+/**
  * Fit to a c++ function. 
  * @param f :: Function to fit to. This chebfun will approximate f.
  */
@@ -173,7 +187,10 @@ void ScaledChebfun::fit(AFunction f)
   m_fun.setP( y );
 }
 
-/// Fit to an IFunction
+/**
+ * Fit to an IFunction. 
+ * @param ifun :: Function to fit to. This chebfun will approximate f.
+ */
 void ScaledChebfun::fit(const IFunction& ifun)
 {
   if ( !hasScaling() )
@@ -196,6 +213,95 @@ void ScaledChebfun::fit(const IFunction& ifun)
     y[i] = values.getCalculated(i);
   }
   m_fun.setP( y );
+}
+
+/**
+ * Assign values from another function to this
+ * @param fun :: 
+ */
+ScaledChebfun& ScaledChebfun::operator=(const ScaledChebfun& fun)
+{
+  m_startX = fun.m_startX;
+  m_endX = fun.m_endX;
+  m_fun = fun.m_fun;
+  return *this;
+}
+
+/**
+ * Assign values from another function to this
+ * @param fun :: 
+ */
+ScaledChebfun& ScaledChebfun::operator=(AFunction fun)
+{
+  fit( fun );
+  return *this;
+}
+
+/**
+ * Assign values from another function to this
+ * @param fun :: 
+ */
+ScaledChebfun& ScaledChebfun::operator=(const IFunction& fun)
+{
+  fit( fun );
+  return *this;
+}
+
+/**
+ * Set this function equal to a constant
+ * @param value :: A constant value to set.
+ */
+ScaledChebfun& ScaledChebfun::operator=(double value)
+{
+  m_fun = value;
+  return *this;
+}
+
+
+/**
+ * Throw a runtime_error exception if ScaledChebfuns have different bases
+ * @param op :: Name of an operation requiring the same base for the ScaledChebfuns invloved.
+ */
+void ScaledChebfun::throwDifferentBaseInOperation(const std::string& op) const
+{
+  throw std::runtime_error("ScaledChebfun operation \""+op+"\" requires equal bases");
+}
+
+/**
+ * Add values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator+=(const ScaledChebfun& fun)
+{
+  if ( !haveSameBase( fun ) ) throwDifferentBaseInOperation("+");
+  m_fun += fun.m_fun;
+  return *this;
+}
+
+/**
+ * Add values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator+=(AFunction fun)
+{
+  if ( !hasScaling() )
+  {
+    m_fun += fun;
+  }
+  else
+  {
+    std::vector<double> x;
+    fillXValues( x );
+    std::vector<double> y( x.size() );
+    // copy m_p values to y
+    y = m_fun.ypoints();
+    for(size_t i = 0; i < x.size(); ++i)
+    {
+      y[i] += fun( x[i] );
+    }
+    m_fun.setP( y );
+  }
+  return *this;
 }
 
 

@@ -2,6 +2,9 @@
 #include "Numeric/ScaledChebfun.h"
 #include "Numeric/Constants.h"
 #include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
+#include "Numeric/IFunction1D.h"
+#include "Numeric/ParamFunction.h"
 
 #include <iostream>
 
@@ -28,6 +31,27 @@ double xgauss(double x)
   const double t = x - 5.0;
   return x*exp(-0.1*t*t);
 }
+
+class TestScaledChebfun_Gauss: public virtual IFunction1D, public virtual ParamFunction
+{
+public:
+  TestScaledChebfun_Gauss()
+  {
+  }
+  virtual std::string name()const {return "TestScaledChebfun_Gauss";}
+protected:
+  virtual void function1D(double* out, const double* xValues, const size_t nData)const
+  {
+    for(size_t i = 0; i < nData; ++i)
+    {
+      double x = xValues[i];
+      out[i] = exp(-x*x);
+    }
+  }
+  virtual void functionDeriv1D(Jacobian* , const double* , const size_t )
+  {
+  }
+};
 
 /*========================================================================*/
 
@@ -181,6 +205,31 @@ TEST(Numeric_ScaledChebfun_Test, FitAFunctionTest)
     double xx = x7[i];
     std::cerr << xx << ' ' << xgauss( xx ) - d.value( xx ) << std::endl;
     //EXPECT_NEAR(  d.value( xx ), xgauss( xx ), 1e-14 );
+  }
+
+}
+
+TEST(Numeric_ScaledChebfun_Test, FitIFunction1DTest)
+{
+  TestScaledChebfun_Gauss Gauss;
+  ScaledChebfun b(100, 0, inf);
+  b.fit( Gauss );
+  FunctionDomain1DVector x1(0, 100, 10);
+  FunctionValues y1( x1 );
+  Gauss.function(x1, y1);
+  for(size_t i = 0; i < x1.size(); ++i)
+  {
+    //std::cerr << x1[i] << ' ' << y1.getCalculated(i) - b.value( x1[i] ) << std::endl;
+    EXPECT_NEAR(  b.value( x1[i] ), y1.getCalculated(i), 1e-14 );
+  }
+
+  FunctionDomain1DVector x2(0, 2, 10);
+  FunctionValues y2( x2 );
+  Gauss.function(x2, y2);
+  for(size_t i = 0; i < x2.size(); ++i)
+  {
+    //std::cerr << x2[i] << ' ' << y2.getCalculated(i) << ' ' << y2.getCalculated(i) - b.value( x2[i] ) << std::endl;
+    EXPECT_NEAR(  b.value( x2[i] ), y2.getCalculated(i), 1e-14 );
   }
 
 }
