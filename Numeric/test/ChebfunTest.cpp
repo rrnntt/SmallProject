@@ -423,3 +423,9 @@ TEST(ChebfunTest, Roots1Test)
 
 }
 
+TEST(ChebfunTest, BestFitTest)
+{
+  chebfun cheb(0, 0, pi);
+  cheb.bestFit( (AFunction)sin );
+  std::cerr << "n=" << cheb.n() << std::endl;
+}

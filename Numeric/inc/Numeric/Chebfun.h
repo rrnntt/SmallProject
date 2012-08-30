@@ -6,6 +6,7 @@
 #include "Numeric/FunctionValues.h"
 #include "Numeric/GSLVector.h"
 #include "Numeric/GSLMatrix.h"
+#include "Numeric/Constants.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -73,6 +74,7 @@ namespace Numeric
     void setP(const GSLMatrix& M, size_t col);
     void fit(const IFunction& ifun);
     void fit(AFunction f);
+    template<typename TYPE> void bestFit(TYPE fun);
     void uniformFit(double start, double end, const std::vector<double>& p);
     /// calculate value at point x using the m_a's and treating them as expansion coefficients over Chebyshev T polynomials
     double valueT(const double& x)const;
@@ -220,6 +222,44 @@ namespace Numeric
     std::vector<double> m_p; ///< function values at m_x points, m_n + 1 items
     mutable std::vector<double> m_a; ///< polynomial coefficients, m_n + 1 items
   };
+
+
+  /**
+   * Find the number on x-points (n) large enough to reproduce fun
+   * with accuracy ~1e-16.
+   */
+  template<typename TYPE> 
+  void chebfun::bestFit(TYPE fun)
+  {
+    const double start = startX();
+    const double end = endX();
+    size_t nn = 9;
+    const double tol = 1e-16;
+    double err = 1.0;
+    while ( err > tol )
+    {
+      set( nn, start, end );
+      fit( fun );
+      auto& a = coeffs();
+      double minAodd = inf;
+      double minAeven = inf;
+      double maxA = 0.0;
+      for(size_t i = 0; i < a.size(); i+=2)
+      {
+        const double abs_even = fabs( a[i] );
+        const double abs_odd = fabs( a[i+1] );
+        if ( abs_even < minAeven ) minAeven = abs_even;
+        if ( abs_odd < minAodd ) minAodd = abs_odd;
+        if ( abs_even > maxA ) maxA = abs_even;
+        if ( abs_odd > maxA ) maxA = abs_odd;
+      }
+      err = (minAodd + minAeven) / maxA / 2;
+      std::cerr << "err " << err << std::endl;
+      nn *= 2;
+      --nn;
+    }
+  }
+
 
   typedef boost::shared_ptr<chebfun> chebfun_sptr;
   typedef boost::shared_ptr<const chebfun> chebfun_const_sptr;
