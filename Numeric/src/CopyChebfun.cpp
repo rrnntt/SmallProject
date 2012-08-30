@@ -24,8 +24,7 @@ void CopyChebfun::exec()
 {
   ChebfunWorkspace_sptr inws = getClass("InputWorkspace");
 
-  ChebfunWorkspace *cws = new ChebfunWorkspace;
-  cws->fun(0) = inws->fun(0);
+  ChebfunWorkspace *cws = new ChebfunWorkspace( *inws );
 
   setProperty("OutputWorkspace", boost::shared_ptr<ChebfunWorkspace>(cws) );
 

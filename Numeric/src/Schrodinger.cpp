@@ -52,8 +52,7 @@ void Schrodinger::exec()
   std::string opStr = get("Operator");
   auto oper = ChebOperator::create( opStr );
 
-  ChebfunWorkspace *cws = new ChebfunWorkspace;
-  auto& y = cws->fun(0);
+  chebfun y;
   y.set(n,startX,endX);
 
   GSLMatrix L;
@@ -95,6 +94,7 @@ void Schrodinger::exec()
   //imin = 29;
   y.setP( v, indx[0] );
 
+  ChebfunWorkspace *cws = new ChebfunWorkspace( y );
   setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 
   auto tws = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(

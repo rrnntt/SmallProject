@@ -40,11 +40,10 @@ void CreateChebfun::exec()
   }
   std::string funStr = get("Function");
   Numeric::IFunction_sptr fun = Numeric::FunctionFactory::instance().createFitFunction(funStr);
+  chebfun cheb(n,startX,endX);
+  cheb.fit(*fun);
 
-  ChebfunWorkspace *cws = new ChebfunWorkspace;
-  cws->fun(0).set(n,startX,endX);
-  cws->fun(0).fit(*fun);
-
+  ChebfunWorkspace *cws = new ChebfunWorkspace( cheb );
   setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 }
 

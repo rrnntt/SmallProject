@@ -43,9 +43,13 @@ void EvalChebfun::exec()
   auto& y = yColumn->data();
   yColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
 
+  FunctionDomain1DView domain(x.data(),x.size());
+  FunctionValues values( domain );
+  cws->eval(domain,values);
+
   for(size_t i = 0; i < x.size(); ++i)
   {
-    y[i] = cws->fun(0)(x[i]);
+    y[i] = values.getCalculated( i );
   }
 }
 

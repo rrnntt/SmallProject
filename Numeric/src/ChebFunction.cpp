@@ -4,7 +4,40 @@ namespace Numeric
 {
 
 ChebFunction::ChebFunction():
-m_fun(1,Storage(new Numeric::chebfun))
+m_fun(1,new ScaledChebfun)
+{
+}
+
+/**
+ * Copy constructor
+ * @param other :: Other function to copy from
+ */
+ChebFunction::ChebFunction(const ChebFunction& other)
+{
+  m_fun.resize( other.m_fun.size() );
+  for(size_t i = 0; i < m_fun.size(); ++i)
+  {
+    m_fun[i] = new ScaledChebfun( *other.m_fun[i] );
+  }
+}
+
+/**
+ * Create and init with a single chebfun
+ * @param fun :: A chebfun to copy the data from. 
+ */
+ChebFunction::ChebFunction(const chebfun& fun):
+m_fun(1,new ScaledChebfun(fun))
+{
+}
+
+/**
+ * Create and init with a single empty chebfun
+ * @param n :: Number of points in the interval. 
+ * @param startX :: The left interval boundary. 
+ * @param endX :: The right interval boundary. 
+ */
+ChebFunction::ChebFunction(size_t n, const double& startX,const double& endX):
+m_fun(1,new ScaledChebfun(n,startX,endX))
 {
 }
 
@@ -13,10 +46,30 @@ m_fun(1,Storage(new Numeric::chebfun))
  */
 ChebFunction::~ChebFunction()
 {
+  clear();
+}
+
+/// clear all data
+void ChebFunction::clear()
+{
   for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
   {
-    delete f->fun;
+    delete *f;
   }
+  m_fun.clear();
+}
+
+/**
+ * Add an empty ScaledChebfun to the right on the x-axis. The new scaled chebfun will have
+ * the interval starting an the end of the previous chebfun and ending at endX.
+ * @param n :: Number of points in the interval of the new function.  
+ * @param endx :: The right interval boundary.
+ */
+void ChebFunction::appendRight(size_t n, const double& endx)
+{
+  if ( endX() == inf ) throw std::runtime_error("Cannot append a chebfun at infinity");
+  if ( endx <= endX() ) throw std::runtime_error("New interval is negative or zero");
+  m_fun.push_back( new ScaledChebfun(n, endX(), endx) );
 }
 
 /// Function you want to fit to.
@@ -31,7 +84,7 @@ void ChebFunction::function1D(double* out, const double* xValues, const size_t n
     const double x = xValues[i];
     if ( x < start ) continue;
     if ( x > end ) break;
-    chebfun* f = m_fun[fi].fun;
+    auto f = m_fun[fi];
     while( x > f->endX() )
     {
       ++fi;
@@ -39,9 +92,9 @@ void ChebFunction::function1D(double* out, const double* xValues, const size_t n
       {
         break;
       }
-      f = m_fun[fi].fun;
+      f = m_fun[fi];
     }
-    out[i] = f->valueB( x );
+    out[i] = f->value( x );
   }
 }
 
@@ -50,8 +103,8 @@ FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
 {
   std::vector<double> x;
   size_t npts = 0;
-  std::for_each(m_fun.begin(),m_fun.end(),[&npts](const Storage& s){
-    npts += s.fun->n();
+  std::for_each(m_fun.begin(),m_fun.end(),[&npts](const ScaledChebfun* fun){
+    npts += fun->n();
   });
   ++npts;
   x.resize( npts );
@@ -59,7 +112,8 @@ FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
   size_t i = 0; // running index
   for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
   {
-    auto xf = f->fun->xpoints();
+    std::vector<double> xf;
+    (**f).fillXValues( xf );
     // there are no gaps between chebfuns
     std::copy(xf.begin(), xf.end() - 1, x.begin() + i);
     i += xf.size() - 1;
@@ -95,7 +149,7 @@ void ChebFunction::eval(const FunctionDomain1D& domain, FunctionValues& values)c
     const double x = domain[i];
     if ( x < start ) continue;
     if ( x > end ) break;
-    chebfun* f = m_fun[fi].fun;
+    auto f = m_fun[fi];
     while( x > f->endX() )
     {
       ++fi;
@@ -103,9 +157,9 @@ void ChebFunction::eval(const FunctionDomain1D& domain, FunctionValues& values)c
       {
         break;
       }
-      f = m_fun[fi].fun;
+      f = m_fun[fi];
     }
-    values.setCalculated( i, f->valueB( x ) );
+    values.setCalculated( i, f->value( x ) );
   }
 }
 
@@ -115,7 +169,7 @@ Numeric::JointDomain_sptr ChebFunction::createJointDomain() const
   auto jointDomain = new JointDomain;
   for(auto f = m_fun.begin(); f != m_fun.end(); ++f)
   {
-    jointDomain->addDomain(f->fun->createDomainFromXPoints());
+    jointDomain->addDomain((**f).createDomainFromXPoints());
   }
   return JointDomain_sptr( jointDomain );
 }
@@ -151,14 +205,15 @@ ChebFunction& ChebFunction::operator+=(const ChebFunction& cws)
   }
   else
   {// general case - more complicated
-    auto jd1 = createJointDomain();
-    auto jd2 = cws.createJointDomain();
-    DomainMap map = jd1->createDomainMap( *jd2 );
-    for(auto r = map.begin(); r != map.end(); ++r)
-    {
+    //auto jd1 = createJointDomain();
+    //auto jd2 = cws.createJointDomain();
+    //DomainMap map = jd1->createDomainMap( *jd2 );
+    //for(auto r = map.begin(); r != map.end(); ++r)
+    //{
 
-      fun( r->i1 ).apply( '+', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
-    }
+    //  fun( r->i1 ).apply( '+', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
+    //}
+    throw std::runtime_error("Cannot add ChebFunction having on a different base");
   }
   return *this;
 }
@@ -178,14 +233,7 @@ ChebFunction& ChebFunction::operator-=(const ChebFunction& cws)
   }
   else
   {// general case - more complicated
-    auto jd1 = createJointDomain();
-    auto jd2 = cws.createJointDomain();
-    DomainMap map = jd1->createDomainMap( *jd2 );
-    for(auto r = map.begin(); r != map.end(); ++r)
-    {
-
-      fun( r->i1 ).apply( '-', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
-    }
+    throw std::runtime_error("Cannot subtract ChebFunction having on a different base");
   }
   return *this;
 }
@@ -205,14 +253,7 @@ ChebFunction& ChebFunction::operator*=(const ChebFunction& cws)
   }
   else
   {// general case - more complicated
-    auto jd1 = createJointDomain();
-    auto jd2 = cws.createJointDomain();
-    DomainMap map = jd1->createDomainMap( *jd2 );
-    for(auto r = map.begin(); r != map.end(); ++r)
-    {
-
-      fun( r->i1 ).apply( '*', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
-    }
+    throw std::runtime_error("Cannot multiply ChebFunction having on a different base");
   }
   return *this;
 }
@@ -232,27 +273,61 @@ ChebFunction& ChebFunction::operator/=(const ChebFunction& cws)
   }
   else
   {// general case - more complicated
-    auto jd1 = createJointDomain();
-    auto jd2 = cws.createJointDomain();
-    DomainMap map = jd1->createDomainMap( *jd2 );
-    for(auto r = map.begin(); r != map.end(); ++r)
-    {
-
-      fun( r->i1 ).apply( '/', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
-    }
+    throw std::runtime_error("Cannot divide ChebFunction having on a different base");
   }
   return *this;
 }
 
 /**
- * Evaluate a chebfun
- * @param s :: Storage object containing the chebfun to be evaluated
- * @param x :: Point at which to evaluate the chebfun
+ * Fit to a c++ function.
+ * @param f :: Function to fit to.
  */
-double ChebFunction::eval(Storage& s, double x) const
+void ChebFunction::fit(AFunction f)
 {
-  return (*s.fun)( x );
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i).fit( f );
+  }
 }
 
+/**
+ * Fit to an IFunction.
+ * @param ifun :: Function to fit to.
+ */
+void ChebFunction::fit(const IFunction& ifun)
+{
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i).fit( ifun );
+  }
+}
+
+/**
+ * Integrate the function on the whole interval
+ */
+double ChebFunction::integr() const
+{
+  double res = 0.0;
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    res += fun(i).integr();
+  }
+  return res;
+}
+
+/**
+ * make this chebfun a derivative of the argument
+ * @param fun :: A function to differentiate.
+ */
+void ChebFunction::fromDerivative(const ChebFunction& fun)
+{
+  clear();
+  for(size_t i = 0; i < fun.nfuns(); ++i)
+  {
+    auto f = new ScaledChebfun;
+    f->fromDerivative( fun.fun(i) );
+    m_fun.push_back( f );
+  }
+}
 
 } // Numeric

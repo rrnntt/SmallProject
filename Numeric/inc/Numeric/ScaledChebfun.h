@@ -38,6 +38,8 @@ public:
   ~ScaledChebfun();
   /// Copy constructor.
   ScaledChebfun(const ScaledChebfun& other);
+  /// Copy from a plain chebfun.
+  ScaledChebfun(const chebfun& other);
   ///  Set the size and domain bounds of this function.
   void set(size_t n, const double& startX, const double& endX);
   /// get the left interval bound
@@ -50,6 +52,8 @@ public:
   bool hasScaling() const {return m_startX == minf || m_endX == inf;}
   /// Check if two chebfuns have shared x-points.
   bool haveSameBase(const ScaledChebfun& other) const;
+  /// Fill a vector with unscaled x-values
+  void fillXValues(std::vector<double>& x) const;
   /// Calculate function value at point x
   double value(double x) const;
   /// evaluate the function
@@ -62,12 +66,16 @@ public:
   void fromDerivative(const ScaledChebfun& fun);
   /// Integrate the function on the whole interval
   double integr() const;
+  /// Creates a domain for the region on which the workspace is defined.
+  FunctionDomain1D_sptr createDomainFromXPoints() const;
 
   /*=== Operations on ScaledChebfun ===*/
 
   /* Assignment */
-  /// Assign values from another function to this
+  /// Make this function a copy of another
   ScaledChebfun& operator=(const ScaledChebfun& fun);
+  /// Make this function a copy of a chebfun
+  ScaledChebfun& operator=(const chebfun& fun);
   /// Assign values from another function to this
   ScaledChebfun& operator=(AFunction fun);
   /// Assign values from another function to this
@@ -80,6 +88,12 @@ public:
   ScaledChebfun& operator+=(const ScaledChebfun& fun);
   /// Add values from another function
   ScaledChebfun& operator+=(AFunction fun);
+  /// Subtract values from another function
+  ScaledChebfun& operator-=(const ScaledChebfun& fun);
+  /// Multiply by values from another function
+  ScaledChebfun& operator*=(const ScaledChebfun& fun);
+  /// Divide by values from another function
+  ScaledChebfun& operator/=(const ScaledChebfun& fun);
 protected:
   /// Transform the argument
   double transform(double x) const;
@@ -89,8 +103,6 @@ protected:
   void throwInvalidArgumetns() const;
   /// Throw a runtime_error exception if ScaledChebfuns have different bases
   void throwDifferentBaseInOperation(const std::string& op) const;
-  /// Fill a vector with unscaled x-values
-  void fillXValues(std::vector<double>& x) const;
   /// Get the base of the underlying chebfun
   ChebfunBase_const_sptr getBase() const {return m_fun.getBase();}
 

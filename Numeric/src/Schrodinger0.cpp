@@ -161,12 +161,12 @@ void Schrodinger0::exec()
   s.initialize(costFunction);
   s.minimize();
 
-  ChebfunWorkspace *cws = new ChebfunWorkspace;
-  auto& y = cws->fun(0);
+  chebfun y;
   schrod->calc( y );
   y /= sqrt( y.norm2() );
   std::cerr << "Energy: " << schrod->val() << ' ' << schrod->getParameter(0) << std::endl;
 
+  ChebfunWorkspace *cws = new ChebfunWorkspace( y );
   setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 
   chebfun test( y );

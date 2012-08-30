@@ -9,8 +9,19 @@ namespace Numeric
 DECLARE_WORKSPACE(ChebfunWorkspace);
 
 ChebfunWorkspace::ChebfunWorkspace():
-Numeric::ChebFunction()
+ChebFunction()
 {
 }
+
+ChebfunWorkspace::ChebfunWorkspace(const ChebFunction& fun):
+ChebFunction(fun)
+{
+}
+
+ChebfunWorkspace::ChebfunWorkspace(const chebfun& fun):
+ChebFunction(fun)
+{
+}
+
 
 } // namespace Numeric

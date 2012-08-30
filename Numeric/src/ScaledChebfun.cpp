@@ -36,6 +36,15 @@ m_fun(other.m_fun),m_startX(other.m_startX),m_endX(other.m_endX)
 }
 
 /**
+ * Copy from a plain chebfun. This function will be unscaled and equal to cheb.
+ * @param cheb :: A chebfun to copy from
+ */
+ScaledChebfun::ScaledChebfun(const chebfun& cheb)
+:m_fun(cheb),m_startX(cheb.startX()),m_endX(cheb.endX())
+{
+}
+
+/**
  * Constructs a ScaledChebfun with n points in the inerval [startX, endX]. startX must be
  * smaller than endX. If endX is Numeric::inf (positive infinity) then the function is
  * defined in the [startX, inf) interval, startX cannot be Numeric::minf (negative infinity) in this case.
@@ -216,7 +225,7 @@ void ScaledChebfun::fit(const IFunction& ifun)
 }
 
 /**
- * Assign values from another function to this
+ * Make this function a copy of another
  * @param fun :: 
  */
 ScaledChebfun& ScaledChebfun::operator=(const ScaledChebfun& fun)
@@ -224,6 +233,18 @@ ScaledChebfun& ScaledChebfun::operator=(const ScaledChebfun& fun)
   m_startX = fun.m_startX;
   m_endX = fun.m_endX;
   m_fun = fun.m_fun;
+  return *this;
+}
+
+/**
+ * Make this function a copy of a chebfun
+ * @param fun :: A chebfun to copy from.
+ */
+ScaledChebfun& ScaledChebfun::operator=(const chebfun& fun)
+{
+  m_startX = fun.startX();
+  m_endX = fun.endX();
+  m_fun = fun;
   return *this;
 }
 
@@ -305,6 +326,39 @@ ScaledChebfun& ScaledChebfun::operator+=(AFunction fun)
 }
 
 /**
+ * Subtract values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator-=(const ScaledChebfun& fun)
+{
+  if ( !haveSameBase( fun ) ) throwDifferentBaseInOperation("-");
+  m_fun -= fun.m_fun;
+  return *this;
+}
+
+/**
+ * Multiply by values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator*=(const ScaledChebfun& fun)
+{
+  if ( !haveSameBase( fun ) ) throwDifferentBaseInOperation("*");
+  m_fun *= fun.m_fun;
+  return *this;
+}
+
+/**
+ * Divide by values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator/=(const ScaledChebfun& fun)
+{
+  if ( !haveSameBase( fun ) ) throwDifferentBaseInOperation("/");
+  m_fun /= fun.m_fun;
+  return *this;
+}
+
+/**
  * make this chebfun a derivative of the argument
  */
 void ScaledChebfun::fromDerivative(const ScaledChebfun& fun)
@@ -360,5 +414,16 @@ double ScaledChebfun::integr() const
   return tmp.integr();
 }
 
+/**
+ * Creates a domain for the region on which the workspace is defined.
+ */
+FunctionDomain1D_sptr ScaledChebfun::createDomainFromXPoints() const
+{
+  std::vector<double> x;
+  fillXValues( x );
+  auto domain = new Numeric::FunctionDomain1DVector( x );
+
+  return Numeric::FunctionDomain1D_sptr( domain );
+}
 
 } // Numeric

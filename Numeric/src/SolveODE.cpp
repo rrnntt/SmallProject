@@ -94,12 +94,12 @@ void SolveODE::exec()
     throw std::invalid_argument("Unknown boundary conditions: Dirichlet or Cauchy are allowed");
   }
 
-  ChebfunWorkspace *cws = new ChebfunWorkspace;
-  cws->fun(0).set(n,startX,endX);
+  chebfun y(n,startX,endX);
 
   oper->log();
-  oper->solve(cws->fun(0), *bc);
+  oper->solve(y, *bc);
 
+  ChebfunWorkspace *cws = new ChebfunWorkspace( y );
   setProperty("Chebfun", boost::shared_ptr<ChebfunWorkspace>(cws));
 }
 

@@ -20,9 +20,6 @@ SimulateParticle::SimulateParticle()
 void SimulateParticle::exec()
 {
   Numeric::ChebfunWorkspace *cws = new Numeric::ChebfunWorkspace;
-  cws->fun(0).set(10,-3.3,3.3);
-  cws->fun(0).fit(sin);
-
   setProperty("XProj", boost::shared_ptr<Numeric::ChebfunWorkspace>(cws));
 }
 

@@ -18,14 +18,20 @@ TEST(CreateChebfunTest, Test)
   EXPECT_TRUE( cheb );
   EXPECT_EQ( cheb->nfuns(), 1 );
 
-  auto& f = cheb->fun( 0 );
-  auto& x = f.xpoints();
-  auto& y = f.ypoints();
+  //auto& f = cheb->fun( 0 );
+  //auto& x = f.xpoints();
+  //auto& y = f.ypoints();
 
-  for(size_t i = 0; i < x.size(); ++i)
+  auto domain = cheb->createDomainFromXPoints();
+  FunctionValues values( *domain );
+  cheb->eval(*domain,values);
+
+  for(size_t i = 0; i < domain->size(); ++i)
   {
-    //std::cerr << x[i] << ' ' << y[i] << ' ' << 2*sin(2*x[i]) << std::endl;
-    EXPECT_NEAR( y[i], 2*sin(2*x[i]), 1e-12 );
+    double x = (*domain)[i];
+    double y = values.getCalculated(i);
+    //std::cerr << x << ' ' << y << ' ' << 2*sin(2*x) << std::endl;
+    EXPECT_NEAR( y, 2*sin(2*x), 1e-12 );
   }
 
   auto ws = API::WorkspaceManager::instance().retrieve("cheb");

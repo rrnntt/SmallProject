@@ -2,7 +2,7 @@
 #define NUMERIC_CHEBFUNCTION_H
 
 #include "Numeric/DllExport.h"
-#include "Numeric/Chebfun.h"
+#include "Numeric/ScaledChebfun.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 #include "Numeric/JointDomain.h"
@@ -26,31 +26,47 @@ class NUMERIC_EXPORT ChebFunction: public IFunction1D, public ParamFunction
 {
 public:
   ChebFunction();
+  /// Copy constructor
+  ChebFunction(const ChebFunction& other);
+  /// Create and init with a single chebfun
+  ChebFunction(const chebfun& fun);
+  /// Create and init with a single empty chebfun
+  ChebFunction(size_t n, const double& startX,const double& endX);
+  /// Destructor.
   ~ChebFunction();
   /// Returns the function's name
   virtual std::string name()const {return "ChebFunction";}
   /// Function you want to fit.
   virtual void function1D(double* out, const double* xValues, const size_t nData)const;
   /// Start of the domain
-  double startX()const {return m_fun.front().fun->startX();}
+  double startX()const {return m_fun.front()->startX();}
   /// End of the domain
-  double endX()const{return m_fun.back().fun->endX();}
+  double endX()const{return m_fun.back()->endX();}
   /// Number of chebfuns in the workspace
   size_t nfuns() const {return m_fun.size();}
-  /// Return reference to i-th chebfun
-  Numeric::chebfun& fun(size_t i) {return *(m_fun[i].fun);}
   /// Return reference to i-th chebfun, const version
-  const Numeric::chebfun& fun(size_t i) const {return *(m_fun[i].fun);}
+  const ScaledChebfun& fun(size_t i) const {return *(m_fun[i]);}
+  /// Add a ScaledChebfun to the right on the x-axis.
+  void appendRight(size_t n, const double& endX);
   /// Creates a domain for the region on which the function is defined.
-  Numeric::FunctionDomain1D_sptr createDomainFromXPoints() const;
+  FunctionDomain1D_sptr createDomainFromXPoints() const;
   /// Creates a domain for the region on which the function is defined.
-  Numeric::FunctionDomain1D_sptr createDomain(size_t n) const;
+  FunctionDomain1D_sptr createDomain(size_t n) const;
   /// Creates a domain for the region on which the function is defined.
-  Numeric::JointDomain_sptr createJointDomain() const;
+  JointDomain_sptr createJointDomain() const;
   /// Evaluate chebfuns on a given domain
   void eval(const FunctionDomain1D& domain, FunctionValues& values)const ;
   /// Check if this function has the same base as another one
   bool haveSameBase(const ChebFunction& other) const;
+  /// Fit to a c++ function
+  void fit(AFunction f);
+  /// Fit to an IFunction
+  void fit(const IFunction& ifun);
+  /// make this chebfun a derivative of the argument
+  void fromDerivative(const ChebFunction& fun);
+  /// Integrate the function on the whole interval
+  double integr() const;
+
   /// Performs a binary operation
   void binaryOperation(const ChebFunction& cws, const char op);
      /* Binary operators */
@@ -59,15 +75,12 @@ public:
   ChebFunction& operator*=(const ChebFunction& cws);
   ChebFunction& operator/=(const ChebFunction& cws);
 protected:
-  struct Storage
-  {
-    Storage(chebfun* f):fun(f){}
-    chebfun* fun;
-  };
-  /// Evaluate a chebfun
-  double eval(Storage& s, double x) const;
+  /// Return reference to i-th chebfun
+  ScaledChebfun& fun(size_t i) {return *(m_fun[i]);}
+  /// clear all data
+  void clear();
   /// Vector of chebfuns
-  std::vector<Storage> m_fun;
+  std::vector<ScaledChebfun*> m_fun;
 };
 
 /// typedef shared pointer

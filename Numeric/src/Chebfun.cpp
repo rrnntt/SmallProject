@@ -693,6 +693,7 @@ namespace Numeric
     std::vector<double> x;
     x.resize( n() + 1 );
 
+    // ??? why are we copying?
     auto xf = xpoints();
     std::copy(xf.begin(), xf.end(), x.begin() );
     auto domain = new Numeric::FunctionDomain1DVector( x );

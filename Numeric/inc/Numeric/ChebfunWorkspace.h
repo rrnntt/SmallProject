@@ -15,6 +15,8 @@ class NUMERIC_EXPORT ChebfunWorkspace: public API::Workspace, public ChebFunctio
 {
 public:
   ChebfunWorkspace();
+  ChebfunWorkspace(const ChebFunction& fun);
+  ChebfunWorkspace(const chebfun& fun);
   ~ChebfunWorkspace(){}
   virtual std::string id()const {return "ChebfunWorkspace";}
 

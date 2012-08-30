@@ -52,8 +52,8 @@ void SchrodScale::exec()
   }
   a.setP( aa );
 
-  ChebFunction_sptr chbA(new ChebFunction());
-  chbA->fun(0) = a;
+  ChebFunction_sptr chbA(new ChebFunction(a));
+  //chbA->fun(0) = a;
   ChebPlus plus; 
   plus.add('+',new ChebDiff);
   plus.add('-',new ChebTimes(chbA));
