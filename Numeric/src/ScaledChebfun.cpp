@@ -304,5 +304,61 @@ ScaledChebfun& ScaledChebfun::operator+=(AFunction fun)
   return *this;
 }
 
+/**
+ * make this chebfun a derivative of the argument
+ */
+void ScaledChebfun::fromDerivative(const ScaledChebfun& fun)
+{
+  m_startX = fun.m_startX;
+  m_endX = fun.m_endX;
+  m_fun.fromDerivative( fun.m_fun );
+  if ( !hasScaling() ) return;
+  // use the chain rule to calculate the derivatives
+  std::vector<double> x;
+  fillXValues( x );
+  // copy m_p values to y
+  std::vector<double> y = m_fun.ypoints();
+  for(size_t i = 0; i < x.size(); ++i)
+  {
+    double xx = m_endX == inf ? x[i] - m_startX + 1.0 : -x[i] + m_endX + 1.0;
+    y[i] *= 2.0 / ( xx*xx );
+  }
+  m_fun.setP( y );
+}
+
+namespace
+{
+  double jacobian_plus(double x)
+  {
+    if ( x == 1.0 ) return 0.0;
+    const double xx = 1.0 - x;
+    return 2.0 / ( xx*xx );
+  }
+  double jacobian_minus(double x)
+  {
+    if ( x == -1.0 ) return 0.0;
+    const double xx = 1.0 + x;
+    return 2.0 / ( xx*xx );
+  }
+}
+
+/**
+ * Integrate the function on the whole interval
+ */
+double ScaledChebfun::integr() const
+{
+  if ( !hasScaling() ) return m_fun.integr();
+  chebfun tmp = m_fun;
+  if ( m_endX == inf )
+  {
+    tmp *= jacobian_plus;
+  }
+  else
+  {
+    tmp *= jacobian_minus;
+  }
+  return tmp.integr();
+}
+
 
 } // Numeric

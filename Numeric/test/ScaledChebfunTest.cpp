@@ -25,6 +25,11 @@ double gauss(double x)
   return exp(-x*x);
 }
 
+double dgauss(double x)
+{
+  return -2*x*exp(-x*x);
+}
+
 double xgauss(double x)
 {
   if ( fabs( x ) == inf ) return 0.0;
@@ -232,4 +237,68 @@ TEST(Numeric_ScaledChebfun_Test, FitIFunction1DTest)
     EXPECT_NEAR(  b.value( x2[i] ), y2.getCalculated(i), 1e-14 );
   }
 
+}
+
+TEST(Numeric_ScaledChebfun_Test, FromDerivativeTest)
+{
+  // positive infinity
+  ScaledChebfun ap(100, 0, inf);
+  ap.fit( gauss );
+
+  ScaledChebfun dp;
+  dp.fromDerivative( ap );
+  FunctionDomain1DVector x1(0, 1, 10);
+  FunctionDomain1DVector x100(0, 100, 10);
+
+  for(size_t i = 0; i < x1.size(); ++i)
+  {
+    const double x = x1[i];
+    //std::cerr << x << ' ' << dgauss( x ) << ' ' << dp.value( x ) << std::endl;
+    EXPECT_NEAR(  dp.value( x ), dgauss( x ), 1e-11 );
+  }
+
+  for(size_t i = 0; i < x100.size(); ++i)
+  {
+    const double x = x100[i];
+    //std::cerr << x << ' ' << dgauss( x ) << ' ' << dp.value( x ) << std::endl;
+    EXPECT_NEAR(  dp.value( x ), dgauss( x ), 1e-11 );
+  }
+
+  // negative infinity
+  ScaledChebfun am(100, minf, 0);
+  am.fit( gauss );
+
+  ScaledChebfun dm;
+  dm.fromDerivative( am );
+  FunctionDomain1DVector xm1(-1, 0, 10);
+  FunctionDomain1DVector xm100(-100, 0, 10);
+
+  for(size_t i = 0; i < xm1.size(); ++i)
+  {
+    const double x = xm1[i];
+    //std::cerr << x << ' ' << dgauss( x ) << ' ' << dm.value( x ) << std::endl;
+    EXPECT_NEAR(  dm.value( x ), dgauss( x ), 1e-11 );
+  }
+
+  for(size_t i = 0; i < xm100.size(); ++i)
+  {
+    const double x = xm100[i];
+    //std::cerr << x << ' ' << dgauss( x ) << ' ' << dm.value( x ) << std::endl;
+    EXPECT_NEAR(  dm.value( x ), dgauss( x ), 1e-11 );
+  }
+}
+
+TEST(Numeric_ScaledChebfun_Test, IntegrTest)
+{
+  // positive infinity
+  ScaledChebfun ap(100, 0, inf);
+  ap.fit( gauss );
+  //std::cerr << ap.integr() - sqrt(pi)/2 << std::endl;
+  EXPECT_NEAR( ap.integr(), sqrt(pi)/2, 1e-15);
+
+  // negative infinity
+  ScaledChebfun am(100, minf, 0);
+  am.fit( gauss );
+  //std::cerr << am.integr() - sqrt(pi)/2 << std::endl;
+  EXPECT_NEAR( am.integr(), sqrt(pi)/2, 1e-15);
 }

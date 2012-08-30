@@ -195,7 +195,7 @@ namespace Numeric
     Numeric::FunctionDomain1D_sptr createDomain(size_t n) const;
 
     double integrate(int pwr = 1);
-    double integr();
+    double integr() const;
     double norm2();
 
     void square()

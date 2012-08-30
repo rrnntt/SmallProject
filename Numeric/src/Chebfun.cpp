@@ -530,7 +530,7 @@ namespace Numeric
     return res;
   }
 
-  double chebfun::integr()
+  double chebfun::integr() const
   {
     double res = 0.0;
     const size_t n = m_base->n;

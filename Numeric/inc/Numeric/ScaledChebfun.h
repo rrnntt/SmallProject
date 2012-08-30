@@ -58,6 +58,10 @@ public:
   void fit(AFunction f);
   /// Fit to an IFunction
   void fit(const IFunction& ifun);
+  /// make this chebfun a derivative of the argument
+  void fromDerivative(const ScaledChebfun& fun);
+  /// Integrate the function on the whole interval
+  double integr() const;
 
   /*=== Operations on ScaledChebfun ===*/
 
