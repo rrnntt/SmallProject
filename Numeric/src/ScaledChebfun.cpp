@@ -426,4 +426,24 @@ FunctionDomain1D_sptr ScaledChebfun::createDomainFromXPoints() const
   return Numeric::FunctionDomain1D_sptr( domain );
 }
 
+/**
+  * Find the number on x-points (n) large enough to reproduce fun
+  * with accuracy ~1e-16.
+  * @param fun :: Function to fit to.
+  */
+void ScaledChebfun::bestFit(AFunction fun)
+{
+  BestFit( *this, fun );
+}
+
+/**
+  * Find the number on x-points (n) large enough to reproduce fun
+  * with accuracy ~1e-16.
+  * @param fun :: Function to fit to.
+  */
+void ScaledChebfun::bestFit(const IFunction& fun)
+{
+  BestFit<ScaledChebfun,const IFunction&>( *this, fun );
+}
+
 } // Numeric

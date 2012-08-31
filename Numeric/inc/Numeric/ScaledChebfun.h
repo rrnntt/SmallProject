@@ -62,6 +62,10 @@ public:
   void fit(AFunction f);
   /// Fit to an IFunction
   void fit(const IFunction& ifun);
+  /// Best fit
+  void bestFit(AFunction fun);
+  /// Best fit
+  void bestFit(const IFunction& ifun);
   /// make this chebfun a derivative of the argument
   void fromDerivative(const ScaledChebfun& fun);
   /// Integrate the function on the whole interval
@@ -105,6 +109,7 @@ protected:
   void throwDifferentBaseInOperation(const std::string& op) const;
   /// Get the base of the underlying chebfun
   ChebfunBase_const_sptr getBase() const {return m_fun.getBase();}
+  const std::vector<double>& coeffs() const {return m_fun.coeffs();}
 
   /*------------------ Data --------------------*/
 
@@ -116,6 +121,8 @@ protected:
   double m_endX;
 
   friend class ChebOperator;
+  friend class ChebFunction;
+  template<class CHEB, typename TYPE> friend void BestFit(CHEB& cheb, TYPE fun);
 };
 
 } // NUMERIC

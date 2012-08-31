@@ -11,6 +11,7 @@
 
 using namespace Numeric;
 
+//=========================================================================//
 class TestCheb: public chebfun
 {
 public:
@@ -30,6 +31,16 @@ public:
     calcA();
   }
 };
+
+namespace
+{
+  double gauss( double x )
+  {
+    return exp(-x*x);
+  }
+};
+
+//=========================================================================//
 
 TEST(ChebfunTest, XPointsTest)
 {
@@ -427,5 +438,11 @@ TEST(ChebfunTest, BestFitTest)
 {
   chebfun cheb(0, 0, pi);
   cheb.bestFit( (AFunction)sin );
-  std::cerr << "n=" << cheb.n() << std::endl;
+  //std::cerr << "n=" << cheb.n() << std::endl;
+  EXPECT_EQ( cheb.n(), 33 );
+
+  chebfun cheb_gauss(0, 0, 4);
+  cheb_gauss.bestFit( (AFunction)gauss );
+  //std::cerr << "n=" << cheb_gauss.n() << std::endl;
+  EXPECT_EQ( cheb_gauss.n(), 65 );
 }

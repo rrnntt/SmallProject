@@ -20,6 +20,9 @@ public:
   using ScaledChebfun::transform;
 };
 
+namespace // anonymous namespace
+{
+
 double gauss(double x)
 {
   return exp(-x*x);
@@ -57,6 +60,8 @@ protected:
   {
   }
 };
+
+} // anonymous namespace
 
 /*========================================================================*/
 
@@ -301,4 +306,13 @@ TEST(Numeric_ScaledChebfun_Test, IntegrTest)
   am.fit( gauss );
   //std::cerr << am.integr() - sqrt(pi)/2 << std::endl;
   EXPECT_NEAR( am.integr(), sqrt(pi)/2, 1e-15);
+}
+
+TEST(Numeric_ScaledChebfun_Test, BestFitTest)
+{
+  // positive infinity
+  ScaledChebfun ap(0, 0, inf);
+  ap.bestFit( gauss );
+  //std::cerr << "n=" << ap.n() << std::endl;
+  EXPECT_EQ( ap.n(), 129 );
 }

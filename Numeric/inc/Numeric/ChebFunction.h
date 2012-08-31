@@ -62,6 +62,8 @@ public:
   void fit(AFunction f);
   /// Fit to an IFunction
   void fit(const IFunction& ifun);
+  /// BestFit to an IFunction
+  void bestFit(const IFunction& ifun);
   /// make this chebfun a derivative of the argument
   void fromDerivative(const ChebFunction& fun);
   /// Integrate the function on the whole interval
@@ -69,6 +71,8 @@ public:
 
   /// Performs a binary operation
   void binaryOperation(const ChebFunction& cws, const char op);
+
+  ChebFunction& operator=(const ChebFunction& cws);
      /* Binary operators */
   ChebFunction& operator+=(const ChebFunction& cws);
   ChebFunction& operator-=(const ChebFunction& cws);

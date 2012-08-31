@@ -313,24 +313,35 @@ std::string::const_iterator VarNameParser::test(std::string::const_iterator star
 //-----------------------------------------------------
 std::string::const_iterator NumberParser::test(std::string::const_iterator start,std::string::const_iterator end) 
 {
-  bool readDot = false;
+  bool readDot = false; // consumed floating point (.), no more allowed
+  bool readE = false;  // consumed exponent e, no more allowed
+  bool readMinus = false; // consumed the minus in the exponent
+  bool readExp = false; // found some digits after 'e'
   auto it = start;
   for(;it != end; ++it)
   {
     if (*it == '.')
     {
-      if (!readDot)
-      {
-        readDot = true;
-      }
-      else
-      {
-        return it;
-      }
+      if (readDot || readE) return it;
+      readDot = true;
+    }
+    else if (*it == 'e' || *it == 'E')
+    {
+      if ( readE || it == start ) return it;
+      readE = true;
+    }
+    else if (*it == '-')
+    {
+      if ( readMinus || !readE || readExp) return it;
+      readMinus = true;
     }
     else if (!isdigit(*it))
     {
       return it;
+    }
+    else if (readMinus)
+    {// it's a digit in the exponent
+      readExp = true;
     }
   }
   return it;
@@ -684,7 +695,7 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     m_funct = parser->match();
     m_ifrom = static_cast<size_t>(parser->getStart() - str.begin());
     m_n = static_cast<size_t>(parser->getEnd() - parser->getStart());
-  if (this->m_n == 0) throw std::runtime_error("Oops002");
+    if (this->m_n == 0) throw std::runtime_error("Oops002");
     return;
   }
   
@@ -694,7 +705,7 @@ void EParser::setFunct(const std::string& str, IParser* parser)
     auto start = brak->getInnerStart();
     auto end = brak->getInnerEnd();
     this->parse(str,start,end);
-  if (this->m_n == 0) throw std::runtime_error("Oops003");
+    if (this->m_n == 0) throw std::runtime_error("Oops003");
     return;
   }
 
@@ -702,24 +713,27 @@ void EParser::setFunct(const std::string& str, IParser* parser)
   if (fun)
   {
     m_funct = fun->getParser(0)->match();
-    EParser* ep = new EParser;
-    ep->parse(str,fun->getInnerStart(),fun->getInnerEnd());
-    if (ep->m_funct != "void" && ep->m_funct != ",")
+    if ( fun->getInnerStart() != fun->getInnerEnd() )
     {
-      m_terms.push_back(ep);
-    }
-    else
-    {
-      moveTerms(ep);
-      //for(auto term = ep.m_terms.begin();term!=ep.m_terms.end();++term)
-      //{
-      //  m_terms.push_back(*term);
-      //  //EParser& ep = m_terms.back();
-      //}
+      EParser* ep = new EParser;
+      ep->parse(str,fun->getInnerStart(),fun->getInnerEnd());
+      if (ep->m_funct != "void" && ep->m_funct != ",")
+      {
+        m_terms.push_back(ep);
+      }
+      else
+      {
+        moveTerms(ep);
+        //for(auto term = ep.m_terms.begin();term!=ep.m_terms.end();++term)
+        //{
+        //  m_terms.push_back(*term);
+        //  //EParser& ep = m_terms.back();
+        //}
+      }
     }
     m_ifrom = static_cast<size_t>(fun->getStart() - str.begin());
     m_n = static_cast<size_t>(fun->getEnd() - fun->getStart());
-  if (this->m_n == 0) throw std::runtime_error("Oops004");
+    if (this->m_n == 0) throw std::runtime_error("Oops004");
     return;
   }
   else // unrecognized stuff

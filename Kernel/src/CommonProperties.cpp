@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <limits>
 
 namespace Kernel
 {
@@ -25,8 +26,23 @@ namespace Kernel
 
   Property& DoubleProperty::operator=(const std::string& str)
   {
-    std::istringstream istr(str);
-    istr >> m_value;
+    if ( str == "inf" ) 
+    {
+      m_value = std::numeric_limits<double>::infinity();
+    }
+    else if ( str == "minf" ) 
+    {
+      m_value = -std::numeric_limits<double>::infinity();
+    }
+    else if ( str == "-inf" ) 
+    {
+      m_value = -std::numeric_limits<double>::infinity();
+    }
+    else
+    {
+      std::istringstream istr(str);
+      istr >> m_value;
+    }
     return *this;
   }
 

@@ -223,27 +223,26 @@ namespace Numeric
     mutable std::vector<double> m_a; ///< polynomial coefficients, m_n + 1 items
   };
 
-
   /**
    * Find the number on x-points (n) large enough to reproduce fun
    * with accuracy ~1e-16.
    */
-  template<typename TYPE> 
-  void chebfun::bestFit(TYPE fun)
+  template<class CHEB, typename TYPE> 
+  void BestFit(CHEB& cheb, TYPE fun)
   {
-    const double start = startX();
-    const double end = endX();
+    const double start = cheb.startX();
+    const double end = cheb.endX();
     size_t nn = 9;
     const double tol = 1e-16;
     double err = 1.0;
     while ( err > tol )
     {
-      set( nn, start, end );
-      fit( fun );
-      auto& a = coeffs();
+      cheb.set( nn, start, end );
+      cheb.fit( fun );
+      auto& a = cheb.coeffs();
       double minAodd = inf;
       double minAeven = inf;
-      double maxA = 0.0;
+      double maxA = 0;
       for(size_t i = 0; i < a.size(); i+=2)
       {
         const double abs_even = fabs( a[i] );
@@ -254,12 +253,20 @@ namespace Numeric
         if ( abs_odd > maxA ) maxA = abs_odd;
       }
       err = (minAodd + minAeven) / maxA / 2;
-      std::cerr << "err " << err << std::endl;
       nn *= 2;
       --nn;
     }
   }
 
+  /**
+   * Find the number on x-points (n) large enough to reproduce fun
+   * with accuracy ~1e-16.
+   */
+  template<typename TYPE> 
+  void chebfun::bestFit(TYPE fun)
+  {
+    BestFit( *this, fun );
+  }
 
   typedef boost::shared_ptr<chebfun> chebfun_sptr;
   typedef boost::shared_ptr<const chebfun> chebfun_const_sptr;

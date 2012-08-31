@@ -1,5 +1,7 @@
 #include "Numeric/ChebFunction.h"
 
+#include <algorithm>
+
 namespace Numeric
 {
 
@@ -70,6 +72,17 @@ void ChebFunction::appendRight(size_t n, const double& endx)
   if ( endX() == inf ) throw std::runtime_error("Cannot append a chebfun at infinity");
   if ( endx <= endX() ) throw std::runtime_error("New interval is negative or zero");
   m_fun.push_back( new ScaledChebfun(n, endX(), endx) );
+}
+
+ChebFunction& ChebFunction::operator=(const ChebFunction& cws)
+{
+  clear();
+  m_fun.resize( cws.m_fun.size() );
+  for(size_t i = 0; i < m_fun.size(); ++i)
+  {
+    m_fun[i] = new ScaledChebfun( *cws.m_fun[i] );
+  }
+  return *this;
 }
 
 /// Function you want to fit to.
@@ -301,6 +314,46 @@ void ChebFunction::fit(const IFunction& ifun)
     fun(i).fit( ifun );
   }
 }
+
+/**
+ * BestFit to an IFunction
+ * @param ifun :: Function to fit to.
+ */
+void ChebFunction::bestFit(const IFunction& ifun)
+{
+  const double tol = 1e-16;
+  double err = 1.0;
+  std::vector<bool> done(nfuns(),false);
+  std::vector<size_t> nn(nfuns(),9);
+  double maxA = 0;
+  while ( std::find(done.begin(),done.end(),false) != done.end() )
+  {
+    double minAodd = inf;
+    double minAeven = inf;
+    for(size_t k = 0; k < nfuns(); ++k)
+    {
+      if ( done[k] ) continue;
+      auto& f = fun(k);
+      f.set( nn[k], f.startX(), f.endX() );
+      f.fit( ifun );
+      auto& a = f.coeffs();
+      for(size_t i = 0; i < a.size(); i+=2)
+      {
+        const double abs_even = fabs( a[i] );
+        const double abs_odd = fabs( a[i+1] );
+        if ( abs_even < minAeven ) minAeven = abs_even;
+        if ( abs_odd < minAodd ) minAodd = abs_odd;
+        if ( abs_even > maxA ) maxA = abs_even;
+        if ( abs_odd > maxA ) maxA = abs_odd;
+      }
+      err = (minAodd + minAeven) / maxA / 2;
+      nn[k] *= 2;
+      --nn[k];
+      if ( err <= tol ) done[k] = true;
+    }
+  }
+}
+
 
 /**
  * Integrate the function on the whole interval
