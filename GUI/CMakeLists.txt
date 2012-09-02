@@ -53,7 +53,7 @@ ${QT_QTOPENGL_INCLUDE_DIR}
 )
 
 target_link_libraries(Plotter
-QtAPI Kernel API Numeric DataObjects qwt Modeling
+QtAPI Kernel API Numeric DataObjects qwt #Modeling
 )
 
 target_link_libraries(Plotter

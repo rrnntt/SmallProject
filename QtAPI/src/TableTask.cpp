@@ -4,6 +4,9 @@
 #include "QtAPI/WindowManager.h"
 
 #include "API/WorkspaceFactory.h"
+#include "API/AlgorithmFactory.h"
+
+#include "Numeric/ChebfunWorkspace.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QFileDialog>
@@ -96,14 +99,33 @@ void TableTask::showTable(const QString& wsName)
 {
   try
   {
-    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(
-      API::WorkspaceManager::instance().retrieve(wsName.toStdString()));
-    if (!tws)
+    auto ws = API::WorkspaceManager::instance().retrieve(wsName.toStdString());
+    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>( ws );
+    if (tws)
+    {
+      showTable(tws);
+    }
+    else if ( auto cws = boost::dynamic_pointer_cast<Numeric::ChebfunWorkspace>( ws ) )
+    {
+      auto alg = API::AlgorithmFactory::instance().createAlgorithm("ChebfunToTable");
+      if ( !alg )
+      {
+        errorMessage("Cannot display workspace " + cws->API::Workspace::name() );
+        return;
+      }
+      alg->setClassProperty("InputWorkspace",cws);
+      alg->execute();
+      tws = alg->getClass("OutputWorkspace");
+      if ( tws )
+      {
+        showTable( tws );
+      }
+    }
+    else
     {
       errorMessage("Workspace " + wsName.toStdString()+" is not a TableWorkspace.");
       return;
     }
-    showTable(tws);
   }
   catch(std::exception& e)
   {

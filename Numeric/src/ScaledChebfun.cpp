@@ -94,6 +94,18 @@ bool ScaledChebfun::haveSameBase(const ScaledChebfun& other) const
 }
 
 /**
+ * Set same base as in other function
+ * @param other :: Function to share base with.
+ */
+void ScaledChebfun::setBaseFrom(const ScaledChebfun& other)
+{
+  m_fun.setBase( other.m_fun );
+  m_startX = other.startX();
+  m_endX = other.endX();
+}
+
+
+/**
  * Throw an invalid_argument exception after checking arguments to set(...)
  */
 void ScaledChebfun::throwInvalidArgumetns() const
@@ -316,12 +328,36 @@ ScaledChebfun& ScaledChebfun::operator+=(AFunction fun)
     std::vector<double> y( x.size() );
     // copy m_p values to y
     y = m_fun.ypoints();
-    for(size_t i = 0; i < x.size(); ++i)
+    size_t istart = 0;
+    size_t ni = x.size();
+    if ( ni > 1 )
+    {
+      if ( x.front() == minf )
+      {
+        istart = 1;
+        --ni;
+      }
+      else if ( x.back() == inf )
+      {
+        --ni;
+      }
+    }
+    for(size_t i = istart; i < ni; ++i)
     {
       y[i] += fun( x[i] );
     }
     m_fun.setP( y );
   }
+  return *this;
+}
+
+/**
+ * Add a value
+ * @param value :: Value to add.
+ */
+ScaledChebfun& ScaledChebfun::operator+=(const double& value)
+{
+  m_fun += value;
   return *this;
 }
 
@@ -337,6 +373,17 @@ ScaledChebfun& ScaledChebfun::operator-=(const ScaledChebfun& fun)
 }
 
 /**
+ * Subtract a value
+ * @param value :: Value to subtract.
+ */
+ScaledChebfun& ScaledChebfun::operator-=(const double& value)
+{
+  m_fun -= value;
+  return *this;
+}
+
+
+/**
  * Multiply by values from another function
  * @param fun :: A function to add to this function.
  */
@@ -346,6 +393,57 @@ ScaledChebfun& ScaledChebfun::operator*=(const ScaledChebfun& fun)
   m_fun *= fun.m_fun;
   return *this;
 }
+
+/**
+ * Multiply by values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator*=(AFunction fun)
+{
+  if ( !hasScaling() )
+  {
+    m_fun *= fun;
+  }
+  else
+  {
+    std::vector<double> x;
+    fillXValues( x );
+    std::vector<double> y( x.size() );
+    // copy m_p values to y
+    y = m_fun.ypoints();
+    size_t istart = 0;
+    size_t ni = x.size();
+    if ( ni > 1 )
+    {
+      if ( x.front() == minf )
+      {
+        istart = 1;
+        --ni;
+      }
+      else if ( x.back() == inf )
+      {
+        --ni;
+      }
+    }
+    for(size_t i = istart; i < ni; ++i)
+    {
+      y[i] *= fun( x[i] );
+    }
+    m_fun.setP( y );
+  }
+  return *this;
+}
+
+/**
+ * Multiply by a value
+ * @param value :: Value to multiply by.
+ */
+ScaledChebfun& ScaledChebfun::operator*=(const double& value)
+{
+  m_fun *= value;
+  return *this;
+}
+
 
 /**
  * Divide by values from another function

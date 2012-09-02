@@ -14,12 +14,19 @@ m_fun(1,new ScaledChebfun)
  * Copy constructor
  * @param other :: Other function to copy from
  */
-ChebFunction::ChebFunction(const ChebFunction& other)
+ChebFunction::ChebFunction(const ChebFunction& other, bool copy)
 {
   m_fun.resize( other.m_fun.size() );
   for(size_t i = 0; i < m_fun.size(); ++i)
   {
-    m_fun[i] = new ScaledChebfun( *other.m_fun[i] );
+    ScaledChebfun* scf = nullptr;
+    if ( copy ) scf = new ScaledChebfun( *other.m_fun[i] );
+    else
+    {
+      scf = new ScaledChebfun;
+      scf->setBaseFrom( *other.m_fun[i] );
+    }
+    m_fun[i] = scf;
   }
 }
 
@@ -111,10 +118,12 @@ void ChebFunction::function1D(double* out, const double* xValues, const size_t n
   }
 }
 
-/// Creates a domain for the region on which the workspace is defined.
-FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
+/**
+ * Fill a vector with x values.
+ * @param x :: Vector to get the values.
+ */
+void ChebFunction::fillXValues(std::vector<double>& x) const
 {
-  std::vector<double> x;
   size_t npts = 0;
   std::for_each(m_fun.begin(),m_fun.end(),[&npts](const ScaledChebfun* fun){
     npts += fun->n();
@@ -132,8 +141,14 @@ FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
     i += xf.size() - 1;
   }
   x.back() = this->endX();
-  auto domain = new FunctionDomain1DVector( x );
+}
 
+/// Creates a domain for the region on which the workspace is defined.
+FunctionDomain1D_sptr ChebFunction::createDomainFromXPoints() const
+{
+  std::vector<double> x;
+  fillXValues( x );
+  auto domain = new FunctionDomain1DVector( x );
   return FunctionDomain1D_sptr( domain );
 }
 
@@ -191,7 +206,7 @@ Numeric::JointDomain_sptr ChebFunction::createJointDomain() const
  * Check if this workspace has the same base as another one. Having the same base means
  * that the two workspaces have the same number of chebfuns and the chebfuns with the same
  * indices have shared x-points.
- * @param other :: A workspace to compare with.
+ * @param other :: A function to compare with.
  */
 bool ChebFunction::haveSameBase(const ChebFunction& other) const
 {
@@ -201,6 +216,19 @@ bool ChebFunction::haveSameBase(const ChebFunction& other) const
     if ( !fun(i).haveSameBase(other.fun(i))) return false;
   }
   return true;
+}
+
+/**
+ * Set this function to a constant value.
+ * @param value :: A value to assign.
+ */
+ChebFunction& ChebFunction::operator=(const double& value)
+{
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i) = value;
+  }
+  return *this;
 }
 
 /**
@@ -227,6 +255,32 @@ ChebFunction& ChebFunction::operator+=(const ChebFunction& cws)
     //  fun( r->i1 ).apply( '+', cws.fun( r->i2 ), r->domain->as<FunctionDomain1D>() );
     //}
     throw std::runtime_error("Cannot add ChebFunction having on a different base");
+  }
+  return *this;
+}
+
+/**
+ * Add a valut to the function.
+ * @param value :: Value to add.
+ */
+ChebFunction& ChebFunction::operator+=(const double& value)
+{
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i) += value;
+  }
+  return *this;
+}
+
+/**
+ * Multiply the function by a value.
+ * @param value :: Value to multiply.
+ */
+ChebFunction& ChebFunction::operator*=(const double& value)
+{
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i) *= value;
   }
   return *this;
 }
@@ -290,6 +344,20 @@ ChebFunction& ChebFunction::operator/=(const ChebFunction& cws)
   }
   return *this;
 }
+
+/**
+ * Multiply by a C++ function.
+ * @param f :: A function to multiply.
+ */
+ChebFunction& ChebFunction::operator*=(AFunction f)
+{
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i) *= f;
+  }
+  return *this;
+}
+
 
 /**
  * Fit to a c++ function.
@@ -380,6 +448,24 @@ void ChebFunction::fromDerivative(const ChebFunction& fun)
     auto f = new ScaledChebfun;
     f->fromDerivative( fun.fun(i) );
     m_fun.push_back( f );
+  }
+}
+
+/// Square the function
+void ChebFunction::square()
+{
+  for(size_t i = 0; i < m_fun.size(); ++i)
+  {
+    m_fun[i]->square();
+  }
+}
+
+/// Take a square root of the function
+void ChebFunction::sqrt()
+{
+  for(size_t i = 0; i < m_fun.size(); ++i)
+  {
+    m_fun[i]->sqrt();
   }
 }
 

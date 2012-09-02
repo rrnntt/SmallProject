@@ -25,6 +25,7 @@ ChebfunToTable::ChebfunToTable()
   declareWorkspace("InputWorkspace");
   declareWorkspace("OutputWorkspace");
   declareInt("N");
+  declareBool("DropXInf", true);
 }
 
 void ChebfunToTable::exec()
@@ -66,6 +67,19 @@ void ChebfunToTable::exec()
   {
     x[i] = (*domain)[i];
     y[i] = values.getCalculated(i);
+  }
+
+  bool dropXInf = get("DropXInf");
+  if ( dropXInf )
+  {
+    if ( fabs( x.front() ) == inf )
+    {
+      tws->removeRow( 0 );
+    }
+    if ( fabs( x.back() ) == inf )
+    {
+      tws->removeRow( tws->rowCount() - 1 );
+    }
   }
 
   setProperty("OutputWorkspace",tws);

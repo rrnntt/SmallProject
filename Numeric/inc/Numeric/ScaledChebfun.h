@@ -52,6 +52,8 @@ public:
   bool hasScaling() const {return m_startX == minf || m_endX == inf;}
   /// Check if two chebfuns have shared x-points.
   bool haveSameBase(const ScaledChebfun& other) const;
+  /// Set same base as in other function
+  void setBaseFrom(const ScaledChebfun& other);
   /// Fill a vector with unscaled x-values
   void fillXValues(std::vector<double>& x) const;
   /// Calculate function value at point x
@@ -87,17 +89,31 @@ public:
   /// Set this function equal to a constant
   ScaledChebfun& operator=(double value);
 
-  /* Add */
+  /* Binary */
   /// Add values from another function
   ScaledChebfun& operator+=(const ScaledChebfun& fun);
   /// Add values from another function
   ScaledChebfun& operator+=(AFunction fun);
+  /// Add a value
+  ScaledChebfun& operator+=(const double& value);
   /// Subtract values from another function
   ScaledChebfun& operator-=(const ScaledChebfun& fun);
+  /// Subtract a value
+  ScaledChebfun& operator-=(const double& value);
   /// Multiply by values from another function
   ScaledChebfun& operator*=(const ScaledChebfun& fun);
+  /// Add values from another function
+  ScaledChebfun& operator*=(AFunction fun);
+  /// Mutiply by a value
+  ScaledChebfun& operator*=(const double& value);
   /// Divide by values from another function
   ScaledChebfun& operator/=(const ScaledChebfun& fun);
+
+  /* Functions */
+  /// Square the function
+  void square() {m_fun.square();}
+  /// Take a square root of the function
+  void sqrt() {m_fun.sqrt();}
 protected:
   /// Transform the argument
   double transform(double x) const;

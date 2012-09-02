@@ -824,4 +824,34 @@ namespace Numeric
     gsl_vector_complex_free( eval );
   }
 
+/**
+ * Make a square of this funcion.
+ */
+void chebfun::square()
+{
+  for(size_t i = 0; i < m_p.size(); ++i)
+  {
+    double& d = m_p[i];
+    d *= d;
+  }
+  invalidateA();
+}
+
+/**
+ * Make a square root of this funcion.
+ */
+void chebfun::sqrt()
+{
+  for(size_t i = 0; i < m_p.size(); ++i)
+  {
+    double& d = m_p[i];
+    if ( d < 0.0 )
+    {
+      throw std::runtime_error("Square root of negative number");
+    }
+    d = std::sqrt( d );
+  }
+  invalidateA();
+}
+
 } // Numeric

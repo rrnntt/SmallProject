@@ -82,7 +82,15 @@ void MakeQuadratureScheme::exec()
     std::cerr << i << ' ' << f.n() << std::endl;
   }
   std::cerr << "integr " << weight.integr() - sqrt(pi)/2 << std::endl;
-  const ChebFunction& cweight = weight;
+  // we need the root of it
+  try
+  {
+    weight.sqrt();
+  }
+  catch(...)
+  {
+    throw std::runtime_error("Weight function must be positive everywhere");
+  }
 
   // create the output table
   auto tws = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
@@ -97,28 +105,43 @@ void MakeQuadratureScheme::exec()
   // b-coefficients in the recurrence relation p_j+1 = (x-a_j)*p_j - b_j*p_j-1
   tws->addColumn("double","b");
   tws->setRowCount(n);
+  auto& a = tws->getDoubleData("a");
+  auto& b = tws->getDoubleData("b");
 
-  std::vector<chebfun_sptr> poly( n );
+  // !! it's not very good because it potentially can change the size of the column
+  std::vector<double> x;
+  weight.fillXValues( x );
+  tws->getDoubleData("x") = x;
+
+  std::vector<ChebFunction_sptr> poly( n );
   for(size_t i = 0; i < n; ++i)
   {
-    poly[i] = chebfun_sptr( new chebfun(n, startX, endX) );
+    poly[i] = ChebFunction_sptr( new ChebFunction(weight, false) );
   }
 
-  *poly[0] = 1.0;
-  // !! it's not very good because it potentially can change the size of the column
-  tws->getDoubleData("x") = poly[0]->getBase()->x;
-  ChebFunction xx(cweight);
-  xx.fit( xfun );
-  ScaledChebfun xpp(n, startX, endX);
-  ScaledChebfun pp(n, startX, endX);
-  pp = *poly[0];
+  std::vector<double> norms( n );
+
+  *poly[0] = weight;
+
+  // don't copy just use the same base
+  ChebFunction pp(*poly[0]);
   pp *= *poly[0];
-  pp *= cweight.fun(0);
+  norms[0] = pp.integr();
+  pp *= xfun;
+  a[0] = pp.integr() / norms[0];
+  b[0] = 0.0;
 
-  xpp = pp;
-  xpp *= xx;
+  *poly[1] = *poly[0];
+  *poly[1] *= xfun;
+  pp = *poly[0];
+  pp *= a[0];
+  *poly[1] -= pp;
 
-  auto test = ChebfunWorkspace_sptr( new ChebfunWorkspace(xpp) );
+  pp = *poly[1];
+  pp *= *poly[0];
+  std::cerr << "integr " << pp.integr() << std::endl;
+
+  auto test = ChebfunWorkspace_sptr( new ChebfunWorkspace(*poly[1]) );
   setProperty("Test",test);
 }
 

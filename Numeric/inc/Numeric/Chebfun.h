@@ -200,15 +200,8 @@ namespace Numeric
     double integr() const;
     double norm2();
 
-    void square()
-    {
-      for(size_t i = 0; i < m_p.size(); ++i)
-      {
-        double& d = m_p[i];
-        d *= d;
-      }
-      invalidateA();
-    }
+    void square();
+    void sqrt();
 
     void roots(std::vector<double>& r) const;
 

@@ -27,7 +27,7 @@ class NUMERIC_EXPORT ChebFunction: public IFunction1D, public ParamFunction
 public:
   ChebFunction();
   /// Copy constructor
-  ChebFunction(const ChebFunction& other);
+  ChebFunction(const ChebFunction& other, bool copy = true);
   /// Create and init with a single chebfun
   ChebFunction(const chebfun& fun);
   /// Create and init with a single empty chebfun
@@ -48,6 +48,8 @@ public:
   const ScaledChebfun& fun(size_t i) const {return *(m_fun[i]);}
   /// Add a ScaledChebfun to the right on the x-axis.
   void appendRight(size_t n, const double& endX);
+  /// Fill a vector with x values
+  void fillXValues(std::vector<double>& x) const;
   /// Creates a domain for the region on which the function is defined.
   FunctionDomain1D_sptr createDomainFromXPoints() const;
   /// Creates a domain for the region on which the function is defined.
@@ -73,11 +75,24 @@ public:
   void binaryOperation(const ChebFunction& cws, const char op);
 
   ChebFunction& operator=(const ChebFunction& cws);
+  ChebFunction& operator=(const double& value);
      /* Binary operators */
   ChebFunction& operator+=(const ChebFunction& cws);
   ChebFunction& operator-=(const ChebFunction& cws);
   ChebFunction& operator*=(const ChebFunction& cws);
   ChebFunction& operator/=(const ChebFunction& cws);
+
+  ChebFunction& operator+=(const double& value);
+  ChebFunction& operator*=(const double& value);
+
+  ChebFunction& operator*=(AFunction fun);
+
+  /* Functions */
+  /// Square the function
+  void square();
+  /// Take a square root of the function
+  void sqrt();
+
 protected:
   /// Return reference to i-th chebfun
   ScaledChebfun& fun(size_t i) {return *(m_fun[i]);}
