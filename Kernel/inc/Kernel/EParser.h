@@ -226,6 +226,16 @@ namespace Kernel
     virtual std::string::const_iterator test(std::string::const_iterator start,std::string::const_iterator end) ;
     Mutiplicity m_multiplicity;
   };
+  
+  //------------------------------------------------------------
+  /**
+   * Parse lists
+   */
+  //class KERNEL_EXPORT TokenParser: public ListParser
+  //{
+  //public:
+  //  TokenParser(const std::string& sep);
+  //};
 
   //------------------------------------------------------------
   class KERNEL_EXPORT AltParser: public MultiParser

@@ -257,6 +257,9 @@ std::string::const_iterator ListParser::test(std::string::const_iterator start,s
   return it;
 }
 
+//TokenParser::TokenParser(const std::string& sep)
+//{
+//}
 //-----------------------------------------------------
 AltParser::AltParser(const AltParser& p):
 MultiParser(p),
@@ -630,7 +633,7 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
     {// multiple terms
 
       m_op = "";
-      m_funct = "void";
+      m_funct = "";
       EParser* ep = addTerm(str,firstTerm->getParser());
       for(size_t i = 0; i < otherTerms->size(); ++i)
       {
@@ -651,26 +654,34 @@ void EParser::parse(const std::string& str, std::string::const_iterator start,st
 
     if ( !secondOp.empty() && !un->isEmpty() )
     {
-      //std::cerr << "OK " << un->match() << ' ' << secondOp << ' ' << std::string(start,end) << ' ' << this->name() << std::endl;
       std::string op = un->match();
+      //std::cerr << "OK " << un->match() << ' ' << secondOp << ' ' << std::string(start,end) << ' ' << this->name();
+      //std::cerr << operators()->precedence( op ) << ',' << operators()->precedence( name() ) << std::endl;
       //secondOp = name();
       if ( operators()->precedence( op ) == operators()->precedence( name() ) )
       {
         m_terms[0]->m_op = un->match();
+      }
+      else if (operators()->precedence( op ) > operators()->precedence( name() ))
+      {
+        EParser* ep = new EParser;
+        ep->m_terms.push_back( m_terms[0] );
+        m_terms[0]  = ep;
+        ep->m_funct = op;
       }
       else
       {
         EParser* ep = new EParser;
         ep->moveTerms( this );
         ep->m_funct = m_funct;
-        m_funct = un->match();
+        m_funct = op;
         m_terms.push_back( ep );
       }
     }
   }
   else
   {
-    m_funct = "void";
+    m_funct = "";
   }
 
   m_ifrom = static_cast<size_t>(start - str.begin());

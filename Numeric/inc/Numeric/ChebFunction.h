@@ -70,6 +70,8 @@ public:
   void fromDerivative(const ChebFunction& fun);
   /// Integrate the function on the whole interval
   double integr() const;
+  /// Get the roots of the function
+  void roots(std::vector<double>& r) const;
 
   /// Performs a binary operation
   void binaryOperation(const ChebFunction& cws, const char op);

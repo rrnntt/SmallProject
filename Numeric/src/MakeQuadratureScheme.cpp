@@ -1,9 +1,12 @@
 #include "Numeric/MakeQuadratureScheme.h"
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/IFunction.h"
+#include "Numeric/IFunction1D.h"
+#include "Numeric/ParamFunction.h"
 #include "Numeric/ChebFunction.h"
 #include "Numeric/Constants.h"
-#include "Numeric/ChebfunWorkspace.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -31,12 +34,45 @@ MakeQuadratureScheme::MakeQuadratureScheme()
   declareString("Function");
   // TableWorkspace with the created qudrature data
   declareWorkspace("Quadrature");
+  // guess start of the interval containing all integration points
+  declareDouble("StartX",-1);
+  // guess end of the interval containing all integration points
+  declareDouble("EndX",1);
   declareWorkspace("Test");
 }
 
 namespace 
 {
+  /// function x
   double xfun(double x){return x;}
+  /// add function values to a table
+  void addValuesToWorkspace(API::TableWorkspace_ptr tws, 
+    const std::string& xColumn,
+    const std::string& yColumn,
+    const IFunction& fun);
+  /// valuate a polynom recursively
+  double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b);
+  /// valuate a polynom recursively
+  class EvalPoly: public IFunction1D, public ParamFunction
+  {
+    const size_t m_n;
+    const std::vector<double>& m_a;
+    const std::vector<double>& m_b;
+  public:
+    EvalPoly(size_t n, const std::vector<double>& a, const std::vector<double>& b):
+    m_n(n),m_a(a),m_b(b)
+    {}
+    /// Returns the function's name
+    virtual std::string name()const {return "EvalPoly";}
+    /// Function you want to fit to.
+    virtual void function1D(double* out, const double* xValues, const size_t nData)const
+    {
+      for(size_t i = 0; i < nData; ++i)
+      {
+        out[i] = evalPoly(m_n, xValues[i], m_a, m_b);
+      }
+    }
+  };
 }
 
 /// Execute algorithm.
@@ -46,6 +82,7 @@ void MakeQuadratureScheme::exec()
   Kernel::EParser intervalParser;
   intervalParser.parse( intervalStr );
   intervalParser.toList();
+  intervalParser.log();
   if ( intervalParser.size() < 2 )
   {
     throw std::invalid_argument("Interval must have at least two bounds");
@@ -65,6 +102,9 @@ void MakeQuadratureScheme::exec()
     double x = readDouble( intervalParser[i].str() );
     weight.appendRight( 0, x ); // throws if x isn't right
   }
+
+  startX = get("StartX");
+  endX = get("EndX");
 
   int n = get("N");
   if (n < 2)
@@ -108,10 +148,23 @@ void MakeQuadratureScheme::exec()
   auto& a = tws->getDoubleData("a");
   auto& b = tws->getDoubleData("b");
 
-  // !! it's not very good because it potentially can change the size of the column
-  std::vector<double> x;
-  weight.fillXValues( x );
-  tws->getDoubleData("x") = x;
+  {
+    FunctionDomain1DVector xdomain(startX, endX, n);
+    // !! it's not very good because it potentially can change the size of the column
+    tws->getDoubleData("x").assign(xdomain.getPointerAt(0),xdomain.getPointerAt(0) + n);
+  }
+
+  auto test = API::TableWorkspace_ptr( new API::TableWorkspace );
+  test->addColumn("double","x");
+  test->getColumn("x")->asNumeric()->setPlotRole(API::NumericColumn::X);
+  const size_t testSize = 200;
+  test->setRowCount(testSize);
+  {
+    FunctionDomain1DVector xdomain(startX, endX, testSize);
+    // !! it's not very good because it potentially can change the size of the column
+    test->getDoubleData("x").assign(xdomain.getPointerAt(0),xdomain.getPointerAt(0) + testSize);
+  }
+  setProperty("Test",test);
 
   std::vector<ChebFunction_sptr> poly( n );
   for(size_t i = 0; i < n; ++i)
@@ -141,8 +194,47 @@ void MakeQuadratureScheme::exec()
   pp *= *poly[0];
   std::cerr << "integr " << pp.integr() << std::endl;
 
-  auto test = ChebfunWorkspace_sptr( new ChebfunWorkspace(*poly[1]) );
-  setProperty("Test",test);
+  addValuesToWorkspace( test, "x", "p0", *poly[0] );
+  addValuesToWorkspace( test, "x", "p1", *poly[1] );
+
+  for(size_t i = 2; i < n; ++i)
+  {
+    std::cerr << "making " << i << "-th poly" << std::endl;
+    size_t i1 = i - 1;
+    size_t i2 = i - 2;
+    // calculate a and b for this iteration
+    pp = *poly[i1];
+    pp *= *poly[i1];
+    norms[i1] = pp.integr();
+    pp *= xfun;
+    a[i1] = pp.integr() / norms[i1];
+    b[i1] = norms[i1] / norms[i2];
+
+    //calculate i-th poly
+    *poly[i] = *poly[i1];
+    *poly[i] *= xfun;
+    pp = *poly[i1];
+    pp *= a[i1];
+    *poly[i] -= pp;
+    pp = *poly[i2];
+    pp *= b[i1];
+    *poly[i] -= pp;
+    addValuesToWorkspace( test, "x", "p"+boost::lexical_cast<std::string>(i), *poly[i] );
+  }
+
+  //std::cerr << "Calculating abscissas" << std::endl;
+  //EvalPoly ePoly(n, a, b);
+  //ChebFunction res(n, startX, endX);
+  //res.bestFit( *poly.back() );
+  //addValuesToWorkspace( test, "x", "res", res );
+  //std::vector<double> r;
+  //res.roots( r );
+  //std::cerr << "size " << r.size() << std::endl;
+
+  //for(size_t i = 0; i < r.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << r[i] << std::endl;
+  //}
 }
 
 /**
@@ -160,6 +252,69 @@ double MakeQuadratureScheme::readDouble(const std::string& str) const
     return minf;
   }
   return boost::lexical_cast<double>( str );
+}
+
+namespace 
+{
+  /**
+   * Add a column to a table workspace filled with double values
+   * calculated with a function wich uses another numeric column as its x values.
+   * @param tws :: The table workspace.
+   * @param xColumn :: Name of the column with the x-values. Must exist and be numeric
+   * @param yColumn :: Name of a column to store the calculated values. If a column with 
+   *  this name exists it will be overwritten if numeric or exception thrown otherwise.
+   *  If the column doesn't exist it will be created.
+   * @param fun :: A function to calculate the values.
+   */
+  void addValuesToWorkspace(API::TableWorkspace_ptr tws, 
+    const std::string& xColumn,
+    const std::string& yColumn,
+    const IFunction& fun)
+  {
+    auto& x = tws->getDoubleData( xColumn );
+    if ( tws->hasColumn( yColumn ) )
+    {
+      if ( !tws->getColumn( yColumn )->isNumeric() )
+        throw std::runtime_error("Column "+yColumn+" isn't numeric");
+    }
+    else
+    {
+      tws->addColumn( "double", yColumn );
+    }
+    tws->getColumn( yColumn )->asNumeric()->setPlotRole(API::NumericColumn::Y);
+    auto& y = tws->getDoubleData( yColumn );
+
+    FunctionDomain1DView domain( x.data(), x.size() );
+    FunctionValues values( domain );
+    fun.function( domain, values );
+    for(size_t i = 0; i < y.size(); ++i)
+    {
+      y[i] = values.getCalculated(i);
+    }
+  }
+
+  /**
+   * Evaluate a polynom recursively: 
+   * @param n :: Polynom order
+   * @param x :: Abscissa at wich to evaluate the polynom.
+   * @param a :: The a-coefficients of the recurrence.
+   * @param b :: The b-coefficients of the recurrence.
+   */
+  double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b)
+  {
+    double p0 = 1.0;
+    if ( n == 0 ) return p0;
+    double p1 = ( x - a[0] ) * p0;
+    if ( n == 1 ) return p1;
+    for(size_t i = 2; i <= n; ++i)
+    {
+      double p = ( x - a[i-1] ) * p1 - b[i-1] * p0;
+      p0 = p1;
+      p1 = p;
+    }
+    return p1;
+  }
+
 }
 
 

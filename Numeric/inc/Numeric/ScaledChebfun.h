@@ -74,6 +74,8 @@ public:
   double integr() const;
   /// Creates a domain for the region on which the workspace is defined.
   FunctionDomain1D_sptr createDomainFromXPoints() const;
+  /// Get the roots of the function
+  void roots(std::vector<double>& r) const;
 
   /*=== Operations on ScaledChebfun ===*/
 

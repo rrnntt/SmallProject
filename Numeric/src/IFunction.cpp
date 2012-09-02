@@ -19,9 +19,9 @@ namespace Numeric
 /**
  * Destructor
  */
-  IFunction::~IFunction()
-  {
-  }
+IFunction::~IFunction()
+{
+}
 
 /** Base class implementation of derivative IFunction throws error. This is to check if such a function is provided
     by derivative class. In the derived classes this method must return the derivatives of the function
@@ -89,6 +89,7 @@ void IFunction::removeTie(const std::string& parName)
 
 /**
  * Writes a string that can be used in Fit.IFunction to create a copy of this IFunction
+ * @param fmt :: Formatting flag. Set to true to ctreated formatted output.
  * @return string representation of the function
  */
 std::string IFunction::asString(bool fmt, size_t level)const

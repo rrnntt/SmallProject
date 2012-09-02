@@ -26,7 +26,7 @@ MainWindow::MainWindow()
   :QMainWindow()
 {
   setAttribute(Qt::WA_DeleteOnClose);
-  //setGeometry(900,900,300,200);
+  resize(1200,600);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
 
@@ -65,7 +65,7 @@ QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)
   connect(subwnd,SIGNAL(subWindowClosed(QtAPI::SubWindow*)),this,SLOT(subWindowClosed(QtAPI::SubWindow*)));
   subwnd->setWidget(widget);
   m_mdiArea->addSubWindow(subwnd);
-  subwnd->resize(400,300);
+  subwnd->resize(500,400);
   subwnd->show();
   return subwnd;
 }

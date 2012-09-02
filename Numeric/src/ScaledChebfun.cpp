@@ -544,4 +544,19 @@ void ScaledChebfun::bestFit(const IFunction& fun)
   BestFit<ScaledChebfun,const IFunction&>( *this, fun );
 }
 
+/**
+ * Find all roots of this function.
+ */
+void ScaledChebfun::roots(std::vector<double>& r) const
+{
+  m_fun.roots( r );
+  if ( hasScaling() )
+  {
+    for(auto i = r.begin(); i != r.end(); ++i)
+    {
+      *i = invTransform( *i );
+    }
+  }
+}
+
 } // Numeric

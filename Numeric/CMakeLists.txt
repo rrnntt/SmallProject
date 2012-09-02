@@ -60,6 +60,7 @@ set( INC_FILES
    inc/Numeric/Vector.h
 # Algorithms
    inc/Numeric/AddChebfun.h
+   inc/Numeric/AddFunctionValuesToTable.h
    inc/Numeric/ChebfunWorkspace.h
    inc/Numeric/CopyChebfun.h
    inc/Numeric/CreateChebfun.h
@@ -116,6 +117,7 @@ set( SRC_FILES
   src/PhysBody.cpp
 # Algorithms
    src/AddChebfun.cpp
+   src/AddFunctionValuesToTable.cpp
    src/ChebfunWorkspace.cpp
    src/CopyChebfun.cpp
    src/CreateChebfun.cpp
@@ -175,6 +177,7 @@ set( SRC_FILES
   test/VectorTest.cpp
 # Algorithms
   test/AddChebfunTest.cpp
+  test/AddFunctionValuesToTableTest.cpp
   test/ChebfunWorkspaceTest.cpp
   test/CreateChebfunTest.cpp
   test/MakeQuadratureSchemeTest.cpp

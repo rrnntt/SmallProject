@@ -469,4 +469,18 @@ void ChebFunction::sqrt()
   }
 }
 
+/**
+ * Find all roots of this function.
+ */
+void ChebFunction::roots(std::vector<double>& r) const
+{
+  r.clear();
+  for(size_t i = 0; i < m_fun.size(); ++i)
+  {
+    std::vector<double> rr;
+    m_fun[i]->roots( rr );
+    r.insert( r.end(), rr.begin(), rr.end() );
+  }
+}
+
 } // Numeric

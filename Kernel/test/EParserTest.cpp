@@ -338,6 +338,12 @@ TEST(EParserTest, EParserUnary)
   parser.parse("-x+x");
   EXPECT_EQ(parser.str(),"-x+x");
 
+  parser.parse("-x,x");
+  EXPECT_EQ(parser.str(),"-x,x");
+
+  parser.parse("-f(x,x)");
+  EXPECT_EQ(parser.str(),"-f(x,x)");
+
 }
 
 TEST(EParserTest, ToList) 
