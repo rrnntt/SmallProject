@@ -307,20 +307,28 @@ void MakeQuadratureScheme::exec()
       // compute the weights
       FunctionDomain1DView domain( r.data(), r.size() );
       // p_n-1
-      FunctionValues pn( domain ); 
+      FunctionValues pn1( domain ); 
+      poly[n-2]->function( domain, pn1 );
       // p'_n
       FunctionValues dn( domain );
-
-      // p_n-1
-      poly[n-2]->function( domain, pn );
-      // p'_n
       res.fromDerivative(*poly[n-1]);
       res.function( domain, dn );
+      FunctionValues pn( domain ); 
+      poly[n-1]->function( domain, pn );
+      // weight function
+      FunctionValues wgt( domain );
+      weight.function( domain, wgt );
+      ChebFunction dweight;
+      dweight.fromDerivative( weight );
+      FunctionValues dwgt( domain );
+      dweight.function( domain, dwgt );
+
       std::vector<double> w( n-1 );
       for(size_t i = 0; i < n-1; ++i)
       {
-        w[i] = 1.0 / (pn.getCalculated(i)*dn.getCalculated(i));
-        //w[i] = dn.getCalculated(i);
+        // w[i] = 1 / ( pn1*( dn/wgt^2 - pn*dwgt/wgt^3 ) )
+        double tmp = pn1[i] * (dn[i] - pn[i]*dwgt[i]/wgt[i]) / (wgt[i] * wgt[i]);
+        w[i] = 1.0 / tmp;
       }
 
       tws->addColumn("double","w");
