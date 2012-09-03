@@ -17,6 +17,7 @@
 #include "Kernel/EParser.h"
 
 #include <boost/lexical_cast.hpp>
+#include <algorithm>
 
 namespace Numeric
 {
@@ -51,16 +52,17 @@ namespace
     const std::string& yColumn,
     const IFunction& fun);
   /// valuate a polynom recursively
-  double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b);
+  double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
   /// valuate a polynom recursively
   class EvalPoly: public IFunction1D, public ParamFunction
   {
     const size_t m_n;
     const std::vector<double>& m_a;
     const std::vector<double>& m_b;
+    const std::vector<double>& m_c;
   public:
-    EvalPoly(size_t n, const std::vector<double>& a, const std::vector<double>& b):
-    m_n(n),m_a(a),m_b(b)
+    EvalPoly(size_t n, const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c):
+    m_n(n),m_a(a),m_b(b),m_c(c)
     {}
     /// Returns the function's name
     virtual std::string name()const {return "EvalPoly";}
@@ -69,10 +71,12 @@ namespace
     {
       for(size_t i = 0; i < nData; ++i)
       {
-        out[i] = evalPoly(m_n, xValues[i], m_a, m_b);
+        out[i] = evalPoly(m_n, xValues[i], m_a, m_b, m_c);
       }
     }
   };
+
+  void printoutOrtho(const std::vector<ChebFunction_sptr>& poly);
 }
 
 /// Execute algorithm.
@@ -96,17 +100,15 @@ void MakeQuadratureScheme::exec()
     throw std::invalid_argument("StartX must be <= EndX");
   }
 
-  ChebFunction weight(0, startX, endX);
+  ChebFunction weight(1000, startX, endX);
   for(size_t i = 2; i < intervalParser.size(); ++i)
   {
     double x = readDouble( intervalParser[i].str() );
     weight.appendRight( 0, x ); // throws if x isn't right
   }
 
-  startX = get("StartX");
-  endX = get("EndX");
-
-  int n = get("N");
+  int n = get("N");// it is the order of the polynomial
+  n += 1; // turn it into the size of the problem
   if (n < 2)
   {
     throw std::invalid_argument("N must be > 1");
@@ -115,13 +117,23 @@ void MakeQuadratureScheme::exec()
   IFunction_sptr fun = FunctionFactory::instance().createFitFunction(funStr);
 
   // fit ChebFunction 
-  weight.bestFit( *fun );
+  //if ( weight.nfuns() == 1 )
+  //{
+  //  // increase number of points
+  //  weight.fit( *fun );
+  //}
+  //else
+  {
+    weight.bestFit( *fun );
+  }
+
+
   for(size_t i = 0; i < weight.nfuns(); ++i)
   {
     const ScaledChebfun& f = const_cast<const ChebFunction&>(weight).fun(i);
     std::cerr << i << ' ' << f.n() << std::endl;
   }
-  std::cerr << "integr " << weight.integr() - sqrt(pi)/2 << std::endl;
+  std::cerr << "Weight function integral " << weight.integr() << std::endl;
   // we need the root of it
   try
   {
@@ -138,31 +150,36 @@ void MakeQuadratureScheme::exec()
     );
   setProperty("Quadrature",tws);
 
-  tws->addColumn("double","x");
-  tws->getColumn("x")->asNumeric()->setPlotRole(API::NumericColumn::X);
+  tws->addColumn("double","k");
+  //tws->getColumn("k")->asNumeric()->setPlotRole(API::NumericColumn::X);
   // a-coefficients in the recurrence relation p_j+1 = (x-a_j)*p_j - b_j*p_j-1
   tws->addColumn("double","a");
   // b-coefficients in the recurrence relation p_j+1 = (x-a_j)*p_j - b_j*p_j-1
   tws->addColumn("double","b");
+  tws->addColumn("double","c");
   tws->setRowCount(n);
   auto& a = tws->getDoubleData("a");
   auto& b = tws->getDoubleData("b");
+  auto& c = tws->getDoubleData("c");
 
+  startX = get("StartX");
+  endX = get("EndX");
   {
-    FunctionDomain1DVector xdomain(startX, endX, n);
+    FunctionDomain1DVector xdomain(0, n-1, n);
     // !! it's not very good because it potentially can change the size of the column
-    tws->getDoubleData("x").assign(xdomain.getPointerAt(0),xdomain.getPointerAt(0) + n);
+    tws->getDoubleData("k").assign(xdomain.getPointerAt(0),xdomain.getPointerAt(0) + n);
   }
 
   auto test = API::TableWorkspace_ptr( new API::TableWorkspace );
   test->addColumn("double","x");
   test->getColumn("x")->asNumeric()->setPlotRole(API::NumericColumn::X);
-  const size_t testSize = 200;
-  test->setRowCount(testSize);
+  const size_t testSize = 1000;
   {
-    FunctionDomain1DVector xdomain(startX, endX, testSize);
+    //FunctionDomain1D_sptr xdomain( new FunctionDomain1DVector (startX, endX, testSize) );
+    auto xdomain = weight.createDomainFromXPoints();
+    test->setRowCount(xdomain->size());
     // !! it's not very good because it potentially can change the size of the column
-    test->getDoubleData("x").assign(xdomain.getPointerAt(0),xdomain.getPointerAt(0) + testSize);
+    test->getDoubleData("x").assign(xdomain->getPointerAt(0),xdomain->getPointerAt(0) + xdomain->size());
   }
   setProperty("Test",test);
 
@@ -194,12 +211,12 @@ void MakeQuadratureScheme::exec()
   pp *= *poly[0];
   std::cerr << "integr " << pp.integr() << std::endl;
 
-  addValuesToWorkspace( test, "x", "p0", *poly[0] );
-  addValuesToWorkspace( test, "x", "p1", *poly[1] );
+  //addValuesToWorkspace( test, "x", "p0", *poly[0] );
+  //addValuesToWorkspace( test, "x", "p1", *poly[1] );
 
   for(size_t i = 2; i < n; ++i)
   {
-    std::cerr << "making " << i << "-th poly" << std::endl;
+    //std::cerr << "making " << i << "-th poly" << std::endl;
     size_t i1 = i - 1;
     size_t i2 = i - 2;
     // calculate a and b for this iteration
@@ -219,22 +236,112 @@ void MakeQuadratureScheme::exec()
     pp = *poly[i2];
     pp *= b[i1];
     *poly[i] -= pp;
+    //addValuesToWorkspace( test, "x", "p"+boost::lexical_cast<std::string>(i), *poly[i] );
+  }
+  pp = *poly.back();
+  pp *= *poly.back();
+  norms.back() = pp.integr();
+
+  for(size_t i = 0; i < n; ++i)
+  {
+    const double tmp = 1.0 / sqrt( norms[i] );
+    *poly[i] *= tmp;
+    if ( i > 0 )
+    {
+      c[i-1] = sqrt( norms[i-1] / norms[i]  );
+      a[i-1] *= c[i-1];
+      b[i-1] *= c[i-1];
+    }
     addValuesToWorkspace( test, "x", "p"+boost::lexical_cast<std::string>(i), *poly[i] );
+    pp = *poly[i];
+    pp *= *poly[i];
+    //std::cerr << "<" << i << ">= " << pp.integr() << std::endl;
+  }
+  tws->removeRow( n-1 );
+  pp.fromDerivative( *poly.back() );
+  addValuesToWorkspace( test, "x", "deriv", pp );
+
+  // find the domain where the resultant polynomial isn't practically zero
+  {
+    auto xdomain = weight.createDomainFromXPoints();
+    FunctionValues values( *xdomain );
+    poly.back()->function( *xdomain, values );
+    size_t i = 0;
+    while( fabs(values.getCalculated(i)) < 1e-3 ) ++i;
+    startX = (*xdomain)[i];
+    i = values.size() - 1;
+    while( i > 0 && fabs(values.getCalculated(i)) < 1e-3 ) --i;
+    endX = (*xdomain)[i];
   }
 
-  //std::cerr << "Calculating abscissas" << std::endl;
-  //EvalPoly ePoly(n, a, b);
-  //ChebFunction res(n, startX, endX);
-  //res.bestFit( *poly.back() );
-  //addValuesToWorkspace( test, "x", "res", res );
-  //std::vector<double> r;
-  //res.roots( r );
-  //std::cerr << "size " << r.size() << std::endl;
+  std::cerr << "Calculating abscissas on " << startX << " - " << endX << std::endl;
+  ChebFunction res(0, startX, endX);
+  //res.fit( *poly.back() );
+  res.bestFit( *poly.back() );
+  addValuesToWorkspace( test, "x", "res", res );
+  std::cerr << "res size " << res.cfun(0).n() << std::endl;
 
-  //for(size_t i = 0; i < r.size(); ++i)
-  //{
-  //  std::cerr << i << ' ' << r[i] << std::endl;
-  //}
+  //if ( res.cfun(0).n() < 1000 )
+  {
+    std::vector<double> r;
+    res.roots( r );
+    std::cerr << "size " << r.size() << std::endl;
+
+    //FunctionDomain1DView domain( r.data(), r.size() );
+    //FunctionValues values( domain );
+    //res.function( domain, values );
+    //for(size_t i = 0; i < r.size(); ++i)
+    //{
+    //  std::cerr << i << ' ' << r[i] << ' ' << values.getCalculated(i) << std::endl;
+    //}
+    // output the integration points and weights
+    if ( r.size() == n - 1 )
+    {
+      std::sort( r.begin(), r.end() );
+
+      tws->addColumn("double","r");
+      //tws->getColumn("r")->asNumeric()->setPlotRole(API::NumericColumn::X);
+      assert(r.size() == tws->rowCount());
+      tws->getDoubleData("r") = r;
+
+      // compute the weights
+      FunctionDomain1DView domain( r.data(), r.size() );
+      // p_n-1
+      FunctionValues pn( domain ); 
+      // p'_n
+      FunctionValues dn( domain );
+
+      // p_n-1
+      poly[n-2]->function( domain, pn );
+      // p'_n
+      res.fromDerivative(*poly[n-1]);
+      res.function( domain, dn );
+      std::vector<double> w( n-1 );
+      for(size_t i = 0; i < n-1; ++i)
+      {
+        w[i] = 1.0 / (pn.getCalculated(i)*dn.getCalculated(i));
+        //w[i] = dn.getCalculated(i);
+      }
+
+      tws->addColumn("double","w");
+      //tws->getColumn("w")->asNumeric()->setPlotRole(API::NumericColumn::Y);
+      assert(w.size() == tws->rowCount());
+      tws->getDoubleData("w") = w;
+
+      double test = 0.0;
+      for(size_t i = 0; i < r.size(); ++i)
+      {
+        test += w[i];
+      }
+      std::cerr << "test = " << test << std::endl;
+    }
+    else
+    {
+      std::cerr << "Failed to calculate the roots." << std::endl;
+    }
+  }
+
+  //printoutOrtho(poly);
 }
 
 /**
@@ -300,21 +407,34 @@ namespace
    * @param a :: The a-coefficients of the recurrence.
    * @param b :: The b-coefficients of the recurrence.
    */
-  double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b)
+  double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c)
   {
     double p0 = 1.0;
     if ( n == 0 ) return p0;
     double p1 = ( x - a[0] ) * p0;
     if ( n == 1 ) return p1;
-    for(size_t i = 2; i <= n; ++i)
+    for(size_t i = 2; i < n; ++i)
     {
-      double p = ( x - a[i-1] ) * p1 - b[i-1] * p0;
+      double p = ( c[i-1] * x - a[i-1] ) * p1 - b[i-1] * p0;
       p0 = p1;
       p1 = p;
     }
     return p1;
   }
 
+  void printoutOrtho(const std::vector<ChebFunction_sptr>& poly)
+  {
+    const size_t n = poly.size();
+    for(size_t i = 0; i < n; ++i)
+    {
+      for(size_t j = i; j < n; ++j)
+      { 
+        ChebFunction pp( *poly[i] );
+        pp *= *poly[j];
+        std::cerr << "<" << i << "|" << j << ">=" << pp.integr() << std::endl;
+      }
+    }
+  }
 }
 
 

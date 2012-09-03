@@ -46,6 +46,8 @@ public:
   size_t nfuns() const {return m_fun.size();}
   /// Return reference to i-th chebfun, const version
   const ScaledChebfun& fun(size_t i) const {return *(m_fun[i]);}
+  /// Return reference to i-th chebfun, const version
+  const ScaledChebfun& cfun(size_t i) const {return *(m_fun[i]);}
   /// Add a ScaledChebfun to the right on the x-axis.
   void appendRight(size_t n, const double& endX);
   /// Fill a vector with x values

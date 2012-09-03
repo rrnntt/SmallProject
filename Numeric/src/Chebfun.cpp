@@ -800,7 +800,7 @@ namespace Numeric
       double re = GSL_REAL( val );
       double im = GSL_IMAG( val );
       double ab = re*re + im*im;
-      if ( fabs( ab - 1.0 ) > 1e-10 ) 
+      if ( fabs( ab - 1.0 ) > 1e-5 ) 
       {
         isFirst = true;
         continue;
