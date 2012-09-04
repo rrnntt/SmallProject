@@ -7,6 +7,8 @@
 #include "Numeric/Constants.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
+#include "Numeric/GSLMatrix.h"
+#include "Numeric/GSLVector.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -77,6 +79,8 @@ namespace
   };
 
   void printoutOrtho(const std::vector<ChebFunction_sptr>& poly);
+  void computeWeights(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w);
+  void computeWeights1(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w);
 }
 
 /// Execute algorithm.
@@ -100,7 +104,7 @@ void MakeQuadratureScheme::exec()
     throw std::invalid_argument("StartX must be <= EndX");
   }
 
-  ChebFunction weight(1000, startX, endX);
+  ChebFunction weight(0, startX, endX);
   for(size_t i = 2; i < intervalParser.size(); ++i)
   {
     double x = readDouble( intervalParser[i].str() );
@@ -116,16 +120,7 @@ void MakeQuadratureScheme::exec()
   std::string funStr = get("Function");
   IFunction_sptr fun = FunctionFactory::instance().createFitFunction(funStr);
 
-  // fit ChebFunction 
-  //if ( weight.nfuns() == 1 )
-  //{
-  //  // increase number of points
-  //  weight.fit( *fun );
-  //}
-  //else
-  {
-    weight.bestFit( *fun );
-  }
+  weight.bestFit( *fun );
 
 
   for(size_t i = 0; i < weight.nfuns(); ++i)
@@ -151,7 +146,6 @@ void MakeQuadratureScheme::exec()
   setProperty("Quadrature",tws);
 
   tws->addColumn("double","k");
-  //tws->getColumn("k")->asNumeric()->setPlotRole(API::NumericColumn::X);
   // a-coefficients in the recurrence relation p_j+1 = (x-a_j)*p_j - b_j*p_j-1
   tws->addColumn("double","a");
   // b-coefficients in the recurrence relation p_j+1 = (x-a_j)*p_j - b_j*p_j-1
@@ -211,9 +205,6 @@ void MakeQuadratureScheme::exec()
   pp *= *poly[0];
   std::cerr << "integr " << pp.integr() << std::endl;
 
-  //addValuesToWorkspace( test, "x", "p0", *poly[0] );
-  //addValuesToWorkspace( test, "x", "p1", *poly[1] );
-
   for(size_t i = 2; i < n; ++i)
   {
     //std::cerr << "making " << i << "-th poly" << std::endl;
@@ -236,7 +227,6 @@ void MakeQuadratureScheme::exec()
     pp = *poly[i2];
     pp *= b[i1];
     *poly[i] -= pp;
-    //addValuesToWorkspace( test, "x", "p"+boost::lexical_cast<std::string>(i), *poly[i] );
   }
   pp = *poly.back();
   pp *= *poly.back();
@@ -258,8 +248,12 @@ void MakeQuadratureScheme::exec()
     //std::cerr << "<" << i << ">= " << pp.integr() << std::endl;
   }
   tws->removeRow( n-1 );
-  pp.fromDerivative( *poly.back() );
-  addValuesToWorkspace( test, "x", "deriv", pp );
+
+  pp.fromDerivative( *poly.front() );
+  ChebFunction der2;
+  der2.fromDerivative( pp );
+  der2 /= *poly.front();
+  addValuesToWorkspace( test, "x", "deriv", der2 );
 
   // find the domain where the resultant polynomial isn't practically zero
   {
@@ -287,52 +281,18 @@ void MakeQuadratureScheme::exec()
     res.roots( r );
     std::cerr << "size " << r.size() << std::endl;
 
-    //FunctionDomain1DView domain( r.data(), r.size() );
-    //FunctionValues values( domain );
-    //res.function( domain, values );
-    //for(size_t i = 0; i < r.size(); ++i)
-    //{
-    //  std::cerr << i << ' ' << r[i] << ' ' << values.getCalculated(i) << std::endl;
-    //}
     // output the integration points and weights
     if ( r.size() == n - 1 )
     {
       std::sort( r.begin(), r.end() );
 
       tws->addColumn("double","r");
-      //tws->getColumn("r")->asNumeric()->setPlotRole(API::NumericColumn::X);
       assert(r.size() == tws->rowCount());
       tws->getDoubleData("r") = r;
 
-      // compute the weights
-      FunctionDomain1DView domain( r.data(), r.size() );
-      // p_n-1
-      FunctionValues pn1( domain ); 
-      poly[n-2]->function( domain, pn1 );
-      // p'_n
-      FunctionValues dn( domain );
-      res.fromDerivative(*poly[n-1]);
-      res.function( domain, dn );
-      FunctionValues pn( domain ); 
-      poly[n-1]->function( domain, pn );
-      // weight function
-      FunctionValues wgt( domain );
-      weight.function( domain, wgt );
-      ChebFunction dweight;
-      dweight.fromDerivative( weight );
-      FunctionValues dwgt( domain );
-      dweight.function( domain, dwgt );
-
-      std::vector<double> w( n-1 );
-      for(size_t i = 0; i < n-1; ++i)
-      {
-        // w[i] = 1 / ( pn1*( dn/wgt^2 - pn*dwgt/wgt^3 ) )
-        double tmp = pn1[i] * (dn[i] - pn[i]*dwgt[i]/wgt[i]) / (wgt[i] * wgt[i]);
-        w[i] = 1.0 / tmp;
-      }
-
+      std::vector<double> w;
+      computeWeights1( poly, r, weight, w );
       tws->addColumn("double","w");
-      //tws->getColumn("w")->asNumeric()->setPlotRole(API::NumericColumn::Y);
       assert(w.size() == tws->rowCount());
       tws->getDoubleData("w") = w;
 
@@ -443,7 +403,100 @@ namespace
       }
     }
   }
-}
+
+  /**
+   * Compute the quadrature weights using w = 1/ (p[n-2] * p'[n-1]), where p'[n-1] is the 
+   *  derivative of the last polynomial.
+   * @param poly :: Vector of p*weight functions
+   * @param r :: Quadrature abscissas (roots of the last polynomial)
+   * @param weight :: Square root of the weight function
+   * @param w :: Result weights
+   */
+  void computeWeights(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w)
+  {
+    size_t n = poly.size() - 1;
+    w.resize( n );
+    // compute the weights
+    FunctionDomain1DView domain( r.data(), r.size() );
+    // p_n-1
+    FunctionValues pn1( domain ); 
+    poly[n-1]->function( domain, pn1 );
+    // p'_n
+    FunctionValues dn( domain );
+    ChebFunction der;
+    der.fromDerivative(*poly[n]);
+    der.function( domain, dn );
+    FunctionValues pn( domain ); 
+    poly[n]->function( domain, pn );
+    // weight function
+    FunctionValues wgt( domain );
+    weight.function( domain, wgt );
+    ChebFunction dweight;
+    dweight.fromDerivative( weight );
+    FunctionValues dwgt( domain );
+    dweight.function( domain, dwgt );
+
+    ChebFunction weight2(weight);
+    weight2.square();
+    double factor = 1.0 / weight2.integr();
+    factor *= factor; // it is a wrong factor !!!
+
+    for(size_t i = 0; i < n; ++i)
+    {
+      // w[i] = 1 / ( pn1*( dn/wgt^2 - pn*dwgt/wgt^3 ) )
+      double tmp = pn1[i] * (dn[i] - pn[i]*dwgt[i]/wgt[i]) / (wgt[i] * wgt[i]);
+      w[i] = factor / tmp;
+    }
+
+  }
+
+  /// This one works better than the other one.
+  void computeWeights1(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w)
+  {
+    size_t n = poly.size() - 1;
+    w.resize( n );
+    GSLMatrix M(n,n);
+    GSLVector rhs(n);
+    rhs.zero();
+    GSLVector x(n);
+
+    ChebFunction weight2(weight);
+    weight2.square();
+    rhs.set(0, weight2.integr());
+    std::cerr << "weight integr " << rhs[0] << std::endl;
+
+    FunctionDomain1DView domain( r.data(), r.size() );
+    FunctionValues wgt( domain );
+    weight.function( domain, wgt );
+    FunctionValues values( domain );
+
+    for(size_t i = 0; i < n; ++i)
+    {
+      if ( i == 0 )
+      {
+        for(size_t j=0; j < n; ++j)
+        {
+          M.set( i, j, 1.0);
+        }
+      }
+      else
+      {
+        poly[i]->function( domain, values );
+        for(size_t j=0; j < n; ++j)
+        {
+          M.set( i, j, values[j] / wgt[j] );
+        }
+      }
+    }
+    //std::cerr << M << std::endl;
+    M.solve(rhs,x);
+    for(size_t i = 0; i < n; ++i)
+    {
+      w[i] = x[i];
+    }
+  }
+
+} // namespace
 
 
 } // namespace Numeric
