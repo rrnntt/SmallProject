@@ -77,6 +77,7 @@ class NUMERIC_EXPORT FunctionDomain1DView: public FunctionDomain1D
 {
 public:
   FunctionDomain1DView(const double* x, size_t n):FunctionDomain1D(x,n){}
+  FunctionDomain1DView(const std::vector<double>& x):FunctionDomain1D(x.data(),x.size()){}
 private:
   FunctionDomain1DView(const FunctionDomain1DView&);
   FunctionDomain1DView& operator=(const FunctionDomain1DView&);

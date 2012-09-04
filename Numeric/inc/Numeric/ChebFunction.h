@@ -90,6 +90,7 @@ public:
   ChebFunction& operator*=(const double& value);
 
   ChebFunction& operator*=(AFunction fun);
+  ChebFunction& operator*=(const IFunction& fun);
 
   /* Functions */
   /// Square the function

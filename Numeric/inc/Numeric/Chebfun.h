@@ -166,6 +166,7 @@ namespace Numeric
     }
     
     chebfun& operator*=(const chebfun& f);
+    chebfun& operator*=(const IFunction& f);
 
     /// /= operators
     chebfun& operator/=(double v)

@@ -358,6 +358,18 @@ ChebFunction& ChebFunction::operator*=(AFunction f)
   return *this;
 }
 
+/**
+ * Multiply by a IFunction.
+ * @param f :: A function to multiply.
+ */
+ChebFunction& ChebFunction::operator*=(const IFunction& f)
+{
+  for(size_t i = 0; i < nfuns(); ++i)
+  {
+    fun(i) *= f;
+  }
+  return *this;
+}
 
 /**
  * Fit to a c++ function.

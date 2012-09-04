@@ -637,6 +637,19 @@ namespace Numeric
     return *this;
   }
 
+  chebfun& chebfun::operator*=(const IFunction& f)
+  {
+    FunctionDomain1DView x( m_base->x );
+    FunctionValues y( x );
+    f.function( x, y );
+    for(size_t i = 0; i < m_p.size(); ++i)
+    {
+      m_p[i] *= y[i];
+    }
+    invalidateA();
+    return *this;
+  }
+
   chebfun& chebfun::operator/=(const chebfun& f)
   {
     if ( haveSameBase(f) )

@@ -106,6 +106,8 @@ public:
   ScaledChebfun& operator*=(const ScaledChebfun& fun);
   /// Add values from another function
   ScaledChebfun& operator*=(AFunction fun);
+  /// Add values from another function
+  ScaledChebfun& operator*=(const IFunction& fun);
   /// Mutiply by a value
   ScaledChebfun& operator*=(const double& value);
   /// Divide by values from another function

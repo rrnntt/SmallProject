@@ -435,6 +435,49 @@ ScaledChebfun& ScaledChebfun::operator*=(AFunction fun)
 }
 
 /**
+ * Multiply by values from another function
+ * @param fun :: A function to add to this function.
+ */
+ScaledChebfun& ScaledChebfun::operator*=(const IFunction& fun)
+{
+  if ( !hasScaling() )
+  {
+    m_fun *= fun;
+  }
+  else
+  {
+    auto x = createDomainFromXPoints();
+    FunctionValues values( *x );
+    fun.function( *x, values );
+
+    size_t istart = 0;
+    size_t ni = x->size();
+    if ( ni > 1 )
+    {
+      if ( (*x)[0] == minf )
+      {
+        istart = 1;
+        --ni;
+      }
+      else if ( (*x)[ni-1] == inf )
+      {
+        --ni;
+      }
+    }
+
+    std::vector<double> y( (*x).size() );
+    // copy m_p values to y
+    y = m_fun.ypoints();
+    for(size_t i = istart; i < ni; ++i)
+    {
+      y[i] *= values[i];
+    }
+    m_fun.setP( y );
+  }
+  return *this;
+}
+
+/**
  * Multiply by a value
  * @param value :: Value to multiply by.
  */

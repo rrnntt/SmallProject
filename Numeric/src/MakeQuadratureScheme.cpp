@@ -47,7 +47,27 @@ MakeQuadratureScheme::MakeQuadratureScheme()
 namespace 
 {
   /// function x
-  double xfun(double x){return x;}
+  //double xfun(double x){return x;}
+
+  class Xfun: public IFunction1D, public ParamFunction
+  {
+    size_t m_i;
+  public:
+    Xfun():m_i(0){}
+    /// Returns the function's name
+    virtual std::string name()const {return "Xfun";}
+    /// Function you want to fit to.
+    virtual void function1D(double* out, const double* xValues, const size_t nData)const
+    {
+      for(size_t i = 0; i < nData; ++i)
+      {
+        const double x = xValues[i];
+        out[i] = x;// - (0.01 * m_i) *x*x;
+      }
+    }
+    Xfun& operator()(size_t i){m_i = i; return *this;}
+  };
+
   /// add function values to a table
   void addValuesToWorkspace(API::TableWorkspace_ptr tws, 
     const std::string& xColumn,
@@ -78,7 +98,7 @@ namespace
     }
   };
 
-  void printoutOrtho(const std::vector<ChebFunction_sptr>& poly);
+  void checkOrtho(const std::vector<ChebFunction_sptr>& poly);
   void computeWeights(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w);
   void computeWeights1(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w);
 }
@@ -187,16 +207,19 @@ void MakeQuadratureScheme::exec()
 
   *poly[0] = weight;
 
+  // define the "x"-function
+  Xfun xfun;
+
   // don't copy just use the same base
   ChebFunction pp(*poly[0]);
   pp *= *poly[0];
   norms[0] = pp.integr();
-  pp *= xfun;
+  pp *= xfun(0);
   a[0] = pp.integr() / norms[0];
   b[0] = 0.0;
 
   *poly[1] = *poly[0];
-  *poly[1] *= xfun;
+  *poly[1] *= xfun(1);
   pp = *poly[0];
   pp *= a[0];
   *poly[1] -= pp;
@@ -214,13 +237,13 @@ void MakeQuadratureScheme::exec()
     pp = *poly[i1];
     pp *= *poly[i1];
     norms[i1] = pp.integr();
-    pp *= xfun;
+    pp *= xfun(i);
     a[i1] = pp.integr() / norms[i1];
     b[i1] = norms[i1] / norms[i2];
 
     //calculate i-th poly
     *poly[i] = *poly[i1];
-    *poly[i] *= xfun;
+    *poly[i] *= xfun(i);
     pp = *poly[i1];
     pp *= a[i1];
     *poly[i] -= pp;
@@ -302,6 +325,20 @@ void MakeQuadratureScheme::exec()
         test += w[i];
       }
       std::cerr << "test = " << test << std::endl;
+
+      // output the "x"-function
+      {
+        FunctionDomain1DView xdomain( r );
+        FunctionValues values( xdomain );
+        xfun.function( xdomain, values );
+        tws->addColumn("double","x");
+        auto& xcol = tws->getDoubleData("x");
+        for(size_t i = 0; i < xcol.size(); ++i)
+        {
+          xcol[i] = values[i];
+        }
+      }
+
     }
     else
     {
@@ -309,7 +346,7 @@ void MakeQuadratureScheme::exec()
     }
   }
 
-  //printoutOrtho(poly);
+  checkOrtho(poly);
 }
 
 /**
@@ -390,8 +427,10 @@ namespace
     return p1;
   }
 
-  void printoutOrtho(const std::vector<ChebFunction_sptr>& poly)
+  void checkOrtho(const std::vector<ChebFunction_sptr>& poly)
   {
+    double norm = 0.0;
+    double offd = 0.0;
     const size_t n = poly.size();
     for(size_t i = 0; i < n; ++i)
     {
@@ -399,9 +438,16 @@ namespace
       { 
         ChebFunction pp( *poly[i] );
         pp *= *poly[j];
-        std::cerr << "<" << i << "|" << j << ">=" << pp.integr() << std::endl;
+        const double d = fabs( pp.integr() );
+        //std::cerr << "<" << i << "|" << j << ">=" << d << std::endl;
+        if ( i == j ) norm += d;
+        else
+        {
+          offd += d;
+        }
       }
     }
+    std::cerr << "orthonormality " << norm / n << ' ' << 2*offd / (n*(n-1)) << std::endl;
   }
 
   /**
