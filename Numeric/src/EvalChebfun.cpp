@@ -45,7 +45,7 @@ void EvalChebfun::exec()
 
   FunctionDomain1DView domain(x.data(),x.size());
   FunctionValues values( domain );
-  cws->eval(domain,values);
+  cws->fun().eval(domain,values);
 
   for(size_t i = 0; i < x.size(); ++i)
   {

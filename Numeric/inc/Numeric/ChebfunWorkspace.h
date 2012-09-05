@@ -11,7 +11,7 @@ namespace Numeric
 /**
  * 
  */
-class NUMERIC_EXPORT ChebfunWorkspace: public API::Workspace, public ChebFunction
+class NUMERIC_EXPORT ChebfunWorkspace: public API::Workspace
 {
 public:
   ChebfunWorkspace();
@@ -19,7 +19,9 @@ public:
   ChebfunWorkspace(const chebfun& fun);
   ~ChebfunWorkspace(){}
   virtual std::string id()const {return "ChebfunWorkspace";}
-
+  ChebFunction& fun(){return m_fun;}
+private:
+  ChebFunction m_fun;
 };
 
 /// typedef shared pointer

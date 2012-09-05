@@ -212,4 +212,10 @@ namespace Numeric
       return fun;
     }
 
+    /// Create function property
+    boost::shared_ptr<Kernel::PropertyClass> FunctionFactory::createProperty(const std::string& value) const
+    {
+      return createFitFunction( value );
+    }
+
 } // namespace Numeric

@@ -38,16 +38,16 @@ void ChebfunToTable::exec()
 
   if (n < 2)
   {// if n has default value (0) use the x-points of the chebfuns
-    domain = cws->createDomainFromXPoints();
+    domain = cws->fun().createDomainFromXPoints();
     n = domain->size();
   }
   else
   {// otherwise create a regular comb
-    domain = cws->createDomain( n );
+    domain = cws->fun().createDomain( n );
   }
 
   Numeric::FunctionValues values( *domain );
-  cws->function(*domain, values);
+  cws->fun().function(*domain, values);
 
   auto tws = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory::instance().create("TableWorkspace"))

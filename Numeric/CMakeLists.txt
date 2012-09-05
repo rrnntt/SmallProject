@@ -24,7 +24,6 @@ set( INC_FILES
    inc/Numeric/FunctionDomain.h
    inc/Numeric/FunctionDomain1D.h
    inc/Numeric/FunctionFactory.h
-   inc/Numeric/FunctionProperty.h
    inc/Numeric/FunctionValues.h
    inc/Numeric/GSLJacobian.h
    inc/Numeric/GSLMatrix.h
@@ -89,7 +88,6 @@ set( SRC_FILES
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp
   src/FunctionFactory.cpp
-  src/FunctionProperty.cpp
   src/FunctionValues.cpp
   src/IFuncMinimizer.cpp
   src/IFunction.cpp
@@ -158,7 +156,6 @@ set( SRC_FILES
   test/Function1DTest.cpp
   test/FunctionDomain1DTest.cpp
   test/FunctionFactoryTest.cpp
-  test/FunctionPropertyTest.cpp
   test/FuncMinimizerFactoryTest.cpp
   test/JointDomainFunctionTest.cpp
   test/GSLMatrixTest.cpp

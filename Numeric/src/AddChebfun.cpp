@@ -32,19 +32,19 @@ void AddChebfun::exec()
 
   if (op == "+")
   {
-    *cws += *cws1;
+    cws->fun() += cws1->fun();
   }
   else if (op == "-")
   {
-    *cws -= *cws1;
+    cws->fun() -= cws1->fun();
   }
   else if (op == "*")
   {
-    *cws *= *cws1;
+    cws->fun() *= cws1->fun();
   }
   else if (op == "/")
   {
-    *cws /= *cws1;
+    cws->fun() /= cws1->fun();
   }
 }
 

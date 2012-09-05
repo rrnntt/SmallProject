@@ -34,7 +34,7 @@ MakeQuadratureScheme::MakeQuadratureScheme()
   // integration interval
   declareString("Interval","-1.0,1.0");
   // FunctionFcatory init string for a weight function
-  declareString("Function");
+  declareClass("Function",&FunctionFactory::instance());
   // TableWorkspace with the created qudrature data
   declareWorkspace("Quadrature");
   // guess start of the interval containing all integration points
@@ -72,7 +72,8 @@ namespace
   void addValuesToWorkspace(API::TableWorkspace_ptr tws, 
     const std::string& xColumn,
     const std::string& yColumn,
-    const IFunction& fun);
+    const IFunction& fun,
+    API::NumericColumn::PlotRole role = API::NumericColumn::Y);
   /// valuate a polynom recursively
   double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
   /// valuate a polynom recursively
@@ -266,8 +267,8 @@ void MakeQuadratureScheme::exec()
       b[i-1] *= c[i-1];
     }
     addValuesToWorkspace( test, "x", "p"+boost::lexical_cast<std::string>(i), *poly[i] );
-    pp = *poly[i];
-    pp *= *poly[i];
+    //pp = *poly[i];
+    //pp *= *poly[i];
     //std::cerr << "<" << i << ">= " << pp.integr() << std::endl;
   }
   tws->removeRow( n-1 );
@@ -339,6 +340,18 @@ void MakeQuadratureScheme::exec()
         }
       }
 
+      // output function values, first and second derivatives
+      for(size_t i = 0; i < n; ++i)
+      {
+        const std::string si = boost::lexical_cast<std::string>(i);
+        addValuesToWorkspace( tws, "r", "p"+si, *poly[i], API::NumericColumn::Unset );
+        ChebFunction dp;
+        dp.fromDerivative( *poly[i] );
+        addValuesToWorkspace( tws, "r", "d"+si, dp, API::NumericColumn::Unset );
+        ChebFunction ddp;
+        ddp.fromDerivative( dp );
+        addValuesToWorkspace( tws, "r", "dd"+si, ddp, API::NumericColumn::Unset );
+      }
     }
     else
     {
@@ -381,7 +394,9 @@ namespace
   void addValuesToWorkspace(API::TableWorkspace_ptr tws, 
     const std::string& xColumn,
     const std::string& yColumn,
-    const IFunction& fun)
+    const IFunction& fun,
+    API::NumericColumn::PlotRole role
+    )
   {
     auto& x = tws->getDoubleData( xColumn );
     if ( tws->hasColumn( yColumn ) )
@@ -393,7 +408,7 @@ namespace
     {
       tws->addColumn( "double", yColumn );
     }
-    tws->getColumn( yColumn )->asNumeric()->setPlotRole(API::NumericColumn::Y);
+    tws->getColumn( yColumn )->asNumeric()->setPlotRole(role);
     auto& y = tws->getDoubleData( yColumn );
 
     FunctionDomain1DView domain( x.data(), x.size() );

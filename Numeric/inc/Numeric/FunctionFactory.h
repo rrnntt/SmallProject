@@ -9,6 +9,7 @@
 #include "Kernel/DynamicFactory.h"
 #include "Kernel/Logger.h"
 #include "Kernel/Singleton.h"
+#include "Kernel/PropertyClassFactory.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -34,7 +35,7 @@ namespace Numeric
     It is implemented as a singleton class.
 */
 
-  class NUMERIC_EXPORT FunctionFactory : public Kernel::DynamicFactory<IFunction>, protected Kernel::Singleton
+  class NUMERIC_EXPORT FunctionFactory : public Kernel::DynamicFactory<IFunction>, protected Kernel::Singleton, public Kernel::PropertyClassFactory
   {
   public:
     virtual std::string name() const {return "Numeric::FunctionFactory";}
@@ -46,6 +47,9 @@ namespace Numeric
     /// Query available functions based on the template type
     template<typename FunctionType>
     std::vector<std::string> getFunctionNames() const;
+
+    /// Create function property
+    boost::shared_ptr<Kernel::PropertyClass> createProperty(const std::string& value) const;
 
   private:
 

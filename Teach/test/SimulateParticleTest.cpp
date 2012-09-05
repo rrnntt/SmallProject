@@ -10,5 +10,5 @@ TEST(Teach_SimulateParticle_Test, Test)
   simp.execute();
   Numeric::ChebfunWorkspace_sptr xproj = simp.getClass("XProj");
   EXPECT_TRUE(xproj);
-  size_t n = xproj->nfuns();
+  size_t n = xproj->fun().nfuns();
 }

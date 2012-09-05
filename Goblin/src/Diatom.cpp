@@ -91,6 +91,12 @@ void Diatom::exec()
     std::cerr << "Alpha=" << alpha << std::endl;
     std::cerr << "E0=" << 0.5*sqrt(alpha*beta) << std::endl;
   }
+
+  // compute the ground state 
+  auto alg = API::AlgorithmFactory::instance().createAlgorithm("MakeQuadratureScheme");
+  alg->setProperty("N",5);
+  alg->setProperty("Interval","0, 12");
+  alg->setProperty("Function","UserFunction1D(Formula=exp(-x^2))");
 }
 
 } // namespace Goblin

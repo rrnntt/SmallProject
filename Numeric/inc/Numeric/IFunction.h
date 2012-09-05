@@ -8,6 +8,7 @@
 #include "Numeric/FunctionDomain.h"
 #include "Numeric/FunctionValues.h"
 #include "Numeric/Jacobian.h"
+#include "Kernel/PropertyClass.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/variant.hpp>
@@ -84,7 +85,7 @@ class ParameterReference;
     the attributes must be set first, before any fitting parameter, as the number and names of the parameters
     can depend on the attributes.
 */
-class NUMERIC_EXPORT IFunction
+class NUMERIC_EXPORT IFunction: public Kernel::PropertyClass
 {
 public:
 
@@ -196,10 +197,13 @@ public:
   /// Virtual destructor
   virtual ~IFunction();
 
+  /// Implement PropertyClass virtual method
+  std::string asString()const {return IFunction::asString(false);}
+
   /// Returns the function's name
   virtual std::string name()const = 0;
   /// Writes itself into a string
-  virtual std::string asString(bool fmt = false, size_t level = 0)const;
+  virtual std::string asString(bool fmt, size_t level = 0)const;
 
   /// The categories the Fit function belong to.
   /// Categories must be listed as a semi colon separated list.
