@@ -7,6 +7,7 @@ int main( int argc, char** argv )
 {
   Kernel::Framework::instance().parseCommandLine(argc,argv);
   MyApplication app(argc, argv);
+  Kernel::Framework::instance().openAllLibraries();// it needs a better place to be called from
   MainWindow * wnd = new MainWindow();
   QtAPI::WindowManager::createWindowManager(wnd);
   wnd->createMenus();

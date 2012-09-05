@@ -404,7 +404,7 @@ void ChebFunction::bestFit(const IFunction& ifun)
   const double tol = 1e-16;
   double err = 1.0;
   std::vector<bool> done(nfuns(),false);
-  std::vector<size_t> nn(nfuns(),9);
+  std::vector<size_t> nn(nfuns(),3);
   double maxA = 0;
   while ( std::find(done.begin(),done.end(),false) != done.end() )
   {

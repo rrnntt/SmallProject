@@ -21,8 +21,10 @@ namespace Numeric
   extern NUMERIC_EXPORT const double planck_h;
   /// Planck constant over 2*pi in J*s
   extern NUMERIC_EXPORT const double planck_hbar;
-  /// Speed of light in vacuum in km/s
+  /// Speed of light in vacuum in m/s
   extern NUMERIC_EXPORT const double light_speed;
+  /// 1 Angstrom in m
+  extern NUMERIC_EXPORT const double angstrom;
 
 } // NUMERIC
 

@@ -20,7 +20,6 @@ m_idSeed(1)
 void WindowManager::createWindowManager(WindowManager* manager)
 {
   Kernel::Framework::instance().registerSingleton("WindowManager",manager);
-  Kernel::Framework::instance().openAllLibraries();// it needs a better place to be called from
 }
 
 WindowManager& WindowManager::instance()

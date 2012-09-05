@@ -226,7 +226,7 @@ namespace Numeric
   {
     const double start = cheb.startX();
     const double end = cheb.endX();
-    size_t nn = 9;
+    size_t nn = 3;
     const double tol = 1e-16;
     double err = 1.0;
     while ( err > tol )
