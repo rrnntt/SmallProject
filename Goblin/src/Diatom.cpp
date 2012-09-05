@@ -6,12 +6,15 @@
 #include "Numeric/ChebFunction.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
+#include "Numeric/GSLMatrix.h"
+#include "Numeric/GSLVector.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
 
 #include "Kernel/CommonProperties.h"
 
+#include <boost/lexical_cast.hpp>
 #include <stdexcept>
 
 using namespace Numeric;
@@ -20,6 +23,15 @@ namespace Goblin
 {
 
 DECLARE_ALGORITHM(Diatom);
+
+typedef std::vector< std::vector<double>* > FuncVector;
+
+// private namespace forward declarations
+namespace
+{
+  double calcKinet(size_t i, size_t j, FuncVector& ff, FuncVector& d2f, std::vector<double>& w, const double& beta);
+  double calcPot(size_t i, size_t j, FuncVector& ff, std::vector<double>& w, const std::vector<double>& vpot);
+}
 
 /// Constructor. Declare algorithm properties.
 Diatom::Diatom()
@@ -30,6 +42,8 @@ Diatom::Diatom()
   declareInt("Jmax",10);
   declareDouble("rmin",0.01);
   declareDouble("rmax",20.0); // the integration range [rmin,rmax] in angstrom
+  declareWorkspace("Quad");
+  declareWorkspace("Test");
 }
 
 /// Execute algorithm.
@@ -60,7 +74,6 @@ void Diatom::exec()
 
   // find the potential minimum
 
-  nmax = 4;
   ChebFunction v((size_t)nmax, rmin, rmax);
   v.bestFit( *Vpot );
   double r0 = 0;
@@ -93,10 +106,100 @@ void Diatom::exec()
   }
 
   // compute the ground state 
+  auto f0Fun = FunctionFactory::instance().createFitFunction( "UserFunction1D(Formula=exp(-a*(x-c)^2))" );
+  f0Fun->setParameter("a",sqrt(alpha/beta));
+  f0Fun->setParameter("c",r0);
+  std::string intervalStr = boost::lexical_cast<std::string>(rmin)+","+boost::lexical_cast<std::string>(rmax);
   auto alg = API::AlgorithmFactory::instance().createAlgorithm("MakeQuadratureScheme");
-  alg->setProperty("N",5);
-  alg->setProperty("Interval","0, 12");
-  alg->setProperty("Function","UserFunction1D(Formula=exp(-x^2))");
+  alg->setProperty("N",nmax);
+  alg->setProperty("Interval",intervalStr);
+  alg->setProperty("Function",f0Fun);
+  alg->execute();
+
+  API::TableWorkspace_ptr quadWS = alg->getClass("Quadrature");
+  API::TableWorkspace_ptr testWS = alg->getClass("Test");
+
+  setProperty("Quad",quadWS);
+  setProperty("Test",testWS);
+
+  auto& r = quadWS->getDoubleData("r");
+  auto& w = quadWS->getDoubleData("w");
+  FuncVector ff(nmax);
+  FuncVector d2f(nmax);
+  for(size_t i = 0; i < ff.size(); ++i)
+  {
+    const std::string si = boost::lexical_cast<std::string>(i);
+    ff[i] = &quadWS->getDoubleData("p"+si);
+    d2f[i] = &quadWS->getDoubleData("dd"+si);
+  }
+
+  // sample the potential energy
+  FunctionDomain1DView domain( r );
+  FunctionValues values( domain );
+  Vpot->function( domain, values );
+  std::vector<double> vpot(nmax);
+  for(size_t k = 0; k < nmax; ++k)
+  {
+    vpot[k] = values[k];
+    std::cerr << k << ' ' << vpot[k] << std::endl;
+  }
+
+  // build the hamiltonian matrix
+  GSLMatrix H(nmax,nmax);
+  for(size_t i =0; i < nmax; ++i)
+  for(size_t j =i; j < nmax; ++j)
+  {
+    double tmp = calcKinet(i,j,ff,d2f,w,beta);
+    tmp += calcPot(i,j,ff,w,vpot);
+    H.set(i,j, tmp);
+    if ( i != j ) H.set(j,i, tmp);
+  }
+
+  GSLVector ener;
+  GSLMatrix ef;
+  H.diag(ener,ef);
+
+  std::cerr << ener << std::endl;
+}
+
+// privatenamespace
+namespace
+{
+  /**
+   * Calculate a matrix element of the kinetoc energy.
+   * @param i :: The row index
+   * @param j :: The column index
+   * @param ff :: A vector of the basis functions
+   * @param d2f :: A vector of the second derivatives of the basis functions
+   * @param w :: The integration weights
+   * @param beta :: The coefficient at the kinetic energy operator in the Schrodinger equation.
+   * @return The value of the matrix element
+   */
+  double calcKinet(size_t i, size_t j, FuncVector& ff, FuncVector& d2f, std::vector<double>& w, const double& beta)
+  {
+    const size_t n = w.size();
+    std::vector<double>& f = *ff[i];
+    std::vector<double>& d2 = *d2f[j];
+    double res = 0.0;
+    for(size_t k = 0; k < n; ++k)
+    {
+      res += f[k] * d2[k] * w[k];
+    }
+    return -res * beta;
+  }
+
+  double calcPot(size_t i, size_t j, FuncVector& ff, std::vector<double>& w, const std::vector<double>& vpot)
+  {
+    const size_t n = w.size();
+    std::vector<double>& f1 = *ff[i];
+    std::vector<double>& f2 = *ff[j];
+    double res = 0;
+    for(size_t k = 0; k < n; ++k)
+    {
+      res += f1[k] * f2[k] * vpot[k] * w[k];
+    }
+    return res;
+  }
 }
 
 } // namespace Goblin
