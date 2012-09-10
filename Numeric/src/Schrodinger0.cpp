@@ -118,7 +118,7 @@ public:
 
 protected:
   mutable chebfun m_poly;
-  mutable std::vector<double>& m_a;
+  mutable std::vector<double> m_a;
   mutable double m_sig;
   ChebOperator& m_oper;
 };

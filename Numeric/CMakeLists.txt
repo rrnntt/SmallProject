@@ -128,10 +128,13 @@ add_library( Numeric SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc ../Kernel/inc ../API/inc ../Formula/inc ${THIRD_PARTY_INCLUDE_DIR})
 set_target_properties ( Numeric PROPERTIES COMPILE_DEFINITIONS IN_NUMERIC )
 
-set( GSL_DEBUG_LIB "${THIRD_PARTY_LIB_DIR}/gsl_d.lib")
-set( GSL_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gsl.lib")
-set( GSL_LIBS "optimized;${GSL_RELEASE_LIB};debug;${GSL_DEBUG_LIB};")
-
+if (CMAKE_HOST_WIN32)
+  set( GSL_DEBUG_LIB "${THIRD_PARTY_LIB_DIR}/gsl_d.lib")
+  set( GSL_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gsl.lib")
+  set( GSL_LIBS "optimized;${GSL_RELEASE_LIB};debug;${GSL_DEBUG_LIB};")
+else()
+  find_package( GSL )
+endif()
 
 target_link_libraries(Numeric Kernel API Formula
 ${GSL_LIBS}

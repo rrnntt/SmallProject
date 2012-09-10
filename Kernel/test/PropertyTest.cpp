@@ -60,7 +60,7 @@ TEST(PropertyTest, Property)
   EXPECT_EQ(str,"10");
 
   p = &d;
-  str = *p;
+  str = (std::string&)*p;
   EXPECT_EQ(str,"3.14");
 
   d = (int)i;

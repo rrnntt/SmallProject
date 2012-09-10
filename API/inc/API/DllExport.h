@@ -1,10 +1,12 @@
 #ifndef API_DLLEXPORT_H
 #define API_DLLEXPORT_H
 
+#include "Kernel/System.h"
+
 #if defined(IN_API)
-#  define API_EXPORT __declspec( dllexport )
+#  define API_EXPORT DLLEXPORT
 #else
-#  define API_EXPORT __declspec( dllimport )
+#  define API_EXPORT DLLIMPORT
 #endif
 
 #ifdef _WIN32

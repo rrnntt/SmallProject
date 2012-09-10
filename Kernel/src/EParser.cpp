@@ -781,7 +781,7 @@ EParser* EParser::addTerm(const std::string& str, IParser* parser)
 IParser* EParser::createBinParser()const
 {
   std::vector<std::string> ops = m_operators->getAllBinary();
-  std::sort(ops.begin(),ops.end(),[](std::string& l,std::string& r)->bool{
+  std::sort(ops.begin(),ops.end(),[](const std::string& l,const std::string& r)->bool{
     if (l.size() != r.size())
     {
       return l.size() > r.size();
@@ -789,9 +789,10 @@ IParser* EParser::createBinParser()const
     return l > r;
   });
   AltParser* parser = new AltParser;
-  std::for_each(ops.begin(),ops.end(),[&parser](std::string& s){
+  std::for_each(ops.begin(),ops.end(),[&parser](const std::string& s){
     parser->addParser(new StringParser(s));
   });
+
   return parser;
 }
 

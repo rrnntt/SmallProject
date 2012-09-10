@@ -6,6 +6,10 @@ project(SmallProject)
 
 cmake_minimum_required (VERSION 2.8)
 
+if (CMAKE_HOST_UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++0x")
+endif()
+
 set( THIRD_PARTY_DIR "${PROJECT_SOURCE_DIR}/Third_Party" )
 set( THIRD_PARTY_INCLUDE_DIR "${THIRD_PARTY_DIR}/include" )
 
@@ -37,10 +41,14 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/R
 #     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/gtest.dll )
 #file(COPY ${THIRD_PARTY_LIB_DIR}/gtest.dll 
 #     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE} )
-	 
-set( GTEST_DEBUG_LIB "${THIRD_PARTY_LIB_DIR}/gtest_d.lib")
-set( GTEST_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gtest.lib")
-set( GTEST_LIBS "optimized;${GTEST_RELEASE_LIB};debug;${GTEST_DEBUG_LIB};")
+
+if (CMAKE_HOST_WIN32)
+  set( GTEST_DEBUG_LIB "${THIRD_PARTY_LIB_DIR}/gtest_d.lib")
+  set( GTEST_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gtest.lib")
+  set( GTEST_LIBS "optimized;${GTEST_RELEASE_LIB};debug;${GTEST_DEBUG_LIB};")
+else()
+  find_package( GTEST )
+endif()
 
 #set( Boost_INCLUDE_DIR "C:/Users/hqs74821/Work/mantid/Code/Third_Party/include")
 find_package( Boost )

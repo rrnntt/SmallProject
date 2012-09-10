@@ -17,20 +17,20 @@ protected:
   //Singleton();
 };
 
-template<class C>
-C* returnSingleton(Singleton* s)
-{
-  if (s == nullptr)
-  {
-    C *new_s = new C();
-    API::Framework::instance().registerSingleton(new_s->name(),new_s);
-    return new_s;
-  }
-  else
-  {
-    return static_cast<C*>(s);
-  }
-}
+//template<class C>
+//C* returnSingleton(Singleton* s)
+//{
+//  if (s == nullptr)
+//  {
+//    C *new_s = new C();
+//    Kernel::Framework::instance().registerSingleton(new_s->name(),new_s);
+//    return new_s;
+//  }
+//  else
+//  {
+//    return static_cast<C*>(s);
+//  }
+//}
 
 } // Kernel
 

@@ -4,7 +4,7 @@
 #include "Kernel/DllExport.h"
 #include "Kernel/Operators.h"
 
-#include <boost/shared_ptr.hpp>
+//#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <map>

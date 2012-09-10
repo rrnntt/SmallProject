@@ -1,5 +1,7 @@
 #include "Kernel/ParsedExpressionString.h"
 
+#include <stdexcept>
+
 namespace Kernel
 {
 

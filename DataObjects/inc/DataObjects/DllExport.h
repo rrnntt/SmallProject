@@ -1,10 +1,12 @@
 #ifndef DATAOBJECTS_DLLEXPORT_H
 #define DATAOBJECTS_DLLEXPORT_H
 
+#include "Kernel/System.h"
+
 #if defined(IN_DATAOBJECTS)
-#  define DATAOBJECTS_EXPORT __declspec( dllexport )
+#  define DATAOBJECTS_EXPORT DLLEXPORT
 #else
-#  define DATAOBJECTS_EXPORT __declspec( dllimport )
+#  define DATAOBJECTS_EXPORT DLLIMPORT
 #endif
 
 #ifdef _WIN32

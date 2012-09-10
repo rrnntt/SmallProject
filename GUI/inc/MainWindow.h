@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include "QtAPI/WindowManager.h"
-#include <QtGUI/QMainWindow>
+#include <QMainWindow>
 
 class AlgorithmExplorer;
 class WorkspaceExplorer;

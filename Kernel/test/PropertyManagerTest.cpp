@@ -6,6 +6,7 @@
 #include "Kernel/Framework.h"
 
 #include <boost/lexical_cast.hpp>
+#include <stdexcept>
 
 using namespace Kernel;
 
@@ -49,7 +50,7 @@ TEST(Kernel_PropertyManager_Test, SimpleTypes)
   std::string s = mgr.get("s");
   EXPECT_EQ( s, "hello" );
 
-  s = mgr.get("x");
+  s = (std::string&)mgr.get("x");
   EXPECT_EQ( s, "3.14" );
 
   mgr.setProperty("x",2.73);
@@ -75,7 +76,7 @@ TEST(Kernel_PropertyManager_Test, ClassProperty)
   std::cerr << value << std::endl;
 
   mgr.setProperty("c", "15.3");
-  value = mgr.get("c");
+  value = (std::string)mgr.get("c");
   std::cerr << value << std::endl;
   
 }

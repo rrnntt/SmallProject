@@ -107,7 +107,7 @@ void PlotDialog::updateThisCurveList()
     {
       title = QString::number(id);
     }
-    ui->cbCurve->addItem(title,id);
+    ui->cbCurve->addItem(title,(qulonglong)id);
   }
 }
 
@@ -123,7 +123,7 @@ void PlotDialog::initCurveCopyPage()
     Plot* plot = dynamic_cast<Plot*>(w);
     if ( plot && plot != m_plot )
     {
-      ui->cbPlots->addItem(plot->title().text(),sw->getID());
+      ui->cbPlots->addItem(plot->title().text(),(qulonglong)sw->getID());
     }
   }
   connect(ui->cbPlots,SIGNAL(currentIndexChanged(int)),this,SLOT(updateCurveList(int)));

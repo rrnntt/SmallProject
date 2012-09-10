@@ -1,5 +1,7 @@
 #include "Formula/ScriptParser.h"
 
+#include <stdexcept>
+
 namespace Formula
 {
 
