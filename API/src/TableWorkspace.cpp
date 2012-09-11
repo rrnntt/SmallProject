@@ -526,4 +526,28 @@ std::vector<double>& TableWorkspace::getDoubleData(const std::string& name)
   return xColumn->data();
 }
 
+/**
+ * Set the data in a "double" column.
+ * @param name :: The column name to get the data. Must exist and be double type.
+ * @param data :: Pointer to the data.
+ * @param n :: Size of the data. Must be equal to the row count.
+ */
+void TableWorkspace::setDoubleData(const std::string& name, const double* data, size_t n)
+{
+  auto xColumn = static_cast<API::TableColumn<double>*>(getColumn(name).get());
+  if ( !xColumn ) throw std::runtime_error("Column " + name + " is not double");
+  if ( n != rowCount() ) throw std::runtime_error("Data size isn't equal to the row count.");
+  xColumn->data().assign(data,data+n);
+}
+
+/**
+ * Set the data in a "double" column.
+ * @param name :: The column name to get the data. Must exist and be double type.
+ * @param data :: Vector containing the data. The size must be equal to the row count.
+ */
+void TableWorkspace::setDoubleData(const std::string& name, const std::vector<double>& data)
+{
+  setDoubleData( name, data.data(), data.size() );
+}
+
 } // API

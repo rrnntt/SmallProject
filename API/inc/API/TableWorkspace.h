@@ -78,6 +78,10 @@ namespace API
     Column_ptr addDoubleColumn(const std::string& name, int plotRole = 0);
     /// Return reference to the data of a "double" column
     std::vector<double>& getDoubleData(const std::string& name) ;
+    /// Set the data in a "double" column
+    void setDoubleData(const std::string& name, const double* data, size_t n) ;
+    /// Set the data in a "double" column
+    void setDoubleData(const std::string& name, const std::vector<double>& data) ;
 
   private:
 

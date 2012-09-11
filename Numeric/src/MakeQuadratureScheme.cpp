@@ -26,6 +26,7 @@ namespace Numeric
 
 DECLARE_ALGORITHM(MakeQuadratureScheme);
 
+//======================================================================================================
 /// Constructor. Declare algorithm properties.
 MakeQuadratureScheme::MakeQuadratureScheme()
 {
@@ -44,6 +45,8 @@ MakeQuadratureScheme::MakeQuadratureScheme()
   declareWorkspace("Test");
 }
 
+//======================================================================================================
+// Private namespace declarations
 namespace 
 {
   /// function x
@@ -74,8 +77,10 @@ namespace
     const std::string& yColumn,
     const IFunction& fun,
     API::NumericColumn::PlotRole role = API::NumericColumn::Y);
+
   /// valuate a polynom recursively
   double evalPoly(size_t n, double x, const std::vector<double>& a, const std::vector<double>& b, const std::vector<double>& c);
+
   /// valuate a polynom recursively
   class EvalPoly: public IFunction1D, public ParamFunction
   {
@@ -99,11 +104,26 @@ namespace
     }
   };
 
+  /// Check functions' orthonormality
   void checkOrtho(const std::vector<ChebFunction_sptr>& poly);
+
+  /// Calculate the quadrature weights using the formula from Numerical Recipes
   void computeWeights(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w);
+
+  /// Calculate the quadrature weights solving a set of linear equations
   void computeWeights1(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w);
+
+  /// Compute the dvr basis associated with the quadrature
+  void computeDVRBasis(
+    API::TableWorkspace_ptr tws, 
+    const std::vector<ChebFunction_sptr>& poly, 
+    const ChebFunction& weight, 
+    std::vector<double>& r,
+    std::vector<double>& w
+    );
 }
 
+//======================================================================================================
 /// Execute algorithm.
 void MakeQuadratureScheme::exec()
 {
@@ -142,7 +162,6 @@ void MakeQuadratureScheme::exec()
   IFunction_sptr fun = FunctionFactory::instance().createFitFunction(funStr);
 
   weight.bestFit( *fun );
-
 
   for(size_t i = 0; i < weight.nfuns(); ++i)
   {
@@ -340,18 +359,7 @@ void MakeQuadratureScheme::exec()
         }
       }
 
-      // output function values, first and second derivatives
-      for(size_t i = 0; i < n; ++i)
-      {
-        const std::string si = boost::lexical_cast<std::string>(i);
-        addValuesToWorkspace( tws, "r", "p"+si, *poly[i], API::NumericColumn::Unset );
-        ChebFunction dp;
-        dp.fromDerivative( *poly[i] );
-        addValuesToWorkspace( tws, "r", "d"+si, dp, API::NumericColumn::Unset );
-        ChebFunction ddp;
-        ddp.fromDerivative( dp );
-        addValuesToWorkspace( tws, "r", "dd"+si, ddp, API::NumericColumn::Unset );
-      }
+      computeDVRBasis( tws, poly, weight, r, w );
     }
     else
     {
@@ -362,6 +370,7 @@ void MakeQuadratureScheme::exec()
   checkOrtho(poly);
 }
 
+//======================================================================================================
 /**
  * Interpret a string and convert it into a double number.
  * @param str :: Number as a string. Possible aliases: inf for infinity, minf for negative infinity.
@@ -379,8 +388,12 @@ double MakeQuadratureScheme::readDouble(const std::string& str) const
   return boost::lexical_cast<double>( str );
 }
 
+//======================================================================================================
+//    Private namespace definitions
+//======================================================================================================
 namespace 
 {
+//======================================================================================================
   /**
    * Add a column to a table workspace filled with double values
    * calculated with a function wich uses another numeric column as its x values.
@@ -420,6 +433,7 @@ namespace
     }
   }
 
+//======================================================================================================
   /**
    * Evaluate a polynom recursively: 
    * @param n :: Polynom order
@@ -442,6 +456,7 @@ namespace
     return p1;
   }
 
+//======================================================================================================
   void checkOrtho(const std::vector<ChebFunction_sptr>& poly)
   {
     double norm = 0.0;
@@ -465,6 +480,7 @@ namespace
     std::cerr << "orthonormality " << norm / n << ' ' << 2*offd / (n*(n-1)) << std::endl;
   }
 
+//======================================================================================================
   /**
    * Compute the quadrature weights using w = 1/ (p[n-2] * p'[n-1]), where p'[n-1] is the 
    *  derivative of the last polynomial.
@@ -511,6 +527,7 @@ namespace
 
   }
 
+//======================================================================================================
   /// This one works better than the other one.
   void computeWeights1(const std::vector<ChebFunction_sptr>& poly, const std::vector<double>& r, const ChebFunction& weight, std::vector<double>& w)
   {
@@ -557,7 +574,77 @@ namespace
     }
   }
 
+//======================================================================================================
+  /**
+   * Compute the dvr basis associated with the quadrature.
+   * @param tws    :: Table workspace to store the basis.
+   * @param poly   :: The basis as chebfuns.
+   * @param weight :: The square root of the quadrature weight function.
+   * @param r      :: The quadrature ascissas.
+   * @param w      :: The quadrature weights.
+   */
+  void computeDVRBasis(
+    API::TableWorkspace_ptr tws, 
+    const std::vector<ChebFunction_sptr>& poly, 
+    const ChebFunction& weight, 
+    std::vector<double>& r,
+    std::vector<double>& w
+    )
+  {
+    // the basis size
+    const size_t n = r.size();
+
+    // derivative of the weight function
+    ChebFunction dweight;
+    dweight.fromDerivative( weight );
+    FunctionDomain1DView domain( r );
+    FunctionValues wgt( domain );
+    FunctionValues dwgt( domain );
+    weight.function( domain, wgt );
+    dweight.function( domain, dwgt );
+
+    // take a square root of the quadrature weights
+    std::vector<double> wr( n );
+    for(size_t i = 0; i < n; ++i)
+    {
+      wr[i] = sqrt( w[i] );
+    }
+
+    // output function values, first and second derivatives
+    for(size_t i = 0; i < n; ++i)
+    {
+      const std::string si = boost::lexical_cast<std::string>(i);
+      // compute and save the ith basis function
+      FunctionValues p( domain );
+      poly[i]->function( domain, p );
+
+      tws->addDoubleColumn("p"+si);
+      auto& fi = tws->getDoubleData("p"+si);
+
+      for(size_t k = 0; k < n; ++k)
+      {
+        fi[k] = wr[k] / wgt[k] * p[k];
+      }
+
+      // compute and save the derivative of the ith basis function
+      ChebFunction dpoly;
+      dpoly.fromDerivative( *poly[i] );
+      FunctionValues dp( domain );
+      dpoly.function( domain, dp );
+
+      tws->addDoubleColumn("d"+si);
+      auto& di = tws->getDoubleData("d"+si);
+
+      for(size_t k = 0; k < n; ++k)
+      {
+        di[k] = wr[k] / wgt[k] * ( dp[k] - p[k] * dwgt[k] / wgt[k] );
+      }
+
+    }
+  }
+
 } // namespace
+//======================================================================================================
 
 
 } // namespace Numeric
