@@ -8,14 +8,17 @@
 #include "Numeric/FunctionValues.h"
 #include "Numeric/GSLMatrix.h"
 #include "Numeric/GSLVector.h"
+#include "Numeric/AddFunctionValuesToTable.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
+#include "API/NumericColumn.h"
 
 #include "Kernel/CommonProperties.h"
 
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
+#include <fstream>
 
 using namespace Numeric;
 
@@ -44,6 +47,7 @@ Diatom::Diatom()
   declareDouble("rmax",20.0); // the integration range [rmin,rmax] in angstrom
   declareWorkspace("Quad");
   declareWorkspace("Test");
+  declareWorkspace("VPotNum");
 }
 
 /// Execute algorithm.
@@ -74,27 +78,39 @@ void Diatom::exec()
 
   // find the potential minimum
 
-  ChebFunction v((size_t)nmax, rmin, rmax);
-  v.bestFit( *Vpot );
+  ChebFunction v(2, rmin, rmax);
+  v.fit( *Vpot );
   double r0 = 0;
   double alpha = 0;
   std::cerr << "n=" << v.cfun(0).n() << std::endl;
   {
     ChebFunction dv;
     dv.fromDerivative( v );
-    //FunctionDomain1DVector domain(rmin,rmax,100);
-    //FunctionValues values( domain );
-    //dv.function( domain, values );
-    //for(size_t i = 0; i < domain.size(); ++i)
-    //{
-    //  std::cerr << domain[i] << ' ' << values[i] << std::endl;
-    //}
+    FunctionDomain1DVector domain(rmin,rmax,100);
+    FunctionValues values( domain );
+    v.function( domain, values );
+
+    auto vpotWS = API::TableWorkspace_ptr( new API::TableWorkspace );
+    vpotWS->addColumn("double","x");
+    vpotWS->getColumn("x")->asNumeric()->setPlotRole(API::NumericColumn::X);
+    vpotWS->addColumn("double","vpot");
+    vpotWS->getColumn("vpot")->asNumeric()->setPlotRole(API::NumericColumn::Y);
+    vpotWS->setRowCount( domain.size() );
+
+    auto& xcol = vpotWS->getDoubleData("x");
+    auto& vcol = vpotWS->getDoubleData("vpot");
+    for(size_t i = 0; i < domain.size(); ++i)
+    {
+      xcol[i] = domain[i];
+      vcol[i] = values[i];
+    }
+    setProperty("VPotNum",vpotWS);
 
     std::vector<double> r;
     dv.roots( r );
     if ( r.size() != 1 )
     {
-      throw std::runtime_error("Failed to find the potential minimum");
+      throw std::runtime_error("Failed to find the potential minimum ("+boost::lexical_cast<std::string>(r.size())+")");
     }
     r0 = r[0];
     std::cerr << "Minimum at r0=" << r0 << std::endl;
@@ -144,16 +160,22 @@ void Diatom::exec()
     std::cerr << k << ' ' << vpot[k] << std::endl;
   }
 
+  std::ofstream fil("Matrix.txt");
   // build the hamiltonian matrix
   GSLMatrix H(nmax,nmax);
   for(size_t i =0; i < nmax; ++i)
-  for(size_t j =i; j < nmax; ++j)
   {
-    double tmp = calcKinet(i,j,ff,d2f,w,beta);
-    tmp += calcPot(i,j,ff,w,vpot);
-    H.set(i,j, tmp);
-    if ( i != j ) H.set(j,i, tmp);
+    for(size_t j =i; j < nmax; ++j)
+    {
+      double tmp = calcKinet(i,j,ff,d2f,w,beta);
+      tmp += calcPot(i,j,ff,w,vpot);
+      H.set(i,j, tmp);
+      if ( i != j ) H.set(j,i, tmp);
+      fil << std::setw(10) << tmp << ' ';
+    }
+    fil << std::endl;
   }
+  fil.close();
 
   GSLVector ener;
   GSLMatrix ef;
@@ -179,13 +201,14 @@ namespace
   {
     const size_t n = w.size();
     std::vector<double>& f = *ff[i];
-    std::vector<double>& d2 = *d2f[j];
+    std::vector<double>& d2 = *ff[j];//*d2f[j];
     double res = 0.0;
     for(size_t k = 0; k < n; ++k)
     {
-      res += f[k] * d2[k] * w[k];
+      res += f[k] * d2[k];//* w[k];
     }
-    return -res * beta;
+    res *= -beta;
+    return res;
   }
 
   double calcPot(size_t i, size_t j, FuncVector& ff, std::vector<double>& w, const std::vector<double>& vpot)
@@ -196,7 +219,7 @@ namespace
     double res = 0;
     for(size_t k = 0; k < n; ++k)
     {
-      res += f1[k] * f2[k] * vpot[k] * w[k];
+      res += f1[k] * f2[k] * vpot[k]; //* w[k];
     }
     return res;
   }

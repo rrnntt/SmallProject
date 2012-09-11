@@ -22,16 +22,17 @@ void AddFunctionValuesToTable::exec()
 {
 }
 
-/**
- * Add values calculated by a IFunction1D to a table workspace.
- * @param tws :: Table workspace to modify.
- * @param xColumn :: Name of the column with the x-values. Must exist and be double type.
- * @param yColumn :: Name of a column to store the calculated values. If a column with 
- *  this name exists it will be overwritten if numeric or exception thrown otherwise.
- *  If the column doesn't exist it will be created.
- * @param fun :: A function to calculate the values.
- */
-void AddFunctionValuesToTable::addValuesToWorkspace(API::TableWorkspace_ptr tws, 
+  /**
+   * Add a column to a table workspace filled with double values
+   * calculated with a function wich uses another numeric column as its x values.
+   * @param tws :: The table workspace.
+   * @param xColumn :: Name of the column with the x-values. Must exist and be numeric
+   * @param yColumn :: Name of a column to store the calculated values. If a column with 
+   *  this name exists it will be overwritten if numeric or exception thrown otherwise.
+   *  If the column doesn't exist it will be created.
+   * @param fun :: A function to calculate the values.
+   */
+  void AddFunctionValuesToTable::addColumn(API::TableWorkspace_ptr tws, 
     const std::string& xColumn,
     const std::string& yColumn,
     const IFunction& fun,
