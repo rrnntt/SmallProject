@@ -637,7 +637,7 @@ namespace
 
       for(size_t k = 0; k < n; ++k)
       {
-        di[k] = wr[k] / wgt[k] * ( dp[k] - p[k] * dwgt[k] / wgt[k] );
+        di[k] = wr[k] / wgt[k] * ( dp[k] );
       }
 
     }

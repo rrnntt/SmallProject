@@ -9,11 +9,7 @@
 namespace Numeric
 {
 
-<<<<<<< HEAD
-// Forwrad declaration.
-=======
 // Forward declaration
->>>>>>> Add values to Table
 class IFunction;
 
 class NUMERIC_EXPORT AddFunctionValuesToTable: public API::Algorithm

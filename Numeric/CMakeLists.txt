@@ -52,7 +52,6 @@ set( INC_FILES
    inc/Numeric/Schrodinger0.h
    inc/Numeric/Schrodinger.h
    inc/Numeric/SolveODE.h
-   inc/Numeric/SomeFunction.h
    inc/Numeric/StdJacobian.h
    inc/Numeric/UserFunction1D.h
    inc/Numeric/V3D.h
@@ -107,7 +106,6 @@ set( SRC_FILES
   src/Schrodinger0.cpp
   src/Schrodinger.cpp
   src/SolveODE.cpp
-  src/SomeFunction.cpp
   src/UserFunction1D.cpp
   src/Vector.cpp
   src/V3D.cpp
@@ -172,7 +170,6 @@ set( SRC_FILES
   test/SeriesFunctionTest.cpp
   #test/SimplexMinimizerTest.cpp
   test/SolveODETest.cpp
-  test/SomeFunctionTest.cpp
   test/UserFunction1DTest.cpp
   test/VectorTest.cpp
 # Algorithms

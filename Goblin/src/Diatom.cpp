@@ -70,7 +70,8 @@ void Diatom::exec()
 
   // convert hbar^2/mu -> beta in cm-1 and r in angstroms
 
-  double beta = planck_hbar * planck_hbar / mass_p / mu / (planck_h * light_speed * 100 * angstrom * angstrom);
+  //double beta = planck_hbar * planck_hbar / mass_p / mu / (planck_h * light_speed * 100 * angstrom * angstrom);
+  double beta = mu;
 
   // equation now is -0.5*beta*d2/dr2 + ... where beta in cm-1 and r in angstroms
 
@@ -119,11 +120,12 @@ void Diatom::exec()
     dv2.function1D(&alpha,&r0,1);
     std::cerr << "Alpha=" << alpha << std::endl;
     std::cerr << "E0=" << 0.5*sqrt(alpha*beta) << std::endl;
+
   }
 
   // compute the ground state 
   auto f0Fun = FunctionFactory::instance().createFitFunction( "UserFunction1D(Formula=exp(-a*(x-c)^2))" );
-  f0Fun->setParameter("a",sqrt(alpha/beta));
+  f0Fun->setParameter("a",0.5*sqrt(alpha/beta));
   f0Fun->setParameter("c",r0);
   std::string intervalStr = boost::lexical_cast<std::string>(rmin)+","+boost::lexical_cast<std::string>(rmax);
   auto alg = API::AlgorithmFactory::instance().createAlgorithm("MakeQuadratureScheme");
@@ -146,7 +148,7 @@ void Diatom::exec()
   {
     const std::string si = boost::lexical_cast<std::string>(i);
     ff[i] = &quadWS->getDoubleData("p"+si);
-    d2f[i] = &quadWS->getDoubleData("dd"+si);
+    d2f[i] = &quadWS->getDoubleData("d"+si);
   }
 
   // sample the potential energy
@@ -157,11 +159,13 @@ void Diatom::exec()
   for(size_t k = 0; k < nmax; ++k)
   {
     vpot[k] = values[k];
-    std::cerr << k << ' ' << vpot[k] << std::endl;
+    std::cerr << k << ' ' << vpot[k] << ' ' << 0.5*alpha*domain[k]*domain[k] << std::endl;
   }
 
   std::ofstream fil("Matrix.txt");
   // build the hamiltonian matrix
+
+  --nmax; // ?????
   GSLMatrix H(nmax,nmax);
   for(size_t i =0; i < nmax; ++i)
   {
@@ -182,6 +186,18 @@ void Diatom::exec()
   H.diag(ener,ef);
 
   std::cerr << ener << std::endl;
+  std::vector<double> en(nmax);
+  for(size_t i = 0; i < nmax; ++i)
+  {
+    en[i] = ener[i];
+  }
+  std::sort(en.begin(), en.end());
+  for(size_t i = 0; i < nmax; ++i)
+  {
+    std::cerr << i << ' ' << en[i] ;
+    if ( i > 0 ) std::cerr << ' ' << en[i] - en[i-1];
+    std::cerr << std::endl;
+  }
 }
 
 // privatenamespace
@@ -200,14 +216,14 @@ namespace
   double calcKinet(size_t i, size_t j, FuncVector& ff, FuncVector& d2f, std::vector<double>& w, const double& beta)
   {
     const size_t n = w.size();
-    std::vector<double>& f = *ff[i];
-    std::vector<double>& d2 = *ff[j];//*d2f[j];
+    std::vector<double>& f = *d2f[i];
+    std::vector<double>& d2 = *d2f[j];//*d2f[j];
     double res = 0.0;
     for(size_t k = 0; k < n; ++k)
     {
       res += f[k] * d2[k];//* w[k];
     }
-    res *= -beta;
+    res *= beta/2;
     return res;
   }
 
@@ -221,7 +237,7 @@ namespace
     {
       res += f1[k] * f2[k] * vpot[k]; //* w[k];
     }
-    return res;
+    return res/2;
   }
 }
 
