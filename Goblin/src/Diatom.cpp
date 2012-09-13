@@ -125,7 +125,7 @@ void Diatom::exec()
 
   // compute the ground state 
   auto f0Fun = FunctionFactory::instance().createFitFunction( "UserFunction1D(Formula=exp(-a*(x-c)^2))" );
-  f0Fun->setParameter("a",0.5*sqrt(alpha/beta));
+  f0Fun->setParameter("a",sqrt(alpha/beta));
   f0Fun->setParameter("c",r0);
   std::string intervalStr = boost::lexical_cast<std::string>(rmin)+","+boost::lexical_cast<std::string>(rmax);
   auto alg = API::AlgorithmFactory::instance().createAlgorithm("MakeQuadratureScheme");
@@ -163,6 +163,8 @@ void Diatom::exec()
   }
 
   std::ofstream fil("Matrix.txt");
+  std::ofstream filK("MatrixK.txt");
+  std::ofstream filP("MatrixP.txt");
   // build the hamiltonian matrix
 
   --nmax; // ?????
@@ -171,15 +173,21 @@ void Diatom::exec()
   {
     for(size_t j =i; j < nmax; ++j)
     {
-      double tmp = calcKinet(i,j,ff,d2f,w,beta);
-      tmp += calcPot(i,j,ff,w,vpot);
-      H.set(i,j, tmp);
-      if ( i != j ) H.set(j,i, tmp);
-      fil << std::setw(10) << tmp << ' ';
+      double tmpK = calcKinet(i,j,ff,d2f,w,beta);
+      filK << std::setw(10) << tmpK << ' ';
+      double tmpP = calcPot(i,j,ff,w,vpot);
+      filP << std::setw(10) << tmpP << ' ';
+      H.set(i,j, tmpK + tmpP);
+      if ( i != j ) H.set(j,i, tmpK + tmpP);
+      fil << std::setw(10) << tmpK + tmpP << ' ';
     }
     fil << std::endl;
+    filK << std::endl;
+    filP << std::endl;
   }
   fil.close();
+  filK.close();
+  filP.close();
 
   GSLVector ener;
   GSLMatrix ef;
@@ -221,7 +229,7 @@ namespace
     double res = 0.0;
     for(size_t k = 0; k < n; ++k)
     {
-      res += f[k] * d2[k];//* w[k];
+      res += f[k] * d2[k];
     }
     res *= beta/2;
     return res;
@@ -235,9 +243,9 @@ namespace
     double res = 0;
     for(size_t k = 0; k < n; ++k)
     {
-      res += f1[k] * f2[k] * vpot[k]; //* w[k];
+      res += f1[k] * f2[k] * vpot[k];
     }
-    return res/2;
+    return res;
   }
 }
 
