@@ -63,6 +63,7 @@ set( INC_FILES
    inc/Numeric/CopyChebfun.h
    inc/Numeric/CreateChebfun.h
    inc/Numeric/ChebfunToTable.h
+   inc/Numeric/DiffChebfun.h
    inc/Numeric/EvalChebfun.h
    inc/Numeric/MakeQuadratureScheme.h
    inc/Numeric/UniformChebfun.h
@@ -118,6 +119,7 @@ set( SRC_FILES
    src/CopyChebfun.cpp
    src/CreateChebfun.cpp
    src/ChebfunToTable.cpp
+   src/DiffChebfun.cpp
    src/EvalChebfun.cpp
    src/MakeQuadratureScheme.cpp
    src/UniformChebfun.cpp
@@ -177,6 +179,7 @@ set( SRC_FILES
   test/AddFunctionValuesToTableTest.cpp
   test/ChebfunWorkspaceTest.cpp
   test/CreateChebfunTest.cpp
+  test/DiffChebfunTest.cpp
   test/MakeQuadratureSchemeTest.cpp
 )
 
