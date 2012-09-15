@@ -229,6 +229,7 @@ namespace Numeric
     size_t nn = 3;
     const double tol = 1e-16;
     double err = 1.0;
+    double maxA = 0;
     while ( err > tol )
     {
       cheb.set( nn, start, end );
@@ -236,7 +237,6 @@ namespace Numeric
       auto& a = cheb.coeffs();
       double minAodd = inf;
       double minAeven = inf;
-      double maxA = 0;
       for(size_t i = 0; i < a.size(); i+=2)
       {
         const double abs_even = fabs( a[i] );
@@ -249,6 +249,24 @@ namespace Numeric
       err = (minAodd + minAeven) / maxA / 2;
       nn *= 2;
       --nn;
+    }
+    // optimize the fit by finding the smallest significant a-coefficient
+    auto& a = cheb.coeffs();
+    assert( a.size() == nn[k] );
+    for(auto ia = a.rbegin(); ia != a.rend(); ++ia)
+    {
+      //std::cerr << "* " << a.rend() - ia << ' ' << *ia << std::endl;
+      if ( fabs(*ia) / maxA >= tol )
+      {
+        if ( ia != a.rbegin() )
+        {
+          // this n is optimal
+          size_t n = static_cast<size_t>(a.rend() - ia) - 1;
+          cheb.set( n, start, end );
+          cheb.fit( fun );
+        }
+        break;
+      }
     }
   }
 

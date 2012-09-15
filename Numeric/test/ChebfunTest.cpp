@@ -53,6 +53,7 @@ TEST(ChebfunTest, XPointsTest)
   EXPECT_EQ( cheb.endX(), 1.5 );
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, FitTest)
 {
   UserFunction1D user;
@@ -104,6 +105,7 @@ TEST(ChebfunTest, FitTest)
   }
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, CopyTest)
 {
   UserFunction1D user;
@@ -186,6 +188,7 @@ TEST(ChebfunTest, CopyTest)
   }
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, UniformFitTest)
 {
   const double PI = 2*acos(0.0);
@@ -221,6 +224,7 @@ TEST(ChebfunTest, UniformFitTest)
   }
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, IntegrateTest)
 {
   UserFunction1D user;
@@ -237,6 +241,7 @@ TEST(ChebfunTest, IntegrateTest)
   //std::cerr << cheb1.integr() << ' ' << ( cos(0.0) - cos(3*M_PI/4)) << ' ' << cheb1.integrate() << std::endl;
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, IntegrateGaussTest)
 {
   UserFunction1D user;
@@ -261,6 +266,7 @@ TEST(ChebfunTest, IntegrateGaussTest)
   std::cerr << cheb.integr() - sqrt(M_PI) << std::endl;
 }
   
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, CalcATest)
 {
   UserFunction1D user;
@@ -289,6 +295,7 @@ TEST(ChebfunTest, CalcATest)
   }
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, CalcA1Test)
 {
   UserFunction1D user;
@@ -310,6 +317,7 @@ TEST(ChebfunTest, CalcA1Test)
   //}
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, CalcA2Test)
 {
   UserFunction1D user;
@@ -331,6 +339,7 @@ TEST(ChebfunTest, CalcA2Test)
   //}
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, CalcA3Test)
 {
   UserFunction1D user;
@@ -350,6 +359,7 @@ TEST(ChebfunTest, CalcA3Test)
   //}
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, FromDerivativeTest)
 {
   UserFunction1D user;
@@ -371,6 +381,7 @@ TEST(ChebfunTest, FromDerivativeTest)
   }
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, FromDerivative2Test)
 {
   UserFunction1D user;
@@ -392,6 +403,7 @@ TEST(ChebfunTest, FromDerivative2Test)
   }
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, RootsTest)
 {
   UserFunction1D user;
@@ -412,6 +424,7 @@ TEST(ChebfunTest, RootsTest)
 
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, Roots1Test)
 {
   UserFunction1D user;
@@ -434,15 +447,16 @@ TEST(ChebfunTest, Roots1Test)
 
 }
 
+//-----------------------------------------------------------------------------
 TEST(ChebfunTest, BestFitTest)
 {
   chebfun cheb(0, 0, pi);
   cheb.bestFit( (AFunction)sin );
   //std::cerr << "n=" << cheb.n() << std::endl;
-  EXPECT_EQ( cheb.n(), 33 );
+  EXPECT_EQ( cheb.n(), 26 );
 
   chebfun cheb_gauss(0, 0, 4);
   cheb_gauss.bestFit( (AFunction)gauss );
   //std::cerr << "n=" << cheb_gauss.n() << std::endl;
-  EXPECT_EQ( cheb_gauss.n(), 65 );
+  EXPECT_EQ( cheb_gauss.n(), 40 );
 }
