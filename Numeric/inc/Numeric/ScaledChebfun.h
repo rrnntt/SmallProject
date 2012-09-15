@@ -76,6 +76,7 @@ public:
   FunctionDomain1D_sptr createDomainFromXPoints() const;
   /// Get the roots of the function
   void roots(std::vector<double>& r) const;
+  const std::vector<double>& coeffs() const {return m_fun.coeffs();}
 
   /*=== Operations on ScaledChebfun ===*/
 
@@ -129,7 +130,6 @@ protected:
   void throwDifferentBaseInOperation(const std::string& op) const;
   /// Get the base of the underlying chebfun
   ChebfunBase_const_sptr getBase() const {return m_fun.getBase();}
-  const std::vector<double>& coeffs() const {return m_fun.coeffs();}
 
   /*------------------ Data --------------------*/
 

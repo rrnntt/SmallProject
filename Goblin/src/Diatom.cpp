@@ -70,8 +70,8 @@ void Diatom::exec()
 
   // convert hbar^2/mu -> beta in cm-1 and r in angstroms
 
-  //double beta = planck_hbar * planck_hbar / mass_p / mu / (planck_h * light_speed * 100 * angstrom * angstrom);
-  double beta = mu;
+  double beta = planck_hbar * planck_hbar / mass_p / mu / (planck_h * light_speed * 100 * angstrom * angstrom);
+  //double beta = mu;
 
   // equation now is -0.5*beta*d2/dr2 + ... where beta in cm-1 and r in angstroms
 
@@ -80,7 +80,7 @@ void Diatom::exec()
   // find the potential minimum
 
   ChebFunction v(2, rmin, rmax);
-  v.fit( *Vpot );
+  v.bestFit( *Vpot );
   double r0 = 0;
   double alpha = 0;
   std::cerr << "n=" << v.cfun(0).n() << std::endl;

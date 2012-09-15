@@ -401,11 +401,20 @@ void ChebFunction::fit(const IFunction& ifun)
  */
 void ChebFunction::bestFit(const IFunction& ifun)
 {
+  // tolerance to decise when to stop
   const double tol = 1e-16;
+  // fit error: ratio of the smallest a-coefficient to the largest one
   double err = 1.0;
+  // done-flags for each chebfun
   std::vector<bool> done(nfuns(),false);
+  // running number of points for each chebfun
   std::vector<size_t> nn(nfuns(),3);
+  // maximum a-coefficient value
   double maxA = 0;
+  // fit each function with increasing number of points until all done
+  // flags are true
+  // a done-flag for a chebfun is true when its err <= tol
+  // number of points double each iteration
   while ( std::find(done.begin(),done.end(),false) != done.end() )
   {
     double minAodd = inf;
@@ -430,6 +439,29 @@ void ChebFunction::bestFit(const IFunction& ifun)
       nn[k] *= 2;
       --nn[k];
       if ( err <= tol ) done[k] = true;
+    }
+  } // end while
+
+  // numbers of points could be too large, try to reduce them
+  for(size_t k = 0; k < nfuns(); ++k)
+  {
+    auto& f = fun(k);
+    auto& a = f.coeffs();
+    assert( a.size() == nn[k] );
+    for(auto ia = a.rbegin(); ia != a.rend(); ++ia)
+    {
+      //std::cerr << "* " << a.rend() - ia << ' ' << *ia << std::endl;
+      if ( fabs(*ia) / maxA >= tol )
+      {
+        if ( ia != a.rbegin() )
+        {
+          // this n is optimal
+          size_t n = static_cast<size_t>(a.rend() - ia) - 1;
+          f.set( n, f.startX(), f.endX() );
+          f.fit( ifun );
+        }
+        break;
+      }
     }
   }
 }

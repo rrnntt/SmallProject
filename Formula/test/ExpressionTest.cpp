@@ -105,8 +105,9 @@ TEST(ExpressionTest,eval_scalar_expression)
     Formula::Namespace_ptr ns(new Formula::Namespace());
     ns->addVariable("Scalar","x","1");
 
-    Expression ex(ns,"exp(-x^2)");
+    Expression ex(ns,"exp(-(x-0.5)^2)");
     ex.logPrint();
     //EXPECT_EQ(e.eval().toString(),"False");
-    std::cerr << ex.eval().toString() << ' ' << exp(-1.0) << std::endl;
+    double x = 1.0 - 0.5;
+    std::cerr << ex.eval().toString() << ' ' << exp(-x*x) << std::endl;
 }
