@@ -252,7 +252,6 @@ namespace Numeric
     }
     // optimize the fit by finding the smallest significant a-coefficient
     auto& a = cheb.coeffs();
-    assert( a.size() == nn[k] );
     for(auto ia = a.rbegin(); ia != a.rend(); ++ia)
     {
       //std::cerr << "* " << a.rend() - ia << ' ' << *ia << std::endl;

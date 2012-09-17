@@ -2,8 +2,9 @@
 #define NUMERIC_CHEBFUNWORKSPACE_H
 
 #include "Numeric/DllExport.h"
-#include "API/Workspace.h"
 #include "Numeric/ChebFunction.h"
+
+#include "API/Workspace.h"
 
 namespace Numeric
 {

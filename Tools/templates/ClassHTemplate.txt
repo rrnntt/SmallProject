@@ -13,6 +13,6 @@ public:
   ~${ClassName}();
 };
 
-} // ${NAMESPACE}
+} // ${Namespace}
 
 #endif // ${NAMESPACE}_${CLASSNAME}_H

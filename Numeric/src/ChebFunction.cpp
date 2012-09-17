@@ -447,7 +447,6 @@ void ChebFunction::bestFit(const IFunction& ifun)
   {
     auto& f = fun(k);
     auto& a = f.coeffs();
-    assert( a.size() == nn[k] );
     for(auto ia = a.rbegin(); ia != a.rend(); ++ia)
     {
       //std::cerr << "* " << a.rend() - ia << ' ' << *ia << std::endl;

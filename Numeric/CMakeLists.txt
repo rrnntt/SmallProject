@@ -7,6 +7,7 @@ set( INC_FILES
    inc/Numeric/BFGS_Minimizer.h
    inc/Numeric/Chebfun.h
    inc/Numeric/Chebfun2DSpline.h
+   inc/Numeric/ChebfunVector.h
    inc/Numeric/ChebFunction.h
    inc/Numeric/ChebOperator.h
    inc/Numeric/Chebyshev.h
@@ -62,6 +63,7 @@ set( INC_FILES
    inc/Numeric/ChebfunWorkspace.h
    inc/Numeric/CopyChebfun.h
    inc/Numeric/CreateChebfun.h
+   inc/Numeric/CreateQuadratureChebfuns.h
    inc/Numeric/ChebfunToTable.h
    inc/Numeric/DiffChebfun.h
    inc/Numeric/EvalChebfun.h
@@ -73,6 +75,7 @@ set( SRC_FILES
   src/BFGS_Minimizer.cpp
   src/Chebfun.cpp
   src/Chebfun2DSpline.cpp
+  src/ChebfunVector.cpp
   src/ChebFunction.cpp
   src/ChebOperator.cpp
   src/Chebyshev.cpp
@@ -118,6 +121,7 @@ set( SRC_FILES
    src/ChebfunWorkspace.cpp
    src/CopyChebfun.cpp
    src/CreateChebfun.cpp
+   src/CreateQuadratureChebfuns.cpp
    src/ChebfunToTable.cpp
    src/DiffChebfun.cpp
    src/EvalChebfun.cpp
@@ -151,6 +155,7 @@ set( SRC_FILES
   test/ChebFunctionTest.cpp
   test/ChebOperatorTest.cpp
   test/ChebfunTest.cpp
+  test/ChebfunVectorTest.cpp
   test/Chebfun2DSplineTest.cpp
   #test/ConjugateFRMinimizerTest.cpp
   test/CostFuncFittingTest.cpp
