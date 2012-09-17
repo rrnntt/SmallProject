@@ -316,18 +316,18 @@ namespace
   /**-----------------------------------------------------------------------------
    * Calculate eigenfunctions as a linear combinations of basis functions.
    */
-  void calcEigenFunction(TableWorkspace_sptr out, TableWorkspace_sptr quad, const GSLMatrix& ef, const std::vector<size_t>& indx)
+  void calcEigenFunction(API::TableWorkspace_ptr out, API::TableWorkspace_ptr quad, const GSLMatrix& ef, const std::vector<size_t>& indx)
   {
     const size_t n = indx.size();
     auto& c = quad->getDoubleData("c");
     auto& a = quad->getDoubleData("a");
     auto& b = quad->getDoubleData("b");
 
-    for(size_t m = 0; m < n; ++m)
-    {
-      d += ef.get(m,j) * (*ff[m])[k];
-    }
-    fun[k] = d;
+    //for(size_t m = 0; m < n; ++m)
+    //{
+    //  d += ef.get(m,j) * (*ff[m])[k];
+    //}
+    //fun[k] = d;
   }
 }
 

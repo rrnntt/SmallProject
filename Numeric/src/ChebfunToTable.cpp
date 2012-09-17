@@ -1,5 +1,7 @@
 #include "Numeric/ChebfunToTable.h"
 #include "Numeric/ChebfunWorkspace.h"
+#include "Numeric/ChebfunVector.h"
+#include "Numeric/AddFunctionValuesToTable.h"
 
 #include "API/TableWorkspace.h"
 #include "API/TableColumn.h"
@@ -11,6 +13,8 @@
 #include "API/WorkspaceFactory.h"
 
 #include "Kernel/CommonProperties.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace Numeric
 {
@@ -29,6 +33,26 @@ ChebfunToTable::ChebfunToTable()
 }
 
 void ChebfunToTable::exec()
+{
+  API::Workspace_ptr ws = getClass("InputWorkspace");
+  if ( boost::dynamic_pointer_cast<ChebfunWorkspace>( ws ) )
+  {
+    fromChebWorkspace();
+  }
+  else if ( boost::dynamic_pointer_cast<ChebfunVector>( ws ) )
+  {
+    fromChebVector();
+  }
+  else
+  {
+    throw std::invalid_argument("Unsupported workspace type.");
+  }
+}
+
+/**----------------------------------------------------------------
+ * Create the output from a single ChebfunWorkspace.
+ */
+void ChebfunToTable::fromChebWorkspace()
 {
   ChebfunWorkspace_sptr cws = getClass("InputWorkspace");
 
@@ -80,6 +104,50 @@ void ChebfunToTable::exec()
     {
       tws->removeRow( tws->rowCount() - 1 );
     }
+  }
+
+  setProperty("OutputWorkspace",tws);
+}
+
+/**----------------------------------------------------------------
+ * Create the output from a ChebfunVector.
+ */
+void ChebfunToTable::fromChebVector()
+{
+  ChebfunVector_sptr cws = getClass("InputWorkspace");
+
+  Numeric::FunctionDomain1D_sptr domain;
+
+  size_t n = (int)get("N");
+
+  if (n < 2)
+  {// if n has default value (0) use the x-points of the chebfuns
+    domain = cws->fun(0).createDomainFromXPoints();
+    n = domain->size();
+  }
+  else
+  {// otherwise create a regular comb
+    domain = cws->fun(0).createDomain( n );
+  }
+
+  auto tws = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
+    API::WorkspaceFactory::instance().create("TableWorkspace"))
+    );
+
+  tws->addColumn("double","x");
+  tws->setRowCount(n);
+  auto xColumn = tws->getColumn("x");
+  xColumn->asNumeric()->setPlotRole(API::NumericColumn::X);
+  auto& x = tws->getDoubleData("x");
+  for(size_t i = 0; i < domain->size(); ++i)
+  {
+    x[i] = (*domain)[i];
+  }
+
+  for(size_t i = 0; i < cws->size(); ++i)
+  {
+    const std::string yColumn = "y" + boost::lexical_cast<std::string>( i );
+    AddFunctionValuesToTable::addColumn( tws, "x", yColumn, cws->fun(i), API::NumericColumn::Y );
   }
 
   setProperty("OutputWorkspace",tws);

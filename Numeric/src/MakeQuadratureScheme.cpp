@@ -9,6 +9,7 @@
 #include "Numeric/FunctionValues.h"
 #include "Numeric/GSLMatrix.h"
 #include "Numeric/GSLVector.h"
+#include "Numeric/ChebfunVector.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -43,6 +44,7 @@ MakeQuadratureScheme::MakeQuadratureScheme()
   // guess end of the interval containing all integration points
   declareDouble("EndX",1);
   declareWorkspace("Test");
+  declareWorkspace("Basis");
 }
 
 //======================================================================================================
@@ -292,11 +294,18 @@ void MakeQuadratureScheme::exec()
   }
   tws->removeRow( n-1 );
 
-  pp.fromDerivative( *poly.front() );
-  ChebFunction der2;
-  der2.fromDerivative( pp );
-  der2 /= *poly.front();
-  addValuesToWorkspace( test, "x", "deriv", der2 );
+  //pp.fromDerivative( *poly.front() );
+  //ChebFunction der2;
+  //der2.fromDerivative( pp );
+  //der2 /= *poly.front();
+  //addValuesToWorkspace( test, "x", "deriv", der2 );
+
+  auto basisWS = ChebfunVector_sptr( new ChebfunVector );
+  for(size_t i = 0; i < n; ++i)
+  {
+    basisWS->add( poly[i] );
+  }
+  setProperty( "Basis", basisWS );
 
   // find the domain where the resultant polynomial isn't practically zero
   {

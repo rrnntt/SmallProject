@@ -16,6 +16,8 @@ public:
 
 protected:
   void exec();
+  void fromChebWorkspace();
+  void fromChebVector();
 };
 
 } // Numeric

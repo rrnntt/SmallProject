@@ -34,6 +34,10 @@ protected:
   std::vector<ChebFunction_sptr> m_funs;
 };
 
+/// typedef shared pointer
+typedef boost::shared_ptr<ChebfunVector> ChebfunVector_sptr;
+typedef boost::shared_ptr<const ChebfunVector> ChebfunVector_const_sptr;
+
 } // Numeric
 
 #endif // NUMERIC_CHEBFUNVECTOR_H

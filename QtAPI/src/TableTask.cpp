@@ -7,6 +7,7 @@
 #include "API/AlgorithmFactory.h"
 
 #include "Numeric/ChebfunWorkspace.h"
+#include "Numeric/ChebfunVector.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QFileDialog>
@@ -105,15 +106,16 @@ void TableTask::showTable(const QString& wsName)
     {
       showTable(tws);
     }
-    else if ( auto cws = boost::dynamic_pointer_cast<Numeric::ChebfunWorkspace>( ws ) )
+    else if ( boost::dynamic_pointer_cast<Numeric::ChebfunWorkspace>( ws ) ||
+      boost::dynamic_pointer_cast<Numeric::ChebfunVector>( ws ))
     {
       auto alg = API::AlgorithmFactory::instance().createAlgorithm("ChebfunToTable");
       if ( !alg )
       {
-        errorMessage("Cannot display workspace " + cws->API::Workspace::name() );
+        errorMessage("Cannot display workspace " + ws->API::Workspace::name() );
         return;
       }
-      alg->setClassProperty("InputWorkspace",cws);
+      alg->setClassProperty("InputWorkspace",ws);
       alg->execute();
       tws = alg->getClass("OutputWorkspace");
       if ( tws )
