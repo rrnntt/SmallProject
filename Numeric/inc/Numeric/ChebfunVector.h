@@ -11,6 +11,11 @@
 namespace Numeric
 {
 
+//========================================================
+//    Forward declaration
+//========================================================
+class GSLMatrix;
+
 /**
  * A vector of ChebFunctions
  */
@@ -25,10 +30,16 @@ public:
   virtual std::string id() const {return "ChebfunVector";}
   /// get i-th function
   ChebFunction& fun(size_t i){return *m_funs[i];}
+  /// get i-th function
+  const ChebFunction& cfun(size_t i) const {return *m_funs[i];}
   /// add a function
   void add( ChebFunction_sptr f ){m_funs.push_back(f);}
   /// number of functions in the matrix
   size_t size() const {return m_funs.size();}
+  /// Create a ChebfunVector (this) from another ChebfunVector as their linear combinations
+  void fromLinearCombinations(const ChebfunVector& basis, const GSLMatrix& coeffs);
+  /// Sort the functions in the vector according to a table
+  void sort(const std::vector<size_t>& indx);
 protected:
   /// The functions
   std::vector<ChebFunction_sptr> m_funs;

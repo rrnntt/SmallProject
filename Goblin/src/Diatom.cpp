@@ -9,6 +9,7 @@
 #include "Numeric/GSLMatrix.h"
 #include "Numeric/GSLVector.h"
 #include "Numeric/AddFunctionValuesToTable.h"
+#include "Numeric/ChebfunVector.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -44,6 +45,7 @@ namespace
     }
   };
   void calcEigenFun(size_t i, std::vector<double>& fun, const FuncVector& ff, const GSLMatrix& ef, const std::vector<size_t>& indx);
+  void calcEigenFunctions(ChebfunVector_sptr out, ChebfunVector_sptr basis, const GSLMatrix& ef, const std::vector<size_t>& indx);
 }
 
 /// Constructor. Declare algorithm properties.
@@ -57,7 +59,8 @@ Diatom::Diatom()
   declareDouble("rmax",20.0); // the integration range [rmin,rmax] in angstrom
   declareWorkspace("Quad");
   declareWorkspace("Test");
-  declareWorkspace("Test1");
+  declareWorkspace("Basis");
+  declareWorkspace("Basis1");
   declareWorkspace("VPotNum");
 }
 
@@ -141,12 +144,15 @@ void Diatom::exec()
 
     API::TableWorkspace_ptr quadWS = alg->getClass("Quadrature");
     API::TableWorkspace_ptr testWS = alg->getClass("Test");
+    ChebfunVector_sptr basis = alg->getClass("Basis");
 
     setProperty("Quad",quadWS);
     setProperty("Test",testWS);
+    setProperty("Basis",basis);
   }
   API::TableWorkspace_ptr quadWS = getClass("Quad");
   API::TableWorkspace_ptr testWS = getClass("Test");
+  ChebfunVector_sptr basis = getClass("Basis");
 
   // quadrature abscissas
   auto& r = quadWS->getDoubleData("r");
@@ -237,10 +243,10 @@ void Diatom::exec()
   }
 
   // the output workspace with interpolated eigen-function values
-  auto test1WS = API::TableWorkspace_ptr( new API::TableWorkspace );
-  test1WS->addColumn("double","x");
-  test1WS->getColumn("x")->asNumeric()->setPlotRole(API::NumericColumn::X);
-  setProperty("Test1",test1WS);
+  auto basis1 = ChebfunVector_sptr( new ChebfunVector );
+  setProperty("Basis1",basis1);
+  calcEigenFunctions(basis1, basis, ef, indx);
+
 }
 
 //================================================================
@@ -300,9 +306,10 @@ namespace
   {
     std::cerr << "sizes: " << ff.size() << ' ' << ff[0]->size() << ' ' << indx.size() << ' ' << ef.size1() << std::endl;
     const size_t n = indx.size();
-    fun.resize( n + 1 );
+    const size_t n1 = n + 1;
+    fun.resize( n1 );
     size_t j = indx[i];
-    for(size_t k = 0; k < n + 1; ++k)
+    for(size_t k = 0; k < n1; ++k)
     {
       double d = 0.0;
       for(size_t m = 0; m < n; ++m)
@@ -316,18 +323,10 @@ namespace
   /**-----------------------------------------------------------------------------
    * Calculate eigenfunctions as a linear combinations of basis functions.
    */
-  void calcEigenFunction(API::TableWorkspace_ptr out, API::TableWorkspace_ptr quad, const GSLMatrix& ef, const std::vector<size_t>& indx)
+  void calcEigenFunctions(ChebfunVector_sptr out, ChebfunVector_sptr basis, const GSLMatrix& ef, const std::vector<size_t>& indx)
   {
-    const size_t n = indx.size();
-    auto& c = quad->getDoubleData("c");
-    auto& a = quad->getDoubleData("a");
-    auto& b = quad->getDoubleData("b");
-
-    //for(size_t m = 0; m < n; ++m)
-    //{
-    //  d += ef.get(m,j) * (*ff[m])[k];
-    //}
-    //fun[k] = d;
+    out->fromLinearCombinations(*basis, ef);
+    out->sort( indx );
   }
 }
 
