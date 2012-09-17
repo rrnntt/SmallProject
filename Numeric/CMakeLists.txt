@@ -60,6 +60,7 @@ set( INC_FILES
 # Algorithms
    inc/Numeric/AddChebfun.h
    inc/Numeric/AddFunctionValuesToTable.h
+   inc/Numeric/AnalyseBasis.h
    inc/Numeric/ChebfunWorkspace.h
    inc/Numeric/CopyChebfun.h
    inc/Numeric/CreateChebfun.h
@@ -118,6 +119,7 @@ set( SRC_FILES
 # Algorithms
    src/AddChebfun.cpp
    src/AddFunctionValuesToTable.cpp
+   src/AnalyseBasis.cpp
    src/ChebfunWorkspace.cpp
    src/CopyChebfun.cpp
    src/CreateChebfun.cpp
@@ -182,6 +184,7 @@ set( SRC_FILES
 # Algorithms
   test/AddChebfunTest.cpp
   test/AddFunctionValuesToTableTest.cpp
+  test/AnalyseBasisTest.cpp
   test/ChebfunWorkspaceTest.cpp
   test/CreateChebfunTest.cpp
   test/DiffChebfunTest.cpp
