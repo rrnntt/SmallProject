@@ -36,6 +36,14 @@ public:
   ~ChebFunction();
   /// Returns the function's name
   virtual std::string name()const {return "ChebFunction";}
+  static boost::shared_ptr<ChebFunction> create() 
+  {
+    return boost::shared_ptr<ChebFunction>(new ChebFunction());
+  }
+  static boost::shared_ptr<ChebFunction> create(const ChebFunction& other) 
+  {
+    return boost::shared_ptr<ChebFunction>(new ChebFunction(other));
+  }
   /// Function you want to fit.
   virtual void function1D(double* out, const double* xValues, const size_t nData)const;
   /// Start of the domain

@@ -47,6 +47,7 @@ set( INC_FILES
    inc/Numeric/ParamFunction.h
    inc/Numeric/PhysBody.h
    inc/Numeric/PhysModel.h
+   inc/Numeric/ProductFunction.h
 #   inc/Numeric/SeriesFunction.h
    inc/Numeric/ScaledChebfun.h
    inc/Numeric/SchrodScale.h
@@ -68,6 +69,7 @@ set( INC_FILES
    inc/Numeric/ChebfunToTable.h
    inc/Numeric/DiffChebfun.h
    inc/Numeric/EvalChebfun.h
+   inc/Numeric/Fit.h
    inc/Numeric/MakeQuadratureScheme.h
    inc/Numeric/UniformChebfun.h
 
@@ -105,6 +107,7 @@ set( SRC_FILES
   src/ParamFunction.cpp
   src/ParameterReference.cpp
   src/ParameterTie.cpp
+  src/ProductFunction.cpp
   src/ScaledChebfun.cpp
 #  src/SeriesFunction.cpp
   src/SchrodScale.cpp
@@ -127,6 +130,7 @@ set( SRC_FILES
    src/ChebfunToTable.cpp
    src/DiffChebfun.cpp
    src/EvalChebfun.cpp
+   src/Fit.cpp
    src/MakeQuadratureScheme.cpp
    src/UniformChebfun.cpp
   )
@@ -173,6 +177,7 @@ set( SRC_FILES
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp
+  test/ProductFunctionTest.cpp
   test/ScaledChebfunTest.cpp
   test/SchrodScaleTest.cpp
   test/Schrodinger0Test.cpp
@@ -188,6 +193,7 @@ set( SRC_FILES
   test/ChebfunWorkspaceTest.cpp
   test/CreateChebfunTest.cpp
   test/DiffChebfunTest.cpp
+  test/FitTest.cpp
   test/MakeQuadratureSchemeTest.cpp
 )
 

@@ -160,8 +160,9 @@ void MakeQuadratureScheme::exec()
   {
     throw std::invalid_argument("N must be > 1");
   }
-  std::string funStr = get("Function");
-  IFunction_sptr fun = FunctionFactory::instance().createFitFunction(funStr);
+  //std::string funStr = get("Function");
+  //IFunction_sptr fun = FunctionFactory::instance().createFitFunction(funStr);
+  IFunction_sptr fun = getClass("Function");
 
   weight.bestFit( *fun );
 

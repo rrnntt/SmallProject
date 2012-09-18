@@ -166,8 +166,6 @@ protected:
 
   size_t paramOffset(size_t i)const{return m_paramOffsets[i];}
 
-private:
-
   /// Extract function index and parameter name from a variable name
   static void parseName(const std::string& varName,size_t& index, std::string& name);
 

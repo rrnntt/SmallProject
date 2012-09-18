@@ -10,6 +10,10 @@
 #include "Numeric/GSLVector.h"
 #include "Numeric/AddFunctionValuesToTable.h"
 #include "Numeric/ChebfunVector.h"
+#include "Numeric/Fit.h"
+#include "Numeric/ProductFunction.h"
+#include "Numeric/Chebyshev.h"
+#include "Numeric/ChebfunWorkspace.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -45,7 +49,13 @@ namespace
     }
   };
   void calcEigenFun(size_t i, std::vector<double>& fun, const FuncVector& ff, const GSLMatrix& ef, const std::vector<size_t>& indx);
-  void calcEigenFunctions(ChebfunVector_sptr out, ChebfunVector_sptr basis, const GSLMatrix& ef, const std::vector<size_t>& indx);
+  void calcEigenFunctions(
+    ChebfunVector_sptr out, 
+    ChebfunVector_sptr basis, 
+    const GSLMatrix& ef, 
+    const std::vector<size_t>& indx,
+    ChebfunVector_sptr recur
+    );
 }
 
 /// Constructor. Declare algorithm properties.
@@ -58,9 +68,9 @@ Diatom::Diatom()
   declareDouble("rmin",0.01);
   declareDouble("rmax",20.0); // the integration range [rmin,rmax] in angstrom
   declareWorkspace("Quad");
-  declareWorkspace("Test");
   declareWorkspace("Basis");
   declareWorkspace("Basis1");
+  declareWorkspace("Recur");
   declareWorkspace("VPotNum");
 }
 
@@ -132,7 +142,7 @@ void Diatom::exec()
 
   // compute the harmonic quadrature
   {
-    auto f0Fun = FunctionFactory::instance().createFitFunction( "UserFunction1D(Formula=exp(-a*(x-c)^2))" );
+    auto f0Fun = FunctionFactory::instance().createFitFunction( "UserFunction1D(Formula=x*exp(-a*(x-c)^2))" );
     f0Fun->setParameter("a",sqrt(alpha/beta));
     f0Fun->setParameter("c",r0);
     std::string intervalStr = boost::lexical_cast<std::string>(rmin)+","+boost::lexical_cast<std::string>(rmax);
@@ -143,15 +153,12 @@ void Diatom::exec()
     alg->execute();
 
     API::TableWorkspace_ptr quadWS = alg->getClass("Quadrature");
-    API::TableWorkspace_ptr testWS = alg->getClass("Test");
     ChebfunVector_sptr basis = alg->getClass("Basis");
 
     setProperty("Quad",quadWS);
-    setProperty("Test",testWS);
     setProperty("Basis",basis);
   }
   API::TableWorkspace_ptr quadWS = getClass("Quad");
-  API::TableWorkspace_ptr testWS = getClass("Test");
   ChebfunVector_sptr basis = getClass("Basis");
 
   // quadrature abscissas
@@ -242,10 +249,24 @@ void Diatom::exec()
     calcEigenFun(i, fi0, ff, ef, indx);
   }
 
+  ChebfunVector_sptr recur = ChebfunVector_sptr( new ChebfunVector );
+  setProperty("Recur",recur);
   // the output workspace with interpolated eigen-function values
   auto basis1 = ChebfunVector_sptr( new ChebfunVector );
   setProperty("Basis1",basis1);
-  calcEigenFunctions(basis1, basis, ef, indx);
+  calcEigenFunctions(basis1, basis, ef, indx, recur);
+
+  ChebFunction tmp;
+  tmp.fromDerivative( basis1->cfun(0) );
+  auto tmp2 = ChebFunction::create();
+  tmp2->fromDerivative( tmp );
+
+  *tmp2 /= basis1->cfun(0);
+  *tmp2 *= beta/2;
+  tmp.fit( vpot );
+  *tmp2 -= tmp;
+
+  basis1->add( tmp2 );
 
 }
 
@@ -323,10 +344,89 @@ namespace
   /**-----------------------------------------------------------------------------
    * Calculate eigenfunctions as a linear combinations of basis functions.
    */
-  void calcEigenFunctions(ChebfunVector_sptr out, ChebfunVector_sptr basis, const GSLMatrix& ef, const std::vector<size_t>& indx)
+  void calcEigenFunctions(
+    ChebfunVector_sptr out, 
+    ChebfunVector_sptr basis, 
+    const GSLMatrix& ef, 
+    const std::vector<size_t>& indx,
+    ChebfunVector_sptr recur
+    )
   {
     out->fromLinearCombinations(*basis, ef);
     out->sort( indx );
+
+    ChebFunction_sptr f0(new ChebFunction(out->cfun(0)));
+    ChebfunWorkspace_sptr cws( new ChebfunWorkspace(out->cfun(1)) );
+    //ChebFunction_sptr f0(new ChebFunction(basis->cfun(0)));
+    //ChebfunWorkspace_sptr cws( new ChebfunWorkspace(basis->cfun(1)) );
+
+    Fit fit;
+    IFunction1D_sptr chebyshev( new Chebyshev );
+    chebyshev->setAttributeValue("n",3);
+    chebyshev->setAttributeValue("StartX",out->cfun(0).startX());
+    chebyshev->setAttributeValue("EndX",out->cfun(0).endX());
+
+    {
+      CompositeFunction_sptr prod( new ProductFunction );
+      prod->addFunction(chebyshev);
+      prod->addFunction( f0 );
+
+      fit.setClassProperty("Function",prod);
+      fit.setClassProperty("InputWorkspace",cws);
+      fit.execute();
+
+      for(size_t i = 0; i < prod->nParams(); ++i)
+      {
+        std::cerr << prod->parameterName(i) << ' ' << prod->getParameter(i) << std::endl;
+      }
+    }
+
+    auto res = ChebFunction::create(*f0);
+    auto df = ChebFunction::create(*f0);
+    df->fit(*chebyshev);
+    *res *= *df;
+
+    recur->add( res );
+    recur->add( df );
+
+    cws.reset(new ChebfunWorkspace(out->cfun(2)));
+    ChebFunction_sptr f1(new ChebFunction(out->cfun(1)));
+
+    IFunction1D_sptr bfun( new Chebyshev );
+    bfun->setAttributeValue("n",3);
+    bfun->setAttributeValue("StartX",out->cfun(0).startX());
+    bfun->setAttributeValue("EndX",out->cfun(0).endX());
+    bfun->setParameter(0,1);
+
+    {
+      CompositeFunction_sptr sum( new CompositeFunction );
+      
+      CompositeFunction_sptr prod1( new ProductFunction );
+      prod1->addFunction(chebyshev);
+      prod1->addFunction( f1 );
+      
+      CompositeFunction_sptr prod2( new ProductFunction );
+      prod2->addFunction(bfun);
+      prod2->addFunction( f0 );
+
+      sum->addFunction( prod1 );
+      sum->addFunction( prod2 );
+
+      fit.setClassProperty("Function",sum);
+      fit.setClassProperty("InputWorkspace",cws);
+      fit.execute();
+
+      std::cerr << "Fun 2\n";
+      for(size_t i = 0; i < sum->nParams(); ++i)
+      {
+        std::cerr << sum->parameterName(i) << ' ' << sum->getParameter(i) << std::endl;
+      }
+
+      auto res1 = ChebFunction::create(*f0);
+      res1->fit( *sum );
+      recur->add( res1 );
+    }
+
   }
 }
 
