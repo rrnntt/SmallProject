@@ -39,6 +39,7 @@ set( INC_FILES
    inc/Numeric/Jacobian.h
    inc/Numeric/JointDomain.h
    inc/Numeric/JointDomainFunction.h
+   inc/Numeric/Laguerre.h
    inc/Numeric/LeastSquares.h
    inc/Numeric/LevenbergMarquardt.h
    inc/Numeric/MultiDomainFunction.h
@@ -101,6 +102,7 @@ set( SRC_FILES
   src/IPeakFunction.cpp
   src/JointDomain.cpp
   src/JointDomainFunction.cpp
+  src/Laguerre.cpp
   src/LeastSquares.cpp
   src/LevenbergMarquardt.cpp
   src/MultiDomainFunction.cpp
@@ -174,6 +176,7 @@ set( SRC_FILES
   test/JointDomainFunctionTest.cpp
   test/GSLMatrixTest.cpp
   test/IFuncMinimizerTest.cpp
+  test/LaguerreTest.cpp
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp

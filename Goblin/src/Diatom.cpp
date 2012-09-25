@@ -140,7 +140,7 @@ void Diatom::exec()
 
   }
 
-  // compute the harmonic quadrature
+  // compute the "harmonic" quadrature
   {
     auto f0Fun = FunctionFactory::instance().createFitFunction( "UserFunction1D(Formula=x*exp(-a*(x-c)^2))" );
     f0Fun->setParameter("a",sqrt(alpha/beta));
