@@ -10,6 +10,7 @@ set( INC_FILES
    inc/Goblin/GoblinTask.h
    inc/Goblin/GoblinPlotPicker.h
    inc/Goblin/LineList.h
+   inc/Goblin/TestMorse.h
    inc/Goblin/comdiff.h
    inc/Goblin/humlicek.h
    inc/Goblin/vjkg.h
@@ -22,6 +23,7 @@ set( SRC_FILES
   src/GoblinTask.cpp
   src/GoblinPlotPicker.cpp
   src/LineList.cpp
+  src/TestMorse.cpp
   src/comdiff.cpp
   src/humlicek.cpp
   src/vjkg.cpp
@@ -64,6 +66,7 @@ set( SRC_FILES
   test/ComDiffTest.cpp
   test/DiatomTest.cpp
   test/EnergyListTest.cpp
+  test/TestMorseTest.cpp
 )
 
 add_executable(GoblinTest ${SRC_FILES} ${INC_FILES})

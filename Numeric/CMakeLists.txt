@@ -49,6 +49,7 @@ set( INC_FILES
    inc/Numeric/PhysBody.h
    inc/Numeric/PhysModel.h
    inc/Numeric/ProductFunction.h
+   inc/Numeric/Quadrature.h
 #   inc/Numeric/SeriesFunction.h
    inc/Numeric/ScaledChebfun.h
    inc/Numeric/SchrodScale.h
@@ -110,6 +111,7 @@ set( SRC_FILES
   src/ParameterReference.cpp
   src/ParameterTie.cpp
   src/ProductFunction.cpp
+  src/Quadrature.cpp
   src/ScaledChebfun.cpp
 #  src/SeriesFunction.cpp
   src/SchrodScale.cpp
@@ -181,6 +183,7 @@ set( SRC_FILES
   test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp
   test/ProductFunctionTest.cpp
+  test/QuadratureTest.cpp
   test/ScaledChebfunTest.cpp
   test/SchrodScaleTest.cpp
   test/Schrodinger0Test.cpp
