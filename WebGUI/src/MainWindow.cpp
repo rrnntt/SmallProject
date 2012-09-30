@@ -17,8 +17,8 @@ MainWindow::MainWindow()
   //setGeometry(900,900,300,200);
   m_wView = new QWebView(this);
   //m_wView->load(QUrl("file:///C:/Users/Roman/Work/cpp/SmallProject/WebGUI/http/index.html"));
-  //m_wView->load(QUrl("http://tolchenov.com/tmp/app/"));
-  m_wView->load(QUrl("http://www.google.co.uk"));
+  m_wView->load(QUrl("http://tolchenov.com/tmp/app/"));
+  //m_wView->load(QUrl("http://www.google.co.uk"));
   setCentralWidget(m_wView);
 
   m_wView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);

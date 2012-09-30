@@ -7,6 +7,8 @@
 namespace Numeric
 {
 
+class GSLMatrix;
+
 /** 
  * Table workspace containing all necessary data for an n-point quadrature
  * calculations. The number of rows == n.
@@ -24,14 +26,19 @@ public:
   ~Quadrature();
   virtual std::string id()const {return "Quadrature";}
   void init();
+  /// Number of the integration points
+  size_t size() const {return rowCount();}
   /// Calculate kinetic energy matrix elemetnt
   double calcKinet(size_t i, size_t j, const double& beta) const;
   double calcPot(size_t i, size_t j, const std::vector<double>& vpot) const;
+  /// Build a hamiltonian matrix
+  void buildHamiltonian(const double& beta, const std::vector<double>& vpot, GSLMatrix& H) const;
 protected:
   typedef std::vector< std::vector<double>* > FuncVector;
   std::vector<double>* m_r; ///< the integration points
   std::vector<double>* m_w; ///< the integration weights
   FuncVector m_funs;        ///< basis function values at integration points, m_funs.size()==n
+  FuncVector m_derivs;      ///< derivatives of basis function values at integration points
 };
 
 } // Numeric

@@ -73,6 +73,7 @@ set( INC_FILES
    inc/Numeric/EvalChebfun.h
    inc/Numeric/Fit.h
    inc/Numeric/MakeQuadratureScheme.h
+   inc/Numeric/MakeQuadrature.h
    inc/Numeric/UniformChebfun.h
 
    )
@@ -136,6 +137,7 @@ set( SRC_FILES
    src/EvalChebfun.cpp
    src/Fit.cpp
    src/MakeQuadratureScheme.cpp
+   src/MakeQuadrature.cpp
    src/UniformChebfun.cpp
   )
 add_library( Numeric SHARED ${SRC_FILES} ${INC_FILES} )
@@ -201,6 +203,7 @@ set( SRC_FILES
   test/DiffChebfunTest.cpp
   test/FitTest.cpp
   test/MakeQuadratureSchemeTest.cpp
+  test/MakeQuadratureTest.cpp
 )
 
 add_executable(NumericTest ${SRC_FILES} ${INC_FILES})
