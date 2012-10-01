@@ -48,6 +48,7 @@ set( INC_FILES
    inc/Numeric/ParamFunction.h
    inc/Numeric/PhysBody.h
    inc/Numeric/PhysModel.h
+   inc/Numeric/Polynomial.h
    inc/Numeric/ProductFunction.h
    inc/Numeric/Quadrature.h
 #   inc/Numeric/SeriesFunction.h
@@ -111,6 +112,7 @@ set( SRC_FILES
   src/ParamFunction.cpp
   src/ParameterReference.cpp
   src/ParameterTie.cpp
+  src/Polynomial.cpp
   src/ProductFunction.cpp
   src/Quadrature.cpp
   src/ScaledChebfun.cpp

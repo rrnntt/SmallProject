@@ -65,6 +65,7 @@ void ParamFunction::setParameter(size_t i, const double& value, bool explicitlyS
   {
     m_explicitlySet[i] = true;
   }
+  this->updateStateRequired();
 }
 
 /** Sets a new parameter description to the i-th parameter.
@@ -480,6 +481,7 @@ void ParamFunction::clearAllParameters()
   m_parameterNames.clear();
   m_parameterDescriptions.clear();
   m_isFixed.clear();
+  updateStateRequired();
 }
 
 /// Get the address of the parameter

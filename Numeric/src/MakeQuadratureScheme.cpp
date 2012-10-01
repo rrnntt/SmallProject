@@ -455,7 +455,7 @@ namespace
   {
     double p0 = 1.0;
     if ( n == 0 ) return p0;
-    double p1 = ( x - a[0] ) * p0;
+    double p1 = ( c[0] * x - a[0] ) * p0;
     if ( n == 1 ) return p1;
     for(size_t i = 2; i < n; ++i)
     {

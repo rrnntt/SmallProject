@@ -337,6 +337,9 @@ protected:
 
   /// Function initialization. Declare function parameters in this method.
   virtual void init(){};
+  /// Update internal state (if needed) after a parameter changed its value. 
+  /// This method mustn't be long as it can be called frequently.
+  virtual void updateStateRequired()const{}
   /// Declare a new parameter
   virtual void declareParameter(const std::string& name, double initValue = 0, const std::string& description="") = 0;
 
