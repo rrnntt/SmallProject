@@ -86,7 +86,6 @@ void Polynomial::function1D(double* out, const double* xValues, const size_t nDa
 {
   if ( nData == 0 ) return;
   if ( m_a.empty() ) updateABC();
-  const double alpha = getParameter("Alpha");
   const double height = getParameter("Height");
   const double scaling = getParameter("Scaling");
   for(size_t i = 0; i < nData; ++i)
