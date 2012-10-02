@@ -2,13 +2,28 @@
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/Chebfun.h"
 
+#include <algorithm>
+
 namespace Numeric
 {
 
 DECLARE_FUNCTION(Laguerre);
 
 /// Constructor
-Laguerre::Laguerre()
+Laguerre::Laguerre():Polynomial()
+{
+  init();
+}
+
+/// Constructor
+Laguerre::Laguerre(double alpha, int n):Polynomial(n)
+{
+  init();
+  setParameter("Alpha",alpha);
+}
+
+/// Create parameters
+void Laguerre::init()
 {
   declareParameter("Alpha",0.0,"The alpha parameter of the generalized Laguerre polynomial.");
   declareParameter("Height",1.0,"The function scaling factor.");
@@ -62,6 +77,25 @@ void Laguerre::roots( std::vector<double>& r ) const
 
   if ( m_roots.empty() )
   {
+    Polynomial::roots( r );
+    const double scaling = getParameter("Scaling");
+    std::transform(m_roots.begin(),m_roots.end(),m_roots.begin(),std::bind2nd(std::multiplies<double>(), 1.0/scaling));
+  }
+
+  r.assign(m_roots.begin(), m_roots.end());
+}
+
+/// Find all roots of the polynomial
+void Laguerre::myroots( std::vector<double>& r ) const
+{
+  if ( m_n == 0 ) 
+  {
+    r.clear();
+    return;
+  }
+
+  if ( m_roots.empty() )
+  {
     const double alpha = getParameter("Alpha");
     const double scaling = getParameter("Scaling");
     const size_t maxIt = 10;
@@ -70,9 +104,9 @@ void Laguerre::roots( std::vector<double>& r ) const
     m_roots.resize( m_n );
 
     // from NR
+    double z;
     for(size_t i = 0; i < m_n; ++i)
     {
-      double z;
       // find an approximation for i-th root
       if ( i == 0 )
       {
@@ -111,9 +145,28 @@ void Laguerre::roots( std::vector<double>& r ) const
       }
       m_roots[i] = z;
     } // for i
+
+    std::transform(m_roots.begin(),m_roots.end(),m_roots.begin(),std::bind2nd(std::multiplies<double>(), 1.0/scaling));
   }
 
   r.assign(m_roots.begin(), m_roots.end());
+}
+
+/// Recalculate (re-fill) m_a, m_b, m_c
+void Laguerre::updateABC() const
+{
+  //if ( m_a.size() == m_n ) return; //?
+  const double alpha = getParameter("Alpha");
+  m_a.resize( m_n );
+  m_b.resize( m_n );
+  m_c.resize( m_n );
+  for(size_t i = 0; i < m_n; ++i)
+  {
+    const size_t i1 = i + 1;
+    m_a[i] = - (2.0 + (alpha - 1.0)/i1);
+    m_b[i] = i == 0? 0.0 : (double(i) + alpha) / i1;
+    m_c[i] = - 1.0 / i1;
+  }
 }
 
 } // Numeric

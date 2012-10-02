@@ -50,7 +50,7 @@ bool Polynomial::hasAttribute(const std::string& attName)const
 /**
  * Update internal state.
  */
-void Polynomial::updateStateRequired()
+void Polynomial::updateStateRequired() const
 {
   if ( !m_roots.empty() )
   {
@@ -78,9 +78,10 @@ void Polynomial::roots( std::vector<double>& r ) const
       J.set(i,i, m_a[i] / m_c[i]);
       if ( i < m_n - 1 )
       {
-        const double b = sqrt(m_b[i] / m_c[i]);
-        J.set(i, i+1, b);
-        J.set(i+1, i, b);
+        const size_t i1 = i + 1;
+        const double b = sqrt(m_b[i1] / (m_c[i] * m_c[i1]));
+        J.set(i, i1, b);
+        J.set(i1, i, b);
       }
     }
 

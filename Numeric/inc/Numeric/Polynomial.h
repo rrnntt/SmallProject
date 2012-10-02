@@ -15,6 +15,10 @@ namespace Numeric
 class NUMERIC_EXPORT Polynomial: public IFunction1D, public ParamFunction
 {
 public:
+  /// Default constructor.
+  Polynomial():IFunction1D(),ParamFunction(),m_n(0){}
+  /// Constructor.
+  Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n){}
   /* Base class virtual methods */
   /// Returns the number of attributes associated with the function
   virtual size_t nAttributes()const{return 1;}
