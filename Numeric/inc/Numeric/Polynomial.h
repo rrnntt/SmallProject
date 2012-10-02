@@ -44,16 +44,12 @@ public:
   /// Return the quadrature weights
   virtual void weights( std::vector<double>& w ) const;
   /// Returns the integral of the weight function
-  virtual double weightIntegral() const;
+  virtual double weightIntegral() const {return 1.0;}
 protected:
-  /// Create parameters
-  void init();
   /// Update internal state.
   virtual void updateStateRequired() const;
   /// Recalculate (re-fill) m_a, m_b, m_c
   virtual void updateABC() const = 0;
-  /// Returns the unscaled integral of the weight function
-  virtual double unscaledWeightIntegral() const {return 1.0;}
 
   /// the n attribute - order of the polynomial
   int m_n;

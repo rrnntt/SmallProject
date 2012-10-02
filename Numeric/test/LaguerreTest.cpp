@@ -53,28 +53,6 @@ TEST(Numeric_Laguerre_Test, RootsAlphaNonZeroTest)
   LaguerreRootTest(L,L1);
 }
 
-TEST(Numeric_Laguerre_Test, ScaledRootsAlpha0Test)
-{
-  Laguerre L(0,10);
-  Laguerre L0(0,10);
-
-  L.setParameter("Scaling", 2.2);
-  L0.setParameter("Scaling", 2.2);
-
-  LaguerreRootTest(L,L0);
-}
-
-TEST(Numeric_Laguerre_Test, ScaledRootsAlphaNonZeroTest)
-{
-  Laguerre L(2.5,10);
-  Laguerre L0(2.5,10);
-
-  L.setParameter("Scaling", 2.2);
-  L0.setParameter("Scaling", 2.2);
-
-  LaguerreRootTest(L,L0);
-}
-
 TEST(Numeric_Laguerre_Test, WeightsAlpha0Test)
 {
   Laguerre L(0,10);

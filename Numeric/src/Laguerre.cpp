@@ -58,7 +58,6 @@ void Laguerre::myroots( std::vector<double>& r ) const
   if ( m_roots.empty() )
   {
     const double alpha = getParameter("Alpha");
-    const double scaling = getParameter("Scaling");
     const size_t maxIt = 10;
     const double tol = 3e-14;
 
@@ -107,7 +106,6 @@ void Laguerre::myroots( std::vector<double>& r ) const
       m_roots[i] = z;
     } // for i
 
-    std::transform(m_roots.begin(),m_roots.end(),m_roots.begin(),std::bind2nd(std::multiplies<double>(), 1.0/scaling));
   }
 
   r.assign(m_roots.begin(), m_roots.end());
@@ -132,7 +130,7 @@ void Laguerre::updateABC() const
 }
 
 /// Returns the integral of the weight function
-double Laguerre::unscaledWeightIntegral() const 
+double Laguerre::weightIntegral() const 
 {
   return gsl_sf_gamma( getParameter("Alpha") + 1.0 );
 }

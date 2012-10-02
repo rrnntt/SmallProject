@@ -8,20 +8,11 @@ namespace Numeric
 /// Default constructor.
 Polynomial::Polynomial():IFunction1D(),ParamFunction(),m_n(0)
 {
-  init();
 }
 
 /// Constructor.
 Polynomial::Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n)
 {
-  init();
-}
-
-/// Create parameters
-void Polynomial::init()
-{
-  declareParameter("Height",1.0,"The function scaling factor.");
-  declareParameter("Scaling",1.0,"The argument scaling factor.");
 }
 
 /// Return a value of attribute attName
@@ -86,13 +77,11 @@ void Polynomial::function1D(double* out, const double* xValues, const size_t nDa
 {
   if ( nData == 0 ) return;
   if ( m_a.empty() ) updateABC();
-  const double height = getParameter("Height");
-  const double scaling = getParameter("Scaling");
   for(size_t i = 0; i < nData; ++i)
   {
     double p0 = 1.0;
     double p1 = 0;
-    const double x = xValues[i] * scaling;
+    const double x = xValues[i];
     if ( m_n == 0 )
     {
       p1 = p0;
@@ -111,7 +100,7 @@ void Polynomial::function1D(double* out, const double* xValues, const size_t nDa
         p1 = p;
       }
     }
-    out[i] = height * p1;
+    out[i] = p1;
   }
 }
 
@@ -158,8 +147,6 @@ void Polynomial::roots( std::vector<double>& r ) const
       double vv = v.get(0, i);
       m_weights[i] = vv * vv * wgt;
     }
-    const double scaling = getParameter("Scaling");
-    std::transform(m_roots.begin(),m_roots.end(),m_roots.begin(),std::bind2nd(std::multiplies<double>(), 1.0/scaling));
   }
 
   r.assign(m_roots.begin(), m_roots.end());
@@ -178,14 +165,6 @@ void Polynomial::weights( std::vector<double>& w ) const
     roots( r );
   }
   w.assign(m_weights.begin(), m_weights.end());
-}
-
-/// Returns the integral of the weight function
-double Polynomial::weightIntegral() const
-{
-  const double height = getParameter("Height");
-  const double scaling = getParameter("Scaling");
-  return unscaledWeightIntegral() * height * scaling;
 }
 
 } // Numeric

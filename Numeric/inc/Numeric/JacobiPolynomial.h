@@ -16,11 +16,11 @@ public:
   JacobiPolynomial(double alpha, double beta, int n);
   /// Returns the function's name
   virtual std::string name()const {return "JacobiPolynomial";}
+  /// Returns the integral of the weight function
+  virtual double weightIntegral() const;
 protected:
   /// Recalculate (re-fill) m_a, m_b, m_c
   virtual void updateABC() const;
-  /// Returns the unscaled integral of the weight function
-  virtual double unscaledWeightIntegral() const;
   /// Create parameters
   void init();
 };
