@@ -37,6 +37,7 @@ set( INC_FILES
    inc/Numeric/IFunctionValues.h
    inc/Numeric/IPeakFunction.h
    inc/Numeric/Jacobian.h
+   inc/Numeric/JacobiPolynomial.h
    inc/Numeric/JointDomain.h
    inc/Numeric/JointDomainFunction.h
    inc/Numeric/Laguerre.h
@@ -103,6 +104,7 @@ set( SRC_FILES
   src/IFunction.cpp
   src/IFunction1D.cpp
   src/IPeakFunction.cpp
+  src/JacobiPolynomial.cpp
   src/JointDomain.cpp
   src/JointDomainFunction.cpp
   src/Laguerre.cpp
@@ -179,6 +181,7 @@ set( SRC_FILES
   test/FunctionDomain1DTest.cpp
   test/FunctionFactoryTest.cpp
   test/FuncMinimizerFactoryTest.cpp
+  test/JacobiPolynomialTest.cpp
   test/JointDomainFunctionTest.cpp
   test/GSLMatrixTest.cpp
   test/IFuncMinimizerTest.cpp
