@@ -11,14 +11,17 @@ namespace Numeric
 /**
  * A member of an orthogonal polynomial basis. Intentional use:
  * quadratures.
+ *
+ * The concrete classes must implement updateABC() and unscaledWeightIntegral()
+ * if it returns number other than 1.0.
  */
 class NUMERIC_EXPORT Polynomial: public IFunction1D, public ParamFunction
 {
 public:
   /// Default constructor.
-  Polynomial():IFunction1D(),ParamFunction(),m_n(0){}
+  Polynomial();
   /// Constructor.
-  Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n){}
+  Polynomial(int n);
   /* Base class virtual methods */
   /// Returns the number of attributes associated with the function
   virtual size_t nAttributes()const{return 1;}
@@ -30,17 +33,28 @@ public:
   virtual void setAttribute(const std::string& attName,const Attribute& );
   /// Check if attribute attName exists
   virtual bool hasAttribute(const std::string& attName)const;
+  /// Function you want to fit to.
+  virtual void function1D(double* out, const double* xValues, const size_t nData)const;
+  /// Derivatives of function with respect to active parameters
+  virtual void functionDeriv(const FunctionDomain& domain, Jacobian& jacobian);
 
   /* Own methods */
   /// Find all roots of the polynomial
   virtual void roots( std::vector<double>& r ) const;
   /// Return the quadrature weights
   virtual void weights( std::vector<double>& w ) const;
+  /// Returns the integral of the weight function
+  virtual double weightIntegral() const;
 protected:
+  /// Create parameters
+  void init();
   /// Update internal state.
   virtual void updateStateRequired() const;
   /// Recalculate (re-fill) m_a, m_b, m_c
   virtual void updateABC() const = 0;
+  /// Returns the unscaled integral of the weight function
+  virtual double unscaledWeightIntegral() const {return 1.0;}
+
   /// the n attribute - order of the polynomial
   int m_n;
   /// store the roots

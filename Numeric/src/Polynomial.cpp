@@ -5,6 +5,25 @@
 namespace Numeric
 {
 
+/// Default constructor.
+Polynomial::Polynomial():IFunction1D(),ParamFunction(),m_n(0)
+{
+  init();
+}
+
+/// Constructor.
+Polynomial::Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n)
+{
+  init();
+}
+
+/// Create parameters
+void Polynomial::init()
+{
+  declareParameter("Height",1.0,"The function scaling factor.");
+  declareParameter("Scaling",1.0,"The argument scaling factor.");
+}
+
 /// Return a value of attribute attName
 Polynomial::Attribute Polynomial::getAttribute(const std::string& attName)const
 {
@@ -62,6 +81,47 @@ void Polynomial::updateStateRequired() const
   }
 }
 
+/// Function you want to fit to.
+void Polynomial::function1D(double* out, const double* xValues, const size_t nData)const
+{
+  if ( nData == 0 ) return;
+  if ( m_a.empty() ) updateABC();
+  const double alpha = getParameter("Alpha");
+  const double height = getParameter("Height");
+  const double scaling = getParameter("Scaling");
+  for(size_t i = 0; i < nData; ++i)
+  {
+    double p0 = 1.0;
+    double p1 = 0;
+    const double x = xValues[i] * scaling;
+    if ( m_n == 0 )
+    {
+      p1 = p0;
+    }
+    else if ( m_n == 1 )
+    {
+      p1 = ( m_c[0] * x - m_a[0] ) * p0;
+    }
+    else
+    {
+      p1 = ( m_c[0] * x - m_a[0] ) * p0;
+      for(size_t j = 1; j < m_n; ++j)
+      {
+        double p = ( m_c[j] * x - m_a[j] ) * p1 - m_b[j] * p0;
+        p0 = p1;
+        p1 = p;
+      }
+    }
+    out[i] = height * p1;
+  }
+}
+
+/// Derivatives of function with respect to active parameters
+void Polynomial::functionDeriv(const FunctionDomain& domain, Jacobian& jacobian)
+{
+  calNumericalDeriv(domain,jacobian);
+}
+
 /**
  * Find all roots of the polynomial
  * @param r :: Vector to store the calculated roots.
@@ -92,12 +152,15 @@ void Polynomial::roots( std::vector<double>& r ) const
     m_roots.resize( m_n );
     m_weights.resize( m_n );
 
+    const double wgt = weightIntegral();
     for(size_t i = 0; i < m_n; ++i)
     {
       m_roots[i] = x[i];
-      double vv = v.get(i, 0);
-      m_weights[i] = vv * vv;
+      double vv = v.get(0, i);
+      m_weights[i] = vv * vv * wgt;
     }
+    const double scaling = getParameter("Scaling");
+    std::transform(m_roots.begin(),m_roots.end(),m_roots.begin(),std::bind2nd(std::multiplies<double>(), 1.0/scaling));
   }
 
   r.assign(m_roots.begin(), m_roots.end());
@@ -118,5 +181,12 @@ void Polynomial::weights( std::vector<double>& w ) const
   w.assign(m_weights.begin(), m_weights.end());
 }
 
+/// Returns the integral of the weight function
+double Polynomial::weightIntegral() const
+{
+  const double height = getParameter("Height");
+  const double scaling = getParameter("Scaling");
+  return unscaledWeightIntegral() * height * scaling;
+}
 
 } // Numeric

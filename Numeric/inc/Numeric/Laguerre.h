@@ -20,17 +20,13 @@ public:
   Laguerre(double alpha, int n);
   /// Returns the function's name
   virtual std::string name()const {return "Laguerre";}
-  /// Function you want to fit to.
-  virtual void function1D(double* out, const double* xValues, const size_t nData)const;
-  /// Derivatives of function with respect to active parameters
-  virtual void functionDeriv(const FunctionDomain& domain, Jacobian& jacobian);
-  /// Find all roots of the polynomial
-  virtual void roots( std::vector<double>& r ) const ;
   /// Find all roots of the polynomial
   virtual void myroots( std::vector<double>& r ) const ;
 protected:
   /// Recalculate (re-fill) m_a, m_b, m_c
   virtual void updateABC() const;
+  /// Returns the unscaled integral of the weight function
+  virtual double unscaledWeightIntegral() const;
   /// Returns the value of the un-scaled generalized Laguerre polynomial
   static double unscaledLaguerre(double alpha, int n, double x);
   /// Create parameters

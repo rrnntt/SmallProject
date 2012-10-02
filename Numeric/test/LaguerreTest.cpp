@@ -75,3 +75,72 @@ TEST(Numeric_Laguerre_Test, ScaledRootsAlphaNonZeroTest)
   LaguerreRootTest(L,L0);
 }
 
+TEST(Numeric_Laguerre_Test, WeightsAlpha0Test)
+{
+  Laguerre L(0,10);
+  std::vector<double> r,w;
+
+  L.roots( r );
+  L.weights( w );
+
+  EXPECT_EQ( w.size(), 10 );
+
+  double d0 = 0;
+  double d1 = 0;
+  double d2 = 0;
+  double d3 = 0;
+  for(size_t i = 0; i < w.size(); ++i)
+  {
+    //std::cerr << i << ' ' << r[i] << ' ' << w[i] << std::endl;
+    double x = r[i];
+    d0 += w[i];
+    d1 += x * w[i];
+    x *= r[i];
+    d2 += x * w[i];
+    x *= r[i];
+    d3 += x * w[i];
+  }
+  
+  EXPECT_NEAR( d0, 1.0, 1e-14);
+  EXPECT_NEAR( d1, 1.0, 1e-14);
+  EXPECT_NEAR( d2, 2.0, 1e-14);
+  EXPECT_NEAR( d3, 6.0, 1e-13);
+
+  //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+}
+
+TEST(Numeric_Laguerre_Test, WeightsAlphaNonZeroTest)
+{
+  const double alpha = 3;
+  Laguerre L(alpha,10);
+  std::vector<double> r,w;
+
+  L.roots( r );
+  L.weights( w );
+
+  EXPECT_EQ( w.size(), 10 );
+
+  double d0 = 0;
+  double d1 = 0;
+  double d2 = 0;
+  double d3 = 0;
+  for(size_t i = 0; i < w.size(); ++i)
+  {
+    //std::cerr << i << ' ' << r[i] << ' ' << w[i] << std::endl;
+    double x = r[i];
+    d0 += w[i];
+    d1 += x * w[i];
+    x *= r[i];
+    d2 += x * w[i];
+    x *= r[i];
+    d3 += x * w[i];
+  }
+  
+  EXPECT_NEAR( d0, 6.0, 1e-12);   // (alpha + 0)!
+  EXPECT_NEAR( d1, 24.0, 1e-12);  // (alpha + 1)!
+  EXPECT_NEAR( d2, 120.0, 1e-12); // (alpha + 2)!
+  EXPECT_NEAR( d3, 720.0, 1e-12); // (alpha + 3)!
+
+  //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+}
+

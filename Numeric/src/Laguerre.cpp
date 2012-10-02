@@ -2,6 +2,7 @@
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/Chebfun.h"
 
+#include <gsl/gsl_sf_gamma.h>
 #include <algorithm>
 
 namespace Numeric
@@ -26,27 +27,6 @@ Laguerre::Laguerre(double alpha, int n):Polynomial(n)
 void Laguerre::init()
 {
   declareParameter("Alpha",0.0,"The alpha parameter of the generalized Laguerre polynomial.");
-  declareParameter("Height",1.0,"The function scaling factor.");
-  declareParameter("Scaling",1.0,"The argument scaling factor.");
-}
-
-/// Function you want to fit to.
-void Laguerre::function1D(double* out, const double* xValues, const size_t nData)const
-{
-  if ( nData == 0 ) return;
-  const double alpha = getParameter("Alpha");
-  const double height = getParameter("Height");
-  const double scaling = getParameter("Scaling");
-  for(size_t i = 0; i < nData; ++i)
-  {
-    out[i] = height * unscaledLaguerre( alpha, m_n, scaling * xValues[i] );
-  }
-}
-
-/// Derivatives of function with respect to active parameters
-void Laguerre::functionDeriv(const FunctionDomain& domain, Jacobian& jacobian)
-{
-  calNumericalDeriv(domain,jacobian);
 }
 
 /// Returns the value of the un-scaled generalized Laguerre polynomial
@@ -66,26 +46,7 @@ double Laguerre::unscaledLaguerre(double alpha, int n, double x)
   return p;
 }
 
-/// Find all roots of the polynomial
-void Laguerre::roots( std::vector<double>& r ) const
-{
-  if ( m_n == 0 ) 
-  {
-    r.clear();
-    return;
-  }
-
-  if ( m_roots.empty() )
-  {
-    Polynomial::roots( r );
-    const double scaling = getParameter("Scaling");
-    std::transform(m_roots.begin(),m_roots.end(),m_roots.begin(),std::bind2nd(std::multiplies<double>(), 1.0/scaling));
-  }
-
-  r.assign(m_roots.begin(), m_roots.end());
-}
-
-/// Find all roots of the polynomial
+/// Find all roots of the polynomial using NR algorithm
 void Laguerre::myroots( std::vector<double>& r ) const
 {
   if ( m_n == 0 ) 
@@ -166,7 +127,15 @@ void Laguerre::updateABC() const
     m_a[i] = - (2.0 + (alpha - 1.0)/i1);
     m_b[i] = i == 0? 0.0 : (double(i) + alpha) / i1;
     m_c[i] = - 1.0 / i1;
+    //std::cerr << i << ' ' << m_a[i] << ' ' << m_b[i] << ' ' << m_c[i] << std::endl;
   }
 }
+
+/// Returns the integral of the weight function
+double Laguerre::unscaledWeightIntegral() const 
+{
+  return gsl_sf_gamma( getParameter("Alpha") + 1.0 );
+}
+
 
 } // Numeric
