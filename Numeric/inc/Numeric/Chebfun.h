@@ -228,6 +228,7 @@ namespace Numeric
     const double end = cheb.endX();
     size_t nn = 3;
     const double tol = 1e-16;
+    const size_t nMax = 2000;
     double err = 1.0;
     double maxA = 0;
     while ( err > tol )
@@ -249,6 +250,7 @@ namespace Numeric
       err = (minAodd + minAeven) / maxA / 2;
       nn *= 2;
       --nn;
+      if ( nn > nMax ) throw std::runtime_error("chebfun fit cannot converge.");
     }
     // optimize the fit by finding the smallest significant a-coefficient
     auto& a = cheb.coeffs();

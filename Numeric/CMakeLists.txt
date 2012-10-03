@@ -191,6 +191,7 @@ set( SRC_FILES
   test/GSLMatrixTest.cpp
   test/IFuncMinimizerTest.cpp
   test/LaguerreTest.cpp
+  test/LaguerreWeightTest.cpp
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
   test/ParamFunctionTest.cpp

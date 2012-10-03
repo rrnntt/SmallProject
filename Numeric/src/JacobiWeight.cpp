@@ -1,7 +1,10 @@
 #include "Numeric/JacobiWeight.h"
+#include "Numeric/FunctionFactory.h"
 
 namespace Numeric
 {
+
+DECLARE_FUNCTION(JacobiWeight);
 
 /**
  * Constructor.
