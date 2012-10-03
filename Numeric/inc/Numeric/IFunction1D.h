@@ -29,7 +29,7 @@ public:
   virtual void function(const FunctionDomain& domain,FunctionValues& values)const;
   void functionDeriv(const FunctionDomain& domain, Jacobian& jacobian);
 
-  /// Function you want to fit to.
+  /// Function you want to fit.
   virtual void function1D(double* out, const double* xValues, const size_t nData)const = 0;
   /// Derivatives of function with respect to active parameters
   virtual void functionDeriv1D(Jacobian* out, const double* xValues, const size_t nData);

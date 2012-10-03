@@ -38,6 +38,10 @@ namespace
   {
     return exp(-x*x);
   }
+  double xSquared( double x )
+  {
+    return (1.0 + x)*(1.0 + x);
+  }
 };
 
 //=========================================================================//
@@ -459,4 +463,12 @@ TEST(ChebfunTest, BestFitTest)
   cheb_gauss.bestFit( (AFunction)gauss );
   //std::cerr << "n=" << cheb_gauss.n() << std::endl;
   EXPECT_EQ( cheb_gauss.n(), 40 );
+}
+
+//-----------------------------------------------------------------------------
+TEST(ChebfunTest, IntegrPolyTest)
+{
+  chebfun cheb(2);
+  cheb.fit( xSquared );
+  EXPECT_NEAR( cheb.integr(), 8./3, 1e-15);
 }

@@ -536,7 +536,7 @@ namespace Numeric
     const size_t n = m_base->n;
     auto& iw = m_base->iw;
     auto& a = coeffs();
-    for(size_t i = 0; i < n; i+=2)
+    for(size_t i = 0; i < a.size(); i+=2)
     {
       res += a[i] * iw[i];
     }
