@@ -1,4 +1,5 @@
 #include "Numeric/JacobiPolynomial.h"
+#include "Numeric/JacobiWeight.h"
 
 #include <gsl/gsl_sf_gamma.h>
 
@@ -61,5 +62,15 @@ double JacobiPolynomial::weightIntegral() const
     - gsl_sf_lngamma(alpha+beta+1.0) );
   return res * pow(2.0, alpha + beta + 1.0) / (alpha + beta + 1.0);
 }
+
+/// Return cost shared pointer to the weight function (creates weight function)
+IFunction_const_sptr JacobiPolynomial::createWeightFunction() const
+{
+  JacobiWeight* fun = new JacobiWeight;
+  fun->setParameter("Alpha",getParameter("Alpha"));
+  fun->setParameter("Beta",getParameter("Beta"));
+  return IFunction_const_sptr( fun );
+}
+
 
 } // Numeric

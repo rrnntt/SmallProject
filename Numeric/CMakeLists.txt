@@ -17,6 +17,7 @@ set( INC_FILES
    inc/Numeric/CostFunctionFactory.h
    inc/Numeric/CostFuncFitting.h
    inc/Numeric/Constants.h
+   inc/Numeric/CustomPolynomial.h
    inc/Numeric/DllExport.h
    inc/Numeric/Distribution.h
    inc/Numeric/DerivMinimizer.h
@@ -94,6 +95,7 @@ set( SRC_FILES
   src/CostFunctionFactory.cpp
   src/CostFuncFitting.cpp
   src/Constants.cpp
+  src/CustomPolynomial.cpp
   src/Distribution.cpp
   src/DerivMinimizer.cpp
   src/DomainMap.cpp
@@ -179,6 +181,7 @@ set( SRC_FILES
   test/Chebfun2DSplineTest.cpp
   #test/ConjugateFRMinimizerTest.cpp
   test/CostFuncFittingTest.cpp
+  test/CustomPolynomialTest.cpp
   test/DistributionTest.cpp
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp

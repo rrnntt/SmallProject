@@ -45,11 +45,18 @@ public:
   virtual void weights( std::vector<double>& w ) const;
   /// Returns the integral of the weight function
   virtual double weightIntegral() const {return 1.0;}
+  /// Return cost shared pointer to the weight function
+  virtual IFunction_const_sptr weightFunction() const;
+  const std::vector<double>& getA() const;
+  const std::vector<double>& getB() const;
+  const std::vector<double>& getC() const;
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;
   /// Recalculate (re-fill) m_a, m_b, m_c
   virtual void updateABC() const = 0;
+  /// Return cost shared pointer to the weight function (creates weight function)
+  virtual IFunction_const_sptr createWeightFunction() const = 0;
 
   /// the n attribute - order of the polynomial
   int m_n;
@@ -61,6 +68,7 @@ protected:
   mutable std::vector<double> m_a;
   mutable std::vector<double> m_b;
   mutable std::vector<double> m_c;
+  mutable IFunction_const_sptr m_weightFunction;
 };
 
 } // Numeric

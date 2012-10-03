@@ -867,4 +867,31 @@ void chebfun::sqrt()
   invalidateA();
 }
 
+void chebfun::bestFit(const IFunction& fun)
+{
+  BestFit<chebfun,const IFunction&>( *this, fun );
+}
+
+/**
+ * Resize the base (creates new base with same bounds but different n)
+ * @param nn :: New base size.
+ */
+void chebfun::resize(size_t nn)
+{
+  if ( m_a.empty() )
+  {
+    calcA();
+  }
+  std::vector<double> a( nn + 1, 0.0 );
+  size_t dn = 0;
+  if ( a.size() < m_a.size() )
+  {
+    dn = m_a.size() - a.size();
+  }
+  std::copy( m_a.begin(), m_a.end() - dn, a.begin() );
+  set( nn, startX(), endX() );
+  setA( a );
+}
+
+
 } // Numeric

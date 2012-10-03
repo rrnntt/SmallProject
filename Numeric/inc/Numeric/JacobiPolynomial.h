@@ -23,6 +23,8 @@ protected:
   virtual void updateABC() const;
   /// Create parameters
   void init();
+  /// Return cost shared pointer to the weight function (creates weight function)
+  virtual IFunction_const_sptr createWeightFunction() const;
 };
 
 } // Numeric

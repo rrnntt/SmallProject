@@ -1,4 +1,5 @@
 #include "Numeric/Laguerre.h"
+#include "Numeric/LaguerreWeight.h"
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/Chebfun.h"
 
@@ -135,5 +136,12 @@ double Laguerre::weightIntegral() const
   return gsl_sf_gamma( getParameter("Alpha") + 1.0 );
 }
 
+/// Return cost shared pointer to the weight function (creates weight function)
+IFunction_const_sptr Laguerre::createWeightFunction() const
+{
+  auto fun = new LaguerreWeight;
+  fun->setParameter("Alpha",getParameter("Alpha"));
+  return IFunction_const_sptr( fun );
+}
 
 } // Numeric

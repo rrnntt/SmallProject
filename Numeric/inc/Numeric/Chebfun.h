@@ -75,6 +75,7 @@ namespace Numeric
     void fit(const IFunction& ifun);
     void fit(AFunction f);
     template<typename TYPE> void bestFit(TYPE fun);
+    void bestFit(const IFunction& fun);
     void uniformFit(double start, double end, const std::vector<double>& p);
     /// calculate value at point x using the m_a's and treating them as expansion coefficients over Chebyshev T polynomials
     double valueT(const double& x)const;
@@ -92,6 +93,8 @@ namespace Numeric
     void fromDerivative(const chebfun& fun);
     /// make this chebfun a second derivative of the argument
     void fromDerivative2(const chebfun& fun);
+    /// Resize the base (creates new base with same bounds but different n)
+    void resize(size_t nn);
 
     chebfun& operator=(AFunction f)
     {

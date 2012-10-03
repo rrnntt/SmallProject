@@ -167,4 +167,32 @@ void Polynomial::weights( std::vector<double>& w ) const
   w.assign(m_weights.begin(), m_weights.end());
 }
 
+/// Return cost shared pointer to the weight function
+IFunction_const_sptr Polynomial::weightFunction() const
+{
+  if ( !m_weightFunction )
+  {
+    m_weightFunction = this->createWeightFunction();
+  }
+  return m_weightFunction;
+}
+
+const std::vector<double>& Polynomial::getA() const
+{
+  if ( m_a.empty() ) updateABC();
+  return m_a;
+}
+
+const std::vector<double>& Polynomial::getB() const
+{
+  if ( m_b.empty() ) updateABC();
+  return m_b;
+}
+
+const std::vector<double>& Polynomial::getC() const
+{
+  if ( m_c.empty() ) updateABC();
+  return m_c;
+}
+
 } // Numeric
