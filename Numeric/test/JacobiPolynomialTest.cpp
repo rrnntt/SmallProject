@@ -8,9 +8,7 @@ using namespace Numeric;
 TEST(Numeric_JacobiPolynomial_Test, RootsTest)
 {
   JacobiPolynomial P(1,1,11);
-  std::vector<double> r;
-
-  P.roots( r );
+  auto& r = P.getRoots();
 
   FunctionDomain1DView d( r );
   FunctionValues v( d );

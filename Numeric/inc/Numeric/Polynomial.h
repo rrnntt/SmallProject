@@ -39,10 +39,6 @@ public:
   virtual void functionDeriv(const FunctionDomain& domain, Jacobian& jacobian);
 
   /* Own methods */
-  /// Find all roots of the polynomial
-  virtual void roots( std::vector<double>& r ) const;
-  /// Return the quadrature weights
-  virtual void weights( std::vector<double>& w ) const;
   /// Returns the integral of the weight function
   virtual double weightIntegral() const {return 1.0;}
   /// Return cost shared pointer to the weight function
@@ -50,6 +46,8 @@ public:
   const std::vector<double>& getA() const;
   const std::vector<double>& getB() const;
   const std::vector<double>& getC() const;
+  const std::vector<double>& getRoots() const;
+  const std::vector<double>& getWeights() const;
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;
@@ -57,6 +55,8 @@ protected:
   virtual void updateABC() const = 0;
   /// Return cost shared pointer to the weight function (creates weight function)
   virtual IFunction_const_sptr createWeightFunction() const = 0;
+  /// Find all roots of the polynomial
+  virtual void calcRoots() const;
 
   /// the n attribute - order of the polynomial
   int m_n;

@@ -7,9 +7,9 @@ using namespace Numeric;
 
 void LaguerreRootTest(Laguerre& L, Laguerre& L1, bool out = false)
 {
-  std::vector<double> r,r0;
+  std::vector<double> r;
   L.myroots(r);
-  L1.roots(r0);
+  auto& r0 = L1.getRoots();
 
   FunctionDomain1DView d( r );
   FunctionValues v( d );
@@ -56,10 +56,9 @@ TEST(Numeric_Laguerre_Test, RootsAlphaNonZeroTest)
 TEST(Numeric_Laguerre_Test, WeightsAlpha0Test)
 {
   Laguerre L(0,10);
-  std::vector<double> r,w;
 
-  L.roots( r );
-  L.weights( w );
+  auto& r = L.getRoots();
+  auto& w = L.getWeights();
 
   EXPECT_EQ( w.size(), 10 );
 
@@ -91,10 +90,9 @@ TEST(Numeric_Laguerre_Test, WeightsAlphaNonZeroTest)
 {
   const double alpha = 3;
   Laguerre L(alpha,10);
-  std::vector<double> r,w;
 
-  L.roots( r );
-  L.weights( w );
+  auto& r = L.getRoots();
+  auto& w = L.getWeights();
 
   EXPECT_EQ( w.size(), 10 );
 

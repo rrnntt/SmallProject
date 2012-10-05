@@ -17,11 +17,17 @@ TEST(Numeric_CustomPolynomial_Test, LaguerreTest)
 
   EXPECT_EQ( a.size(), 10 );
 
+  double sum = 0;
+  auto& w = cp.getWeights();
   for(size_t i = 0; i < a.size(); ++i)
   {
     //std::cerr << i << ' ' << a[i] << ' ' << al[i] << ' ' << fabs(a[i]) - fabs(al[i]) << std::endl;
     EXPECT_NEAR( fabs(a[i]) - fabs(al[i]), 0.0, 1e-13 );
+    sum += w[i];
   }
+  //std::cerr << "Weight " << sum << ' ' << lagP.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
+  EXPECT_NEAR( sum, lagP.weightIntegral(), 1e-9 );
+  EXPECT_NEAR( sum, cp.weightIntegral(), 1e-9 );
 }
 
 TEST(Numeric_CustomPolynomial_Test, JacobiTest)
@@ -30,19 +36,23 @@ TEST(Numeric_CustomPolynomial_Test, JacobiTest)
   CustomPolynomial cp( 10, -1.0, 1.0 );
   cp.setWeightFunction( P.weightFunction() );
 
-  std::vector<double> r;
-  P.roots( r );
+  auto& rP = P.getRoots();
+  auto& r = cp.getRoots();
 
   auto& a = cp.getB();
   auto& ap = P.getB();
 
   EXPECT_EQ( a.size(), 10 );
 
+  double sum = 0;
+  auto& w = cp.getWeights();
   for(size_t i = 0; i < a.size(); ++i)
   {
     std::cerr << i <<": "<<std::endl;
     std::cerr << "      " << a[i] << ' ' << ap[i] << ' ' << fabs(a[i]) - fabs(ap[i]) << std::endl;
-    //std::cerr << "      " << r[i] << std::endl;
+    std::cerr << "      " << r[i]<< ' ' << rP[i] << std::endl;
     //EXPECT_NEAR( fabs(a[i]) - fabs(ap[i]), 0.0, 1e-13 );
+    sum += w[i];
   }
+  std::cerr << "Weight " << sum << ' ' << P.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
 }

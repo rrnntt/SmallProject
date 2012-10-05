@@ -112,59 +112,38 @@ void Polynomial::functionDeriv(const FunctionDomain& domain, Jacobian& jacobian)
 
 /**
  * Find all roots of the polynomial
- * @param r :: Vector to store the calculated roots.
  */
-void Polynomial::roots( std::vector<double>& r ) const
+void Polynomial::calcRoots() const
 {
-  if ( m_roots.empty() )
+  updateABC();
+  GSLMatrix J(m_n,m_n);
+  J.zero();
+  for(size_t i = 0; i < m_n; ++i)
   {
-    updateABC();
-    GSLMatrix J(m_n,m_n);
-    J.zero();
-    for(size_t i = 0; i < m_n; ++i)
+    J.set(i,i, m_a[i] / m_c[i]);
+    if ( i < m_n - 1 )
     {
-      J.set(i,i, m_a[i] / m_c[i]);
-      if ( i < m_n - 1 )
-      {
-        const size_t i1 = i + 1;
-        const double b = sqrt(m_b[i1] / (m_c[i] * m_c[i1]));
-        J.set(i, i1, b);
-        J.set(i1, i, b);
-      }
-    }
-
-    GSLVector x( m_n );
-    GSLMatrix v( m_n, m_n );
-    J.diag( x, v );
-
-    m_roots.resize( m_n );
-    m_weights.resize( m_n );
-
-    const double wgt = weightIntegral();
-    for(size_t i = 0; i < m_n; ++i)
-    {
-      m_roots[i] = x[i];
-      double vv = v.get(0, i);
-      m_weights[i] = vv * vv * wgt;
+      const size_t i1 = i + 1;
+      const double b = sqrt(m_b[i1] / (m_c[i] * m_c[i1]));
+      J.set(i, i1, b);
+      J.set(i1, i, b);
     }
   }
 
-  r.assign(m_roots.begin(), m_roots.end());
-}
+  GSLVector x( m_n );
+  GSLMatrix v( m_n, m_n );
+  J.diag( x, v );
 
-/**
- * Return the quadrature weights
- * @param w :: Vector to store the weights.
- */
-void Polynomial::weights( std::vector<double>& w ) const
-{
-  if ( m_weights.empty() )
+  m_roots.resize( m_n );
+  m_weights.resize( m_n );
+
+  const double wgt = weightIntegral();
+  for(size_t i = 0; i < m_n; ++i)
   {
-    updateStateRequired();
-    std::vector<double> r;
-    roots( r );
+    m_roots[i] = x[i];
+    double vv = v.get(0, i);
+    m_weights[i] = vv * vv * wgt;
   }
-  w.assign(m_weights.begin(), m_weights.end());
 }
 
 /// Return cost shared pointer to the weight function
@@ -193,6 +172,24 @@ const std::vector<double>& Polynomial::getC() const
 {
   if ( m_c.empty() ) updateABC();
   return m_c;
+}
+
+const std::vector<double>& Polynomial::getRoots() const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+  return m_roots;
+}
+
+const std::vector<double>& Polynomial::getWeights() const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+  return m_weights;
 }
 
 } // Numeric
