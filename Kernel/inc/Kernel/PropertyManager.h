@@ -69,6 +69,8 @@ namespace Kernel
     /// Return a pointer to a property 
     Property* getPropertyPointer(const std::string& name) const;
     virtual void setClassProperty(const std::string& name, boost::shared_ptr<PropertyClass> value);
+    /// Implement to do some action straight after a property was set.
+    virtual void applyProperty(const std::string& name) {}
 
     /// Property storage
     std::vector<Storage> m_properties;

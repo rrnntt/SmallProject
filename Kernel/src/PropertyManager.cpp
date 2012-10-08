@@ -87,6 +87,7 @@ namespace Kernel
     {
       *prop = value;
       prop->m_isDefault = false;
+      applyProperty( name );
     }
     else
     {
@@ -106,6 +107,7 @@ namespace Kernel
     {
       *prop = value;
       prop->m_isDefault = false;
+      applyProperty( name );
     }
     else
     {
@@ -125,6 +127,7 @@ namespace Kernel
     {
       *prop = value;
       prop->m_isDefault = false;
+      applyProperty( name );
     }
     else
     {
@@ -142,6 +145,7 @@ namespace Kernel
     auto prop = getPropertyPointer(name);
     *prop = value;
      prop->m_isDefault = false;
+     applyProperty( name );
   }
 
   /**
@@ -157,6 +161,7 @@ namespace Kernel
       throw std::runtime_error("Property " + name + " is not a class.");
     }
     prop->m_value.reset( value );
+    applyProperty( name );
     //value->store(); // store a workspace (or something) in a data storage
   }
 
@@ -173,6 +178,7 @@ namespace Kernel
       throw std::runtime_error("Property " + name + " is not a class.");
     }
     prop->m_value = value;
+    applyProperty( name );
     //value->store(); // store a workspace (or something) in a data storage
   }
 

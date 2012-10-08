@@ -14,6 +14,8 @@ public:
   virtual std::string name() const {return "MakeQuadrature";}
 protected:
   virtual void exec();
+  virtual void applyProperty(const std::string& name);
+  void makeChebyshev();
 };
 
 } // NUMERIC
