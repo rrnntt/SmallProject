@@ -574,7 +574,7 @@ FunctionDomain1D_sptr ScaledChebfun::createDomainFromXPoints() const
   */
 void ScaledChebfun::bestFit(AFunction fun)
 {
-  BestFit( *this, fun );
+  BestFit( *this, fun, 1e-16 );
 }
 
 /**
@@ -584,7 +584,7 @@ void ScaledChebfun::bestFit(AFunction fun)
   */
 void ScaledChebfun::bestFit(const IFunction& fun)
 {
-  BestFit<ScaledChebfun,const IFunction&>( *this, fun );
+  BestFit<ScaledChebfun,const IFunction&>( *this, fun, 1e-16 );
 }
 
 /**

@@ -25,7 +25,7 @@ public:
   double startX() const {return m_fun.startX();}
   double endX() const {return m_fun.endX();}
   /// Set the weight function
-  void setWeightFunction(IFunction_const_sptr wgtFun);
+  void setWeightFunction(IFunction_const_sptr wgtFun, const double& tol = 1e-16);
 protected:
   /// Recalculate (re-fill) m_a, m_b, m_c
   virtual void updateABC() const;

@@ -3,6 +3,8 @@
 #include "Numeric/Laguerre.h"
 #include "Numeric/LaguerreWeight.h"
 #include "Numeric/JacobiPolynomial.h"
+#include "Numeric/FunctionFactory.h"
+#include "Numeric/Constants.h"
 
 using namespace Numeric;
 
@@ -55,4 +57,31 @@ TEST(Numeric_CustomPolynomial_Test, JacobiTest)
     sum += w[i];
   }
   std::cerr << "Weight " << sum << ' ' << P.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
+}
+
+TEST(Numeric_CustomPolynomial_Test, ChebyshevTest)
+{
+  system("pause");
+  auto user = FunctionFactory::instance().createFitFunction("UserFunction1D(Formula=sqrt(1-x^2))");
+  CustomPolynomial cp( 10, -1.0, 1.0 );
+  cp.setWeightFunction( user, 1e-6 );
+
+  auto& r = cp.getRoots();
+
+  auto& a = cp.getB();
+
+  EXPECT_EQ( a.size(), 10 );
+
+  double sum = 0;
+  auto& w = cp.getWeights();
+  for(size_t i = 0; i < a.size(); ++i)
+  {
+    std::cerr << i <<": "<<std::endl;
+    std::cerr << "      " << a[i] << ' '  << std::endl;
+    std::cerr << "      " << r[i]<< ' '  << std::endl;
+    std::cerr << "      " << w[i]<< ' '  << std::endl;
+    //EXPECT_NEAR( fabs(a[i]) - fabs(ap[i]), 0.0, 1e-13 );
+    sum += w[i];
+  }
+  std::cerr << "Weight " << sum << ' ' << pi/2 << ' ' << pi/2 - cp.weightIntegral() << std::endl;
 }

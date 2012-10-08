@@ -50,10 +50,10 @@ CustomPolynomial::~CustomPolynomial()
 }
 
 /// Set the weight function
-void CustomPolynomial::setWeightFunction(IFunction_const_sptr wgtFun)
+void CustomPolynomial::setWeightFunction(IFunction_const_sptr wgtFun, const double& tol)
 {
   m_weightFunction = wgtFun;
-  m_fun.bestFit( *wgtFun );
+  m_fun.bestFit( *wgtFun, tol );
 }
 
 /// Recalculate (re-fill) m_a, m_b, m_c

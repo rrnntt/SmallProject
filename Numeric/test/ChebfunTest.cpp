@@ -42,6 +42,14 @@ namespace
   {
     return (1.0 + x)*(1.0 + x);
   }
+  double unit( double x )
+  {
+    return 1.0;
+  }
+  double xSquared2( double x )
+  {
+    return x * x;
+  }
 };
 
 //=========================================================================//
@@ -468,7 +476,24 @@ TEST(ChebfunTest, BestFitTest)
 //-----------------------------------------------------------------------------
 TEST(ChebfunTest, IntegrPolyTest)
 {
+  //system("pause");
   chebfun cheb(2);
   cheb.fit( xSquared );
   EXPECT_NEAR( cheb.integr(), 8./3, 1e-15);
+  //std::cerr << "integr " << cheb.integr() << ' ' << cheb.integr2() << std::endl;
+}
+
+TEST(ChebfunTest, IntegrateWeightedTest)
+{
+  chebfun cheb(3);
+  cheb.fit( xSquared2 );
+  EXPECT_NEAR( cheb.integrateWeighted(), pi/8, 1e-15);
+  //std::cerr << "integr " << pi/8 << ' ' << cheb.integrateWeighted() << std::endl;
+  //auto& w = cheb.weights();
+  //auto& x = cheb.xpoints();
+  //auto& p = cheb.ypoints();
+  //for(size_t i = 0; i < x.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << x[i] << ' ' << p[i] << ' ' << w[i] << std::endl;
+  //}
 }

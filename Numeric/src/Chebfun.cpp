@@ -28,13 +28,15 @@ namespace Numeric
     x.resize(n+1);
     w.resize(n+1);
     iw.resize(n+1);
+    iw2.resize(n+1);
     double x0 = (startX + endX)/2;
     double b  = (endX - startX)/2;
-    const double ifactor = M_PI/n;
+    const double pin = M_PI/n;
     for(size_t i = 0; i < x.size(); ++i)
     {
       size_t j = n - i;
-      double c = cos( M_PI*i/n );
+      const double pi_i_n = pin*i;
+      const double c = cos( pi_i_n );
       x[j] = x0 + b * c;
       w[j] = 1.;
       if ( j % 2 != 0 ) w[j] = -1.;
@@ -47,6 +49,15 @@ namespace Numeric
       else
       {
         iw[i] = 0.0;
+      }
+      if ( i == 0 || j == 0 )
+      {
+        iw2[j] = 0.0;
+      }
+      else
+      {
+        const double s = sin( pi_i_n );
+        iw2[j] = pin * s * s;
       }
     }
   }
@@ -543,6 +554,20 @@ namespace Numeric
     return res * (endX() - startX()) / 2;
   }
 
+  double chebfun::integrateWeighted() const
+  {
+    double res = 0.0;
+    const size_t n = m_base->n;
+    auto& iw2 = m_base->iw2;
+    auto& p = ypoints();
+    auto& x = xpoints();
+    for(size_t i = 1; i < p.size() - 1; ++i)
+    {
+      res += p[i] * iw2[i];
+    }
+    return res * (endX() - startX()) / 2;
+  }
+
   double chebfun::norm2()
   {
     chebfun tmp;
@@ -867,9 +892,9 @@ void chebfun::sqrt()
   invalidateA();
 }
 
-void chebfun::bestFit(const IFunction& fun)
+void chebfun::bestFit(const IFunction& fun, const double& tol)
 {
-  BestFit<chebfun,const IFunction&>( *this, fun );
+  BestFit<chebfun,const IFunction&>( *this, fun, tol );
 }
 
 /**

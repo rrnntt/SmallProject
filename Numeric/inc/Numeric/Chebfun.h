@@ -29,6 +29,7 @@ namespace Numeric
     std::vector<double> x;   ///< x-vaues for use in the barycentric formula, n + 1 items
     std::vector<double> w;   ///< weights used in the barycentric formula, n + 1 items
     std::vector<double> iw;   ///< weights for integration
+    std::vector<double> iw2;   ///< weights for integration
     void calcX();  ///< Calclulate x and w based on values of n, startX, and endX
   };
 
@@ -65,6 +66,8 @@ namespace Numeric
     /// Get the vector of y-points, size n() + 1
     std::vector<double>& coeffs(){if (m_a.empty()) calcA(); return m_a;}
     /// Set the y points from a std vector
+    const std::vector<double>& weights()const{return m_base->iw2;}
+    /// Get the vector of y-points, size n() + 1
     void setP(const std::vector<double>& y);
     /// Set the y points from a GSL vector
     void setP(const GSLVector& y);
@@ -74,8 +77,8 @@ namespace Numeric
     void setP(const GSLMatrix& M, size_t col);
     void fit(const IFunction& ifun);
     void fit(AFunction f);
-    template<typename TYPE> void bestFit(TYPE fun);
-    void bestFit(const IFunction& fun);
+    template<typename TYPE> void bestFit(TYPE fun, const double& tol = 1e-16);
+    void bestFit(const IFunction& fun, const double& tol = 1e-16);
     void uniformFit(double start, double end, const std::vector<double>& p);
     /// calculate value at point x using the m_a's and treating them as expansion coefficients over Chebyshev T polynomials
     double valueT(const double& x)const;
@@ -202,6 +205,8 @@ namespace Numeric
 
     double integrate(int pwr = 1);
     double integr() const;
+    /// Integrate this function woth weight sqrt(1-x^2)
+    double integrateWeighted() const;
     double norm2();
 
     void square();
@@ -225,13 +230,12 @@ namespace Numeric
    * with accuracy ~1e-16.
    */
   template<class CHEB, typename TYPE> 
-  void BestFit(CHEB& cheb, TYPE fun)
+  void BestFit(CHEB& cheb, TYPE fun, const double tol = 1e-16)
   {
     const double start = cheb.startX();
     const double end = cheb.endX();
     size_t nn = 3;
-    const double tol = 1e-16;
-    const size_t nMax = 2000;
+    const size_t nMax = 5000;
     double err = 1.0;
     double maxA = 0;
     while ( err > tol )
@@ -279,9 +283,9 @@ namespace Numeric
    * with accuracy ~1e-16.
    */
   template<typename TYPE> 
-  void chebfun::bestFit(TYPE fun)
+  void chebfun::bestFit(TYPE fun, const double& tol)
   {
-    BestFit( *this, fun );
+    BestFit( *this, fun, tol );
   }
 
   typedef boost::shared_ptr<chebfun> chebfun_sptr;
