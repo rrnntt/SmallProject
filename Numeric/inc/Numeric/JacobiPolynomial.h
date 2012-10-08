@@ -25,6 +25,8 @@ protected:
   void init();
   /// Return cost shared pointer to the weight function (creates weight function)
   virtual IFunction_const_sptr createWeightFunction() const;
+  virtual IFunction_const_sptr createWeightDerivative() const;
+
 };
 
 } // Numeric

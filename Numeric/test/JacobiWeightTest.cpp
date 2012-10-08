@@ -19,25 +19,25 @@ void testJacobiWeight(double alpha, double beta)
   EXPECT_NEAR(jacP.weightIntegral(), cf.integr(), 1e-12);
 }
 
-void testJacobiWeightDerivs(double alpha, double beta)
+void testJacobiWeightDerivs(double alpha, double beta, const double tol = 1e-16)
 {
   JacobiWeight jacW;
   jacW.setParameter("Alpha", alpha);
   jacW.setParameter("Beta", beta);
   chebfun cf;
-  cf.bestFit( jacW );
+  cf.bestFit( jacW, tol );
 
   const double da = 0.000001;
   // make a shifted in alpha chebfun
   jacW.setParameter("Alpha", alpha + da);
   chebfun cfa;
-  cfa.bestFit( jacW );
+  cfa.bestFit( jacW, tol );
 
   // make a shifted in beta chebfun
   jacW.setParameter("Alpha", alpha);
   jacW.setParameter("Beta", beta + da);
   chebfun cfb;
-  cfb.bestFit( jacW );
+  cfb.bestFit( jacW, tol );
 
   jacW.setParameter("Alpha", alpha);
   jacW.setParameter("Beta", beta);
@@ -92,7 +92,7 @@ TEST(Numeric_JacobiWeight_Test, TestNonInt)
 
 TEST(Numeric_JacobiWeight_Test, TestDerivs11)
 {
-  testJacobiWeightDerivs(1.0, 1.0);
+  testJacobiWeightDerivs(1.0, 1.0, 1e-6);
 }
 
 TEST(Numeric_JacobiWeight_Test, TestDerivs12)

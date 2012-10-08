@@ -104,6 +104,7 @@ set( SRC_FILES
   src/FunctionDomain1D.cpp
   src/FunctionFactory.cpp
   src/FunctionValues.cpp
+  src/GSLVector.cpp
   src/IFuncMinimizer.cpp
   src/IFunction.cpp
   src/IFunction1D.cpp

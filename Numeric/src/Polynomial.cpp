@@ -137,11 +137,15 @@ void Polynomial::calcRoots() const
   m_roots.resize( m_n );
   m_weights.resize( m_n );
 
+  std::vector<size_t> indx;
+  x.indexSort( indx );
+
   const double wgt = weightIntegral();
   for(size_t i = 0; i < m_n; ++i)
   {
-    m_roots[i] = x[i];
-    double vv = v.get(0, i);
+    size_t j = indx[i];
+    m_roots[i] = x[j];
+    double vv = v.get(0, j);
     m_weights[i] = vv * vv * wgt;
   }
 }
@@ -154,6 +158,16 @@ IFunction_const_sptr Polynomial::weightFunction() const
     m_weightFunction = this->createWeightFunction();
   }
   return m_weightFunction;
+}
+
+/// Return cost shared pointer to the weight function
+IFunction_const_sptr Polynomial::weightDerivative() const
+{
+  if ( !m_weightDerivative )
+  {
+    m_weightDerivative = this->createWeightDerivative();
+  }
+  return m_weightDerivative;
 }
 
 const std::vector<double>& Polynomial::getA() const

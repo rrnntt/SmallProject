@@ -4,6 +4,8 @@
 #include "Numeric/DllExport.h"
 
 #include <gsl/gsl_vector.h>
+
+#include <vector>
 #include <stdexcept>
 #include <iostream>
 #include <iomanip>
@@ -19,51 +21,18 @@ public:
     
   public:
     /// Constructor
-    GSLVector():m_vector(NULL){}
+    GSLVector();
     /// Constructor
-    GSLVector(const size_t n)
-    {
-      m_vector = gsl_vector_alloc(n);
-    }
+    GSLVector(const size_t n);
 
-    GSLVector(const GSLVector& v)
-    {
-      m_vector = gsl_vector_alloc(v.size());
-      gsl_vector_memcpy(m_vector, v.gsl());
-    }
+    GSLVector(const GSLVector& v);
 
-    GSLVector(const std::vector<double>& v)
-    {
-      m_vector = gsl_vector_alloc(v.size());
-      for(size_t i = 0; i < v.size(); ++i)
-      {
-        gsl_vector_set( m_vector, i, v[i] );
-      }
-    }
+    GSLVector(const std::vector<double>& v);
 
-    GSLVector& operator=(const GSLVector& v)
-    {
-      if (m_vector && size() != v.size())
-      {
-        gsl_vector_free(m_vector);
-        m_vector = NULL;
-      }
-      if (!m_vector)
-      {
-        m_vector = gsl_vector_alloc(v.size());
-      }
-      gsl_vector_memcpy(m_vector, v.gsl());
-      return *this;
-    }
+    GSLVector& operator=(const GSLVector& v);
 
     /// Destructor.
-    ~GSLVector()
-    {
-      if (m_vector)
-      {
-        gsl_vector_free(m_vector);
-      }
-    }
+    ~GSLVector();
 
     /// Get the pointer to the GSL vector
     gsl_vector * gsl(){return m_vector;}
@@ -126,6 +95,8 @@ public:
       gsl_vector_scale(m_vector, d);
       return *this;
     }
+
+    void indexSort(std::vector<size_t>& indx);
 
 };
 

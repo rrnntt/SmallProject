@@ -72,5 +72,9 @@ IFunction_const_sptr JacobiPolynomial::createWeightFunction() const
   return IFunction_const_sptr( fun );
 }
 
+IFunction_const_sptr JacobiPolynomial::createWeightDerivative() const
+{
+}
+
 
 } // Numeric

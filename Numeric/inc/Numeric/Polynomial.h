@@ -43,6 +43,7 @@ public:
   virtual double weightIntegral() const {return 1.0;}
   /// Return cost shared pointer to the weight function
   virtual IFunction_const_sptr weightFunction() const;
+  virtual IFunction_const_sptr weightDerivative() const;
   const std::vector<double>& getA() const;
   const std::vector<double>& getB() const;
   const std::vector<double>& getC() const;
@@ -55,6 +56,7 @@ protected:
   virtual void updateABC() const = 0;
   /// Return cost shared pointer to the weight function (creates weight function)
   virtual IFunction_const_sptr createWeightFunction() const = 0;
+  virtual IFunction_const_sptr createWeightDerivative() const = 0;
   /// Find all roots of the polynomial
   virtual void calcRoots() const;
 
@@ -69,6 +71,7 @@ protected:
   mutable std::vector<double> m_b;
   mutable std::vector<double> m_c;
   mutable IFunction_const_sptr m_weightFunction;
+  mutable IFunction_const_sptr m_weightDerivative;
 };
 
 } // Numeric
