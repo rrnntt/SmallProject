@@ -24,6 +24,19 @@ public:
   virtual void functionDeriv1D(Jacobian* out, const double* xValues, const size_t nData);
 };
 
+/**
+ * The weight function for the Jacobi polynomials: (1 - x)^alpha * (1 + x)^beta
+ */
+class NUMERIC_EXPORT JacobiWeightDerivative: public IFunction1D, public ParamFunction
+{
+public:
+  JacobiWeightDerivative();
+  /// Returns the function's name
+  virtual std::string name()const {return "JacobiWeightDerivative";}
+  /// Function you want to fit.
+  virtual void function1D(double* out, const double* xValues, const size_t nData)const;
+};
+
 } // Numeric
 
 #endif // NUMERIC_JACOBIWEIGHT_H

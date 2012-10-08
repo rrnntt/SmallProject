@@ -74,6 +74,10 @@ IFunction_const_sptr JacobiPolynomial::createWeightFunction() const
 
 IFunction_const_sptr JacobiPolynomial::createWeightDerivative() const
 {
+  auto fun = new JacobiWeightDerivative;
+  fun->setParameter("Alpha",getParameter("Alpha"));
+  fun->setParameter("Beta",getParameter("Beta"));
+  return IFunction_const_sptr( fun );
 }
 
 

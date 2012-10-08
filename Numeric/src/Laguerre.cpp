@@ -144,4 +144,12 @@ IFunction_const_sptr Laguerre::createWeightFunction() const
   return IFunction_const_sptr( fun );
 }
 
+/// Return cost shared pointer to the weight function (creates weight function)
+IFunction_const_sptr Laguerre::createWeightDerivative() const
+{
+  auto fun = new LaguerreWeightDerivative;
+  fun->setParameter("Alpha",getParameter("Alpha"));
+  return IFunction_const_sptr( fun );
+}
+
 } // Numeric

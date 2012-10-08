@@ -58,4 +58,26 @@ void LaguerreWeight::functionDeriv1D(Jacobian* out, const double* xValues, const
   }
 }
 
+/**
+ * Constructor.
+ */
+LaguerreWeightDerivative::LaguerreWeightDerivative()
+{
+  declareParameter("Alpha",0.0,"The alpha parameter of the Laguerre polynomial.");
+}
+
+/**
+ * Function you want to fit.
+ */
+void LaguerreWeightDerivative::function1D(double* out, const double* xValues, const size_t nData)const
+{
+  if ( nData == 0 ) return;
+  const double alpha = getParameter("Alpha");
+  for(size_t i = 0; i < nData; ++i)
+  {
+    const double x = xValues[i];
+    out[i] = -pow(x, alpha-1) * (x - alpha) * exp(-x);
+  }
+}
+
 } // Numeric

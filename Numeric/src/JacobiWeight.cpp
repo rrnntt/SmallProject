@@ -62,4 +62,31 @@ void JacobiWeight::functionDeriv1D(Jacobian* out, const double* xValues, const s
   }
 }
 
+/**
+ * Constructor.
+ */
+JacobiWeightDerivative::JacobiWeightDerivative()
+{
+  declareParameter("Alpha",0.0,"The alpha parameter of the Jacobi polynomial.");
+  declareParameter("Beta",0.0,"The beta parameter of the Jacobi polynomial.");
+}
+
+/**
+ * Function you want to fit.
+ */
+void JacobiWeightDerivative::function1D(double* out, const double* xValues, const size_t nData)const
+{
+  if ( nData == 0 ) return;
+  const double alpha = getParameter("Alpha");
+  const double beta = getParameter("Beta");
+  for(size_t i = 0; i < nData; ++i)
+  {
+    const double x = xValues[i];
+    const double x1 = 1.0 - x;
+    const double x2 = 1.0 + x;
+    out[i] = pow(x1, alpha) * pow(x2, beta) * (beta/x2 - alpha/x1);
+  }
+}
+
+
 } // Numeric

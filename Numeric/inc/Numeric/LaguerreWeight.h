@@ -24,6 +24,19 @@ public:
   virtual void functionDeriv1D(Jacobian* out, const double* xValues, const size_t nData);
 };
 
+/**
+ * The weight function for the generalized Laguerre polynomials: x^alpha * exp(-x)
+ */
+class NUMERIC_EXPORT LaguerreWeightDerivative: public IFunction1D, public ParamFunction
+{
+public:
+  LaguerreWeightDerivative();
+  /// Returns the function's name
+  virtual std::string name()const {return "LaguerreWeightDerivative";}
+  /// Function you want to fit.
+  virtual void function1D(double* out, const double* xValues, const size_t nData)const;
+};
+
 } // Numeric
 
 #endif // NUMERIC_LAGUERREWEIGHT_H

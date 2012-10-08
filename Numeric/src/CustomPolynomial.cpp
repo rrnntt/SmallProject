@@ -1,4 +1,5 @@
 #include "Numeric/CustomPolynomial.h"
+#include "Numeric/ChebFunction.h"
 
 namespace Numeric
 {
@@ -164,6 +165,17 @@ IFunction_const_sptr CustomPolynomial::createWeightFunction() const
     throw std::runtime_error("Weight function hasn't been set for CustomPolynomial.");
   }
   return m_weightFunction;
+}
+
+IFunction_const_sptr CustomPolynomial::createWeightDerivative() const
+{
+  if ( !m_weightFunction ) 
+  {
+    throw std::runtime_error("Weight function hasn't been set for CustomPolynomial.");
+  }
+  auto deriv = ChebFunction::create();
+  deriv->fromDerivative( ChebFunction(m_fun) );
+  return deriv;
 }
 
 } // Numeric
