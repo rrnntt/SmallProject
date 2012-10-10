@@ -5,6 +5,8 @@
 #include "Numeric/IFunction1D.h"
 #include "Numeric/ParamFunction.h"
 
+#include <set>
+
 namespace Numeric
 {
 
@@ -49,6 +51,9 @@ public:
   const std::vector<double>& getC() const;
   const std::vector<double>& getRoots() const;
   const std::vector<double>& getWeights() const;
+
+  void partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
+  void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;

@@ -47,7 +47,7 @@ void MakeQuadrature::makeChebyshev()
 {
   const double startX = get("StartX");
   const double endX = get("EndX");
-  const int n = getN("N");
+  const int n = get("N");
   JacobiPolynomial jac( 0.5, 0.5, n );
 }
 

@@ -206,4 +206,107 @@ const std::vector<double>& Polynomial::getWeights() const
   return m_weights;
 }
 
+/**
+ * Calculate partial barycentric weights for a sub-set of roots.
+ * @param ri :: Sub-set of root indices to be used in the barycentric interpolation.
+ * @param w  :: Output vector of partial barycentric weights.
+ */
+void Polynomial::calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+  const size_t nr = m_roots.size();
+  if ( ri.size() > nr )
+  {
+    throw std::runtime_error("Too many roots for partial barycentric interpolation.");
+  }
+  if ( *std::max_element(ri.begin(), ri.end()) >= nr )
+  {
+    throw std::runtime_error("Partial barycentric interpolation contains non-existent root.");
+  }
+  for(auto i = ri.begin(); i != ri.end(); ++i)
+  {
+    double d = 1.0;
+    for(auto j = ri.begin(); j != ri.end(); ++j)
+    {
+      if ( i == j ) continue;
+      d /= m_roots[*i] - m_roots[*j];
+    }
+    w.push_back( d );
+  }
+}
+
+/**
+ * Create a partial quadrature
+ * @param ri :: A subset of root indices for which a partial quadrature will be generated.
+ * @param w  :: Output vector of partial roots.
+ * @param w  :: Output vector of partial weights.
+ */
+void Polynomial::partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+  const size_t nr = m_roots.size();
+  if ( ri.size() > nr )
+  {
+    throw std::runtime_error("Too many roots for a partial quadrature.");
+  }
+  if ( *std::max_element(ri.begin(), ri.end()) >= nr )
+  {
+    throw std::runtime_error("Partial quadrature contains non-existent roots.");
+  }
+  // excluded indices
+  std::set<size_t> rj;
+  for(size_t i = 0; i < nr; ++i) {rj.insert(i);}
+  for(auto i = ri.begin(); i != ri.end(); ++i)
+  {
+    r.push_back( m_roots[*i] );
+    w.push_back( m_weights[*i] );
+    rj.erase( *i );
+  }
+  // partial barycentric weights
+  std::vector<double> barw;
+  calcBarycentricWeights( rj, barw );
+
+  const size_t K = ri.size(); // included roots number
+  const size_t N = rj.size(); // excluded roots number
+  assert( K + N == nr );
+
+  GSLMatrix S( N, K);
+  size_t jj = 0; // incremental excluded index 
+  for(auto j = rj.begin(); j != rj.end(); ++j,++jj)
+  {
+    double s = 0.0;
+    size_t ii = 0;
+    for(auto i = ri.begin(); i != ri.end(); ++i,++ii)
+    {
+      const double bw = barw[ii];
+      s += bw / (m_roots[*j]-m_roots[*i]);
+    }
+    ii = 0;
+    for(auto i = ri.begin(); i != ri.end(); ++i,++ii)
+    {
+      const double bw = barw[ii];
+      S.set( jj, ii, bw / (m_roots[*j]-m_roots[*i]) / s );
+    }
+  }
+
+  size_t ii = 0;
+  for(auto i = ri.begin(); i != ri.end(); ++i,++ii)
+  {
+    size_t jj = 0;
+    double s = 0.0;
+    for(auto j = rj.begin(); j != rj.end(); ++j,++jj)
+    {
+      s += m_weights[ *j ] * S.get( jj, ii );
+    }
+    w[ii] += s;
+  }
+}
+
+
 } // Numeric
