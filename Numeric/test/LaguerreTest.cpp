@@ -126,10 +126,10 @@ TEST(Numeric_Laguerre_Test, PartialTest)
 
   auto& r = L.getRoots();
   auto& w = L.getWeights();
-  for(size_t i = 0; i < w.size(); ++i)
-  {
-    std::cerr << i << ' ' << r[i] << ' ' << w[i] << std::endl;
-  }
+  //for(size_t i = 0; i < w.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << r[i] << ' ' << w[i] << std::endl;
+  //}
 
   std::set<size_t> ri;
   ri.insert(0);
@@ -140,15 +140,15 @@ TEST(Numeric_Laguerre_Test, PartialTest)
 
   //system("pause");
   L.partialQuadrature( ri, rp, wp );
-  EXPECT_EQ( rp.size(), 2 );
-  EXPECT_EQ( wp.size(), 2 );
+  EXPECT_EQ( rp.size(), 3 );
+  EXPECT_EQ( wp.size(), 3 );
   double d0 = 0;
   double d1 = 0;
   double d2 = 0;
   double d3 = 0;
   for(size_t i = 0; i < wp.size(); ++i)
   {
-    std::cerr << i << ' ' << rp[i] << ' ' << wp[i] << std::endl;
+    //std::cerr << i << ' ' << rp[i] << ' ' << wp[i] << std::endl;
     double x = rp[i];
     d0 += wp[i];
     d1 += x * wp[i];
@@ -157,7 +157,11 @@ TEST(Numeric_Laguerre_Test, PartialTest)
     x *= rp[i];
     d3 += x * wp[i];
   }
-  std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+  //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+  EXPECT_NEAR( d0, 1.0, 1e-14); // integr( weight )
+  EXPECT_NEAR( d1, 1.0, 1e-14); // integr( x*weight )
+  EXPECT_NEAR( d2, 2.0, 1e-14); // integr( x^2*weight )
+  EXPECT_LT( d3, 6.0); // integr( x^3*weight )
 }
 
 
@@ -172,35 +176,46 @@ TEST(Numeric_Laguerre_Test, BarycentricTest)
   ri.insert(0);
   ri.insert(1);
   ri.insert(2);
-  //std::vector<double> rp; // partial roots
   std::vector<double> baryw; // barycentric weights
   
   L.calcBarycentricWeights(ri, baryw );
-  std::vector<double> fx(3),fx2(3);
+  std::vector<double> fx(3),fx2(3),fx3(3);
   fx[0] = r[0];
   fx[1] = r[1];
   fx[2] = r[2];
+
   fx2[0] = r[0]*r[0];
   fx2[1] = r[1]*r[1];
   fx2[2] = r[2]*r[2];
+
+  fx3[0] = 2*r[0]*r[0] + r[0] + 1.0;
+  fx3[1] = 2*r[1]*r[1] + r[1] + 1.0;
+  fx3[2] = 2*r[2]*r[2] + r[2] + 1.0;
 
   for(size_t i = 3; i < r.size(); ++i)
   {
     double x = 0;
     double x2 = 0;
+    double x3 = 0;
     double s = 0;
     for(size_t j = 0; j < baryw.size(); ++j)
     {
       const double t = baryw[j] / (r[i] - r[j]);
       x += fx[j] * t;
       x2 += fx2[j] * t;
+      x3 += fx3[j] * t;
       s += t;
     }
     x /= s;
     x2 /= s;
-    std::cerr << i << ':' << std::endl;
-    std::cerr << "     " << x << ' ' << r[i] << std::endl;
-    std::cerr << "     " << x2 << ' ' << r[i]*r[i] << std::endl;
+    x3 /= s;
+    //std::cerr << i << ':' << std::endl;
+    //std::cerr << "     " << x << ' ' << r[i] << std::endl;
+    //std::cerr << "     " << x2 << ' ' << r[i]*r[i] << std::endl;
+    //std::cerr << "     " << x3 << ' ' << 2*r[i]*r[i] + r[i] + 1.0 << std::endl;
+    EXPECT_NEAR( x, r[i], 1e-9 );
+    EXPECT_NEAR( x2, r[i]*r[i], 1e-9 );
+    EXPECT_NEAR( x3, 2*r[i]*r[i] + r[i] + 1.0, 1e-9 );
   }
 }
 
