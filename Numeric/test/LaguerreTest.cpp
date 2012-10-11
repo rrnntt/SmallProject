@@ -78,10 +78,10 @@ TEST(Numeric_Laguerre_Test, WeightsAlpha0Test)
     d3 += x * w[i];
   }
   
-  EXPECT_NEAR( d0, 1.0, 1e-14);
-  EXPECT_NEAR( d1, 1.0, 1e-14);
-  EXPECT_NEAR( d2, 2.0, 1e-14);
-  EXPECT_NEAR( d3, 6.0, 1e-13);
+  EXPECT_NEAR( d0, 1.0, 1e-14); // integr( weight )
+  EXPECT_NEAR( d1, 1.0, 1e-14); // integr( x*weight )
+  EXPECT_NEAR( d2, 2.0, 1e-14); // integr( x^2*weight )
+  EXPECT_NEAR( d3, 6.0, 1e-13); // integr( x^3*weight )
 
   //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
 }
@@ -118,5 +118,89 @@ TEST(Numeric_Laguerre_Test, WeightsAlphaNonZeroTest)
   EXPECT_NEAR( d3, 720.0, 1e-12); // (alpha + 3)!
 
   //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+}
+
+TEST(Numeric_Laguerre_Test, PartialTest)
+{
+  Laguerre L(0,10);
+
+  auto& r = L.getRoots();
+  auto& w = L.getWeights();
+  for(size_t i = 0; i < w.size(); ++i)
+  {
+    std::cerr << i << ' ' << r[i] << ' ' << w[i] << std::endl;
+  }
+
+  std::set<size_t> ri;
+  ri.insert(0);
+  ri.insert(1);
+  ri.insert(2);
+  std::vector<double> rp; // partial roots
+  std::vector<double> wp; // partial weights
+
+  //system("pause");
+  L.partialQuadrature( ri, rp, wp );
+  EXPECT_EQ( rp.size(), 2 );
+  EXPECT_EQ( wp.size(), 2 );
+  double d0 = 0;
+  double d1 = 0;
+  double d2 = 0;
+  double d3 = 0;
+  for(size_t i = 0; i < wp.size(); ++i)
+  {
+    std::cerr << i << ' ' << rp[i] << ' ' << wp[i] << std::endl;
+    double x = rp[i];
+    d0 += wp[i];
+    d1 += x * wp[i];
+    x *= rp[i];
+    d2 += x * wp[i];
+    x *= rp[i];
+    d3 += x * wp[i];
+  }
+  std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+}
+
+
+TEST(Numeric_Laguerre_Test, BarycentricTest)
+{
+  Laguerre L(0,10);
+
+  auto& r = L.getRoots();
+  auto& w = L.getWeights();
+
+  std::set<size_t> ri;
+  ri.insert(0);
+  ri.insert(1);
+  ri.insert(2);
+  //std::vector<double> rp; // partial roots
+  std::vector<double> baryw; // barycentric weights
+  
+  L.calcBarycentricWeights(ri, baryw );
+  std::vector<double> fx(3),fx2(3);
+  fx[0] = r[0];
+  fx[1] = r[1];
+  fx[2] = r[2];
+  fx2[0] = r[0]*r[0];
+  fx2[1] = r[1]*r[1];
+  fx2[2] = r[2]*r[2];
+
+  for(size_t i = 3; i < r.size(); ++i)
+  {
+    double x = 0;
+    double x2 = 0;
+    double s = 0;
+    for(size_t j = 0; j < baryw.size(); ++j)
+    {
+      const double t = baryw[j] / (r[i] - r[j]);
+      x += fx[j] * t;
+      x2 += fx2[j] * t;
+      s += t;
+    }
+    x /= s;
+    x2 /= s;
+    std::cerr << i << ':' << std::endl;
+    std::cerr << "     " << x << ' ' << r[i] << std::endl;
+    std::cerr << "     " << x2 << ' ' << r[i]*r[i] << std::endl;
+  }
 }
 

@@ -54,6 +54,7 @@ public:
 
   void partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
+  //void calcBarycentricMatrix(
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;

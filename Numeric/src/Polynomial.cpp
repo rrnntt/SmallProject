@@ -270,7 +270,7 @@ void Polynomial::partialQuadrature(const std::set<size_t>& ri, std::vector<doubl
   }
   // partial barycentric weights
   std::vector<double> barw;
-  calcBarycentricWeights( rj, barw );
+  calcBarycentricWeights( ri, barw );
 
   const size_t K = ri.size(); // included roots number
   const size_t N = rj.size(); // excluded roots number
