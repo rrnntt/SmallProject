@@ -14,6 +14,8 @@ class NUMERIC_EXPORT LagrangeInterpolation: public IFunction1D, public ParamFunc
 public:
   LagrangeInterpolation(const std::vector<double>& r);
   ~LagrangeInterpolation();
+  /// Name of the function
+  virtual std::string name()const {return "LagrangeInterpolation";}
   /// Function you want to fit to.
   void function1D(double* out, const double* xValues, const size_t nData)const;
   /// size: number of interpolation points
