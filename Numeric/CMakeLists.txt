@@ -30,6 +30,7 @@ set( INC_FILES
    inc/Numeric/GSLJacobian.h
    inc/Numeric/GSLMatrix.h
    inc/Numeric/GSLVector.h
+   inc/Numeric/Hermite.h
    inc/Numeric/IConstraint.h
    inc/Numeric/ICostFunction.h
    inc/Numeric/IFuncMinimizer.h
@@ -59,7 +60,6 @@ set( INC_FILES
    inc/Numeric/ScaledChebfun.h
    inc/Numeric/SchrodScale.h
    inc/Numeric/Schrodinger0.h
-   inc/Numeric/Schrodinger.h
    inc/Numeric/SolveODE.h
    inc/Numeric/StdJacobian.h
    inc/Numeric/UserFunction1D.h
@@ -79,6 +79,8 @@ set( INC_FILES
    inc/Numeric/Fit.h
    inc/Numeric/MakeQuadratureScheme.h
    inc/Numeric/MakeQuadrature.h
+   inc/Numeric/Schrodinger.h
+   inc/Numeric/Schrodinger1.h
    inc/Numeric/UniformChebfun.h
 
    )
@@ -105,6 +107,7 @@ set( SRC_FILES
   src/FunctionFactory.cpp
   src/FunctionValues.cpp
   src/GSLVector.cpp
+  src/Hermite.cpp
   src/IFuncMinimizer.cpp
   src/IFunction.cpp
   src/IFunction1D.cpp
@@ -128,7 +131,6 @@ set( SRC_FILES
 #  src/SeriesFunction.cpp
   src/SchrodScale.cpp
   src/Schrodinger0.cpp
-  src/Schrodinger.cpp
   src/SolveODE.cpp
   src/UserFunction1D.cpp
   src/Vector.cpp
@@ -149,6 +151,8 @@ set( SRC_FILES
    src/Fit.cpp
    src/MakeQuadratureScheme.cpp
    src/MakeQuadrature.cpp
+   src/Schrodinger.cpp
+   src/Schrodinger1.cpp
    src/UniformChebfun.cpp
   )
 add_library( Numeric SHARED ${SRC_FILES} ${INC_FILES} )
@@ -219,6 +223,7 @@ set( SRC_FILES
   test/FitTest.cpp
   test/MakeQuadratureSchemeTest.cpp
   test/MakeQuadratureTest.cpp
+  test/Schrodinger1Test.cpp
 )
 
 add_executable(NumericTest ${SRC_FILES} ${INC_FILES})

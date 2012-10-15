@@ -231,7 +231,7 @@ public:
   /// Constructor
   ChebTimes(double factor);
   /// Constructor
-  ChebTimes(IFunction1D_sptr fun);
+  ChebTimes(IFunction_sptr fun);
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
@@ -245,7 +245,7 @@ protected:
   /// the constant
   double m_constant;
   /// the function
-  IFunction1D_sptr m_fun;
+  IFunction_sptr m_fun;
 };
 
 } // NUMERIC

@@ -575,7 +575,7 @@ m_constant(factor)
 }
 
 /// Constructor
-ChebTimes::ChebTimes(IFunction1D_sptr fun):
+ChebTimes::ChebTimes(IFunction_sptr fun):
 m_constant(0),
 m_fun(fun)
 {

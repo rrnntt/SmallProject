@@ -26,7 +26,8 @@ MakeQuadrature::MakeQuadrature()
 
 void MakeQuadrature::applyProperty(const std::string& name)
 {
-  if ( name == "Chebyshev" )
+  std::string quad = get(name);
+  if ( quad == "Chebyshev" )
   {
     declareDouble("StartX",-1.0);
     declareDouble("EndX",1.0);

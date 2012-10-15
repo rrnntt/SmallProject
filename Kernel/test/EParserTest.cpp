@@ -296,6 +296,14 @@ TEST(EParserTest, EParserFunctions)
   EXPECT_EQ(parser.str(),"sin(x)");
 }
 
+TEST(EParserTest, EParserPower) 
+{
+  std::string str = " x ^ 2";
+  EParser parser;
+  parser.parse(str);
+  EXPECT_EQ(parser.str(),"x^2");
+}
+
 TEST(EParserTest, EParserStr) 
 {
   EParser parser;
