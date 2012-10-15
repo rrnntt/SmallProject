@@ -43,6 +43,7 @@ set( INC_FILES
    inc/Numeric/JacobiWeight.h
    inc/Numeric/JointDomain.h
    inc/Numeric/JointDomainFunction.h
+   inc/Numeric/LagrangeInterpolation.h
    inc/Numeric/Laguerre.h
    inc/Numeric/LaguerreWeight.h
    inc/Numeric/LeastSquares.h
@@ -116,6 +117,7 @@ set( SRC_FILES
   src/JacobiWeight.cpp
   src/JointDomain.cpp
   src/JointDomainFunction.cpp
+  src/LagrangeInterpolation.cpp
   src/Laguerre.cpp
   src/LaguerreWeight.cpp
   src/LeastSquares.cpp
@@ -198,6 +200,7 @@ set( SRC_FILES
   test/JointDomainFunctionTest.cpp
   test/GSLMatrixTest.cpp
   test/IFuncMinimizerTest.cpp
+  test/LagrangeInterpolationTest.cpp
   test/LaguerreTest.cpp
   test/LaguerreWeightTest.cpp
   test/LeastSquaresTest.cpp
