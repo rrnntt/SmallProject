@@ -25,6 +25,7 @@ LagrangeInterpolation::~LagrangeInterpolation()
 void LagrangeInterpolation::init()
 {
   const size_t n = size();
+  m_p.resize( n );
   m_D.resize( n, n );
   for(size_t i = 0; i < n; ++i)
   {
@@ -54,19 +55,20 @@ void LagrangeInterpolation::setValue(size_t i, double v)
 /// Function you want to fit to.
 void LagrangeInterpolation::function1D(double* out, const double* xValues, const size_t nData)const
 {
+  
   if ( nData == 0 ) return;
   const size_t n = size();
   // distances between current x and a root
-  std::vector<double> xr( n );
+  //std::vector<double> xr( n );
   // basis functions' values
-  std::vector<double> f( n );
+  //std::vector<double> f( n );
   for(size_t i = 0; i < nData; ++i)
   {
     double x = xValues[i];
     double res = 0.0;
     for(size_t j = 0; j < n; ++j)
     {
-      xr[j] = x - m_r[j];
+      //xr[j] = x - m_r[j];
       double t = 1.0;
       for(size_t k = 0; k < n; ++k)
       {
