@@ -148,7 +148,7 @@ TEST(Numeric_Laguerre_Test, PartialTest)
   double d3 = 0;
   for(size_t i = 0; i < wp.size(); ++i)
   {
-    //std::cerr << i << ' ' << rp[i] << ' ' << wp[i] << std::endl;
+    std::cerr << i << ' ' << rp[i] << ' ' << wp[i] << std::endl;
     double x = rp[i];
     d0 += wp[i];
     d1 += x * wp[i];
@@ -157,7 +157,7 @@ TEST(Numeric_Laguerre_Test, PartialTest)
     x *= rp[i];
     d3 += x * wp[i];
   }
-  //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
+  std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
   EXPECT_NEAR( d0, 1.0, 1e-14); // integr( weight )
   EXPECT_NEAR( d1, 1.0, 1e-14); // integr( x*weight )
   EXPECT_NEAR( d2, 2.0, 1e-14); // integr( x^2*weight )
@@ -219,3 +219,74 @@ TEST(Numeric_Laguerre_Test, BarycentricTest)
   }
 }
 
+TEST(Numeric_Laguerre_Test, SubPolynomialTest)
+{
+  Laguerre L10(0,10);
+  Laguerre L3(0,3);
+  auto sL = L10.subPolynomial( 3 );
+
+  auto& r3 = L3.getRoots();
+  auto& w3 = L3.getWeights();
+
+  auto& sr = sL->getRoots();
+  auto& sw = sL->getWeights();
+
+  EXPECT_EQ( L3.n(), sL->n() );
+
+  for(size_t i = 0; i < r3.size(); ++i)
+  {
+    //std::cerr << "i:" << std::endl;
+    //std::cerr << r3[i] << ' ' << sr[i] << std::endl;
+    //std::cerr << w3[i] << ' ' << sw[i] << std::endl;
+    EXPECT_NEAR( r3[i], sr[i], 1e-15 );
+    EXPECT_NEAR( w3[i], sw[i], 1e-15 );
+  }
+}
+
+TEST(Numeric_Laguerre_Test, Partial2Test)
+{
+  Laguerre L(0,10);
+  auto& r = L.getRoots();
+  auto& w = L.getWeights();
+  //for(size_t i = 0; i < w.size(); ++i)
+  //{
+  //  std::cerr << i << ' ' << r[i] << ' ' << w[i] << std::endl;
+  //}
+  Laguerre L3(0,3);
+  auto& r3 = L3.getRoots();
+  auto& w3 = L3.getWeights();
+
+  std::set<size_t> ri;
+  ri.insert(0);
+  ri.insert(1);
+  ri.insert(2);
+  std::vector<double> rp; // partial roots
+  std::vector<double> wp; // partial weights
+
+  //system("pause");
+  L.partialQuadrature2( ri, rp, wp );
+  EXPECT_EQ( rp.size(), 3 );
+  EXPECT_EQ( wp.size(), 3 );
+  double d0 = 0;
+  double d1 = 0;
+  double d2 = 0;
+  double d3 = 0;
+  double d3_L3 = 0;
+  for(size_t i = 0; i < wp.size(); ++i)
+  {
+    std::cerr << i << ' ' << rp[i] << ' ' << wp[i] << std::endl;
+    double x = rp[i];
+    d0 += wp[i];
+    d1 += x * wp[i];
+    x *= rp[i];
+    d2 += x * wp[i];
+    x *= rp[i];
+    d3 += x * wp[i];
+    d3_L3 += r3[i] * r3[i] * r3[i] * w3[i];
+  }
+  std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << ' ' << d3_L3 << std::endl;
+  EXPECT_NEAR( d0, 1.0, 1e-14); // integr( weight )
+  EXPECT_NEAR( d1, 1.0, 1e-14); // integr( x*weight )
+  EXPECT_NEAR( d2, 2.0, 1e-14); // integr( x^2*weight )
+  EXPECT_LT( d3, 6.0); // integr( x^3*weight )
+}

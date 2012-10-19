@@ -15,6 +15,36 @@ Polynomial::Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n)
 {
 }
 
+/**----------------------------------------------------------------
+ * Constructor.
+ * @param a :: A vector with a-coefficients.
+ * @param b :: A vector with b-coefficients.
+ * @param c :: A vector with c-coefficients.
+ * @param weightFun :: Shared pointer to the weight function.
+ * @param weightDeriv :: Shared pointer to the weight function derivative.
+ */
+Polynomial::Polynomial(
+  const std::vector<double>& a, 
+  const std::vector<double>& b, 
+  const std::vector<double>& c,
+  IFunction_const_sptr weightFun,
+  IFunction_const_sptr weightDeriv,
+  const std::string& aName
+  ):
+IFunction1D(),
+ParamFunction(),
+m_n( int(a.size()) ),
+m_a(a),
+m_b(b),
+m_c(c),
+m_weightFunction(weightFun),
+m_weightDerivative(weightDeriv),
+m_polynomialName(aName)
+{
+  // check input consistency
+  updateABC();
+}
+
 /// Return a value of attribute attName
 Polynomial::Attribute Polynomial::getAttribute(const std::string& attName)const
 {
@@ -110,7 +140,7 @@ void Polynomial::functionDeriv(const FunctionDomain& domain, Jacobian& jacobian)
   calNumericalDeriv(domain,jacobian);
 }
 
-/**
+/**--------------------------------------------------------------
  * Find all roots of the polynomial
  */
 void Polynomial::calcRoots() const
@@ -170,24 +200,82 @@ IFunction_const_sptr Polynomial::weightDerivative() const
   return m_weightDerivative;
 }
 
+/**------------------------------------------------------------
+ * Create a polynomial of a smaller order with the same weight 
+ * function as this one.
+ * @param m :: Order of the polynomial to create.
+ */
+boost::shared_ptr<Polynomial> Polynomial::subPolynomial(int m) const
+{
+  if ( m > m_n ) throw std::invalid_argument("Cannot create a Polynomial of a larger order");
+  if ( m_a.empty() ) updateABC();
+  std::vector<double> a,b,c;
+  a.assign( m_a.begin(), m_a.begin() + m );
+  b.assign( m_b.begin(), m_b.begin() + m );
+  c.assign( m_c.begin(), m_c.begin() + m );
+  auto sp = new Polynomial( a, b, c, weightFunction(), weightDerivative(), name() );
+  return Polynomial_sptr( sp );
+}
+
+/**------------------------------------------------------------
+ * Recalculate (re-fill) m_a, m_b, m_c.
+ * The default implementation checks that a,b and c vectors are not empty and if empty
+ * throws.
+ */
+void Polynomial::updateABC() const
+{
+  if ( m_n == 0 ) throw std::runtime_error("Polynomial wasn't initialized.");
+  size_t mn = static_cast<size_t>( m_n );
+  if ( m_a.size() != mn || m_b.size() != mn || m_c.size() != mn )
+  {
+    throw std::runtime_error("Polynomial wasn't initialized.");
+  }
+}
+
+/**------------------------------------------------------------
+ * Returns a shared pointer to the weight function. The default implementation
+ * throws.
+ */
+IFunction_const_sptr Polynomial::createWeightFunction() const
+{
+  throw std::runtime_error("Polynomial wasn't initialized.");
+}
+
+/**------------------------------------------------------------
+ * Returns a shared pointer to the weight function derivative. The default implementation
+ * throws.
+ */
+IFunction_const_sptr Polynomial::createWeightDerivative() const
+{
+  throw std::runtime_error("Polynomial wasn't initialized.");
+}
+
+/**------------------------------------------------------------
+ */
 const std::vector<double>& Polynomial::getA() const
 {
   if ( m_a.empty() ) updateABC();
   return m_a;
 }
 
+/**------------------------------------------------------------
+ */
 const std::vector<double>& Polynomial::getB() const
 {
   if ( m_b.empty() ) updateABC();
   return m_b;
 }
 
+/**------------------------------------------------------------
+ */
 const std::vector<double>& Polynomial::getC() const
 {
   if ( m_c.empty() ) updateABC();
   return m_c;
 }
 
+/**------------------------------------------------------------
+ */
 const std::vector<double>& Polynomial::getRoots() const
 {
   if ( m_roots.empty() )
@@ -197,6 +285,8 @@ const std::vector<double>& Polynomial::getRoots() const
   return m_roots;
 }
 
+/**------------------------------------------------------------
+ */
 const std::vector<double>& Polynomial::getWeights() const
 {
   if ( m_roots.empty() )
@@ -206,7 +296,7 @@ const std::vector<double>& Polynomial::getWeights() const
   return m_weights;
 }
 
-/**
+/**------------------------------------------------------------
  * Calculate partial barycentric weights for a sub-set of roots.
  * @param ri :: Sub-set of root indices to be used in the barycentric interpolation.
  * @param w  :: Output vector of partial barycentric weights.
@@ -238,7 +328,7 @@ void Polynomial::calcBarycentricWeights(const std::set<size_t>& ri, std::vector<
   }
 }
 
-/**
+/**------------------------------------------------------------
  * Create a partial quadrature
  * @param ri :: A subset of root indices for which a partial quadrature will be generated.
  * @param w  :: Output vector of partial roots.
@@ -308,5 +398,68 @@ void Polynomial::partialQuadrature(const std::set<size_t>& ri, std::vector<doubl
   }
 }
 
+/**------------------------------------------------------------
+ * Create a partial quadrature-2
+ * @param ri :: A subset of root indices for which a partial quadrature will be generated.
+ * @param r  :: Output vector of partial roots.
+ * @param w  :: Output vector of partial weights.
+ */
+void Polynomial::partialQuadrature2(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+  const size_t nr = m_roots.size();
+  if ( ri.size() > nr )
+  {
+    throw std::runtime_error("Too many roots for a partial quadrature.");
+  }
+  if ( *std::max_element(ri.begin(), ri.end()) >= nr )
+  {
+    throw std::runtime_error("Partial quadrature contains non-existent roots.");
+  }
+  // partial barycentric weights
+  std::vector<double> barw;
+  calcBarycentricWeights( ri, barw );
+  // size of the partial quadrature
+  const size_t mr = ri.size();
+  // roots of the created partial quadrature
+  for(auto i = ri.begin(); i != ri.end(); ++i)
+  {
+    r.push_back( m_roots[*i] );
+  }
+  // find roots and weights of full mr-point quadrature
+  auto subPoly = subPolynomial( int(mr) );
+  auto sr = subPoly->getRoots();
+  auto sw = subPoly->getWeights();
+
+  GSLMatrix S( mr, mr);
+  for(auto j = 0; j < mr; ++j)
+  {
+    double t = 0.0;
+    for(auto k = 0; k < mr; ++k)
+    {
+      const double bw = barw[k];
+      t += bw / (sr[j] - r[k]);
+    }
+    for(auto k = 0; k < mr; ++k)
+    {
+      const double bw = barw[k];
+      S.set( j, k, bw / (sr[j] - r[k]) / t );
+    }
+  }
+
+  w.resize( mr );
+  for(auto k = 0; k < mr; ++k)
+  {
+    double s = 0.0;
+    for(auto j = 0; j < mr; ++j)
+    {
+      s += sw[ j ] * S.get( j, k );
+    }
+    w[k] = s;
+  }
+}
 
 } // Numeric

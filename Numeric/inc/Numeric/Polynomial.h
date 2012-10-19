@@ -24,7 +24,18 @@ public:
   Polynomial();
   /// Constructor.
   Polynomial(int n);
+  /// Constructor.
+  Polynomial(const std::vector<double>& a, 
+    const std::vector<double>& b, 
+    const std::vector<double>& c,
+    IFunction_const_sptr weightFun,
+    IFunction_const_sptr weightDeriv,
+    const std::string& aName = "Polynomial"
+    );
+
   /* Base class virtual methods */
+  /// Returns the function's name
+  virtual std::string name()const {return m_polynomialName;}
   /// Returns the number of attributes associated with the function
   virtual size_t nAttributes()const{return 1;}
   /// Returns a list of attribute names
@@ -46,6 +57,10 @@ public:
   /// Return cost shared pointer to the weight function
   virtual IFunction_const_sptr weightFunction() const;
   virtual IFunction_const_sptr weightDerivative() const;
+  /// Create a polynomial of a smaller order
+  virtual boost::shared_ptr<Polynomial> subPolynomial(int n) const;
+  /// Get the order of the polynomial
+  const int n() const {return m_n;}
   const std::vector<double>& getA() const;
   const std::vector<double>& getB() const;
   const std::vector<double>& getC() const;
@@ -53,16 +68,17 @@ public:
   const std::vector<double>& getWeights() const;
 
   void partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
+  void partialQuadrature2(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
   //void calcBarycentricMatrix(
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;
   /// Recalculate (re-fill) m_a, m_b, m_c
-  virtual void updateABC() const = 0;
+  virtual void updateABC() const;
   /// Return cost shared pointer to the weight function (creates weight function)
-  virtual IFunction_const_sptr createWeightFunction() const = 0;
-  virtual IFunction_const_sptr createWeightDerivative() const = 0;
+  virtual IFunction_const_sptr createWeightFunction() const;
+  virtual IFunction_const_sptr createWeightDerivative() const;
   /// Find all roots of the polynomial
   virtual void calcRoots() const;
 
@@ -78,7 +94,11 @@ protected:
   mutable std::vector<double> m_c;
   mutable IFunction_const_sptr m_weightFunction;
   mutable IFunction_const_sptr m_weightDerivative;
+  std::string m_polynomialName;
 };
+
+typedef boost::shared_ptr<Polynomial> Polynomial_sptr;
+typedef boost::shared_ptr<const Polynomial> Polynomial_const_sptr;
 
 } // Numeric
 
