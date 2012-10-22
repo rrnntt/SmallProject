@@ -16,6 +16,7 @@ protected:
   virtual void exec();
   virtual void applyProperty(const std::string& name);
   void makeChebyshev();
+  void makeHermite();
 };
 
 } // NUMERIC

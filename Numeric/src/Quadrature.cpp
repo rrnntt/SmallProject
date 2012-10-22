@@ -1,19 +1,21 @@
 #include "Numeric/Quadrature.h"
 #include "Numeric/GSLMatrix.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include <boost/lexical_cast.hpp>
 
 namespace Numeric
 {
 
-/**
+/**--------------------------------------------------------------------------------
  * Constructor.
  */
 Quadrature::Quadrature()
 {
 }
 
-/**
+/**--------------------------------------------------------------------------------
  * Destructor.
  */
 Quadrature::~Quadrature()
@@ -63,7 +65,7 @@ double Quadrature::calcKinet(size_t i, size_t j, const double& beta) const
   * Calculate a matrix element of the potential energy.
   * @param i :: The row index
   * @param j :: The column index
-  * @param vpot :: A vector of the values of the potential energy
+  * @param vpot :: A vector of values of the potential energy
   * @return The value of the matrix element
   */
 double Quadrature::calcPot(size_t i, size_t j, const std::vector<double>& vpot) const
@@ -79,7 +81,12 @@ double Quadrature::calcPot(size_t i, size_t j, const std::vector<double>& vpot) 
   return res;
 }
 
-/// Build a hamiltonian matrix
+/**----------------------------------------------------------------------------
+ * Build a hamiltonian matrix.
+ * @param beta :: The coefficient at the kinetic energy operator in the Schrodinger equation.
+ * @param vpot :: A vector of values of the potential energy.
+ * @param H :: The output hamiltonian matrix.
+ */
 void Quadrature::buildHamiltonian(const double& beta, const std::vector<double>& vpot, GSLMatrix& H) const
 {
   const size_t n = size();
@@ -96,5 +103,20 @@ void Quadrature::buildHamiltonian(const double& beta, const std::vector<double>&
   }
 }
 
+/**----------------------------------------------------------------------------
+ * Build a hamiltonian matrix.
+ * @param beta :: The coefficient at the kinetic energy operator in the Schrodinger equation.
+ * @param vpot :: A potential energy function.
+ * @param H :: The output hamiltonian matrix.
+ */
+void Quadrature::buildHamiltonian(const double& beta, const IFunction& vpot, GSLMatrix& H) const
+{
+  FunctionDomain1DView domain( *m_r );
+  FunctionValues vpot_values( domain );
+  vpot.function( domain, vpot_values );
+  std::vector<double> vpot_vec;
+  vpot_vec.assign( vpot_values.getPointerToCalculated(0), vpot_values.getPointerToCalculated(size()) );
+  buildHamiltonian( beta, vpot_vec, H );
+}
 
 } // Numeric

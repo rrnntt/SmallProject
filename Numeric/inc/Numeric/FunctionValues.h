@@ -51,6 +51,8 @@ public:
   double getCalculated(size_t i) const {return m_calculated[i];}
   double operator[](size_t i) const {return m_calculated[i];}
   void addToCalculated(size_t i, double value) {m_calculated[i] += value;}
+  /// Copy calculated values to an std::vector
+  void copyToStdVector(std::vector<double>& vec)const;
 
   /// Add other calculated values
   FunctionValues& operator=(const FunctionValues& values)

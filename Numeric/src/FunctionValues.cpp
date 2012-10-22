@@ -219,4 +219,13 @@ namespace Numeric
     m_data.assign(values.m_calculated.begin(),values.m_calculated.end());
   }
 
+  /**
+   * Copy calculated values to an std::vector.
+   * @param vec :: A vector to copy the data to.
+   */
+  void FunctionValues::copyToStdVector(std::vector<double>& vec)const
+  {
+    vec.assign( m_calculated.begin(), m_calculated.end() );
+  }
+
 } // namespace Numeric

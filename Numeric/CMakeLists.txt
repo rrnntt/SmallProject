@@ -82,6 +82,7 @@ set( INC_FILES
    inc/Numeric/MakeQuadrature.h
    inc/Numeric/Schrodinger.h
    inc/Numeric/Schrodinger1.h
+   inc/Numeric/Schrodinger1D.h
    inc/Numeric/UniformChebfun.h
 
    )
@@ -155,6 +156,7 @@ set( SRC_FILES
    src/MakeQuadrature.cpp
    src/Schrodinger.cpp
    src/Schrodinger1.cpp
+   src/Schrodinger1D.cpp
    src/UniformChebfun.cpp
   )
 add_library( Numeric SHARED ${SRC_FILES} ${INC_FILES} )
@@ -227,6 +229,7 @@ set( SRC_FILES
   test/MakeQuadratureSchemeTest.cpp
   test/MakeQuadratureTest.cpp
   test/Schrodinger1Test.cpp
+  test/Schrodinger1DTest.cpp
 )
 
 add_executable(NumericTest ${SRC_FILES} ${INC_FILES})

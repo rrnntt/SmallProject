@@ -10,7 +10,7 @@
 namespace Numeric
 {
 
-DECLARE_ALGORITHM(AddFunctionValuesToTable);
+//DECLARE_ALGORITHM(AddFunctionValuesToTable);
 
 /// Constructor. Declare algorithm properties.
 AddFunctionValuesToTable::AddFunctionValuesToTable()

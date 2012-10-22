@@ -2,6 +2,8 @@
 #define NUMERIC_QUADRATURE_H
 
 #include "Numeric/DllExport.h"
+#include "Numeric/IFunction.h"
+
 #include "API/TableWorkspace.h"
 
 namespace Numeric
@@ -33,6 +35,7 @@ public:
   double calcPot(size_t i, size_t j, const std::vector<double>& vpot) const;
   /// Build a hamiltonian matrix
   void buildHamiltonian(const double& beta, const std::vector<double>& vpot, GSLMatrix& H) const;
+  void buildHamiltonian(const double& beta, const IFunction& vpot, GSLMatrix& H) const;
 protected:
   typedef std::vector< std::vector<double>* > FuncVector;
   // pointers to data in the table columns. init() sets these pointers up.
