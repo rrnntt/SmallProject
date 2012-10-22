@@ -57,6 +57,7 @@ public:
   /// Return cost shared pointer to the weight function
   virtual IFunction_const_sptr weightFunction() const;
   virtual IFunction_const_sptr weightDerivative() const;
+  virtual IFunction_const_sptr derivative() const;
   /// Create a polynomial of a smaller order
   virtual boost::shared_ptr<Polynomial> subPolynomial(int n) const;
   /// Get the order of the polynomial
@@ -94,11 +95,34 @@ protected:
   mutable std::vector<double> m_c;
   mutable IFunction_const_sptr m_weightFunction;
   mutable IFunction_const_sptr m_weightDerivative;
+  mutable IFunction_const_sptr m_derivative;
   std::string m_polynomialName;
 };
 
 typedef boost::shared_ptr<Polynomial> Polynomial_sptr;
 typedef boost::shared_ptr<const Polynomial> Polynomial_const_sptr;
+
+
+/**
+ * Derivative of a Polynomial.
+ */
+class NUMERIC_EXPORT PolynomialDerivative: public IFunction1D, public ParamFunction
+{
+public:
+  /// Constructor.
+  PolynomialDerivative(const Polynomial& poly);
+
+  /* Base class virtual methods */
+  /// Returns the function's name
+  virtual std::string name()const {return "PolynomialDerivative";}
+  virtual void function1D(double* out, const double* xValues, const size_t nData)const;
+protected:
+  /// p(i) = ( c[i-1] * x - a[i-1] ) * p(i-1) - b[i-1] * p(i-2);
+  std::vector<double> m_a;
+  std::vector<double> m_b;
+  std::vector<double> m_c;
+  size_t m_n; 
+};
 
 } // Numeric
 

@@ -2,6 +2,7 @@
 #include "Numeric/Laguerre.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
+#include "Numeric/Chebfun.h"
 
 using namespace Numeric;
 
@@ -289,4 +290,26 @@ TEST(Numeric_Laguerre_Test, Partial2Test)
   EXPECT_NEAR( d1, 1.0, 1e-14); // integr( x*weight )
   EXPECT_NEAR( d2, 2.0, 1e-14); // integr( x^2*weight )
   EXPECT_LT( d3, 6.0); // integr( x^3*weight )
+}
+
+TEST(Numeric_Laguerre_Test, PolynomialDerivativeTest)
+{
+  Laguerre L(0,10);
+  auto& r = L.getRoots();
+  auto der = L.derivative();
+
+  FunctionDomain1DVector domain(r.front(), r.back(), 10);
+  FunctionValues der_values( domain );
+  der->function( domain, der_values );
+
+  chebfun cheb(10,r.front(), r.back());
+  cheb.fit( L );
+  chebfun cheb_der(10,r.front(), r.back());
+  cheb_der.fromDerivative( cheb );
+
+  for(size_t i = 0; i < domain.size(); ++i)
+  {
+    //std::cerr << domain[i] << ' ' << der_values.getCalculated(i) - cheb_der(domain[i]) << std::endl;
+    EXPECT_NEAR( der_values.getCalculated(i),  cheb_der(domain[i]), 1e-10 );
+  }
 }

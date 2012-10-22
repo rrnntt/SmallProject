@@ -190,7 +190,7 @@ IFunction_const_sptr Polynomial::weightFunction() const
   return m_weightFunction;
 }
 
-/// Return cost shared pointer to the weight function
+/// Return cost shared pointer to the derivative of the weight function
 IFunction_const_sptr Polynomial::weightDerivative() const
 {
   if ( !m_weightDerivative )
@@ -198,6 +198,16 @@ IFunction_const_sptr Polynomial::weightDerivative() const
     m_weightDerivative = this->createWeightDerivative();
   }
   return m_weightDerivative;
+}
+
+/// Return cost shared pointer to the derivative of this polynomial
+IFunction_const_sptr Polynomial::derivative() const
+{
+  if ( !m_derivative )
+  {
+    m_derivative = IFunction_const_sptr( new PolynomialDerivative(*this) );
+  }
+  return m_derivative;
 }
 
 /**------------------------------------------------------------
@@ -459,6 +469,62 @@ void Polynomial::partialQuadrature2(const std::set<size_t>& ri, std::vector<doub
       s += sw[ j ] * S.get( j, k );
     }
     w[k] = s;
+  }
+}
+
+//======================================================================
+/**
+ * Constructor.
+ * @param poly :: A polynomial for which a derivaive function is created.
+ */
+PolynomialDerivative::PolynomialDerivative(const Polynomial& poly):
+m_a(poly.getA()),
+m_b(poly.getB()),
+m_c(poly.getC()),
+m_n(m_a.size())
+{
+  
+  if ( m_n == 0 || m_b.size() != m_n || m_c.size() != m_n )
+  {
+    throw std::invalid_argument("Inconsistent Polynomial in PolynomialDerivative.");
+  }
+}
+
+void PolynomialDerivative::function1D(double* out, const double* xValues, const size_t nData)const
+{
+  if ( nData == 0 ) return;
+  for(size_t i = 0; i < nData; ++i)
+  {
+    double p0 = 1.0;
+    double p1 = 0;
+    double d0 = 0.0;
+    double d1 = 0;
+    const double x = xValues[i];
+    if ( m_n == 0 )
+    {
+      //p1 = p0;
+      d1 = 0.0;
+    }
+    else if ( m_n == 1 )
+    {
+      //p1 = ( m_c[0] * x - m_a[0] ) * p0;
+      d1 = m_c[0] * p0;
+    }
+    else
+    {
+      p1 = ( m_c[0] * x - m_a[0] ) * p0;
+      d1 = m_c[0] * p0;
+      for(size_t j = 1; j < m_n; ++j)
+      {
+        double p = ( m_c[j] * x - m_a[j] ) * p1 - m_b[j] * p0;
+        double d = ( m_c[j] * x - m_a[j] ) * d1 - m_b[j] * d0 + m_c[j] * p1;
+        p0 = p1;
+        p1 = p;
+        d0 = d1;
+        d1 = d;
+      }
+    }
+    out[i] = d1;
   }
 }
 
