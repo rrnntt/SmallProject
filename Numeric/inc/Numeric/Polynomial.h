@@ -20,12 +20,24 @@ namespace Numeric
 class NUMERIC_EXPORT Polynomial: public IFunction1D, public ParamFunction
 {
 public:
+  /// Type for function values at integration points
+  typedef std::vector< std::vector<double>* > FuncVector;
+
   /// Default constructor.
   Polynomial();
   /// Constructor.
   Polynomial(int n);
   /// Constructor.
   Polynomial(const std::vector<double>& a, 
+    const std::vector<double>& b, 
+    const std::vector<double>& c,
+    IFunction_const_sptr weightFun,
+    IFunction_const_sptr weightDeriv,
+    const std::string& aName = "Polynomial"
+    );
+  /// Constructor.
+  Polynomial(double c0,
+    const std::vector<double>& a, 
     const std::vector<double>& b, 
     const std::vector<double>& c,
     IFunction_const_sptr weightFun,
@@ -65,13 +77,15 @@ public:
   const std::vector<double>& getA() const;
   const std::vector<double>& getB() const;
   const std::vector<double>& getC() const;
+  const double getC0() const;
   const std::vector<double>& getRoots() const;
   const std::vector<double>& getWeights() const;
 
   void partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
   void partialQuadrature2(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
-  //void calcBarycentricMatrix(
+  
+  void calcPolyValues(FuncVector funs, FuncVector ders) const;
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;
@@ -89,6 +103,8 @@ protected:
   mutable std::vector<double> m_roots;
   /// store the quadrature weights
   mutable std::vector<double> m_weights;
+  /// p0 = m_c0, default == 1
+  mutable double m_c0;
   /// p(i) = ( c[i-1] * x - a[i-1] ) * p(i-1) - b[i-1] * p(i-2);
   mutable std::vector<double> m_a;
   mutable std::vector<double> m_b;
@@ -117,6 +133,8 @@ public:
   virtual std::string name()const {return "PolynomialDerivative";}
   virtual void function1D(double* out, const double* xValues, const size_t nData)const;
 protected:
+  /// p0 = m_c0, default == 1
+  double m_c0;
   /// p(i) = ( c[i-1] * x - a[i-1] ) * p(i-1) - b[i-1] * p(i-2);
   std::vector<double> m_a;
   std::vector<double> m_b;

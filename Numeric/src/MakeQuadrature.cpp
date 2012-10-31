@@ -2,6 +2,7 @@
 #include "Numeric/Quadrature.h"
 #include "Numeric/JacobiPolynomial.h"
 #include "Numeric/Hermite.h"
+#include "Numeric/Laguerre.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 
@@ -9,6 +10,8 @@
 #include "API/NumericColumn.h"
 
 #include "Kernel/CommonProperties.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace Numeric
 {
@@ -58,6 +61,10 @@ void MakeQuadrature::exec()
   {
     makeHermite();
   }
+  else if ( type == "Laguerre" )
+  {
+    makeLaguerre();
+  }
 }
 
 /**-------------------------------------------------
@@ -78,28 +85,69 @@ void MakeQuadrature::makeHermite()
 {
   const int n = get("N");
   Hermite H( n );
-  auto& r = H.getRoots();
-  auto& w = H.getWeights();
 
-  //---------------------------------------
-  //  this is general for all quadratures.
-  //---------------------------------------
+  makeQuadrature( H );
+}
+
+/**-------------------------------------------------
+ * Make a Gauss-Laguerre quadrature.
+ */
+void MakeQuadrature::makeLaguerre()
+{
+  const int n = get("N");
+  Laguerre H( 0, n );
+
+  makeQuadrature( H );
+}
+
+/**-------------------------------------------------
+ * Make a quadrature given a Polynomial.
+ * @param P :: A polynomial to use to make the quadrature.
+ */
+void MakeQuadrature::makeQuadrature(const Polynomial& P)
+{
+  auto& r = P.getRoots();
+  auto& w = P.getWeights();
+  const size_t n = r.size();
+
   auto quad = new Quadrature;
-  quad->setRowCount( n );
+  quad->setRowCount( int(n) );
   quad->addDoubleColumn("r", API::NumericColumn::X);
   auto& rc = quad->getDoubleData("r");
   rc = r;
-  quad->addDoubleColumn("w", API::NumericColumn::X);
+  quad->addDoubleColumn("w", API::NumericColumn::Y);
   auto& wc = quad->getDoubleData("w");
   wc = w;
+
   FunctionDomain1DView domain( r );
   FunctionValues values( domain );
   std::vector<double> wgt;
   std::vector<double> wgtDeriv;
-  H.weightFunction()->function( domain, values );
+  P.weightFunction()->function( domain, values );
   values.copyToStdVector( wgt );
-  H.weightDerivative()->function( domain, values );
+  P.weightDerivative()->function( domain, values );
   values.copyToStdVector( wgtDeriv );
+
+  quad->addDoubleColumn("weight", API::NumericColumn::Y);
+  auto& wgtc = quad->getDoubleData("weight");
+  wgtc = wgt;
+  quad->addDoubleColumn("deriv", API::NumericColumn::Y);
+  auto& derc = quad->getDoubleData("deriv");
+  derc = wgtDeriv;
+
+  Quadrature::FuncVector fvec( n );
+  Quadrature::FuncVector dvec( n );
+  for(size_t i = 0; i < n; ++i)
+  {
+    std::string colInd = boost::lexical_cast<std::string>( i );
+    quad->addDoubleColumn("f"+colInd, API::NumericColumn::Y);
+    fvec[i] = &quad->getDoubleData("f"+colInd);
+    quad->addDoubleColumn("d"+colInd, API::NumericColumn::Y);
+    dvec[i] = &quad->getDoubleData("d"+colInd);
+  }
+  P.calcPolyValues( fvec, dvec );
+
+  setClassProperty( "Quadrature", API::TableWorkspace_ptr( quad ) );
 }
 
 } // namespace Numeric

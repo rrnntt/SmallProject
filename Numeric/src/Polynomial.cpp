@@ -1,17 +1,19 @@
 #include "Numeric/Polynomial.h"
 #include "Numeric/GSLMatrix.h"
 #include "Numeric/GSLVector.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 namespace Numeric
 {
 
 /// Default constructor.
-Polynomial::Polynomial():IFunction1D(),ParamFunction(),m_n(0)
+Polynomial::Polynomial():IFunction1D(),ParamFunction(),m_n(0),m_c0(1.0)
 {
 }
 
 /// Constructor.
-Polynomial::Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n)
+Polynomial::Polynomial(int n):IFunction1D(),ParamFunction(),m_n(n),m_c0(1.0)
 {
 }
 
@@ -34,6 +36,40 @@ Polynomial::Polynomial(
 IFunction1D(),
 ParamFunction(),
 m_n( int(a.size()) ),
+m_c0(1.0),
+m_a(a),
+m_b(b),
+m_c(c),
+m_weightFunction(weightFun),
+m_weightDerivative(weightDeriv),
+m_polynomialName(aName)
+{
+  // check input consistency
+  updateABC();
+}
+
+/**----------------------------------------------------------------
+ * Constructor.
+ * @param c0 :: The zeroth order polynomial constant (p(0) == c0)
+ * @param a :: A vector with a-coefficients.
+ * @param b :: A vector with b-coefficients.
+ * @param c :: A vector with c-coefficients.
+ * @param weightFun :: Shared pointer to the weight function.
+ * @param weightDeriv :: Shared pointer to the weight function derivative.
+ */
+Polynomial::Polynomial(
+  double c0,
+  const std::vector<double>& a, 
+  const std::vector<double>& b, 
+  const std::vector<double>& c,
+  IFunction_const_sptr weightFun,
+  IFunction_const_sptr weightDeriv,
+  const std::string& aName
+  ):
+IFunction1D(),
+ParamFunction(),
+m_n( int(a.size()) ),
+m_c0(c0),
 m_a(a),
 m_b(b),
 m_c(c),
@@ -109,7 +145,7 @@ void Polynomial::function1D(double* out, const double* xValues, const size_t nDa
   if ( m_a.empty() ) updateABC();
   for(size_t i = 0; i < nData; ++i)
   {
-    double p0 = 1.0;
+    double p0 = m_c0;
     double p1 = 0;
     const double x = xValues[i];
     if ( m_n == 0 )
@@ -282,6 +318,13 @@ const std::vector<double>& Polynomial::getC() const
 {
   if ( m_c.empty() ) updateABC();
   return m_c;
+}
+
+/**------------------------------------------------------------
+ */
+const double Polynomial::getC0() const
+{
+  return m_c0;
 }
 
 /**------------------------------------------------------------
@@ -472,12 +515,82 @@ void Polynomial::partialQuadrature2(const std::set<size_t>& ri, std::vector<doub
   }
 }
 
+/**------------------------------------------------------------
+ * Calculate the polynomial and their derivative values at the integration points.
+ * @param funs :: Output function values.
+ * @param ders :: Output derivatives.
+ */
+void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVector ders) const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+  const size_t nr = m_roots.size();
+  
+  if ( funs.size() != nr )
+  {
+    throw std::runtime_error("FuncVector funs has a wrong size.");
+  }
+
+  if ( ders.size() != nr )
+  {
+    throw std::runtime_error("FuncVector ders has a wrong size.");
+  }
+
+  FunctionDomain1DView domain( m_roots );
+  FunctionValues wgtValues( domain );
+  FunctionValues derValues( domain );
+  weightFunction()->function( domain, wgtValues );
+  weightDerivative()->function( domain, derValues );
+
+  std::vector<double> wgt( nr );
+  std::vector<double> wgt_der( nr );
+  for(size_t i = 0; i < nr; ++i)
+  {
+    if ( funs[i]->size() != nr ) throw std::runtime_error("A vector in FuncVector funs has a wrong size.");
+    if ( ders[i]->size() != nr ) throw std::runtime_error("A vector in FuncVector ders has a wrong size.");
+    wgt[i] = sqrt( m_weights[i] );
+    wgt_der[i] = derValues.getCalculated(i) / wgtValues.getCalculated(i);
+  }
+
+  for(size_t i = 0; i < nr; ++i)
+  {
+    double p0 = m_c0 * wgt[i];
+    double p1 = 0;
+    double d0 = 0.0;
+    double d1 = 0;
+    const double x = m_roots[i];
+    (*funs[0])[i] = p0;
+    (*ders[0])[i] = d0 + p0 * wgt_der[i];
+    if ( m_n > 1 )
+    {
+      p1 = ( m_c[0] * x - m_a[0] ) * p0;
+      d1 = m_c[0] * p0;
+      (*funs[1])[i] = p1;
+      (*ders[1])[i] = d1 + p1 * wgt_der[i];
+      for(size_t j = 1; j < m_n - 1; ++j)
+      {
+        double p = ( m_c[j] * x - m_a[j] ) * p1 - m_b[j] * p0;
+        double d = ( m_c[j] * x - m_a[j] ) * d1 - m_b[j] * d0 + m_c[j] * p1;
+        p0 = p1;
+        p1 = p;
+        d0 = d1;
+        d1 = d;
+        (*funs[j + 1])[i] = p1;
+        (*ders[j + 1])[i] = d1 + p1 * wgt_der[i];
+      }
+    }
+  }
+}
+
 //======================================================================
 /**
  * Constructor.
  * @param poly :: A polynomial for which a derivaive function is created.
  */
 PolynomialDerivative::PolynomialDerivative(const Polynomial& poly):
+m_c0(poly.getC0()),
 m_a(poly.getA()),
 m_b(poly.getB()),
 m_c(poly.getC()),
@@ -495,7 +608,7 @@ void PolynomialDerivative::function1D(double* out, const double* xValues, const 
   if ( nData == 0 ) return;
   for(size_t i = 0; i < nData; ++i)
   {
-    double p0 = 1.0;
+    double p0 = m_c0;
     double p1 = 0;
     double d0 = 0.0;
     double d1 = 0;

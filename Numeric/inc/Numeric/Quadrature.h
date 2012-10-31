@@ -24,6 +24,8 @@ class GSLMatrix;
 class NUMERIC_EXPORT Quadrature: public API::TableWorkspace
 {
 public:
+  /// Type for function values at integration points
+  typedef std::vector< std::vector<double>* > FuncVector;
   Quadrature();
   ~Quadrature();
   virtual std::string id()const {return "Quadrature";}
@@ -37,7 +39,6 @@ public:
   void buildHamiltonian(const double& beta, const std::vector<double>& vpot, GSLMatrix& H) const;
   void buildHamiltonian(const double& beta, const IFunction& vpot, GSLMatrix& H) const;
 protected:
-  typedef std::vector< std::vector<double>* > FuncVector;
   // pointers to data in the table columns. init() sets these pointers up.
   std::vector<double>* m_r; ///< the integration points
   std::vector<double>* m_w; ///< the integration weights
