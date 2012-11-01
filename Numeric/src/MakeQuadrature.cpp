@@ -29,6 +29,7 @@ MakeQuadrature::MakeQuadrature()
   // Hermite
   declareString("Type","Custom");
   declareInt("N",10);
+  declareBool("Normalize",true);
 }
 
 /**-------------------------------------------------
@@ -84,7 +85,13 @@ void MakeQuadrature::makeChebyshev()
 void MakeQuadrature::makeHermite()
 {
   const int n = get("N");
+  const bool norm = get("Normalize");
+  std::cerr << "norm " << norm << std::endl;
   Hermite H( n );
+  if ( norm )
+  {
+    H.normalize();
+  }
 
   makeQuadrature( H );
 }
@@ -96,6 +103,11 @@ void MakeQuadrature::makeLaguerre()
 {
   const int n = get("N");
   Laguerre H( 0, n );
+  const bool norm = get("Normalize");
+  if ( norm )
+  {
+    H.normalize();
+  }
 
   makeQuadrature( H );
 }

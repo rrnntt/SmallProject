@@ -84,7 +84,8 @@ void Hermite::updateABC() const
 /// Returns the unscaled integral of the weight function
 double Hermite::weightIntegral() const
 {
-  return sqrt( pi ) * exp( gsl_sf_lngamma(m_n+1) + m_n *log(2.0) );
+  //return sqrt( pi ) * exp( gsl_sf_lngamma(m_n+1) + m_n *log(2.0) );
+  return sqrt( pi );
 }
 
 /// Return cost shared pointer to the weight function (creates weight function)

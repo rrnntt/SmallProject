@@ -86,6 +86,7 @@ public:
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
   
   void calcPolyValues(FuncVector funs, FuncVector ders) const;
+  void normalize();
 protected:
   /// Update internal state.
   virtual void updateStateRequired() const;

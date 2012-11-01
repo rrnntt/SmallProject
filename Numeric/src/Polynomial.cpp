@@ -4,6 +4,8 @@
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 
+#include <algorithm>
+
 namespace Numeric
 {
 
@@ -554,6 +556,7 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
     wgt_der[i] = derValues.getCalculated(i) / wgtValues.getCalculated(i);
   }
 
+  if ( m_a.empty() ) updateABC();
   for(size_t i = 0; i < nr; ++i)
   {
     double p0 = m_c0 * wgt[i];
@@ -580,6 +583,66 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
         (*funs[j + 1])[i] = p1;
         (*ders[j + 1])[i] = d1 + p1 * wgt_der[i];
       }
+    }
+  }
+}
+
+/**------------------------------------------------------------
+ * Normalize the coefficients so that all "sub-polynomials" have
+ * norm == 1.
+ */
+void Polynomial::normalize()
+{
+  if ( m_roots.empty() ) calcRoots();
+  const size_t nr = m_roots.size();
+  if ( m_a.empty() ) updateABC();
+  double f0 = 1.0 / (m_c0*m_c0 *sqrt( weightIntegral() ));
+  double f1 = 1.0;
+  m_c0 /= sqrt( weightIntegral() );
+  std::vector<double> p0(nr, m_c0);
+  std::vector<double> p1(nr, 0);
+  for(size_t i = 0; i < nr; ++i)
+  {
+    if ( i == 0 )
+    {
+      double sum = 0.0;
+      m_c[0] /= f0;
+      m_a[0] /= f0;
+      for(size_t j = 0; j < nr; ++j)
+      {
+        p1[j] = ( m_c[0] * m_roots[j] - m_a[0] ) * p0[j];
+        sum += p1[j] *  p1[j] * m_weights[j];
+      }
+      f1 = 1./sqrt( sum );
+      m_c[0] *= f1;
+      m_a[0] *= f1;
+      for(size_t j = 0; j < nr; ++j)
+      {
+        p1[j] *= f1;
+      }
+      //std::transform(p1.begin(),p1.end(),p1.begin(),std::bind2nd(std::divides<double>(),sum));
+    }
+    else
+    {
+      double sum = 0.0;
+      m_c[i] /= f1;
+      m_a[i] /= f1;
+      m_b[i] /= f0;
+      for(size_t j = 0; j < nr; ++j)
+      {
+        double p = ( m_c[i] * m_roots[j] - m_a[i] ) * p1[j] - m_b[i] * p0[j];
+        sum += p * p * m_weights[j];
+        p0[j] = p1[j];
+        p1[j] = p;
+      }
+      //std::cerr << "sum " << i << ' ' << sum << std::endl;
+      double f = 1./sqrt( sum );
+      m_c[i] *= f;
+      m_a[i] *= f;
+      m_b[i] *= f;
+      std::transform(p1.begin(),p1.end(),p1.begin(),std::bind2nd(std::multiplies<double>(),f));
+      f0 = f1;
+      f1 = f;
     }
   }
 }
