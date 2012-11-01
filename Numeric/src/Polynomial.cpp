@@ -600,6 +600,10 @@ void Polynomial::normalize()
   double f1 = 1.0;
   m_c0 /= sqrt( weightIntegral() );
   std::vector<double> p0(nr, m_c0);
+  for(size_t j = 0; j < nr; ++j)
+  {
+    p0[j] *= sqrt( m_weights[j] );
+  }
   std::vector<double> p1(nr, 0);
   for(size_t i = 0; i < nr; ++i)
   {
@@ -611,16 +615,12 @@ void Polynomial::normalize()
       for(size_t j = 0; j < nr; ++j)
       {
         p1[j] = ( m_c[0] * m_roots[j] - m_a[0] ) * p0[j];
-        sum += p1[j] *  p1[j] * m_weights[j];
+        sum += p1[j] *  p1[j];// * m_weights[j];
       }
       f1 = 1./sqrt( sum );
       m_c[0] *= f1;
       m_a[0] *= f1;
-      for(size_t j = 0; j < nr; ++j)
-      {
-        p1[j] *= f1;
-      }
-      //std::transform(p1.begin(),p1.end(),p1.begin(),std::bind2nd(std::divides<double>(),sum));
+      std::transform(p1.begin(),p1.end(),p1.begin(),std::bind2nd(std::multiplies<double>(),f1));
     }
     else
     {
@@ -631,11 +631,10 @@ void Polynomial::normalize()
       for(size_t j = 0; j < nr; ++j)
       {
         double p = ( m_c[i] * m_roots[j] - m_a[i] ) * p1[j] - m_b[i] * p0[j];
-        sum += p * p * m_weights[j];
+        sum += p * p;// * m_weights[j];
         p0[j] = p1[j];
         p1[j] = p;
       }
-      //std::cerr << "sum " << i << ' ' << sum << std::endl;
       double f = 1./sqrt( sum );
       m_c[i] *= f;
       m_a[i] *= f;
@@ -645,6 +644,7 @@ void Polynomial::normalize()
       f1 = f;
     }
   }
+  std::cerr << "OK" << std::endl;
 }
 
 //======================================================================
