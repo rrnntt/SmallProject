@@ -77,7 +77,7 @@ void Hermite::updateABC() const
   {
     m_c[i] =  2.0;
     m_a[i] =  0;
-    m_b[i] =  1.0;
+    m_b[i] =  2.0 * i;
   }
 }
 
