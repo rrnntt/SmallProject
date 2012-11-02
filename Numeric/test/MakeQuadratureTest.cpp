@@ -3,8 +3,11 @@
 #include "Numeric/Quadrature.h"
 #include "Numeric/Hermite.h"
 #include "Numeric/Constants.h"
+#include "Numeric/FunctionDomain1D.h"
+#include "Numeric/FunctionValues.h"
 
 #include <gsl/gsl_sf_gamma.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace Numeric;
 
@@ -57,11 +60,11 @@ TEST(Numeric_MakeQuadrature_Test, UnnormalizedTest)
   EXPECT_NEAR( sum_f1, HermiteIntegral(1), 1e-10 );
   EXPECT_NEAR( sum_f2, HermiteIntegral(2), 1e-10 );
   EXPECT_NEAR( sum_f3, HermiteIntegral(3), 1e-10 );
-  std::cerr << sum << ' ' << H.weightIntegral() << std::endl;
-  std::cerr << sum_f0 << ' ' << HermiteIntegral(0) << std::endl;
-  std::cerr << sum_f1 << ' ' << HermiteIntegral(1) << std::endl;
-  std::cerr << sum_f2 << ' ' << HermiteIntegral(2) << std::endl;
-  std::cerr << sum_f3 << ' ' << HermiteIntegral(3) << std::endl;
+  //std::cerr << sum << ' ' << H.weightIntegral() << std::endl;
+  //std::cerr << sum_f0 << ' ' << HermiteIntegral(0) << std::endl;
+  //std::cerr << sum_f1 << ' ' << HermiteIntegral(1) << std::endl;
+  //std::cerr << sum_f2 << ' ' << HermiteIntegral(2) << std::endl;
+  //std::cerr << sum_f3 << ' ' << HermiteIntegral(3) << std::endl;
 }
 
 TEST(Numeric_MakeQuadrature_Test, NormalizedTest)
@@ -111,11 +114,11 @@ TEST(Numeric_MakeQuadrature_Test, NormalizedTest)
   EXPECT_NEAR( sum_f2, 1, 1e-10 );
   EXPECT_NEAR( sum_f3, 1, 1e-10 );
   EXPECT_NEAR( sum_f9, 1, 1e-10 );
-  std::cerr << sum_f0 << std::endl;
-  std::cerr << sum_f1 << std::endl;
-  std::cerr << sum_f2 << std::endl;
-  std::cerr << sum_f3 << std::endl;
-  std::cerr << sum_f9 << std::endl;
+  //std::cerr << sum_f0 << std::endl;
+  //std::cerr << sum_f1 << std::endl;
+  //std::cerr << sum_f2 << std::endl;
+  //std::cerr << sum_f3 << std::endl;
+  //std::cerr << sum_f9 << std::endl;
 }
 
 TEST(Numeric_MakeQuadrature_Test, BCoeffsTest)
@@ -135,5 +138,80 @@ TEST(Numeric_MakeQuadrature_Test, BCoeffsTest)
     if ( i > 0 ) test *= b[i];
     //std::cerr << i << ' ' << b[i] << ' ' << HermiteIntegral( i ) << ' ' << test << std::endl;
     EXPECT_NEAR(HermiteIntegral( i ) / test, 1.0, 1e-13);
+  }
+}
+
+TEST(Numeric_MakeQuadrature_Test, NormalizationTest)
+{
+  const size_t n = 50;
+  MakeQuadrature alg;
+  alg.setProperty("Type","Hermite");
+  alg.setProperty("N", int(n));
+  alg.setProperty("Normalize", true);
+  alg.execute();
+  boost::shared_ptr<Quadrature> quad = alg.getClass("Quadrature");
+  EXPECT_TRUE( quad );
+  auto& f0 = quad->getDoubleData("f0");
+  auto& f1 = quad->getDoubleData("f1");
+  auto& f2 = quad->getDoubleData("f2");
+
+  //system("pause");
+  std::vector<double> f(n,1);
+  for(size_t i = 0; i < n; ++i)
+  for(size_t j = i; j < n; ++j)
+  {
+    const double test = quad->calcPot(i,j,f);
+    //std::cerr << i << ' ' << j << ' ' << test << ' ' << std::endl;
+    if ( i == j )
+    {
+      EXPECT_NEAR( test, 1.0, 1e-14 );
+    }
+    else
+    {
+      EXPECT_NEAR( test, 0.0, 1e-10 );
+    }
+  }
+}
+
+TEST(Numeric_MakeQuadrature_Test, DerivativesTest)
+{
+  const size_t n = 50;
+  MakeQuadrature alg;
+  alg.setProperty("Type","Hermite");
+  alg.setProperty("N", int(n));
+  alg.setProperty("Normalize", true);
+  alg.execute();
+  boost::shared_ptr<Quadrature> quad = alg.getClass("Quadrature");
+  EXPECT_TRUE( quad );
+  auto& r = quad->getDoubleData("r");
+  auto& w = quad->getDoubleData("w");
+  FunctionDomain1DView x(r);
+  FunctionValues y(x);
+  FunctionValues d(x);
+  FunctionValues W(x);
+  FunctionValues dW(x);
+  Hermite HH(n);
+  HH.weightFunction()->function(x,W);
+  HH.weightDerivative()->function(x,dW);
+  //system("pause");
+  for(size_t i = 1; i < n; ++i)
+  {
+    Hermite H(i);
+    //H.normalize();
+    PolynomialDerivative dH(H);
+    H.function(x,y);
+    dH.function(x,d);
+    auto& f = quad->getDoubleData("f"+boost::lexical_cast<std::string>(i));
+    auto& df = quad->getDoubleData("d"+boost::lexical_cast<std::string>(i));
+    const double norm = sqrt(1./HermiteIntegral(i));
+    for(size_t j = 0; j < n; ++j)
+    {
+      const double val = y[j] * sqrt(w[j]) * norm;
+      //std::cerr << j << ' ' << f[j] << ' ' << val << ' ' << f[j] / val << ' ' << norm << std::endl;
+      EXPECT_NEAR(f[j], val, 1e10);
+      const double der = (d[j] + y[j]*dW[j]/W[j]) * sqrt(w[j]) * norm;
+      //std::cerr << j << ' ' << df[j] << ' ' << der << ' ' << df[j] / der << std::endl;
+      EXPECT_NEAR(df[j], der, 1e10);
+    }
   }
 }

@@ -86,7 +86,6 @@ void MakeQuadrature::makeHermite()
 {
   const int n = get("N");
   const bool norm = get("Normalize");
-  std::cerr << "norm " << norm << std::endl;
   Hermite H( n );
   if ( norm )
   {
@@ -158,6 +157,7 @@ void MakeQuadrature::makeQuadrature(const Polynomial& P)
     dvec[i] = &quad->getDoubleData("d"+colInd);
   }
   P.calcPolyValues( fvec, dvec );
+  quad->init();
 
   setClassProperty( "Quadrature", API::TableWorkspace_ptr( quad ) );
 }

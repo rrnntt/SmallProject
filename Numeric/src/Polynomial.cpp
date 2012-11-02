@@ -630,6 +630,7 @@ void Polynomial::normalize()
   if ( m_roots.empty() ) calcRoots();
   const size_t nr = m_roots.size();
   if ( m_a.empty() ) updateABC();
+  const double oldWeightIntegral = weightIntegral();
   double f0 = 1.0 / (m_c0*m_c0 *sqrt( weightIntegral() ));
   double f1 = 1.0;
   m_c0 /= sqrt( weightIntegral() );
