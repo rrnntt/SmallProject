@@ -117,3 +117,23 @@ TEST(Numeric_MakeQuadrature_Test, NormalizedTest)
   std::cerr << sum_f3 << std::endl;
   std::cerr << sum_f9 << std::endl;
 }
+
+TEST(Numeric_MakeQuadrature_Test, BCoeffsTest)
+{
+  const size_t n = 50;
+  
+  Hermite H(n);
+  auto& r = H.getRoots();
+  auto& w = H.getWeights();
+  // just testing here the way of calculating base polynomials norms
+  // using the b-coefficiants.
+
+  auto& b = H.getB();
+  double test = HermiteIntegral( 0 );
+  for(size_t i = 0; i < n; ++i)
+  {
+    if ( i > 0 ) test *= b[i];
+    //std::cerr << i << ' ' << b[i] << ' ' << HermiteIntegral( i ) << ' ' << test << std::endl;
+    EXPECT_NEAR(HermiteIntegral( i ) / test, 1.0, 1e-13);
+  }
+}

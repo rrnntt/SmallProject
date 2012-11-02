@@ -85,7 +85,7 @@ public:
   void partialQuadrature2(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
   
-  void calcPolyValues(FuncVector funs, FuncVector ders) const;
+  void calcPolyValues(FuncVector funs, FuncVector ders, bool includeWeights = true) const;
   void normalize();
 protected:
   /// Update internal state.

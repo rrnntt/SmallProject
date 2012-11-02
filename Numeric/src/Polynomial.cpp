@@ -5,6 +5,7 @@
 #include "Numeric/FunctionValues.h"
 
 #include <algorithm>
+#include <fstream>
 
 namespace Numeric
 {
@@ -198,6 +199,10 @@ void Polynomial::calcRoots() const
     }
   }
 
+  //std::ofstream fil("C:\\Users\\hqs74821\\Work\\Mantid_stuff\\OUTPUT\\JMatrix.txt");
+  //fil << J;
+  //fil << "\n\n";
+
   GSLVector x( m_n );
   GSLMatrix v( m_n, m_n );
   J.diag( x, v );
@@ -215,6 +220,32 @@ void Polynomial::calcRoots() const
     m_roots[i] = x[j];
     double vv = v.get(0, j);
     m_weights[i] = vv * vv * wgt;
+    //fil << j << ' ' << m_roots[i] << ' ' << m_weights[i] << std::endl;
+  }
+  //fil.close();
+
+  double pp = wgt*m_c.back(); // integral <pn1|pn1>
+  for(size_t j = 1; j < m_n; ++j) pp *= m_b[j];
+  for(size_t i = 0; i < m_n; ++i)
+  {
+    double p0 = m_c0;
+    double p1 = 0;
+    double d0 = 0.0;
+    double d1 = 0;
+    const double x = m_roots[i];
+    p1 = ( m_c[0] * x - m_a[0] ) * p0;
+    d1 = m_c[0] * p0;
+    for(size_t j = 1; j < m_n; ++j)
+    {
+      double p = ( m_c[j] * x - m_a[j] ) * p1 - m_b[j] * p0;
+      double d = ( m_c[j] * x - m_a[j] ) * d1 - m_b[j] * d0 + m_c[j] * p1;
+      p0 = p1;
+      p1 = p;
+      d0 = d1;
+      d1 = d;
+    }
+    //std::cerr << i << ' ' << m_weights[i] << ' ' << pp / p0 / d1  << ' ' << pp << ' ' << p0 << ' ' << d1 << std::endl;
+    m_weights[i] = fabs( pp / (p0 * d1) );
   }
 }
 
@@ -521,8 +552,10 @@ void Polynomial::partialQuadrature2(const std::set<size_t>& ri, std::vector<doub
  * Calculate the polynomial and their derivative values at the integration points.
  * @param funs :: Output function values.
  * @param ders :: Output derivatives.
+ * @param includeWeights :: If set to true the output values will be multiplied by
+ *  a square root of the corresponding weight.
  */
-void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVector ders) const
+void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVector ders, bool includeWeights) const
 {
   if ( m_roots.empty() )
   {
@@ -546,13 +579,14 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
   weightFunction()->function( domain, wgtValues );
   weightDerivative()->function( domain, derValues );
 
+  //m_weights.back() = 0;
   std::vector<double> wgt( nr );
   std::vector<double> wgt_der( nr );
   for(size_t i = 0; i < nr; ++i)
   {
     if ( funs[i]->size() != nr ) throw std::runtime_error("A vector in FuncVector funs has a wrong size.");
     if ( ders[i]->size() != nr ) throw std::runtime_error("A vector in FuncVector ders has a wrong size.");
-    wgt[i] = sqrt( m_weights[i] );
+    wgt[i] = includeWeights ? sqrt( m_weights[i] ) : 1.0;
     wgt_der[i] = derValues.getCalculated(i) / wgtValues.getCalculated(i);
   }
 
@@ -636,6 +670,7 @@ void Polynomial::normalize()
         p1[j] = p;
       }
       double f = 1./sqrt( sum );
+      if ( i == nr - 1 ) f = 0;
       m_c[i] *= f;
       m_a[i] *= f;
       m_b[i] *= f;
@@ -644,7 +679,6 @@ void Polynomial::normalize()
       f1 = f;
     }
   }
-  std::cerr << "OK" << std::endl;
 }
 
 //======================================================================

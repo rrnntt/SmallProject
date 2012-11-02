@@ -200,6 +200,7 @@ set( SRC_FILES
   test/JacobiPolynomialTest.cpp
   test/JacobiWeightTest.cpp
   test/JointDomainFunctionTest.cpp
+  test/HermiteTest.cpp
   test/GSLMatrixTest.cpp
   test/IFuncMinimizerTest.cpp
   test/LagrangeInterpolationTest.cpp

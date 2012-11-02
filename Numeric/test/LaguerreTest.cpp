@@ -116,7 +116,7 @@ TEST(Numeric_Laguerre_Test, WeightsAlphaNonZeroTest)
   EXPECT_NEAR( d0, 6.0, 1e-12);   // (alpha + 0)!
   EXPECT_NEAR( d1, 24.0, 1e-12);  // (alpha + 1)!
   EXPECT_NEAR( d2, 120.0, 1e-12); // (alpha + 2)!
-  EXPECT_NEAR( d3, 720.0, 1e-12); // (alpha + 3)!
+  EXPECT_NEAR( d3, 720.0, 3e-12); // (alpha + 3)!
 
   //std::cerr << "d=" << d0 << ' ' << d1 << ' ' << d2 << ' ' << d3 << std::endl;
 }
