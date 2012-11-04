@@ -420,7 +420,12 @@ void Polynomial::calcBarycentricWeights(const std::set<size_t>& ri, std::vector<
  * @param w  :: Output vector of partial roots.
  * @param w  :: Output vector of partial weights.
  */
-void Polynomial::partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const
+void Polynomial::partialQuadrature(
+  const std::set<size_t>& ri, 
+  std::vector<double>& r, 
+  std::vector<double>& w,
+  GSLMatrix* ssave,
+  GSLMatrix* t) const
 {
   if ( m_roots.empty() )
   {
@@ -482,6 +487,31 @@ void Polynomial::partialQuadrature(const std::set<size_t>& ri, std::vector<doubl
     }
     w[ii] += s;
   }
+
+  if ( ssave ) *ssave = S;
+  if ( t )
+  {
+    t->resize(K,K);
+    size_t ii = 0;
+    for(auto i = ri.begin(); i != ri.end(); ++i,++ii)
+    {
+      size_t kk = 0;
+      for(auto k = ri.begin(); k != ri.end(); ++k,++kk)
+      {
+        double d = 0.0;
+        size_t jj = 0;
+        for(auto j = rj.begin(); j != rj.end(); ++j,++jj)
+        {
+          d += S.get( jj, ii )*S.get( jj, kk )*m_weights[ *j ];
+        }
+        if ( ii == kk )
+        {
+          d += m_weights[ *i ];
+        }
+        t->set( ii, kk, d );
+      }
+    }
+  }
 }
 
 /**------------------------------------------------------------
@@ -490,7 +520,11 @@ void Polynomial::partialQuadrature(const std::set<size_t>& ri, std::vector<doubl
  * @param r  :: Output vector of partial roots.
  * @param w  :: Output vector of partial weights.
  */
-void Polynomial::partialQuadrature2(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const
+void Polynomial::partialQuadrature2(
+  const std::set<size_t>& ri, 
+  std::vector<double>& r, 
+  std::vector<double>& w,
+  GSLMatrix* ssave) const
 {
   if ( m_roots.empty() )
   {
@@ -546,8 +580,88 @@ void Polynomial::partialQuadrature2(const std::set<size_t>& ri, std::vector<doub
     }
     w[k] = s;
   }
+
+  if ( ssave ) *ssave = S;
 }
 
+/**------------------------------------------------------------
+ * Create a partial quadrature-2
+ * @param r  :: Intput vector of partial roots.
+ * @param w  :: Output vector of partial weights.
+ */
+void Polynomial::partialQuadrature3(
+  const std::vector<double>& r, 
+  std::vector<double>& w,
+  GSLMatrix* ssave,
+  GSLMatrix* tsave) const
+{
+  if ( m_roots.empty() )
+  {
+    calcRoots();
+  }
+
+  // size of the 'big' quadrature
+  const size_t nq = m_roots.size();
+  // size of the 'small' quadrature
+  const size_t mq = r.size();
+
+  // barycentric weights 
+  std::vector<double> barw(mq);
+  for(size_t i = 0; i < mq; ++i)
+  {
+    double d = 1.0;
+    for(size_t k = 0; k < mq; ++k)
+    {
+      if ( i == k ) continue;
+      d /= r[i] - r[k];
+    }
+    barw[i] = d;
+  }
+
+  // the S matrix of interpolation coefficients from 'small' to 'big' quadrature
+  GSLMatrix S( nq, mq);
+  for(size_t i = 0; i < nq; ++i)
+  {
+    double d = 0.0;
+    for(size_t k = 0; k < mq; ++k)
+    {
+      d += barw[k] / (m_roots[i] - r[k]);
+    }
+    for(size_t j = 0; j < mq; ++j)
+    {
+      S.set( i, j, barw[j] / (m_roots[i] - r[j]) / d );
+    }
+  }
+
+  w.resize( mq );
+  for(size_t j = 0; j < mq; ++j)
+  {
+    double d = 0.0;
+    for(size_t i = 0; i < nq; ++i)
+    {
+      d += m_weights[i] * S.get( i, j );
+    }
+    w[j] = d;
+  }
+
+  if ( ssave ) *ssave = S;
+  if ( tsave )
+  {
+    tsave->resize( mq, mq );
+    for(size_t j = 0; j < mq; ++j)
+    {
+      for(size_t k = 0; k < mq; ++k)
+      {
+        double d = 0.0;
+        for(size_t i = 0; i < nq; ++i)
+        {
+          d += S.get( i, j )*S.get( i, k ) * m_weights[i];
+        }
+        tsave->set( j, k, d );
+      }
+    }
+  }
+}
 /**------------------------------------------------------------
  * Calculate the polynomial and their derivative values at the integration points.
  * @param funs :: Output function values.

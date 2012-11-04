@@ -10,6 +10,8 @@
 namespace Numeric
 {
 
+class GSLMatrix;
+
 /**
  * A member of an orthogonal polynomial basis. Intentional use:
  * quadratures.
@@ -81,8 +83,22 @@ public:
   const std::vector<double>& getRoots() const;
   const std::vector<double>& getWeights() const;
 
-  void partialQuadrature(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
-  void partialQuadrature2(const std::set<size_t>& ri, std::vector<double>& r, std::vector<double>& w) const;
+  void partialQuadrature(
+    const std::set<size_t>& ri, 
+    std::vector<double>& r, 
+    std::vector<double>& w,
+    GSLMatrix* s = NULL,
+    GSLMatrix* t = NULL) const;
+  void partialQuadrature2(
+    const std::set<size_t>& ri, 
+    std::vector<double>& r, 
+    std::vector<double>& w,
+    GSLMatrix* s = NULL) const;
+  void partialQuadrature3(
+    const std::vector<double>& r, 
+    std::vector<double>& w,
+    GSLMatrix* s = NULL,
+    GSLMatrix* t = NULL) const;
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
   
   void calcPolyValues(FuncVector funs, FuncVector ders, bool includeWeights = true) const;
