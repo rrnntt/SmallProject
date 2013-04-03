@@ -2,6 +2,9 @@
 #  SmallProject
 #
 
+# Add the path to our custom 'find' modules
+set ( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+
 project(SmallProject)
 
 cmake_minimum_required (VERSION 2.8)
@@ -47,11 +50,13 @@ if (CMAKE_HOST_WIN32)
   set( GTEST_RELEASE_LIB "${THIRD_PARTY_LIB_DIR}/gtest.lib")
   set( GTEST_LIBS "optimized;${GTEST_RELEASE_LIB};debug;${GTEST_DEBUG_LIB};")
 else()
-  find_package( GTEST )
+#  find_package( GTEST )
+  set( GTEST_LIBS "gtest")
 endif()
 
 #set( Boost_INCLUDE_DIR "C:/Users/hqs74821/Work/mantid/Code/Third_Party/include")
-find_package( Boost )
+set ( Boost_NO_BOOST_CMAKE TRUE )
+find_package( Boost REQUIRED signals date_time)
 find_package( Qt4 )
 #find_path( OSG_DIR "include/osg/Referenced" )
 add_definitions( -DBOOST_ALL_DYN_LINK -DQWT_DLL)
@@ -63,6 +68,7 @@ link_directories(${THIRD_PARTY_LIB_DIR})
 # Allow organizing stuff into folders in IDE
 set_property ( GLOBAL PROPERTY USE_FOLDERS ON )
 
+add_subdirectory(gtest-1.6.0)
 add_subdirectory(Kernel)
 add_subdirectory(API)
 add_subdirectory(Numeric)
@@ -79,4 +85,3 @@ add_subdirectory(Main)
 #add_subdirectory(Modeling)
 add_subdirectory(QtAPI)
 add_subdirectory(Goblin)
-

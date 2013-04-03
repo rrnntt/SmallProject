@@ -235,8 +235,10 @@ set( SRC_FILES
 
 add_executable(NumericTest ${SRC_FILES} ${INC_FILES})
 include_directories(test ${THIRD_PARTY_INCLUDE_DIR} )
-find_library(GTEST_DEBUG_LIB gtest_d "${THIRD_PARTY_LIB_DIR}")
-find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
+if (CMAKE_HOST_WIN32)
+  find_library(GTEST_DEBUG_LIB gtest_d "${THIRD_PARTY_LIB_DIR}")
+  find_library(GTEST_RELEASE_LIB gtest "${THIRD_PARTY_LIB_DIR}")
+endif()
 target_link_libraries(NumericTest 
 ${GTEST_LIBS} ${GSL_LIBS} Numeric Kernel
 )
