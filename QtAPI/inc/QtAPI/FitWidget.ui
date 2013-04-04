@@ -39,11 +39,12 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="teFunction">
-     <property name="font">
-      <font>
-       <family>Courier</family>
-      </font>
+    <widget class="QtAPI::FunctionBrowser" name="funBrowser" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>
@@ -86,6 +87,13 @@
        </property>
       </widget>
      </item>
+     <item row="6" column="1">
+      <widget class="QSpinBox" name="sbMaxIterations">
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+      </widget>
+     </item>
      <item row="5" column="1">
       <widget class="QComboBox" name="cbErrColumn"/>
      </item>
@@ -96,17 +104,18 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
-      <widget class="QSpinBox" name="sbMaxIterations">
-       <property name="maximum">
-        <number>1000</number>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtAPI::FunctionBrowser</class>
+   <extends>QWidget</extends>
+   <header>inc/QtAPI/FunctionBrowser.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

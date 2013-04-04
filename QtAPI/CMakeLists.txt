@@ -104,7 +104,7 @@ qt4_wrap_cpp(MOC_FILES ${MOC_HEADERS})
 qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_library( QtAPI SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
-include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc ../Formula/inc ../Numeric/inc
+include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc ../Formula/inc ../Numeric/inc .
 "${QT_PROPERTY_BROWSER_INCLUDE}"
 "${CMAKE_BINARY_DIR}/QtAPI"
 ${THIRD_PARTY_INCLUDE_DIR}

@@ -46,6 +46,9 @@ MainWindow::MainWindow()
   this->addDockWidget(Qt::LeftDockWidgetArea,m_fitBrowser);
 
   createMenus();
+
+  QtAPI::WindowManager::createWindowManager(this);
+
 }
 
 MainWindow::~MainWindow()
