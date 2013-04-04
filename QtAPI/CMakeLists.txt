@@ -23,6 +23,7 @@ set( INC_FILES
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/FileTask.h
    inc/QtAPI/FitWidget.h
+   inc/QtAPI/FunctionBrowser.h
    inc/QtAPI/SelectFunctionDialog.h
    inc/QtAPI/SymbolBox.h
    inc/QtAPI/Task.h
@@ -57,6 +58,7 @@ set( SRC_FILES
   src/Task.cpp
   src/FileTask.cpp
   src/FitWidget.cpp
+  src/FunctionBrowser.cpp
   src/Table.cpp
   src/TableDialog.cpp
   src/TableTask.cpp
@@ -76,6 +78,7 @@ set( MOC_HEADERS
    inc/QtAPI/AddTableColumnDialog.h
    inc/QtAPI/CurveManager.h
    inc/QtAPI/FitWidget.h
+   inc/QtAPI/FunctionBrowser.h
    inc/QtAPI/Plot.h
    inc/QtAPI/PlotPicker.h
    inc/QtAPI/PlotTask.h
@@ -102,6 +105,7 @@ qt4_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_library( QtAPI SHARED ${SRC_FILES} ${INC_FILES} ${MOC_FILES} ${UI_HEADERS} ) 
 include_directories(inc ../API/inc ../Kernel/inc ../qwt/src ../DataObjects/inc ../Formula/inc ../Numeric/inc
+"${QT_PROPERTY_BROWSER_INCLUDE}"
 "${CMAKE_BINARY_DIR}/QtAPI"
 ${THIRD_PARTY_INCLUDE_DIR}
 "${QT_QTCORE_INCLUDE_DIR}/.."
@@ -116,6 +120,7 @@ Kernel API DataObjects Formula Numeric qwt
 )
 
 target_link_libraries(QtAPI
+QtPropertyBrowser
 ${QT_QTCORE_LIBRARY}
 ${QT_QTGUI_LIBRARY}
 ${QT_QTOPENGL_LIBRARY}
