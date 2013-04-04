@@ -21,18 +21,11 @@ public:
   FitWidget(QWidget* parent);
   ~FitWidget();
 protected:
-  bool eventFilter(QObject *obj, QEvent *ev);
   QString getFunction();
   bool isFunction(const std::string& fName) const;
 signals:
-  void needUpdateExpression();
-  void saved();
-  void unsaved();
   void needUpdateWorkspaces();
 protected slots:
-  void addFunction();
-  void updateExpression();
-  void updateEditor();
   void fillWorkspaces();
   void fillColumns(int i = 0);
   void fit();
@@ -41,7 +34,6 @@ private:
   void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);
 
   Ui::FitWidget *m_form;
-  Kernel::ParsedExpressionString m_expression;
 };
 
 } // QTAPI

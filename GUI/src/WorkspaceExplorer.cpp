@@ -46,6 +46,7 @@ void WorkspaceExplorer::handleDelete(const API::WorkspaceManager::DeleteNotifica
 void WorkspaceExplorer::addWorkspace(const std::string& name, API::Workspace_ptr ws)
 {
   QTreeWidgetItem* treeItem = new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString::fromStdString(name)));
+  treeItem->setIcon(0, QIcon(":/tableIcon.png"));
   int row = ui->treeWorkspaces->topLevelItemCount();
   ui->treeWorkspaces->insertTopLevelItem(row,treeItem);
 }

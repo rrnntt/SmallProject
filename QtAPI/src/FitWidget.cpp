@@ -32,15 +32,11 @@ namespace QtAPI
  */
 FitWidget::FitWidget(QWidget* parent):
 QWidget(parent),
-m_form(new Ui::FitWidget),
-m_expression("CompositeFunction()")
+m_form(new Ui::FitWidget)
 {
   m_form->setupUi(this);
-//  m_form->teFunction->setText(QString::fromStdString(m_expression));
-//  m_form->teFunction->installEventFilter(this);
 
   connect(this,SIGNAL(needUpdateExpression()),this,SLOT(updateExpression()),Qt::QueuedConnection);
-  //connect(m_form->teFunction,SIGNAL(textChanged()),this,SIGNAL(unsaved()));
   connect(this,SIGNAL(needUpdateWorkspaces()),this,SLOT(fillWorkspaces()),Qt::QueuedConnection);
   connect(m_form->cbWorkspace,SIGNAL(currentIndexChanged(int)),this,SLOT(fillColumns(int)));
   connect(m_form->btnFit,SIGNAL(clicked()),this,SLOT(fit()));
@@ -81,109 +77,6 @@ bool FitWidget::isFunction(const std::string& fName) const
   return Numeric::FunctionFactory::instance().exists(fName);
 }
 
-/**
- * Catch events comming to the text widget.
- */
-bool FitWidget::eventFilter(QObject *obj, QEvent *ev)
-{
-  QTextEdit *te = dynamic_cast<QTextEdit*>(obj);
-  if (!te)return QWidget::eventFilter(obj,ev);
-  //std::cerr << "event " << ev->type() << std::endl;
-//  if (ev->type() == QEvent::MouseButtonPress)
-//  {// mouse event in the function editor
-//    QMouseEvent *mev = static_cast<QMouseEvent*>(ev);
-//    if (mev->button() == Qt::RightButton)
-//    {// right button - context menu
-      
-//      if (m_form->teFunction->textCursor().hasSelection())
-//      {// if editor has a selection - do default stuff
-//        return QWidget::eventFilter(obj,ev);
-//      }
-//      auto cursor = m_form->teFunction->cursorForPosition(mev->pos());
-//      m_form->teFunction->setTextCursor(cursor);
-//      int textPos = cursor.position();
-//      if (textPos >= m_expression.size())
-//      {
-//        textPos = 0;
-//      }
-//      auto& pparser = m_expression.parser(textPos);
-
-//      bool doAddFunction = textPos == 0;
-
-//      if ( isFunction(pparser.name()) )
-//      {
-//        auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(Numeric::FunctionFactory::instance().createFitFunction(pparser.name()));
-//        if (cf)
-//        {
-//          doAddFunction = true;
-//        }
-//      }
-
-//      if (doAddFunction)
-//      {
-//        QMenu *context = new QMenu;
-
-//        QAction *action = new QAction("Add function",this);
-//        connect(action,SIGNAL(triggered()),this,SLOT(addFunction()));
-//        context->addAction(action);
-
-//        context->exec(QCursor::pos());
-//      }
-
-//      ev->accept();
-//      return true;
-//    }
-//  }
-//  else if (ev->type() == QEvent::ShortcutOverride)
-//  {
-//    QKeyEvent *kev = static_cast<QKeyEvent*>(ev);
-//    if (kev->key() == Qt::Key_Return && kev->modifiers() & Qt::ControlModifier)
-//    {
-//      emit needUpdateExpression();
-//    }
-//  }
-//  else if (ev->type() == QEvent::FocusOut)
-//  {
-//    //std::cerr << "event " << ev->type() << std::endl;
-//  }
-  return QWidget::eventFilter(obj,ev);
-}
-
-/**
- * Update m_expression to match the formula editor contents
- */
-void FitWidget::updateExpression()
-{
-//  try
-//  {
-//    auto fun = Numeric::FunctionFactory::instance().createFitFunction(
-//      m_form->teFunction->toPlainText().toStdString());
-//    if (fun)
-//    {
-//      m_expression.reset(fun->asString(true));
-//      m_form->teFunction->setText(QString::fromStdString(m_expression));
-//    }
-//    else
-//    {
-//      TaskManager::instance().errorMessage("Error in function definition");
-//    }
-//  }
-//  catch(std::exception& e)
-//  {
-//    TaskManager::instance().errorMessage(std::string("Error in function:\n")+e.what());
-//    m_form->teFunction->setText(QString::fromStdString(m_expression));
-//  }
-//  emit saved();
-}
-
-/**
- * Update the formula editor contents to match m_expression
- */
-void FitWidget::updateEditor()
-{
-  //m_form->teFunction->setText(QString::fromStdString(m_expression));
-  emit saved();
-}
 
 QString FitWidget::getFunction()
 {
@@ -195,60 +88,6 @@ QString FitWidget::getFunction()
   return "";
 }
 
-/**
- * Add a top-level function
- */
-void FitWidget::addFunction()
-{
-//  // text cursor position in the formula editor
-//  int textPos = m_form->teFunction->textCursor().position();
-//  if (textPos >= m_expression.size())
-//  {
-//    textPos = 0;
-//  }
-//  auto& pparser = m_expression.parser(textPos);
-
-//  auto dlg = new SelectFunctionDialog(this);
-//  if (dlg->exec() == QDialog::Accepted)
-//  {
-//    std::string fnName = dlg->getSelection().function;
-//    auto f = Numeric::FunctionFactory::instance().createFitFunction(fnName);
-//    if (f->name() == "UserFunction1D")
-//    {
-//      std::string formula = dlg->getSelection().formula;
-//      if ( formula.empty() )
-//      {
-//        formula = "a + b * x";
-//      }
-//      f->setAttributeValue("Formula",formula);
-//    }
-
-//    //updateExpression();
-//    auto fun = Numeric::FunctionFactory::instance().createFitFunction(pparser.str());
-
-//    auto cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(fun);
-//    if (!cf)
-//    {
-//      cf = boost::dynamic_pointer_cast<Numeric::CompositeFunction>(
-//        Numeric::FunctionFactory::instance().createFitFunction("CompositeFunction"));
-//      cf->addFunction(fun);
-//    }
-
-//    std::string expr = m_expression;
-//    if (cf->nFunctions() > 0)
-//    {
-//      cf->addFunction(f);
-//      expr.replace(pparser.getStartPos(),pparser.getStringSize(),cf->asString());
-//    }
-//    else
-//    {
-//      expr = f->asString();
-//    }
-//    fun = Numeric::FunctionFactory::instance().createFitFunction(expr);
-//    m_expression.reset(fun->asString(true));
-//    updateEditor();
-//  }
-}
 
 void FitWidget::fillWorkspaces()
 {
@@ -404,8 +243,6 @@ void FitWidget::fit()
     minimizer.initialize(Numeric::ICostFunction_sptr(leastSquares));
 
     minimizer.minimize();
-    m_expression.reset(fun->asString(true));
-    updateEditor();
 
     // create a table with parameters
     auto parsTable = boost::dynamic_pointer_cast<API::TableWorkspace>(
