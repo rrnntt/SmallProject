@@ -2,6 +2,8 @@
 #include "ui_FitWidget.h"
 #include "QtAPI/TaskManager.h"
 #include "QtAPI/SelectFunctionDialog.h"
+#include "QtAPI/PlotTask.h"
+#include "QtAPI/FunctionCurve.h"
 
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/IFunction.h"
@@ -36,9 +38,9 @@ m_form(new Ui::FitWidget)
 {
   m_form->setupUi(this);
 
-  connect(this,SIGNAL(needUpdateExpression()),this,SLOT(updateExpression()),Qt::QueuedConnection);
   connect(this,SIGNAL(needUpdateWorkspaces()),this,SLOT(fillWorkspaces()),Qt::QueuedConnection);
   connect(m_form->cbWorkspace,SIGNAL(currentIndexChanged(int)),this,SLOT(fillColumns(int)));
+  connect(m_form->cbXColumn,SIGNAL(currentIndexChanged(int)),this,SLOT(replot(int)));
   connect(m_form->btnFit,SIGNAL(clicked()),this,SLOT(fit()));
 
   m_form->sbMaxIterations->setValue(500);
@@ -55,7 +57,31 @@ m_form(new Ui::FitWidget)
 FitWidget::~FitWidget()
 {
   delete m_form;
-  API::WorkspaceManager::instance().notificationCenter.removeObserver(this);
+    API::WorkspaceManager::instance().notificationCenter.removeObserver(this);
+}
+
+/**
+  * Return name of the workspace being fitted to.
+  */
+QString FitWidget::getWorkspaceName() const
+{
+    return m_form->cbWorkspace->currentText();
+}
+
+/**
+  * Return name of the X column in the fitted workspace.
+  */
+QString FitWidget::getXColumn() const
+{
+    return m_form->cbXColumn->currentText();
+}
+
+/**
+  * Return name of the Y column in the fitted workspace.
+  */
+QString FitWidget::getYColumn() const
+{
+    return m_form->cbYColumn->currentText();
 }
 
 void FitWidget::handleAdd(const API::WorkspaceManager::AddNotification& nt)
@@ -116,6 +142,8 @@ void FitWidget::fillColumns(int)
   }
   try
   {
+      m_form->cbXColumn->blockSignals(true);
+      m_form->cbYColumn->blockSignals(true);
     auto ws = API::WorkspaceManager::instance().retrieve(m_form->cbWorkspace->currentText().toStdString());
     auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
     if (!tws) return;
@@ -186,9 +214,14 @@ void FitWidget::fillColumns(int)
     {
       m_form->cbErrColumn->setCurrentIndex(m_form->cbErrColumn->findText(QString::fromStdString(errColumn)));
     }
+    m_form->cbXColumn->blockSignals(false);
+    m_form->cbYColumn->blockSignals(false);
+    replot(0);
   }
   catch(...)
   {
+      m_form->cbXColumn->blockSignals(false);
+      m_form->cbYColumn->blockSignals(false);
     return;
   }
 }
@@ -299,6 +332,23 @@ void FitWidget::fit()
     TaskManager::instance().errorMessage(std::string("Fit failed:\n")+e.what());
   }
 
+}
+
+/**
+  * Replot the fitting curves.
+  */
+void FitWidget::replot(int)
+{
+    m_form->plot->removeAllCurves();
+    auto ws = API::WorkspaceManager::instance().retrieve(getWorkspaceName().toStdString());
+    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
+    if (!tws) throw std::runtime_error("Table workspace not found");
+    QString XColumn = getXColumn();
+    QString YColumn = getYColumn();
+    auto plotTask = TaskManager::instance().getAs<PlotTask>("PlotTask");
+    auto curve = plotTask->createCurve(tws, XColumn, YColumn);
+    m_form->plot->addCurve(curve);
+    m_form->plot->replot();
 }
 
 } // QtAPI

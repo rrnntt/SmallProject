@@ -18,6 +18,7 @@ namespace QtAPI
 
 class Table;
 class Plot;
+class FunctionCurve;
 
 class QTAPI_EXPORT PlotTask: public Task
 {
@@ -43,6 +44,8 @@ public:
 
   void addTableToPlot(Plot* plot, boost::shared_ptr<API::TableWorkspace> tws,
     std::vector<std::string>& columnNames) const;
+
+  FunctionCurve* createCurve(boost::shared_ptr<API::TableWorkspace> tws, const QString& XColumn, const QString& YColumn) const;
 
 protected slots:
   void showTablePlot();

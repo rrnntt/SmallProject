@@ -253,6 +253,36 @@ void PlotTask::addTableToPlot(Plot* plot, boost::shared_ptr<API::TableWorkspace>
   }
 }
 
+/**
+  * Create a curve from data in two columns of a table.
+  * @param XColumn :: Name of column with x values.
+  * @param YColumn :: Name of column with y values.
+  */
+FunctionCurve *PlotTask::createCurve(boost::shared_ptr<API::TableWorkspace> tws, const QString &XColumn, const QString &YColumn) const
+{
+    auto column = tws->getColumn(XColumn.toStdString());
+    auto columnX = column->asNumeric();
+    if (!columnX)
+    {
+        errorMessage("Column "+XColumn.toStdString()+" isn't numeric.");
+    }
+    column = tws->getColumn(YColumn.toStdString());
+    auto columnY = column->asNumeric();
+    if (!columnY)
+    {
+        errorMessage("Column "+YColumn.toStdString()+" isn't numeric.");
+    }
+    FunctionCurve* curve = new FunctionCurve;
+    std::vector<double> x,y;
+    columnX->fill(x);
+    columnY->fill(y);
+    curve->setData(x,y);
+    curve->setWorkspace(tws);
+    curve->setCurveStyle((FunctionCurve::CurveStyle)tws->getCurveStyle());
+    curve->setTitle(QString::fromStdString(tws->name()) + "_" + XColumn + "_" + YColumn);
+    return curve;
+}
+
 //------------------------------------
 //   Slots
 //------------------------------------

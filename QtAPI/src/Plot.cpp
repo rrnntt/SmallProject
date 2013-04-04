@@ -455,6 +455,23 @@ void Plot::removeCurve(PlotObject::id_t id)
 }
 
 /**
+  * Remove all curves.
+  */
+void Plot::removeAllCurves()
+{
+    auto items = getAllCurveItems();
+    foreach(PlotItem* item, items)
+    {
+      if ( item->getWorkspace() == m_curves )
+      {
+        m_curves->removeObject(item->getID());
+        item->detach();
+        delete item;
+      }
+    }
+}
+
+/**
  * Save to a file as an image
  * @param fileName :: Name of a file to save to.
  */

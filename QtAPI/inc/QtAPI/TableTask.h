@@ -19,7 +19,6 @@ namespace QtAPI
 {
 
 class Table;
-class Plot;
 
 class QTAPI_EXPORT TableTask: public Task
 {

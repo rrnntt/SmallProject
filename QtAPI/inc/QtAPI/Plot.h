@@ -48,6 +48,8 @@ public:
   void copyCurve(Plot* plot, PlotObject::id_t id);
   /// Remove a curve
   void removeCurve(PlotObject::id_t);
+  /// Remove all curves
+  void removeAllCurves();
 
   void setZoomBase();
   bool isZoomerEnabled() const;

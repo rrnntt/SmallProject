@@ -2,6 +2,7 @@
 #include "QtAPI/Table.h"
 #include "QtAPI/SubWindow.h"
 #include "QtAPI/WindowManager.h"
+#include "QtAPI/FunctionCurve.h"
 
 #include "API/WorkspaceFactory.h"
 #include "API/AlgorithmFactory.h"
@@ -132,7 +133,7 @@ void TableTask::showTable(const QString& wsName)
   catch(std::exception& e)
   {
     errorMessage("Cannot find workspace "+wsName.toStdString()+": \n"+e.what());
-  }
+    }
 }
 
 } // namespace QtAPI

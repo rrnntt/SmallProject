@@ -20,6 +20,9 @@ class QTAPI_EXPORT FitWidget: public QWidget, public Kernel::NotificationObserve
 public:
   FitWidget(QWidget* parent);
   ~FitWidget();
+  QString getWorkspaceName() const;
+  QString getXColumn() const;
+  QString getYColumn() const;
 protected:
   QString getFunction();
   bool isFunction(const std::string& fName) const;
@@ -29,6 +32,7 @@ protected slots:
   void fillWorkspaces();
   void fillColumns(int i = 0);
   void fit();
+  void replot(int);
 private:
   void handleAdd(const API::WorkspaceManager::AddNotification& nt);
   void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);
