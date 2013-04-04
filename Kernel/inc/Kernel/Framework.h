@@ -25,6 +25,7 @@ public:
   /// Load a given library
   bool openLibrary(const std::string & filepath);
   const std::string testDirectory() const;
+  void printoutSingletons()const;
 protected:
   Framework();
   std::map<std::string,Singleton*> m_singletons;

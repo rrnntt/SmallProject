@@ -169,6 +169,8 @@ if (CMAKE_HOST_WIN32)
   set( GSL_LIBS "optimized;${GSL_RELEASE_LIB};debug;${GSL_DEBUG_LIB};")
 else()
   find_package( GSL )
+  #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" ${GSL_EXE_LINKER_FLAGS}"/gslcblas")
+  set( GSL_LIBS ${GSL_LIBRARIES})
 endif()
 
 target_link_libraries(Numeric Kernel API Formula

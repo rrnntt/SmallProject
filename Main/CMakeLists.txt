@@ -6,14 +6,14 @@
 set( INC_FILES 
   test_spirit.h
   test_parser.h
-  test_problem.h
+  #test_problem.h
    )
 set( SRC_FILES 
   main.cpp
   test_spirit.cpp
   test_parser.cpp
   roman_numerals.cpp
-  test_problem.cpp
+#  test_problem.cpp
   )
   
 add_executable( Main ${SRC_FILES} ${INC_FILES} )
@@ -27,6 +27,6 @@ ${THIRD_PARTY_INCLUDE_DIR}
 )
 
 target_link_libraries(Main
-Kernel API Formula Teach
+Kernel API Formula
 #Numeric 
 )

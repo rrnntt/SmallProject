@@ -1,9 +1,13 @@
 #include "Kernel/Framework.h"
 
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 #include <iostream>
+#include <stdexcept>
 
-using namespace boost::filesystem;
+#include <QFileInfo>
+#include <QDir>
+
+//using namespace boost::filesystem;
 
 namespace Kernel
 {
@@ -102,9 +106,9 @@ Singleton* Framework::getSingleton(const std::string& name)
 
 void Framework::parseCommandLine(int argc, char** argv)
 {
-  path binPath(argv[0]);
+  QFileInfo binPath(argv[0]);
   //binPath.make_absolute();
-  m_binDirectory = absolute(binPath).parent_path().string()+"/";
+  m_binDirectory = binPath.absolutePath().toStdString() + "/";
   std::cerr << "bin directory: " << m_binDirectory << std::endl;
 }
 
@@ -119,7 +123,16 @@ const std::string Framework::binDirectory() const
 
 const std::string Framework::testDirectory() const
 {
-  return m_binDirectory + "../../../TestData/";
+    return m_binDirectory + "../../../TestData/";
+}
+
+void Framework::printoutSingletons() const
+{
+    std::cerr << "Singletons:\n";
+    for(auto s = m_singletons.begin(); s != m_singletons.end(); ++s)
+    {
+      std::cerr << "    " <<  s->first << std::endl;
+    }
 }
 
 } // Kernel

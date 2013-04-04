@@ -56,7 +56,7 @@ endif()
 
 #set( Boost_INCLUDE_DIR "C:/Users/hqs74821/Work/mantid/Code/Third_Party/include")
 set ( Boost_NO_BOOST_CMAKE TRUE )
-find_package( Boost REQUIRED signals date_time)
+find_package( Boost )
 find_package( Qt4 )
 #find_path( OSG_DIR "include/osg/Referenced" )
 add_definitions( -DBOOST_ALL_DYN_LINK -DQWT_DLL)

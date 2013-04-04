@@ -45,13 +45,14 @@ set( SRC_FILES
   src/Str.cpp
   src/Framework.cpp
   )
-if (CMAKE_HOST_UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl")
-endif()
+#if (CMAKE_HOST_UNIX)
+#  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl")
+#endif()
 message(${CMAKE_CXX_FLAGS})
 add_library( Kernel SHARED ${SRC_FILES} ${INC_FILES} )
 include_directories(inc)
 set_target_properties ( Kernel PROPERTIES COMPILE_DEFINITIONS IN_KERNEL )
+target_link_libraries(Kernel dl ${QT_QTCORE_LIBRARY})
 
 #target_link_libraries(Numeric
 #debug ${GSL_LIB_DEBUG}

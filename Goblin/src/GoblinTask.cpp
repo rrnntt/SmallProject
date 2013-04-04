@@ -173,7 +173,8 @@ void GoblinTask::plotLineList()
   auto task = QtAPI::TaskManager::instance().getAs<QtAPI::PlotTask>("PlotTask");
   if (task)
   {
-    auto plot = task->showPlot(lineList,std::vector<std::string>(1,"Intensity"));
+    std::vector<std::string> columns(1,"Intensity");
+    auto plot = task->showPlot(lineList,columns);
     plot->setCustomPicker(new GoblinPlotPicker(plot));
   }
 }
@@ -197,7 +198,8 @@ void GoblinTask::addLineList()
   auto task = QtAPI::TaskManager::instance().getAs<QtAPI::PlotTask>("PlotTask");
   if (task)
   {
-    task->addTableToPlot(m_plot,lineList,std::vector<std::string>(1,"Intensity"));
+    std::vector<std::string> columns(1,"Intensity");
+    task->addTableToPlot(m_plot,lineList,columns);
   }
 }
 

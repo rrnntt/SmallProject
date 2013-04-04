@@ -34,6 +34,7 @@ protected slots:
   void subWindowBecameActive(QtAPI::SubWindow*);
   void subWindowClosed(QtAPI::SubWindow*);
 private:
+  //QtAPI::WindowManager* m_windowManager;
   QMdiArea* m_mdiArea;
   AlgorithmExplorer* m_algorithmExplorer;
   WorkspaceExplorer* m_workspaceExplorer;

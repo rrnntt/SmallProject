@@ -22,9 +22,26 @@
 
 #include <iostream>
 
+class MyWindowManager: public QtAPI::WindowManager
+{
+public:
+    MyWindowManager(MainWindow* parent):m_mainWindow(parent)
+    {
+        QtAPI::WindowManager::createWindowManager(this);
+    }
+    QtAPI::SubWindow* newSubWindow(QWidget* widget)
+    {
+        return m_mainWindow->newSubWindow(widget);
+    }
+private:
+    MainWindow* m_mainWindow;
+};
+
 MainWindow::MainWindow()
   :QMainWindow()
+//    m_windowManager(new MyWindowManager(this))
 {
+
   setAttribute(Qt::WA_DeleteOnClose);
   resize(1200,600);
   m_mdiArea = new QMdiArea(this);
@@ -45,7 +62,7 @@ MainWindow::MainWindow()
   m_fitBrowser->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   this->addDockWidget(Qt::LeftDockWidgetArea,m_fitBrowser);
 
-  //createMenus();
+  createMenus();
 }
 
 MainWindow::~MainWindow()
@@ -81,15 +98,16 @@ void MainWindow::createMenus()
    viewTask->setMainWindow(this);
    QtAPI::TaskManager::instance().add("ViewTask",viewTask);
    //menuBar()->addMenu(viewTask->menu());
-  this->customMenuBar(menuBar(),nullptr);
+   QMenuBar *menu = menuBar();
+   customMenuBar(menu,nullptr);
 }
 
 void MainWindow::subWindowBecameActive(QtAPI::SubWindow* w)
 {
-  this->customMenuBar(menuBar(),w);
+  customMenuBar(menuBar(),w);
 }
 
 void MainWindow::subWindowClosed(QtAPI::SubWindow*)
 {
-  this->customMenuBar(menuBar(),nullptr);
+  customMenuBar(menuBar(),nullptr);
 }

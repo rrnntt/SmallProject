@@ -5,10 +5,12 @@
 #include "Kernel/Logger.h"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 #include <set>
 
-using namespace boost::filesystem;
+//using namespace boost::filesystem;
+#include <QDir>
+#include <QFileInfo>
 
 namespace Kernel
 {
@@ -30,41 +32,32 @@ namespace Kernel
   *  @param isRecursive :: Whether to search subdirectories.
   *  @return The number of libraries opened.
   */
-  int LibraryManager::OpenAllLibraries(const std::string& filePath,
-    bool isRecursive)
+  int LibraryManager::OpenAllLibraries(const std::string& filePath, bool isRecursive)
   {
     g_log.debug( "Opening all libraries in " + filePath );
     int libCount = 0;
-    //validate inputs
-    //Poco::File libPath;
-    path libPath;
-    try
-    {
-      libPath = path(filePath);
-    }
-    catch(...)
-    {
-      return libCount;
-    }
-    if ( exists(libPath) && is_directory(libPath) )
+    QString strPath = QString::fromStdString(filePath);
+    QFileInfo libPath(strPath);
+    if ( libPath.exists() && libPath.isDir() )
     {
       DllOpen::addSearchDirectory(filePath);
+      QDir dir(strPath);
       // Iteratate over the available files
-      directory_iterator end_itr;
-      for (directory_iterator itr(libPath); itr != end_itr; ++itr)
+      QFileInfoList entries = dir.entryInfoList();
+      foreach(QFileInfo entry, entries)
       {
-        const path & item = *itr;
-        if ( is_directory(item) )
+        std::string path = entry.filePath().toStdString();
+        if ( entry.isDir() )
         {
           if (isRecursive)
           {
-            libCount += OpenAllLibraries(item.string());
+            libCount += OpenAllLibraries(path);
           }
         }
         else
         {
-          if( skip(item.string()) ) continue;
-          if( loadLibrary(item.string()) ) 
+          if( skip(path) ) continue;
+          if( loadLibrary(path) )
           {
             ++libCount;
           }
@@ -117,28 +110,30 @@ namespace Kernel
 
   /** 
   * Load a library
-  * @param filepath :: The full path to a library as a string
+  * @param filePath :: The full path to a library as a string
   */
-  bool LibraryManager::loadLibrary(const std::string & filepath)
+  bool LibraryManager::loadLibrary(const std::string & filePath)
   {
+    QString strPath = QString::fromStdString(filePath);
+    QFileInfo libPath(strPath);
     // Get the name of the library.
-    std::string libName = DllOpen::ConvertToLibName(path(filepath).filename().string());
-    if( libName.empty() ) return false;
+    QString libName = QString::fromStdString( DllOpen::ConvertToLibName(libPath.fileName().toStdString()) );
+    if( libName.isEmpty() ) return false;
     // The wrapper will unload the library when it is deleted
     boost::shared_ptr<LibraryWrapper> dlwrap(new LibraryWrapper);
-    std::string libNameLower = boost::algorithm::to_lower_copy(libName);
+    std::string libNameLower = libName.toLower().toStdString();
 
     //Check that a libray with this name has not already been loaded
     if (OpenLibs.find(libNameLower) == OpenLibs.end())
     {
-      path directory = path(filepath).parent_path();
-      g_log.debug( "Trying to open library: " + libName + " from " + directory.string() + " ..." );
+      QDir directory = libPath.dir();
+      g_log.debug( "Trying to open library: " + libName.toStdString() + " from " + directory.path().toStdString() + " ..." );
       //Try to open the library
-      if (dlwrap->OpenLibrary(libName, directory.string()))
+      if (dlwrap->OpenLibrary(libName.toStdString(), directory.path().toStdString()))
       {
         //Successfully opened, so add to map
-        g_log.debug("Opened library: " + libName + ".\n");
-        OpenLibs.insert(std::pair< std::string, boost::shared_ptr<LibraryWrapper> >(libName, dlwrap) );
+        g_log.debug("Opened library: " + libName.toStdString() + ".\n");
+        OpenLibs.insert(std::pair< std::string, boost::shared_ptr<LibraryWrapper> >(libName.toStdString(), dlwrap) );
         return true;
       }
       else
@@ -148,7 +143,7 @@ namespace Kernel
     }
     else
     {
-      g_log.debug( libName + " already opened, skipping load\n" );
+      g_log.debug( libName.toStdString() + " already opened, skipping load\n" );
     }
     return false;
   }
