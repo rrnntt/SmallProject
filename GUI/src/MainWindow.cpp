@@ -1,5 +1,4 @@
 #include "MainWindow.h"
-//#include "Modeling/OSGWidget.h"
 #include "ViewTask.h"
 #include "AlgorithmExplorer.h"
 #include "WorkspaceExplorer.h"
@@ -22,24 +21,8 @@
 
 #include <iostream>
 
-class MyWindowManager: public QtAPI::WindowManager
-{
-public:
-    MyWindowManager(MainWindow* parent):m_mainWindow(parent)
-    {
-        QtAPI::WindowManager::createWindowManager(this);
-    }
-    QtAPI::SubWindow* newSubWindow(QWidget* widget)
-    {
-        return m_mainWindow->newSubWindow(widget);
-    }
-private:
-    MainWindow* m_mainWindow;
-};
-
 MainWindow::MainWindow()
   :QMainWindow()
-//    m_windowManager(new MyWindowManager(this))
 {
 
   setAttribute(Qt::WA_DeleteOnClose);
@@ -89,17 +72,11 @@ QtAPI::SubWindow* MainWindow::newSubWindow(QWidget* widget)
 
 void MainWindow::createMenus()
  {
-   //// File menu
-   //QtAPI::Task_ptr fileTask = QtAPI::TaskManager::instance().retrieve("FileTask");
-   //menuBar()->addMenu(fileTask->menu());
-
    // View menu
    ViewTask* viewTask = new ViewTask();
    viewTask->setMainWindow(this);
    QtAPI::TaskManager::instance().add("ViewTask",viewTask);
-   //menuBar()->addMenu(viewTask->menu());
-   QMenuBar *menu = menuBar();
-   customMenuBar(menu,nullptr);
+   customMenuBar(menuBar(),nullptr);
 }
 
 void MainWindow::subWindowBecameActive(QtAPI::SubWindow* w)
