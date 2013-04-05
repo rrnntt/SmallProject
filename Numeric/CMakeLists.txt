@@ -27,6 +27,7 @@ set( INC_FILES
    inc/Numeric/DomainFactory.h
    inc/Numeric/DomainCreatorTable1D.h
    inc/Numeric/FuncMinimizerFactory.h
+   inc/Numeric/FunctionComposition.h
    inc/Numeric/FunctionDomain.h
    inc/Numeric/FunctionDomain1D.h
    inc/Numeric/FunctionFactory.h
@@ -112,6 +113,7 @@ set( SRC_FILES
   src/DomainFactory.cpp
   src/DomainCreatorTable1D.cpp
   src/FuncMinimizerFactory.cpp
+  src/FunctionComposition.cpp
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp
   src/FunctionFactory.cpp
@@ -205,6 +207,7 @@ set( SRC_FILES
   test/DistributionTest.cpp
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp
+  test/FunctionCompositionTest.cpp
   test/FunctionDomain1DTest.cpp
   test/FunctionFactoryTest.cpp
   test/FuncMinimizerFactoryTest.cpp

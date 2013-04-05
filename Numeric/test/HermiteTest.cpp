@@ -118,15 +118,15 @@ TEST(Numeric_Hermite_Test, PartialQuad3Test)
   auto& r = L.getRoots();
   auto& w = L.getWeights();
 
-  const size_t mq = 4;
+  const size_t mq = 3;
   Hermite L1(mq);
 
   std::vector<double> rp; // partial roots
   //rp = L1.getRoots();
-  rp.push_back( -1.3 );
-  rp.push_back( -0.4 );
-  rp.push_back( 0.4 );
-  rp.push_back( 1.3 );
+  rp.push_back( r[4] );
+  rp.push_back( r[5] );
+  rp.push_back( r[6]+0.33 );
+  rp.push_back( r[3]-0.5 );
   std::vector<double> wp; // partial weights
 
   //system("pause");
@@ -147,5 +147,15 @@ TEST(Numeric_Hermite_Test, PartialQuad3Test)
   }
 
   std::cerr << "=======  T  ========" << std::endl;
-  std::cerr << T;
+  std::cerr << T << std::endl;
+
+  std::cerr << "H1^2 " << test_integrate2(rp,wp,Hermite(1)) << ' ' << test_integrate2(r,w,Hermite(1)) << std::endl;
+  std::cerr << "H2   " << test_integrate(rp,wp,Hermite(2)) << ' ' << test_integrate(r,w,Hermite(2)) << std::endl;
+  std::cerr << "H3   " << test_integrate(rp,wp,Hermite(3)) << ' ' << test_integrate(r,w,Hermite(3)) << std::endl;
+  std::cerr << "H2^2 " << test_integrate2(rp,wp,Hermite(2)) << ' ' << test_integrate2(r,w,Hermite(2)) << std::endl;
+  std::cerr << "H4   " << test_integrate(rp,wp,Hermite(4)) << ' ' << test_integrate(r,w,Hermite(4)) << std::endl;
+  std::cerr << "H5   " << test_integrate(rp,wp,Hermite(5)) << ' ' << test_integrate(r,w,Hermite(5)) << std::endl;
+  std::cerr << "H6   " << test_integrate(rp,wp,Hermite(6)) << ' ' << test_integrate(r,w,Hermite(6)) << std::endl;
+  std::cerr << "H3^2 " << test_integrate2(rp,wp,Hermite(3)) << ' ' << test_integrate2(r,w,Hermite(3)) << std::endl;
+
 }

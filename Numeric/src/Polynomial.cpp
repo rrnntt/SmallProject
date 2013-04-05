@@ -606,30 +606,44 @@ void Polynomial::partialQuadrature3(
   const size_t mq = r.size();
 
   // barycentric weights 
-  std::vector<double> barw(mq);
-  for(size_t i = 0; i < mq; ++i)
-  {
-    double d = 1.0;
-    for(size_t k = 0; k < mq; ++k)
-    {
-      if ( i == k ) continue;
-      d /= r[i] - r[k];
-    }
-    barw[i] = d;
-  }
+  //std::vector<double> barw(mq);
+  //for(size_t i = 0; i < mq; ++i)
+  //{
+  //  double d = 1.0;
+  //  for(size_t k = 0; k < mq; ++k)
+  //  {
+  //    if ( i == k ) continue;
+  //    d /= r[i] - r[k];
+  //  }
+  //  barw[i] = d;
+  //}
 
   // the S matrix of interpolation coefficients from 'small' to 'big' quadrature
   GSLMatrix S( nq, mq);
+  //for(size_t i = 0; i < nq; ++i)
+  //{
+  //  double d = 0.0;
+  //  for(size_t k = 0; k < mq; ++k)
+  //  {
+  //    d += barw[k] / (m_roots[i] - r[k]);
+  //  }
+  //  for(size_t j = 0; j < mq; ++j)
+  //  {
+  //    S.set( i, j, barw[j] / (m_roots[i] - r[j]) / d );
+  //  }
+  //}
+
   for(size_t i = 0; i < nq; ++i)
   {
-    double d = 0.0;
-    for(size_t k = 0; k < mq; ++k)
-    {
-      d += barw[k] / (m_roots[i] - r[k]);
-    }
     for(size_t j = 0; j < mq; ++j)
     {
-      S.set( i, j, barw[j] / (m_roots[i] - r[j]) / d );
+      double d = 1.0;
+      for(size_t k = 0; k < mq; ++k)
+      {
+        if ( k == j ) continue;
+        d *= (m_roots[i] - r[k]) / (r[j] - r[k]);
+      }
+      S.set( i, j, d );
     }
   }
 
