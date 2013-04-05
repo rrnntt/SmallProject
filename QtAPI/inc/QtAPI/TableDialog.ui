@@ -170,6 +170,11 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Function</string>
+        </attribute>
+       </widget>
       </widget>
      </item>
     </layout>

@@ -5,6 +5,7 @@
 
 set( INC_FILES 
    inc/Numeric/BFGS_Minimizer.h
+   inc/Numeric/BackToBackExponential.h
    inc/Numeric/Chebfun.h
    inc/Numeric/Chebfun2DSpline.h
    inc/Numeric/ChebfunVector.h
@@ -88,6 +89,7 @@ set( INC_FILES
    )
 set( SRC_FILES 
   src/BFGS_Minimizer.cpp
+  src/BackToBackExponential.cpp
   src/Chebfun.cpp
   src/Chebfun2DSpline.cpp
   src/ChebfunVector.cpp
@@ -185,6 +187,7 @@ ${GSL_LIBS}
 set( INC_FILES )
 set( SRC_FILES 
   test/main.cpp
+  test/BackToBackExponentialTest.cpp
   test/ChebFunctionTest.cpp
   test/ChebOperatorTest.cpp
   test/ChebfunTest.cpp

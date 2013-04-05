@@ -46,9 +46,9 @@ public:
   void setParameters(const GSLVector& params);
   void getParameters(GSLVector& params) const;
 
-protected:
-
   virtual void calActiveCovarianceMatrix(GSLMatrix& covar, double epsrel = 1e-8);
+
+protected:
 
   void addVal(
     FunctionDomain_sptr domain,

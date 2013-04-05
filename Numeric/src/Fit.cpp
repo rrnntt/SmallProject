@@ -5,6 +5,7 @@
 #include "Numeric/LevenbergMarquardt.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/ChebfunWorkspace.h"
+#include "Numeric/GSLMatrix.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -88,6 +89,10 @@ void Fit::exec()
   minimizer.initialize(ICostFunction_sptr(leastSquares));
 
   minimizer.minimize();
+
+  // calculate the covariance matrix
+  GSLMatrix covar;
+  leastSquares->calActiveCovarianceMatrix( covar );
 }
 
 //======================================================================

@@ -12,6 +12,8 @@ namespace Numeric
   extern NUMERIC_EXPORT const double minf;
   /// PI
   extern NUMERIC_EXPORT const double pi;
+  /// sqrt(2.0)
+  extern NUMERIC_EXPORT const double sqrt_2;
 
   /// Proton mass in kg
   extern NUMERIC_EXPORT const double mass_p;

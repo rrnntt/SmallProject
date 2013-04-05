@@ -10,6 +10,7 @@ namespace Numeric
   const double inf = std::numeric_limits<double>::infinity();
   const double minf = -inf;
   const double pi = M_PI;
+  const double sqrt_2 = M_SQRT2;
 
   const double mass_p = 1.672621777e-27; // kg
   const double mass_e = 9.10938291e-31; // kg
