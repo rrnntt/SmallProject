@@ -469,6 +469,7 @@ void Plot::removeAllCurves()
         delete item;
       }
     }
+    m_colorIndex = 0;
 }
 
 /**

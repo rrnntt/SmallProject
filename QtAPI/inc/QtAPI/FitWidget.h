@@ -7,6 +7,8 @@
 
 #include <QWidget>
 
+class QAction;
+
 namespace Ui {
   class FitWidget;
 }
@@ -26,6 +28,7 @@ public:
 protected:
   QString getFunction();
   bool isFunction(const std::string& fName) const;
+  void initPlot();
 signals:
   void needUpdateWorkspaces();
 protected slots:
@@ -33,11 +36,15 @@ protected slots:
   void fillColumns(int i = 0);
   void fit();
   void replot(int);
+  void replot(){ replot(0); }
+  void showPlotDialog();
 private:
   void handleAdd(const API::WorkspaceManager::AddNotification& nt);
   void handleDelete(const API::WorkspaceManager::DeleteNotification& nt);
 
   Ui::FitWidget *m_form;
+  QAction *m_showPlotDialog;
+  QAction *m_replot;
 };
 
 } // QTAPI

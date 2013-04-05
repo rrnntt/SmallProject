@@ -4,6 +4,7 @@
 #include "QtAPI/SelectFunctionDialog.h"
 #include "QtAPI/PlotTask.h"
 #include "QtAPI/FunctionCurve.h"
+#include "QtAPI/PlotDialog.h"
 
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/IFunction.h"
@@ -25,6 +26,7 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QStringList>
+#include <QAction>
 
 namespace QtAPI
 {
@@ -41,7 +43,23 @@ m_form(new Ui::FitWidget)
   connect(this,SIGNAL(needUpdateWorkspaces()),this,SLOT(fillWorkspaces()),Qt::QueuedConnection);
   connect(m_form->cbWorkspace,SIGNAL(currentIndexChanged(int)),this,SLOT(fillColumns(int)));
   connect(m_form->cbXColumn,SIGNAL(currentIndexChanged(int)),this,SLOT(replot(int)));
+  connect(m_form->cbYColumn,SIGNAL(currentIndexChanged(int)),this,SLOT(replot(int)));
   connect(m_form->btnFit,SIGNAL(clicked()),this,SLOT(fit()));
+
+  initPlot();
+
+  //  Actions
+
+  m_showPlotDialog = new QAction("Plot settings...", this);
+  connect(m_showPlotDialog,SIGNAL(triggered()),this,SLOT(showPlotDialog()));
+
+  m_replot = new QAction("Replot",this);
+  connect(m_replot,SIGNAL(triggered()),this,SLOT(replot()));
+
+  QMenu *optionsMenu = new QMenu(this);
+  optionsMenu->addAction(m_replot);
+  optionsMenu->addAction(m_showPlotDialog);
+  m_form->btnOptions->setMenu(optionsMenu);
 
   m_form->sbMaxIterations->setValue(500);
   fillWorkspaces();
@@ -49,6 +67,7 @@ m_form(new Ui::FitWidget)
   setHandler(this,&FitWidget::handleAdd);
   setHandler(this,&FitWidget::handleDelete);
   API::WorkspaceManager::instance().notificationCenter.addObserver(this);
+
 }
 
 /**
@@ -100,7 +119,17 @@ void FitWidget::handleDelete(const API::WorkspaceManager::DeleteNotification& nt
  */
 bool FitWidget::isFunction(const std::string& fName) const
 {
-  return Numeric::FunctionFactory::instance().exists(fName);
+    return Numeric::FunctionFactory::instance().exists(fName);
+}
+
+/**
+  * Initialize Plot widget - set defaults.
+  */
+void FitWidget::initPlot()
+{
+    m_form->plot->setTitle("");
+    m_form->plot->setAxisAutoScale(Plot::yLeft);
+    m_form->plot->setAxisAutoScale(Plot::xBottom);
 }
 
 
@@ -326,6 +355,8 @@ void FitWidget::fit()
     diffCalcColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
     diffDiffColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
     API::WorkspaceManager::instance().addOrReplace(wsName+"_Calc",diffTable);
+    m_form->funBrowser->setFunction(fun);
+    replot();
   }
   catch(std::exception& e)
   {
@@ -340,15 +371,47 @@ void FitWidget::fit()
 void FitWidget::replot(int)
 {
     m_form->plot->removeAllCurves();
-    auto ws = API::WorkspaceManager::instance().retrieve(getWorkspaceName().toStdString());
-    auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
-    if (!tws) throw std::runtime_error("Table workspace not found");
-    QString XColumn = getXColumn();
-    QString YColumn = getYColumn();
+    initPlot();
     auto plotTask = TaskManager::instance().getAs<PlotTask>("PlotTask");
-    auto curve = plotTask->createCurve(tws, XColumn, YColumn);
-    m_form->plot->addCurve(curve);
-    m_form->plot->replot();
+    std::string wsName = getWorkspaceName().toStdString();
+    try
+    {
+        // make fit-data curve
+        auto ws = API::WorkspaceManager::instance().retrieve(wsName);
+        auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
+        if (!tws) throw std::runtime_error("Table workspace not found");
+        QString XColumn = getXColumn();
+        QString YColumn = getYColumn();
+        auto curve = plotTask->createCurve(tws, XColumn, YColumn);
+        m_form->plot->addCurve(curve);
+
+        // try and make the calculated curve
+        try
+        {
+            wsName += "_Calc";
+            auto ws = API::WorkspaceManager::instance().retrieve(wsName);
+            auto tws = boost::dynamic_pointer_cast<API::TableWorkspace>(ws);
+            auto curve = plotTask->createCurve(tws, getXColumn(), "Calc");
+            m_form->plot->addCurve(curve);
+            curve = plotTask->createCurve(tws, getXColumn(), "Diff");
+            m_form->plot->addCurve(curve);
+        }
+        catch(...)
+        {}
+
+        m_form->plot->replot();
+    }
+    catch (...)
+    {}
+}
+
+/**
+  * Show dialog to set plot options.
+  */
+void FitWidget::showPlotDialog()
+{
+    PlotDialog dlg(m_form->plot);
+    dlg.exec();
 }
 
 } // QtAPI
