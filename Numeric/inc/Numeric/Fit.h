@@ -14,6 +14,10 @@ public:
   virtual std::string name() const {return "Fit";}
 protected:
   virtual void exec();
+  void applyProperty(const std::string& name);
+private:
+  bool m_functionSet;
+  bool m_workspaceSet;
 };
 
 } // NUMERIC

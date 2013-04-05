@@ -3,7 +3,7 @@
 
 #include "${Namespace}/DllExport.h"
 #include "${Namespace}/${FactoryType}.h"
-#include "API/Singleton.h"
+#include "Kernel/Singleton.h"
 #include "Kernel/DynamicFactory.h"
 
 namespace ${Namespace}
@@ -12,7 +12,7 @@ namespace ${Namespace}
 /**
  * A factory for dynamically creating instances of ${FactoryType}.
  */
-class ${NAMESPACE}_EXPORT ${ClassName}: public Kernel::DynamicFactory<${FactoryType}>, protected API::Singleton
+class ${NAMESPACE}_EXPORT ${ClassName}: public Kernel::DynamicFactory<${FactoryType}>, protected Kernel::Singleton
 {
 public:
   virtual std::string name() const {return "${ClassName}";}

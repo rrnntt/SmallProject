@@ -23,6 +23,9 @@ set( INC_FILES
    inc/Numeric/Distribution.h
    inc/Numeric/DerivMinimizer.h
    inc/Numeric/DomainMap.h
+   inc/Numeric/DomainCreator.h
+   inc/Numeric/DomainFactory.h
+   inc/Numeric/DomainCreatorTable1D.h
    inc/Numeric/FuncMinimizerFactory.h
    inc/Numeric/FunctionDomain.h
    inc/Numeric/FunctionDomain1D.h
@@ -105,6 +108,9 @@ set( SRC_FILES
   src/Distribution.cpp
   src/DerivMinimizer.cpp
   src/DomainMap.cpp
+  src/DomainCreator.cpp
+  src/DomainFactory.cpp
+  src/DomainCreatorTable1D.cpp
   src/FuncMinimizerFactory.cpp
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp

@@ -39,7 +39,10 @@ namespace
 
 //======================================================================
 /// Constructor. Declare algorithm properties.
-Fit::Fit()
+Fit::Fit():
+    API::Algorithm(),
+    m_functionSet(false),
+    m_workspaceSet(false)
 {
   // FunctionFcatory init string for a fitting function
   declareClass("Function",&FunctionFactory::instance());
@@ -93,6 +96,23 @@ void Fit::exec()
   // calculate the covariance matrix
   GSLMatrix covar;
   leastSquares->calActiveCovarianceMatrix( covar );
+}
+
+/**
+  * Declare additional properties (if needed) after Function and Workspace
+  * have been set.
+  * @param name :: Name of property just set.
+  */
+void Fit::applyProperty(const std::string &name)
+{
+    if (name == "Function")
+    {
+        m_functionSet = true;
+    }
+    if (name == "W")
+    {
+        m_functionSet = true;
+    }
 }
 
 //======================================================================
