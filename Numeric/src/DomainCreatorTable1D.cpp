@@ -20,7 +20,7 @@ DomainCreatorTable1D::~DomainCreatorTable1D()
 /**
   *
   */
-void DomainCreatorTable1D::createDomain(const IFunction &fun, const Workspace &ws, FunctionDomain_sptr &domain, FunctionValues_sptr &values)
+void DomainCreatorTable1D::createDomain(const IFunction &fun, const API::Workspace &ws, FunctionDomain_sptr &domain, FunctionValues_sptr &values)
 {
 }
 

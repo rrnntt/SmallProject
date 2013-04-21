@@ -12,8 +12,8 @@ class NUMERIC_EXPORT DomainCreatorTable1D: public DomainCreator
 public:
   DomainCreatorTable1D();
   ~DomainCreatorTable1D();
-  void createDomain(const IFunction& fun, const Workspace& ws);
-  void createDomain(const IFunction& fun, const Workspace& ws, FunctionDomain_sptr& domain, FunctionValues_sptr& values);
+  void createDomain(const IFunction& fun, const API::Workspace& ws);
+  void createDomain(const IFunction& fun, const API::Workspace& ws, FunctionDomain_sptr& domain, FunctionValues_sptr& values);
 };
 
 } // Numeric

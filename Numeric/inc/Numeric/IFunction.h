@@ -121,7 +121,7 @@ public:
    * Const version of AttributeVisitor. 
    */
   template<typename T = void>
-  class NUMERIC_EXPORT ConstAttributeVisitor: public boost::static_visitor<T>
+  class ConstAttributeVisitor: public boost::static_visitor<T>
   {
   public:
     /// Virtual destructor

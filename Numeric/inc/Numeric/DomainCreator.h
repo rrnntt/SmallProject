@@ -21,9 +21,9 @@ public:
   DomainCreator();
   ~DomainCreator();
   /// Check if this creator can create a domain for given function and workspace.
-  virtual bool canCreateDomain(const IFunction& fun, const Workspace& ws) = 0;
+  virtual bool canCreateDomain(const IFunction& fun, const API::Workspace& ws) = 0;
   /// Create domain and values objects based on given function and workspace.
-  virtual void createDomain(const IFunction& fun, const Workspace& ws, FunctionDomain_sptr& domain, FunctionValues_sptr& values) = 0;
+  virtual void createDomain(const IFunction& fun, const API::Workspace& ws, FunctionDomain_sptr& domain, FunctionValues_sptr& values) = 0;
 };
 
 } // Numeric

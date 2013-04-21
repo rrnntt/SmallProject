@@ -4,7 +4,7 @@
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/CompositeFunction.h"
 //#include "MantidAPI/ITableWorkspace.h"
-//#include "MantidAPI/IPeakFunction.h"
+#include "Numeric/IFunction.h"
 //#include "MantidAPI/IBackgroundFunction.h"
 //#include "MantidAPI/AlgorithmManager.h"
 //#include "MantidAPI/FrameworkManager.h"
