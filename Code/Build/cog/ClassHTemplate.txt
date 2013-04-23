@@ -1,0 +1,27 @@
+//[[[cog from cogdefs import * ]]]
+//[[[end]]]
+
+#ifndef ${NAMESPACE}_${CLASSNAME}_H
+#define ${NAMESPACE}_${CLASSNAME}_H
+
+#include "${Namespace}/DllExport.h"
+
+namespace ${Namespace}
+{
+
+class ${NAMESPACE}_EXPORT ${ClassName}
+{
+public:
+  ${ClassName}();
+  ~${ClassName}();
+};
+
+} // ${Namespace}
+
+#endif // ${NAMESPACE}_${CLASSNAME}_H
+
+//[[[cog start_namespace('MyNamespace') ]]]
+namespace MyNamespace
+{
+//[[[end]]]
+
