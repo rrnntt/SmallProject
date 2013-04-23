@@ -3,7 +3,7 @@
 #
 
 # Add the path to our custom 'find' modules
-set ( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+set ( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/Build/CMake")
 
 project(SmallProject)
 
