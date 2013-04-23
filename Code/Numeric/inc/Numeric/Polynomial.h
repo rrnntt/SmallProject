@@ -13,11 +13,16 @@ namespace Numeric
 class GSLMatrix;
 
 /**
- * A member of an orthogonal polynomial basis. Intentional use:
- * quadratures.
- *
- * The concrete classes must implement updateABC() and unscaledWeightIntegral()
- * if it returns number other than 1.0.
+  @brief A member of an orthogonal polynomial basis. Intentional use: quadratures.
+
+  An orthogonal polynomial basis \f$P_n\f$ satisfies a recurrence relationship:
+
+  \f[
+  P_{n+1}=(c_n x - a_n) P_n - b_n P_{n-1}
+  \f]
+
+  The concrete classes must implement updateABC() and unscaledWeightIntegral()
+  if it returns number other than 1.0.
  */
 class NUMERIC_EXPORT Polynomial: public IFunction1D, public ParamFunction
 {

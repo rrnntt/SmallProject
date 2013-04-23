@@ -17,6 +17,7 @@ set( INC_FILES
    inc/Numeric/ConstraintFactory.h
    inc/Numeric/CostFunctionFactory.h
    inc/Numeric/CostFuncFitting.h
+   inc/Numeric/ConstantFunction.h
    inc/Numeric/Constants.h
    inc/Numeric/CustomPolynomial.h
    inc/Numeric/DllExport.h
@@ -54,6 +55,7 @@ set( INC_FILES
    inc/Numeric/LeastSquares.h
    inc/Numeric/LevenbergMarquardt.h
    inc/Numeric/MultiDomainFunction.h
+   inc/Numeric/NonPolynomial.h
    inc/Numeric/ParameterReference.h
    inc/Numeric/ParameterTie.h
    inc/Numeric/ParamFunction.h
@@ -104,6 +106,7 @@ set( SRC_FILES
   src/ConstraintFactory.cpp
   src/CostFunctionFactory.cpp
   src/CostFuncFitting.cpp
+  src/ConstantFunction.cpp
   src/Constants.cpp
   src/CustomPolynomial.cpp
   src/Distribution.cpp
@@ -134,6 +137,7 @@ set( SRC_FILES
   src/LeastSquares.cpp
   src/LevenbergMarquardt.cpp
   src/MultiDomainFunction.cpp
+  src/NonPolynomial.cpp
   src/ParamFunction.cpp
   src/ParameterReference.cpp
   src/ParameterTie.cpp
@@ -222,6 +226,7 @@ set( SRC_FILES
   test/LaguerreWeightTest.cpp
   test/LeastSquaresTest.cpp
   test/LevenbergMarquardtTest.cpp
+  test/NonPolynomialTest.cpp
   test/ParamFunctionTest.cpp
   test/ProductFunctionTest.cpp
   test/QuadratureTest.cpp
