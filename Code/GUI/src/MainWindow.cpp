@@ -29,6 +29,8 @@ MainWindow::MainWindow()
   resize(1200,600);
   m_mdiArea = new QMdiArea(this);
   setCentralWidget(m_mdiArea);
+  m_mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  m_mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
   // AlgorithmExplorer
   m_algorithmExplorer = new AlgorithmExplorer(this);

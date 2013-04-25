@@ -27,6 +27,8 @@ public:
     /* Own public methods */
     /// Set the \f$x\f$ function
     void setXFunction(IFunction_sptr xfun);
+    double startX() const {return m_startX;}
+    double endX() const {return m_endX;}
 protected:
     /// Recalculate (re-fill) m_a, m_b, m_c
     virtual void updateABC() const;
@@ -37,6 +39,8 @@ protected:
 private:
 
     IFunction_sptr m_xfun;
+    double m_startX;
+    double m_endX;
 
 };
 

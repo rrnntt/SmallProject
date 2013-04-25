@@ -51,6 +51,7 @@ Fit::Fit():
   declareString("XColumn");
   declareString("YColumn");
   declareString("ErrColumn");
+  declareInt("MaxIterations");
 }
 
 /**----------------------------------------------------------------------
@@ -60,6 +61,7 @@ void Fit::exec()
 {
   IFunction_sptr fun = getClass("Function");
   API::Workspace_ptr ws = getClass("InputWorkspace");
+  const int maxIterations = get("MaxIterations");
 
   if ( fun->nParams() == 0 )
   {
@@ -91,7 +93,7 @@ void Fit::exec()
   LevenbergMarquardt minimizer;
   minimizer.initialize(ICostFunction_sptr(leastSquares));
 
-  minimizer.minimize();
+  minimizer.minimize(maxIterations);
 
   // calculate the covariance matrix
   GSLMatrix covar;

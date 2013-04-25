@@ -130,6 +130,7 @@ void FitWidget::initPlot()
     m_form->plot->setTitle("");
     m_form->plot->setAxisAutoScale(Plot::yLeft);
     m_form->plot->setAxisAutoScale(Plot::xBottom);
+    m_form->plot->enableZoomer();
 }
 
 
@@ -399,6 +400,7 @@ void FitWidget::replot(int)
         catch(...)
         {}
 
+        m_form->plot->setZoomBase();
         m_form->plot->replot();
     }
     catch (...)
