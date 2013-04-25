@@ -1197,7 +1197,8 @@ void FunctionBrowser::addFunction()
 
 /**
  * Return the function 
- * @param prop :: Function property 
+ * @param prop :: Function property: QtProperty refering to a function which is to be returned.
+        If NULL return the whole function.
  */
 Numeric::IFunction_sptr FunctionBrowser::getFunction(QtProperty* prop)
 {

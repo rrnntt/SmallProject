@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>610</width>
-    <height>429</height>
+    <width>629</width>
+    <height>531</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Define Table</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -174,6 +174,45 @@
         <attribute name="title">
          <string>Function</string>
         </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Column with arguments</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QtAPI::ColumnBox" name="columnBox"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QtAPI::FunctionBrowser" name="functionBrowser" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
@@ -191,6 +230,19 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtAPI::FunctionBrowser</class>
+   <extends>QWidget</extends>
+   <header>inc/QtAPI/FunctionBrowser.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QtAPI::ColumnBox</class>
+   <extends>QComboBox</extends>
+   <header>inc/QtAPI/ColumnBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

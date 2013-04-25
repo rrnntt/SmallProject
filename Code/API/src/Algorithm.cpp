@@ -36,7 +36,7 @@ namespace API
    */
   void Algorithm::declareWorkspace(const std::string& propName, Kernel::Property::Direction dir)
   {
-    declareClass( propName, &WorkspaceManager::instance(), dir );
+      declareClass( propName, &WorkspaceManager::instance(), dir );
   }
 
   /// Set a value of a workspace property

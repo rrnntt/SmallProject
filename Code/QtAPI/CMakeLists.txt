@@ -6,6 +6,7 @@ set( INC_FILES
    inc/QtAPI/DllExport.h
    inc/QtAPI/AlgorithmInputHistory.h
    inc/QtAPI/ColorBox.h
+   inc/QtAPI/ColumnBox.h
    inc/QtAPI/FunctionCurve.h
    inc/QtAPI/Plot.h
    inc/QtAPI/PlotCurve.h
@@ -38,6 +39,7 @@ set( INC_FILES
 set( SRC_FILES 
   src/AlgorithmInputHistory.cpp
   src/ColorBox.cpp
+  src/ColumnBox.cpp
   src/FunctionCurve.cpp
   src/Plot.cpp
   src/PlotCurve.cpp
@@ -70,6 +72,7 @@ set( SRC_FILES
   
 set( MOC_HEADERS
    inc/QtAPI/ColorBox.h
+   inc/QtAPI/ColumnBox.h
    inc/QtAPI/PlotCurve.h
    inc/QtAPI/PlotDialog.h
    inc/QtAPI/PatternBox.h

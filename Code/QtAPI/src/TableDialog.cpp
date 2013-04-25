@@ -1,5 +1,6 @@
 #include "QtAPI/TableDialog.h"
 #include "QtAPI/AddTableColumnDialog.h"
+//#include "QtAPI/ColumnBox.h"
 #include "ui_TableDialog.h"
 
 #include "API/TableWorkspace.h"
@@ -27,7 +28,8 @@ const int veryBigRowCount = 100000;
 TableDialog::TableDialog(QWidget *parent,boost::shared_ptr<API::TableWorkspace> ws) :
     QDialog(parent),
     ui(new Ui::TableDialog),
-    m_workspace(ws)
+    m_workspace(ws),
+    m_formulaChangesSaved(false)
 {
     ui->setupUi(this);
 
@@ -60,6 +62,7 @@ void TableDialog::init()
   selectedColumn();
   initFormulaPage();
   initDistributionPage();
+  initFunctionPage();
   connect(ui->cbDistribution,SIGNAL(currentIndexChanged(int)),this,SLOT(updateDistributionPage(int)));
   connect(ui->buttonBox,SIGNAL(clicked(QAbstractButton*)),this,SLOT(applyButton(QAbstractButton*)));
   connect(ui->btnAddColumn,SIGNAL(clicked()),this,SLOT(addColumn()));
@@ -111,6 +114,7 @@ void TableDialog::initFormulaPage()
   __add_to_tableVariables("Scalar","i");
   __add_to_tableVariables("Scalar","pi");
   __add_to_tableVariables("Scalar","e");
+  connect(ui->textEdit,SIGNAL(textChanged()),this,SLOT(formulaChanged()));
 }
 
 #undef __add_to_tableVariables
@@ -124,6 +128,14 @@ void TableDialog::initDistributionPage()
   dist << "" << "Serial numbers" << "Uniform" << "Poisson" << "Normal";
   ui->cbDistribution->addItems(dist);
   updateDistributionPage(0);
+}
+
+/**
+ * Initial setup of the Function page.
+ */
+void TableDialog::initFunctionPage()
+{
+    ui->columnBox->setTableWorkspace(m_workspace,false,API::NumericColumn::X);
 }
 
 /**
@@ -259,6 +271,10 @@ void TableDialog::apply()
   {
     applyFormula();
   }
+  else if (tabName == "Function")
+  {
+    applyFunction();
+  }
 }
 
 void TableDialog::applyDistribution()
@@ -322,10 +338,11 @@ void TableDialog::applyDistribution()
 }
 
 /**
- * 
+ * Apply the formula entered in the text area of the Formula page to calculate values in a column.
  */
 void TableDialog::applyFormula()
 {
+    if ( m_formulaChangesSaved ) return;
   auto column = m_workspace->getColumn(selectedColumn());
   if (!column->isNumeric())
   {
@@ -348,6 +365,31 @@ void TableDialog::applyFormula()
   {
     QMessageBox::critical(parentWidget(),"Error",QString("Formula failed \n")+e.what());
   }
+  m_formulaChangesSaved = true;
+}
+
+/**
+  Apply the function set in the Function page.
+  */
+void TableDialog::applyFunction()
+{
+    auto column = m_workspace->getColumn(selectedColumn());
+    if ( !column ) return;
+    try
+    {
+        auto fun = ui->functionBrowser->getFunction();
+        API::Algorithm_ptr alg = API::AlgorithmFactory::instance().createAlgorithm("AddFunctionValuesToTable");
+        alg->setProperty("Workspace", m_workspace);
+        alg->setProperty("Function", fun);
+        alg->setProperty("XColumn",ui->columnBox->currentText().toStdString());
+        alg->setProperty("YColumn",column->name());
+        //alg->setProperty();
+        alg->execute();
+    }
+    catch(std::exception& e)
+    {
+        QMessageBox::critical(parentWidget(),"Error",QString("Function failed \n")+e.what());
+    }
 }
 
 void TableDialog::addColumn()
@@ -376,6 +418,14 @@ void TableDialog::removeColumn()
     m_workspace->removeColumn(columnName);
     m_workspace->modified();
     initColumns();
+}
+
+/**
+  Respond on changes in the formula text area. Marks the formula as unsaved.
+  */
+void TableDialog::formulaChanged()
+{
+    m_formulaChangesSaved = false;
 }
 
 } // QtAPI

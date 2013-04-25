@@ -31,11 +31,13 @@ protected:
     void initColumns();
     void initFormulaPage();
     void initDistributionPage();
+    void initFunctionPage();
     int selectedColumn();
     void accept();
     void apply();
     void applyDistribution();
     void applyFormula();
+    void applyFunction();
 
 protected slots:
     void updateDistributionPage(int);
@@ -43,10 +45,14 @@ protected slots:
     void applyButton(QAbstractButton*);
     void addColumn();
     void removeColumn();
+    void formulaChanged();
 
 private:
   Ui::TableDialog *ui;
   boost::shared_ptr<API::TableWorkspace> m_workspace;
+  /// tracks status of changes to make sure they are not applied twice:
+  /// this can be undesirable when formulas use old values to calculate new ones
+  bool m_formulaChangesSaved;
 };
 
 } // QtAPI
