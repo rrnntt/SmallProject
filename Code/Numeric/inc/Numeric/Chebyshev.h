@@ -24,7 +24,7 @@ public:
   void functionDeriv1D(Jacobian* out, const double* xValues, const size_t nData);
 
   /// Returns the number of attributes associated with the function
-  size_t nAttributes()const{return 1;}
+  size_t nAttributes()const{return 3;}
   /// Returns a list of attribute names
   std::vector<std::string> getAttributeNames()const;
   /// Return a value of attribute attName

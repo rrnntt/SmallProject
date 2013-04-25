@@ -192,7 +192,18 @@ void IFunction::addConstraints(const std::string& str)
   //{
   //  IConstraint* c = ConstraintFactory::Instance().createInitialized(this,*expr);
   //  this->addConstraint(c);
-  //}
+    //}
+}
+
+/**
+  Get an attribute if it exists. If it doen't then throw.
+  */
+IFunction::Attribute IFunction::getAttribute(const std::string &attName) const
+{
+    if ( !hasAttribute(attName) )
+    {
+        throw std::runtime_error("Attribute "+attName+" does not exist.");
+    }
 }
 
 /**
@@ -558,6 +569,20 @@ void IFunction::calNumericalDeriv(const FunctionDomain& domain, Jacobian& jacobi
         }
       }
     }
+}
+
+/**
+  Subclasses will use this method to declare their attributes.
+  @param name :: Name of the attribute.
+  @param initValue :: Initial value
+  */
+void IFunction::declareAttribute(const std::string &name, IFunction::Attribute initValue)
+{
+    if ( hasAttribute(name) )
+    {
+        throw std::runtime_error("Attribute "+name+" already exists.");
+    }
+    m_attributes[name] = initValue;
 }
 
 

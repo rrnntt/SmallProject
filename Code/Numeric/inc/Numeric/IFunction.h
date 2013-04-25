@@ -14,6 +14,7 @@
 #include <boost/variant.hpp>
 #include <string>
 #include <vector>
+#include <map>
 
 #ifdef _WIN32
   #pragma warning( disable: 4250 )
@@ -316,10 +317,7 @@ public:
   /// Returns a list of attribute names
   virtual std::vector<std::string> getAttributeNames()const{return std::vector<std::string>();}
   /// Return a value of attribute attName
-  virtual Attribute getAttribute(const std::string& attName)const
-  {
-    throw std::invalid_argument("Attribute "+attName+" not found in function "+this->name());
-  }
+  virtual Attribute getAttribute(const std::string& attName)const;
   /// Set a value to attribute attName
   virtual void setAttribute(const std::string& attName,const Attribute& )
   {
@@ -336,12 +334,14 @@ public:
 protected:
 
   /// Function initialization. Declare function parameters in this method.
-  virtual void init(){};
+  virtual void init(){}
   /// Update internal state (if needed) after a parameter changed its value. 
   /// This method mustn't be long as it can be called frequently.
   virtual void updateStateRequired()const{}
   /// Declare a new parameter
   virtual void declareParameter(const std::string& name, double initValue = 0, const std::string& description="") = 0;
+  /// Declare a new attribute
+  virtual void declareAttribute(const std::string& name, Attribute initValue);
 
   /// Create an instance of a tie without actually tying it to anything
   //virtual ParameterTie* createTie(const std::string& parName);
@@ -355,6 +355,8 @@ protected:
   FunctionValues m_minusStep;
   /// Values storage for numeric derivatives
   FunctionValues m_plusStep;
+  /// Store attributes
+  std::map<std::string, Attribute> m_attributes;
 
 };
 
