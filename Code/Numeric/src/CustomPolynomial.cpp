@@ -80,10 +80,10 @@ void CustomPolynomial::updateABC() const
   if ( sqrtWgt.n() < m_n )
   {
     //sqrtWgt.resize(m_n + sqrtWgt.n());
-    sqrtWgt.resize( 2*m_n );
+    sqrtWgt.resize( 10*m_n );
   }
 
-  std::cerr << "n = " << m_fun.n() << ' ' << m_fun.integr() << std::endl;
+  std::cerr << "n = " << sqrtWgt.n() << ' ' << m_fun.integr() << std::endl;
 
   const size_t nn = m_n + 1;
   std::vector<chebfun_sptr> poly( nn );

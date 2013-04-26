@@ -50,7 +50,8 @@ TEST(Numeric_CustomPolynomial_Test, LaguerreTest)
 
 TEST(Numeric_CustomPolynomial_Test, JacobiTest)
 {
-  JacobiPolynomial P(1.0, 0.0, 10);
+  // it works only with even integer values for alpha and beta
+  JacobiPolynomial P(4.0, 2.0, 10);
   CustomPolynomial cp( 10, -1.0, 1.0 );
   cp.setWeightFunction( P.weightFunction() );
 
