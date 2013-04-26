@@ -8,10 +8,12 @@
 
 using namespace Numeric;
 
+#define out_coeff(i, a, aP) std::cerr << i << std::setw(14) << a[i] << std::setw(14) << aP[i] << std::setw(14) << fabs(a[i]) / fabs(aP[i]) << std::endl;
+
 TEST(Numeric_CustomPolynomial_Test, LaguerreTest)
 {
-    size_t n = 5;
-  Laguerre P(0.0, n);
+    size_t n = 10;
+  Laguerre P(1.0, n);
   CustomPolynomial cp( n, 0.0, 120.0 );
   cp.setWeightFunction( P.weightFunction() );
 
@@ -32,23 +34,23 @@ TEST(Numeric_CustomPolynomial_Test, LaguerreTest)
   double sum = 0;
   for(size_t i = 0; i < a.size(); ++i)
   {
-//      std::cerr << i << ' ' << r[i] << ' ' << rP[i] << ' ' << fabs(r[i]) - fabs(rP[i]) << std::endl;
-      std::cerr << i << ' ' << w[i] << ' ' << wP[i] << ' ' << fabs(w[i]) - fabs(wP[i]) << std::endl;
-//      std::cerr << i << ' ' << a[i] << ' ' << aP[i] << ' ' << fabs(a[i]) - fabs(aP[i]) << std::endl;
-//      std::cerr << i << ' ' << b[i] << ' ' << bP[i] << ' ' << fabs(b[i]) - fabs(bP[i]) << std::endl;
-//      std::cerr << i << ' ' << c[i] << ' ' << cP[i] << ' ' << fabs(c[i]) - fabs(cP[i]) << std::endl;
+      out_coeff(i, r, rP );
+      out_coeff(i, w, wP );
+//      out_coeff(i, a, aP );
+//      out_coeff(i, b, bP );
+//      out_coeff(i, c, cP );
       EXPECT_NEAR( fabs(r[i]) - fabs(rP[i]), 0.0, 1e-13 );
-      //EXPECT_NEAR( fabs(w[i]) - fabs(wP[i]), 0.0, 1e-6 );
+      EXPECT_NEAR( fabs(w[i]) - fabs(wP[i]), 0.0, 1e-13 );
     sum += w[i];
   }
   //std::cerr << "Weight " << sum << ' ' << P.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
-  //EXPECT_NEAR( sum, P.weightIntegral(), 1e-9 );
-  //EXPECT_NEAR( sum, cp.weightIntegral(), 1e-9 );
+  EXPECT_NEAR( sum, P.weightIntegral(), 1e-9 );
+  EXPECT_NEAR( sum, cp.weightIntegral(), 1e-9 );
 }
 
 TEST(Numeric_CustomPolynomial_Test, JacobiTest)
 {
-  JacobiPolynomial P(1.0, 1.0, 10);
+  JacobiPolynomial P(1.0, 0.0, 10);
   CustomPolynomial cp( 10, -1.0, 1.0 );
   cp.setWeightFunction( P.weightFunction() );
 
@@ -69,11 +71,11 @@ TEST(Numeric_CustomPolynomial_Test, JacobiTest)
   double sum = 0;
   for(size_t i = 0; i < a.size(); ++i)
   {
-    std::cerr << i <<": "<<std::endl;
-    std::cerr << "      " << a[i] << ' ' << aP[i] << ' ' << fabs(a[i]) - fabs(aP[i]) << std::endl;
-    std::cerr << "      " << b[i] << ' ' << bP[i] << ' ' << fabs(b[i]) - fabs(bP[i]) << std::endl;
-    std::cerr << "      " << c[i] << ' ' << cP[i] << ' ' << fabs(c[i]) - fabs(cP[i]) << std::endl;
-    std::cerr << "      " << r[i]<< ' ' << rP[i] << std::endl;
+      out_coeff(i, r, rP );
+      out_coeff(i, w, wP );
+//      out_coeff(i, a, aP );
+//      out_coeff(i, b, bP );
+//      out_coeff(i, c, cP );
     //EXPECT_NEAR( fabs(a[i]) - fabs(ap[i]), 0.0, 1e-13 );
     sum += w[i];
   }

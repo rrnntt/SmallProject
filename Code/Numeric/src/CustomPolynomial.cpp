@@ -143,15 +143,15 @@ void CustomPolynomial::updateABC() const
   pp *= *poly.back();
   norms.back() = pp.integr();
 
-  for(size_t i = 0; i < nn; ++i)
+  for(size_t i = 0; i < nn-1; ++i)
   {
-    const double tmp = 1.0 / sqrt( norms[i] );
-    *poly[i] *= tmp;
+      m_c[i] = sqrt( norms[i] / norms[i+1] );
+      m_a[i] *= m_c[i];
+//    const double tmp = 1.0 / sqrt( norms[i] );
+//    *poly[i] *= tmp;
     if ( i > 0 )
     {
-      m_c[i-1] = 1.0;//sqrt( norms[i-1] / norms[i]  );
-      m_a[i-1] *= m_c[i-1];
-      m_b[i-1] *= m_c[i-1];
+      m_b[i] *= m_c[i] * m_c[i-1];
     }
   }
 //  for(size_t i = 0; i < poly.size(); ++i)

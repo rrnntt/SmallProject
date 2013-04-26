@@ -199,10 +199,6 @@ void Polynomial::calcRoots() const
     }
   }
 
-  //std::ofstream fil("C:\\Users\\hqs74821\\Work\\Mantid_stuff\\OUTPUT\\JMatrix.txt");
-  //fil << J;
-  //fil << "\n\n";
-
   GSLVector x( m_n );
   GSLMatrix v( m_n, m_n );
   J.diag( x, v );
