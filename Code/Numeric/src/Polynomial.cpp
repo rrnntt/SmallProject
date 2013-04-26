@@ -224,29 +224,29 @@ void Polynomial::calcRoots() const
   }
   //fil.close();
 
-  double pp = wgt*m_c.back(); // integral <pn1|pn1>
-  for(size_t j = 1; j < m_n; ++j) pp *= m_b[j];
-  for(size_t i = 0; i < m_n; ++i)
-  {
-    double p0 = m_c0;
-    double p1 = 0;
-    double d0 = 0.0;
-    double d1 = 0;
-    const double x = m_roots[i];
-    p1 = ( m_c[0] * x - m_a[0] ) * p0;
-    d1 = m_c[0] * p0;
-    for(size_t j = 1; j < m_n; ++j)
-    {
-      double p = ( m_c[j] * x - m_a[j] ) * p1 - m_b[j] * p0;
-      double d = ( m_c[j] * x - m_a[j] ) * d1 - m_b[j] * d0 + m_c[j] * p1;
-      p0 = p1;
-      p1 = p;
-      d0 = d1;
-      d1 = d;
-    }
-    //std::cerr << i << ' ' << m_weights[i] << ' ' << pp / p0 / d1  << ' ' << pp << ' ' << p0 << ' ' << d1 << std::endl;
-    m_weights[i] = fabs( pp / (p0 * d1) );
-  }
+//  double pp = wgt*m_c.back(); // integral <pn1|pn1>
+//  for(size_t j = 1; j < m_n; ++j) pp *= m_b[j];
+//  for(size_t i = 0; i < m_n; ++i)
+//  {
+//    double p0 = m_c0;
+//    double p1 = 0;
+//    double d0 = 0.0;
+//    double d1 = 0;
+//    const double x = m_roots[i];
+//    p1 = ( m_c[0] * x - m_a[0] ) * p0;
+//    d1 = m_c[0] * p0;
+//    for(size_t j = 1; j < m_n; ++j)
+//    {
+//      double p = ( m_c[j] * x - m_a[j] ) * p1 - m_b[j] * p0;
+//      double d = ( m_c[j] * x - m_a[j] ) * d1 - m_b[j] * d0 + m_c[j] * p1;
+//      p0 = p1;
+//      p1 = p;
+//      d0 = d1;
+//      d1 = d;
+//    }
+//    //std::cerr << i << ' ' << m_weights[i] << ' ' << pp / p0 / d1  << ' ' << pp << ' ' << p0 << ' ' << d1 << std::endl;
+//    m_weights[i] = fabs( pp / (p0 * d1) );
+//  }
 }
 
 /// Return cost shared pointer to the weight function

@@ -1,8 +1,11 @@
 #include "Numeric/CustomPolynomial.h"
 #include "Numeric/ChebFunction.h"
+#include "Numeric/FunctionFactory.h"
 
 namespace Numeric
 {
+
+DECLARE_FUNCTION(CustomPolynomial)
 
 // Private namespace declarations
 namespace 
@@ -80,6 +83,8 @@ void CustomPolynomial::updateABC() const
     sqrtWgt.resize( 2*m_n );
   }
 
+  std::cerr << "n = " << m_fun.n() << ' ' << m_fun.integr() << std::endl;
+
   const size_t nn = m_n + 1;
   std::vector<chebfun_sptr> poly( nn );
   for(size_t i = 0; i < nn; ++i)
@@ -97,12 +102,12 @@ void CustomPolynomial::updateABC() const
   chebfun pp(*poly[0]);
   pp *= *poly[0];
   norms[0] = pp.integr();
-  pp *= xfun(0);
+  pp *= xfun;
   m_a[0] = pp.integr() / norms[0];
   m_b[0] = 0.0;
 
   *poly[1] = *poly[0];
-  *poly[1] *= xfun(1);
+  *poly[1] *= xfun;
   pp = *poly[0];
   pp *= m_a[0];
   *poly[1] -= pp;
@@ -120,13 +125,13 @@ void CustomPolynomial::updateABC() const
     pp = *poly[i1];
     pp *= *poly[i1];
     norms[i1] = pp.integr();
-    pp *= xfun(i);
+    pp *= xfun;
     m_a[i1] = pp.integr() / norms[i1];
     m_b[i1] = norms[i1] / norms[i2];
 
     //calculate i-th poly
     *poly[i] = *poly[i1];
-    *poly[i] *= xfun(i);
+    *poly[i] *= xfun;
     pp = *poly[i1];
     pp *= m_a[i1];
     *poly[i] -= pp;
@@ -144,11 +149,21 @@ void CustomPolynomial::updateABC() const
     *poly[i] *= tmp;
     if ( i > 0 )
     {
-      m_c[i-1] = sqrt( norms[i-1] / norms[i]  );
+      m_c[i-1] = 1.0;//sqrt( norms[i-1] / norms[i]  );
       m_a[i-1] *= m_c[i-1];
       m_b[i-1] *= m_c[i-1];
     }
   }
+//  for(size_t i = 0; i < poly.size(); ++i)
+//  {
+//      std::cerr << "n(" << i <<")=" << poly[i]->n() << ' ' << poly[i]->startX() << ' ' << poly[i]->endX()  << std::endl;
+//      for(size_t j = 0; j <= i; ++j)
+//      {
+//          chebfun t = *poly[i];
+//          t *= *poly[j];
+//          std::cerr << i << ',' << j << ' ' << t.integr() << std::endl;
+//      }
+//  }
 }
 
 /// Returns the unscaled integral of the weight function

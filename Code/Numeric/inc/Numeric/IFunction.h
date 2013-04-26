@@ -310,12 +310,12 @@ public:
   /// for a BoundaryConstraint this if param value less than lower boundary
   /// it is set to that value and vice versa for if the param value is larger
   /// than the upper boundary value.
-  virtual void setParametersToSatisfyConstraints() {};
+  virtual void setParametersToSatisfyConstraints() {}
 
   /// Returns the number of attributes associated with the function
-  virtual size_t nAttributes()const{return 0;}
+  virtual size_t nAttributes()const;
   /// Returns a list of attribute names
-  virtual std::vector<std::string> getAttributeNames()const{return std::vector<std::string>();}
+  virtual std::vector<std::string> getAttributeNames()const;
   /// Return a value of attribute attName
   virtual Attribute getAttribute(const std::string& attName)const;
   /// Set a value to attribute attName
@@ -324,7 +324,7 @@ public:
     throw std::invalid_argument("Attribute "+attName+" not found in function "+this->name());
   }
   /// Check if attribute attName exists
-  virtual bool hasAttribute(const std::string& attName)const { (void)attName; return false;}
+  virtual bool hasAttribute(const std::string& attName)const;
   template<typename T>
   void setAttributeValue(const std::string& attName,const T& value){setAttribute(attName,Attribute(value));}
 
@@ -356,7 +356,7 @@ protected:
   /// Values storage for numeric derivatives
   FunctionValues m_plusStep;
   /// Store attributes
-  std::map<std::string, Attribute> m_attributes;
+  mutable std::map<std::string, Attribute> m_attributes;
 
 };
 

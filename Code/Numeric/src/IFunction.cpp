@@ -195,6 +195,21 @@ void IFunction::addConstraints(const std::string& str)
     //}
 }
 
+size_t IFunction::nAttributes() const
+{
+    return m_attributes.size();
+}
+
+std::vector<std::string> IFunction::getAttributeNames() const
+{
+    std::vector<std::string> out;
+    for(auto att = m_attributes.begin(); att != m_attributes.end(); ++att)
+    {
+        out.push_back(att->first);
+    }
+    return out;
+}
+
 /**
   Get an attribute if it exists. If it doen't then throw.
   */
@@ -204,6 +219,12 @@ IFunction::Attribute IFunction::getAttribute(const std::string &attName) const
     {
         throw std::runtime_error("Attribute "+attName+" does not exist.");
     }
+    return m_attributes[attName];
+}
+
+bool IFunction::hasAttribute(const std::string &attName) const
+{
+    return m_attributes.find(attName) != m_attributes.end();
 }
 
 /**

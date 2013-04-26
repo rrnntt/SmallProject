@@ -23,6 +23,8 @@ public:
     virtual std::string name()const {return "NonPolynomial";}
     /// Returns the integral of the weight function
     virtual double weightIntegral() const;
+    /// Set a value to attribute attName
+    virtual void setAttribute(const std::string& attName, const Attribute& att);
 
     /* Own public methods */
     /// Set the \f$x\f$ function
@@ -35,6 +37,7 @@ protected:
     virtual IFunction_const_sptr createWeightDerivative() const;
 
 private:
+    double xfun(double x) const;
 
     IFunction_sptr m_xfun;
     double m_startX;

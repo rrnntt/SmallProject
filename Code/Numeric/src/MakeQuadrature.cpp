@@ -3,8 +3,10 @@
 #include "Numeric/JacobiPolynomial.h"
 #include "Numeric/Hermite.h"
 #include "Numeric/Laguerre.h"
+#include "Numeric/CustomPolynomial.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
+#include "Numeric/FunctionFactory.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/NumericColumn.h"
@@ -30,6 +32,9 @@ MakeQuadrature::MakeQuadrature()
   declareString("Type","Custom");
   declareInt("N",10);
   declareBool("Normalize",true);
+  declareDouble("StartX",-1.0);
+  declareDouble("EndX",1.0);
+  declareClass("Weight",&FunctionFactory::instance());
 }
 
 /**-------------------------------------------------
@@ -42,11 +47,15 @@ void MakeQuadrature::applyProperty(const std::string& name)
   if ( name == "Type" )
   {
     std::string quad = get(name);
-    if ( quad == "Chebyshev" )
-    {
-      declareDouble("StartX",-1.0);
-      declareDouble("EndX",1.0);
-    }
+//    if ( quad == "Chebyshev" )
+//    {
+//      declareDouble("StartX",-1.0);
+//      declareDouble("EndX",1.0);
+//    }
+//    if ( quad == "Custom" )
+//    {
+//      declareClass("Weight",&FunctionFactory::instance());
+//    }
   }
 }
 
@@ -65,6 +74,10 @@ void MakeQuadrature::exec()
   else if ( type == "Laguerre" )
   {
     makeLaguerre();
+  }
+  else if ( type == "Custom" )
+  {
+    makeCustom();
   }
 }
 
@@ -109,6 +122,26 @@ void MakeQuadrature::makeLaguerre()
   }
 
   makeQuadrature( H );
+}
+
+/**-------------------------------------------------
+ * Make a custom quadrature.
+ */
+void MakeQuadrature::makeCustom()
+{
+    const int n = get("N");
+    const double startX = get("StartX");
+    const double endX = get("EndX");
+    IFunction_sptr wgt = getClass("Weight");
+    CustomPolynomial cp( n, startX, endX );
+    cp.setWeightFunction( wgt );
+    const bool norm = get("Normalize");
+    if ( norm )
+    {
+      cp.normalize();
+    }
+
+    makeQuadrature( cp );
 }
 
 /**-------------------------------------------------

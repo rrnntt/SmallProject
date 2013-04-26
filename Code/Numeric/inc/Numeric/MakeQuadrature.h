@@ -20,6 +20,7 @@ protected:
   void makeChebyshev();
   void makeHermite();
   void makeLaguerre();
+  void makeCustom();
   void makeQuadrature(const Polynomial& P);
 };
 

@@ -1,8 +1,12 @@
 #include "Numeric/NonPolynomial.h"
 #include "Numeric/ConstantFunction.h"
+#include "Numeric/FunctionFactory.h"
+#include "Numeric/Chebfun.h"
 
 namespace Numeric
 {
+
+DECLARE_FUNCTION(NonPolynomial)
 
 /**
  * Constructor.
@@ -12,6 +16,8 @@ NonPolynomial::NonPolynomial():
     m_startX(0.0),
     m_endX(1.0)
 {
+    declareAttribute("StartX", Attribute(0.0));
+    declareAttribute("EndX", Attribute(0.0));
 }
 
 /**
@@ -30,6 +36,8 @@ NonPolynomial::NonPolynomial(int n, IFunction_sptr xfun):
     {
         throw std::runtime_error("X-function can only be an instance of IFunction1D in NonPolynomial.");
     }
+    declareAttribute("StartX", Attribute(0.0));
+    declareAttribute("EndX", Attribute(0.0));
 }
 
 /**
@@ -38,6 +46,13 @@ NonPolynomial::NonPolynomial(int n, IFunction_sptr xfun):
 double NonPolynomial::weightIntegral() const
 {
     return 1.0;
+}
+
+/**
+  Set attributes: StartX and EndX
+  */
+void NonPolynomial::setAttribute(const std::string &attName, const IFunction::Attribute &att)
+{
 }
 
 /**
@@ -162,6 +177,11 @@ IFunction_const_sptr NonPolynomial::createWeightDerivative() const
     ConstantFunction *fun = new ConstantFunction();
     fun->setParameter(0, 0.0);
     return IFunction_const_sptr(fun);
+}
+
+double NonPolynomial::xfun(double x) const
+{
+    return x*exp(-x*x/2);
 }
 
 } // Numeric
