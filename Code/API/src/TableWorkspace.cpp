@@ -10,10 +10,6 @@
 #include <sstream>
 #include <fstream>
 
-DECLARE_NUMERICTABLECOLUMN(int,int);
-DECLARE_NUMERICTABLECOLUMN(double,double);
-DECLARE_NUMERICTABLECOLUMN(float,float);
-
 namespace API
 {
 
