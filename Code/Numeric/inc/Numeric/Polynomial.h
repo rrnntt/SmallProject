@@ -106,7 +106,7 @@ public:
     GSLMatrix* t = NULL) const;
   void calcBarycentricWeights(const std::set<size_t>& ri, std::vector<double>& w) const;
   
-  void calcPolyValues(FuncVector funs, FuncVector ders, bool includeWeights = true) const;
+  void calcPolyValues(FuncVector funs, FuncVector ders, bool includeWeights = true, const std::vector<double> *xvalues = nullptr) const;
   void normalize();
 protected:
   /// Update internal state.

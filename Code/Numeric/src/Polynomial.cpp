@@ -678,13 +678,25 @@ void Polynomial::partialQuadrature3(
  * @param ders :: Output derivatives.
  * @param includeWeights :: If set to true the output values will be multiplied by
  *  a square root of the corresponding weight.
+ * @param xvalues :: Alternative array of x values. If given they will be used in stead of the roots.
  */
-void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVector ders, bool includeWeights) const
+void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVector ders, bool includeWeights, const std::vector<double> *xvalues) const
 {
-  if ( m_roots.empty() )
+  const std::vector<double> *xpointer = nullptr;
+  if ( !xvalues && m_roots.empty() )
   {
     calcRoots();
   }
+
+  if ( xvalues )
+  {
+    xpointer = xvalues;
+  }
+  else
+  {
+    xpointer = &m_roots;
+  }
+
   const size_t nr = m_roots.size();
   
   if ( funs.size() != nr )

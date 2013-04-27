@@ -33,7 +33,7 @@ namespace
 /**
  * Constructor.
  */
-CustomPolynomial::CustomPolynomial():Polynomial()
+CustomPolynomial::CustomPolynomial():Polynomial(),m_xfun(new Xfun)
 {
 }
 
@@ -42,7 +42,8 @@ CustomPolynomial::CustomPolynomial():Polynomial()
  */
 CustomPolynomial::CustomPolynomial(int n, const double& startX,const double& endX):
 Polynomial(n),
-m_fun(n,startX,endX)
+m_fun(n,startX,endX),
+m_xfun(new Xfun)
 {
 }
 
@@ -58,6 +59,14 @@ void CustomPolynomial::setWeightFunction(IFunction_const_sptr wgtFun, const doub
 {
   m_weightFunction = wgtFun;
   m_fun.bestFit( *wgtFun, tol );
+}
+
+/**
+  Define the function which will be used instead of x in polynomial expression.
+  */
+void CustomPolynomial::setXFunction(IFunction_sptr fun)
+{
+  m_xfun = fun;
 }
 
 /// Recalculate (re-fill) m_a, m_b, m_c
@@ -97,7 +106,11 @@ void CustomPolynomial::updateABC() const
   *poly[0] = sqrtWgt;
 
   // define the "x"-function
-  Xfun xfun;
+  if ( ! m_xfun ) 
+  {
+    throw std::runtime_error("X-function is undefined in CustomPolynomial.");
+  }
+  IFunction &xfun = *m_xfun;
 
   chebfun pp(*poly[0]);
   pp *= *poly[0];
