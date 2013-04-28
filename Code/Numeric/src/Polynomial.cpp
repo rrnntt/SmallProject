@@ -677,8 +677,10 @@ void Polynomial::partialQuadrature3(
  * @param funs :: Output function values.
  * @param ders :: Output derivatives.
  * @param includeWeights :: If set to true the output values will be multiplied by
- *  a square root of the corresponding weight.
+ *  a square root of the corresponding weight. The output is ready to be used in integration
+ *  (DVR points).
  * @param xvalues :: Alternative array of x values. If given they will be used in stead of the roots.
+ *    If includeWeights is true then the function is multiplied by the weight function (not weights).
  */
 void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVector ders, bool includeWeights, const std::vector<double> *xvalues) const
 {
@@ -697,7 +699,9 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
     xpointer = &m_roots;
   }
 
-  const size_t nr = m_roots.size();
+  const std::vector<double>& xpoints = *xpointer;
+
+  const size_t nr = xpoints.size();
   
   if ( funs.size() != nr )
   {
@@ -709,7 +713,7 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
     throw std::runtime_error("FuncVector ders has a wrong size.");
   }
 
-  FunctionDomain1DView domain( m_roots );
+  FunctionDomain1DView domain( xpoints );
   FunctionValues wgtValues( domain );
   FunctionValues derValues( domain );
   weightFunction()->function( domain, wgtValues );
@@ -722,8 +726,16 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
   {
     if ( funs[i]->size() != nr ) throw std::runtime_error("A vector in FuncVector funs has a wrong size.");
     if ( ders[i]->size() != nr ) throw std::runtime_error("A vector in FuncVector ders has a wrong size.");
-    wgt[i] = includeWeights ? sqrt( m_weights[i] ) : 1.0;
-    wgt_der[i] = derValues.getCalculated(i) / wgtValues.getCalculated(i);
+    if (xpointer)
+    {
+        wgt[i] = includeWeights ? sqrt( wgtValues.getCalculated(i) ) : 1.0;
+        wgt_der[i] = includeWeights ? derValues.getCalculated(i) : 0.0;
+    }
+    else
+    {
+        wgt[i] = includeWeights ? sqrt( m_weights[i] ) : 1.0;
+        wgt_der[i] = includeWeights ? derValues.getCalculated(i) / wgtValues.getCalculated(i) : 0.0;
+    }
   }
 
   if ( m_a.empty() ) updateABC();
@@ -733,7 +745,7 @@ void Polynomial::calcPolyValues(Polynomial::FuncVector funs, Polynomial::FuncVec
     double p1 = 0;
     double d0 = 0.0;
     double d1 = 0;
-    const double x = m_roots[i];
+    const double x = xpoints[i];
     (*funs[0])[i] = p0;
     (*ders[0])[i] = d0 + p0 * wgt_der[i];
     if ( m_n > 1 )
