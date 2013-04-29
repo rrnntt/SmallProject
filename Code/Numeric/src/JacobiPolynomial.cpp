@@ -41,14 +41,27 @@ void JacobiPolynomial::updateABC() const
   m_b.resize(m_n);
   m_c.resize(m_n);
 
-  for(int i = 0; i < m_n; ++i)
+  if ( alpha == 0.0 and beta == 0.0 )
   {
-    const double n = double(i + 1);
-    const double q = 2.0*n + alpha + beta;
-    const double r = 2.0*n*(q - n)*(q - 2.0);
-    m_c[i] = q * (q - 1.0) * (q - 2.0) / r;
-    m_a[i] = (q - 1.0) * (alpha + beta) * (alpha - beta) / r;
-    m_b[i] = i == 0? 0.0 : 2.0*q*(n + alpha - 1.0) * (n + beta - 1.0) / r;
+      for(int i = 0; i < m_n; ++i)
+      {
+          const double n = double(i + 1);
+          m_a[i] = 0.0;
+          m_c[i] = (2*n - 1)/n;
+          m_b[i] = (n - 1)/n;
+      }
+  }
+  else
+  {
+      for(int i = 0; i < m_n; ++i)
+      {
+          const double n = double(i + 1);
+          const double q = 2.0*n + alpha + beta;
+          const double r = 2.0*n*(q - n)*(q - 2.0);
+          m_c[i] = q * (q - 1.0) * (q - 2.0) / r;
+          m_a[i] = (q - 1.0) * (alpha + beta) * (alpha - beta) / r;
+          m_b[i] = i == 0? 0.0 : 2.0*q*(n + alpha - 1.0) * (n + beta - 1.0) / r;
+      }
   }
 }
 

@@ -1,6 +1,8 @@
 #include "Numeric/JacobiWeight.h"
 #include "Numeric/FunctionFactory.h"
 
+#include <algorithm>
+
 namespace Numeric
 {
 
@@ -30,6 +32,12 @@ void JacobiWeight::function1D(double* out, const double* xValues, const size_t n
   if ( nData == 0 ) return;
   const double alpha = getParameter("Alpha");
   const double beta = getParameter("Beta");
+
+  if ( alpha == 0.0 && beta == 0.0 )
+  {
+    std::fill(out,out+nData,1.0);
+    return;
+  }
   for(size_t i = 0; i < nData; ++i)
   {
     const double x = xValues[i];
@@ -79,6 +87,11 @@ void JacobiWeightDerivative::function1D(double* out, const double* xValues, cons
   if ( nData == 0 ) return;
   const double alpha = getParameter("Alpha");
   const double beta = getParameter("Beta");
+  if ( alpha == 0.0 && beta == 0.0 )
+  {
+    std::fill(out,out+nData,0.0);
+    return;
+  }
   for(size_t i = 0; i < nData; ++i)
   {
     const double x = xValues[i];

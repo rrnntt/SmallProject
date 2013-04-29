@@ -356,7 +356,7 @@ const double Polynomial::getC0() const
   return m_c0;
 }
 
-/**------------------------------------------------------------
+/**
  */
 const std::vector<double>& Polynomial::getRoots() const
 {
@@ -367,7 +367,7 @@ const std::vector<double>& Polynomial::getRoots() const
   return m_roots;
 }
 
-/**------------------------------------------------------------
+/**
  */
 const std::vector<double>& Polynomial::getWeights() const
 {
@@ -378,7 +378,7 @@ const std::vector<double>& Polynomial::getWeights() const
   return m_weights;
 }
 
-/**------------------------------------------------------------
+/**
  * Calculate partial barycentric weights for a sub-set of roots.
  * @param ri :: Sub-set of root indices to be used in the barycentric interpolation.
  * @param w  :: Output vector of partial barycentric weights.
@@ -410,7 +410,7 @@ void Polynomial::calcBarycentricWeights(const std::set<size_t>& ri, std::vector<
   }
 }
 
-/**------------------------------------------------------------
+/**
  * Create a partial quadrature
  * @param ri :: A subset of root indices for which a partial quadrature will be generated.
  * @param w  :: Output vector of partial roots.
@@ -672,8 +672,9 @@ void Polynomial::partialQuadrature3(
     }
   }
 }
-/**------------------------------------------------------------
- * Calculate the polynomial and their derivative values at the integration points.
+/**
+ * Calculate the polynomial values and their derivatives at the integration points.
+ *
  * @param funs :: Output function values.
  * @param ders :: Output derivatives.
  * @param includeWeights :: If set to true the output values will be multiplied by
@@ -788,7 +789,7 @@ void Polynomial::normalize()
     p0[j] *= sqrt( m_weights[j] );
   }
   std::vector<double> p1(nr, 0);
-  for(size_t i = 0; i < nr; ++i)
+  for(size_t i = 0; i < nr-1; ++i)
   {
     if ( i == 0 )
     {

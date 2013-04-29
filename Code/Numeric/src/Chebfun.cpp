@@ -386,28 +386,35 @@ namespace Numeric
     //return;
     //// End of the correct and direct transform from m_p to m_a
 
-    // This is a magic trick which uses real fft to do the above cosine transform
-    std::vector<double> tmp(m_n*2);
-    std::reverse_copy(m_p.begin(),m_p.end(),tmp.begin());
-    std::copy(m_p.begin()+1,m_p.end()-1,tmp.begin()+m_n+1);
-
-    gsl_fft_real_workspace * workspace = gsl_fft_real_workspace_alloc(2*m_n);
-    gsl_fft_real_wavetable * wavetable = gsl_fft_real_wavetable_alloc(2*m_n);
-    gsl_fft_real_transform (&tmp[0], 1, 2*m_n, wavetable, workspace);
-    gsl_fft_real_wavetable_free (wavetable);
-    gsl_fft_real_workspace_free (workspace);
-
-    HalfComplex fc(&tmp[0],tmp.size());
-    for(size_t i=0; i < nn; ++i)
+    if (m_n > 0)
     {
-      double a = fc.real(i)/m_n;
-      //if (i == 0) a /= 2;
-      m_a[i] = a;
-      //std::cerr << fc.real(i) << ',' << fc.imag(i) << std::endl;
-    }//*/
-    m_a[0] /= 2;
-    m_a[m_n] /= 2;
-    // End of the magic trick
+        // This is a magic trick which uses real fft to do the above cosine transform
+        std::vector<double> tmp(m_n*2);
+        std::reverse_copy(m_p.begin(),m_p.end(),tmp.begin());
+        std::copy(m_p.begin()+1,m_p.end()-1,tmp.begin()+m_n+1);
+
+        gsl_fft_real_workspace * workspace = gsl_fft_real_workspace_alloc(2*m_n);
+        gsl_fft_real_wavetable * wavetable = gsl_fft_real_wavetable_alloc(2*m_n);
+        gsl_fft_real_transform (&tmp[0], 1, 2*m_n, wavetable, workspace);
+        gsl_fft_real_wavetable_free (wavetable);
+        gsl_fft_real_workspace_free (workspace);
+
+        HalfComplex fc(&tmp[0],tmp.size());
+        for(size_t i=0; i < nn; ++i)
+        {
+          double a = fc.real(i)/m_n;
+          //if (i == 0) a /= 2;
+          m_a[i] = a;
+          //std::cerr << fc.real(i) << ',' << fc.imag(i) << std::endl;
+        }//*/
+        m_a[0] /= 2;
+        m_a[m_n] /= 2;
+        // End of the magic trick
+    }
+    else
+    {
+        m_a[0] = m_p[0];
+    }
   }
 
   void chebfun::calcP()
@@ -431,25 +438,31 @@ namespace Numeric
     //  m_p[i] = valueT( x[i] );
     //}
     size_t m_n = n();
-    size_t nn = m_n + 1;
-    std::vector<double> tmp(m_n*2);
-    HalfComplex fc(&tmp[0],tmp.size());
-    for(size_t i=0; i < nn; ++i)
+    if ( m_n > 0 )
     {
-      double a = m_a[i] /2;// * m_n;
-      if (i == 0) a *= 2;
-      fc.set( i, a, 0.0 );
+        size_t nn = m_n + 1;
+        std::vector<double> tmp(m_n*2);
+        HalfComplex fc(&tmp[0],tmp.size());
+        for(size_t i=0; i < nn; ++i)
+        {
+          double a = m_a[i] /2;// * m_n;
+          if (i == 0) a *= 2;
+          fc.set( i, a, 0.0 );
+        }
+        gsl_fft_real_workspace * workspace = gsl_fft_real_workspace_alloc(2*m_n);
+        gsl_fft_halfcomplex_wavetable * wavetable = gsl_fft_halfcomplex_wavetable_alloc(2*m_n);
+
+        gsl_fft_halfcomplex_transform (tmp.data(), 1, 2*m_n, wavetable, workspace);
+
+        gsl_fft_halfcomplex_wavetable_free (wavetable);
+        gsl_fft_real_workspace_free (workspace);
+
+        std::reverse_copy( tmp.begin(), tmp.begin() + nn, m_p.begin() );
     }
-    gsl_fft_real_workspace * workspace = gsl_fft_real_workspace_alloc(2*m_n);
-    gsl_fft_halfcomplex_wavetable * wavetable = gsl_fft_halfcomplex_wavetable_alloc(2*m_n);
-
-    gsl_fft_halfcomplex_transform (tmp.data(), 1, 2*m_n, wavetable, workspace);
-
-    gsl_fft_halfcomplex_wavetable_free (wavetable);
-    gsl_fft_real_workspace_free (workspace);
-
-    std::reverse_copy( tmp.begin(), tmp.begin() + nn, m_p.begin() );
-
+    else
+    {
+        m_p[0] = m_a[0];
+    }
   }
 
   /// make this chebfun a derivative of the argument
@@ -470,16 +483,19 @@ namespace Numeric
     auto& a = fun.coeffs();
     const size_t nn = n();
     m_a[nn] = 0.0;
-    m_a[nn - 1] = 2 * nn * a[nn];
-    for(size_t k = nn - 1; k >= 2; --k)
+    if ( nn > 0 )
     {
-      m_a[k - 1] = m_a[k + 1] + 2 * k * a[k];
-    }
-    m_a[0] = m_a[2] / 2 + a[1];
-    const double Dx = (endX() - startX())/2;
-    for(size_t i = 0; i < m_a.size(); ++i)
-    {
-      m_a[i] /= Dx;
+        m_a[nn - 1] = 2 * nn * a[nn];
+        for(size_t k = nn - 1; k >= 2; --k)
+        {
+          m_a[k - 1] = m_a[k + 1] + 2 * k * a[k];
+        }
+        m_a[0] = m_a[2] / 2 + a[1];
+        const double Dx = (endX() - startX())/2;
+        for(size_t i = 0; i < m_a.size(); ++i)
+        {
+          m_a[i] /= Dx;
+        }
     }
     calcP();
   }

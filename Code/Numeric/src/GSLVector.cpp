@@ -28,6 +28,9 @@ namespace Numeric
     }
   }
 
+  /**
+    Copy elements from another vector.
+    */
   GSLVector& GSLVector::operator=(const GSLVector& v)
   {
     if (m_vector && size() != v.size())
@@ -43,6 +46,18 @@ namespace Numeric
     return *this;
   }
 
+  /**
+    * Copy elements from an std vector.
+    */
+  GSLVector &GSLVector::operator =(const std::vector<double> &v)
+  {
+    resize(v.size());
+    for(size_t i = 0; i < v.size(); ++i)
+    {
+      gsl_vector_set( m_vector, i, v[i] );
+    }
+  }
+
   /// Destructor.
   GSLVector::~GSLVector()
   {
@@ -51,6 +66,18 @@ namespace Numeric
       gsl_vector_free(m_vector);
     }
   }
+
+  /**
+    * Resize this vector.
+    */
+  void GSLVector::resize(const size_t n)
+  {
+    if ( m_vector && n != size() )
+    {
+        gsl_vector_free(m_vector);
+    }
+    m_vector = gsl_vector_alloc(n);
+}
 
   //==========================================================
   // Private namespace

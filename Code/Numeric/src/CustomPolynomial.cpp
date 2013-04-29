@@ -28,6 +28,31 @@ namespace
     }
     Xfun& operator()(size_t i){m_i = i; return *this;}
   };
+
+  DECLARE_FUNCTION(Xfun)
+
+  class XExp2: public IFunction1D, public ParamFunction
+  {
+  public:
+    XExp2()
+    {
+      declareParameter("Sigma",1.0,"Defins thewidth of this functions.");
+    }
+    /// Returns the function's name
+    virtual std::string name()const {return "XExp2";}
+    /// Function you want to fit to.
+    virtual void function1D(double* out, const double* xValues, const size_t nData)const
+    {
+      const double sigma = getParameter(0);
+      for(size_t i = 0; i < nData; ++i)
+      {
+        const double x = xValues[i];
+        out[i] = x * exp( - x*x / 2 * sigma );
+      }
+    }
+  };
+
+  DECLARE_FUNCTION(XExp2)
 }
 
 /**
@@ -66,6 +91,7 @@ void CustomPolynomial::setWeightFunction(IFunction_const_sptr wgtFun, const doub
   */
 void CustomPolynomial::setXFunction(IFunction_sptr fun)
 {
+  throw std::runtime_error("To use non-linear x's inverse function must be implemented.");
   m_xfun = fun;
 }
 
@@ -92,7 +118,7 @@ void CustomPolynomial::updateABC() const
     sqrtWgt.resize( 10*m_n );
   }
 
-  std::cerr << "n = " << sqrtWgt.n() << ' ' << m_fun.integr() << std::endl;
+  //std::cerr << "n = " << sqrtWgt.n() << ' ' << m_fun.integr() << std::endl;
 
   const size_t nn = m_n + 1;
   std::vector<chebfun_sptr> poly( nn );
@@ -115,6 +141,10 @@ void CustomPolynomial::updateABC() const
   chebfun pp(*poly[0]);
   pp *= *poly[0];
   norms[0] = pp.integr();
+  if (norms[0] == 0.0)
+  {
+    throw std::runtime_error("Custom polynomial: zero integral.");
+  }
   pp *= xfun;
   m_a[0] = pp.integr() / norms[0];
   m_b[0] = 0.0;
@@ -141,6 +171,7 @@ void CustomPolynomial::updateABC() const
     pp *= xfun;
     m_a[i1] = pp.integr() / norms[i1];
     m_b[i1] = norms[i1] / norms[i2];
+    m_c[i1] = 1.0;
 
     //calculate i-th poly
     *poly[i] = *poly[i1];
@@ -166,6 +197,7 @@ void CustomPolynomial::updateABC() const
     {
       m_b[i] *= m_c[i] * m_c[i-1];
     }
+    //std::cerr << i << ' ' << m_a[i] << ' ' << m_b[i] << ' ' << m_c[i] << std::endl;
   }
 //  for(size_t i = 0; i < poly.size(); ++i)
 //  {
@@ -182,7 +214,26 @@ void CustomPolynomial::updateABC() const
 /// Returns the unscaled integral of the weight function
 double CustomPolynomial::weightIntegral() const
 {
-  return m_fun.integr();
+    return m_fun.integr();
+}
+
+/**
+Override function evaluation to use m_xfun instead of x.
+*/
+void CustomPolynomial::function1D(double *out, const double *xValues, const size_t nData) const
+{
+    std::vector<double> x(nData);
+    IFunction1D_sptr xfun = boost::dynamic_pointer_cast<IFunction1D>( m_xfun );
+    if ( !xfun )
+    {
+      throw std::runtime_error("X-function in CustomPolynomial must be 1D");
+    }
+    xfun->function1D(&x[0],xValues,nData);
+//    for(size_t i = 0; i < nData; ++i)
+//    {
+//        std::cerr << "x("<<i<<")="<<x[i] << std::endl;
+//    }
+    Polynomial::function1D(out,&x[0],nData);
 }
 
 /// Throws exception if weight function isn't set.

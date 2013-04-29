@@ -45,7 +45,7 @@ TEST(Numeric_CustomPolynomial_Test, LaguerreTest)
       EXPECT_NEAR( fabs(w[i]) - fabs(wP[i]), 0.0, 1e-13 );
     sum += w[i];
   }
-  //std::cerr << "Weight " << sum << ' ' << P.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
+  std::cerr << "Weight " << sum << ' ' << P.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
   EXPECT_NEAR( sum, P.weightIntegral(), 1e-9 );
   EXPECT_NEAR( sum, cp.weightIntegral(), 1e-9 );
 }
@@ -66,35 +66,6 @@ public:
   }
 };
 
-
-TEST(Numeric_CustomPolynomial_Test, LaguerreTest1)
-{
-    size_t n = 10;
-  Laguerre P(1.0, n);
-  CustomPolynomial cp( n, 0.0, 120.0 );
-  cp.setWeightFunction( P.weightFunction() );
-  cp.setXFunction(IFunction_sptr(new Xfun()));
-
-  get_coeffs()
-
-  EXPECT_EQ( a.size(), n );
-
-  double sum = 0;
-  for(size_t i = 0; i < a.size(); ++i)
-  {
-      //out_coeff(i, r, rP );
-      //out_coeff(i, w, wP );
-      out_coeff(i, a, aP );
-      out_coeff(i, b, bP );
-      out_coeff(i, c, cP );
-      //EXPECT_NEAR( fabs(r[i]) - fabs(rP[i]), 0.0, 1e-13 );
-      //EXPECT_NEAR( fabs(w[i]) - fabs(wP[i]), 0.0, 1e-13 );
-    sum += w[i];
-  }
-  //std::cerr << "Weight " << sum << ' ' << P.weightIntegral() << ' ' << cp.weightIntegral() << std::endl;
-  //EXPECT_NEAR( sum, P.weightIntegral(), 1e-9 );
-  //EXPECT_NEAR( sum, cp.weightIntegral(), 1e-9 );
-}
 
 TEST(Numeric_CustomPolynomial_Test, JacobiTest)
 {

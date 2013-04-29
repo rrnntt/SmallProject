@@ -7,6 +7,7 @@
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 #include "Numeric/FunctionFactory.h"
+#include "Numeric/ChebfunWorkspace.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/NumericColumn.h"
@@ -35,6 +36,8 @@ MakeQuadrature::MakeQuadrature()
   declareDouble("StartX",-1.0);
   declareDouble("EndX",1.0);
   declareClass("Weight",&FunctionFactory::instance());
+  //declareClass("XFun",&FunctionFactory::instance());
+  declareWorkspace("ChebWorkspace", Kernel::Property::Output);
 }
 
 /**-------------------------------------------------
@@ -74,6 +77,10 @@ void MakeQuadrature::exec()
   else if ( type == "Laguerre" )
   {
     makeLaguerre();
+  }
+  else if ( type == "Legendre" )
+  {
+    makeLegendre();
   }
   else if ( type == "Custom" )
   {
@@ -124,6 +131,19 @@ void MakeQuadrature::makeLaguerre()
   makeQuadrature( H );
 }
 
+void MakeQuadrature::makeLegendre()
+{
+  const int n = get("N");
+  JacobiPolynomial H( 0, 0, n );
+  const bool norm = get("Normalize");
+  if ( norm )
+  {
+    H.normalize();
+  }
+
+  makeQuadrature( H );
+}
+
 /**-------------------------------------------------
  * Make a custom quadrature.
  */
@@ -133,15 +153,17 @@ void MakeQuadrature::makeCustom()
     const double startX = get("StartX");
     const double endX = get("EndX");
     IFunction_sptr wgt = getClass("Weight");
+    //IFunction_sptr xfun = getClass("XFun");
     CustomPolynomial cp( n, startX, endX );
     cp.setWeightFunction( wgt );
+    //if (xfun)    cp.setXFunction( xfun );
     const bool norm = get("Normalize");
     if ( norm )
     {
       cp.normalize();
     }
-
     makeQuadrature( cp );
+
 }
 
 /**-------------------------------------------------
@@ -193,6 +215,13 @@ void MakeQuadrature::makeQuadrature(const Polynomial& P)
   quad->init();
 
   setClassProperty( "Quadrature", API::TableWorkspace_ptr( quad ) );
+  {
+    const double startX = get("StartX");
+    const double endX = get("EndX");
+    ChebfunWorkspace_sptr cheb( new ChebfunWorkspace(chebfun( 100, startX, endX )) );
+    cheb->fun().fit( P );
+    setClassProperty("ChebWorkspace", cheb);
+  }
 }
 
 } // namespace Numeric

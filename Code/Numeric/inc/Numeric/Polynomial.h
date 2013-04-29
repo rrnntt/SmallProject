@@ -4,6 +4,7 @@
 #include "Numeric/DllExport.h"
 #include "Numeric/IFunction1D.h"
 #include "Numeric/ParamFunction.h"
+#include "Numeric/GSLVector.h"
 
 #include <set>
 

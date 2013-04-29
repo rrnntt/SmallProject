@@ -435,7 +435,7 @@ void ChebFunction::bestFit(const IFunction& ifun)
         if ( abs_even > maxA ) maxA = abs_even;
         if ( abs_odd > maxA ) maxA = abs_odd;
       }
-      err = (minAodd + minAeven) / maxA / 2;
+      err = maxA > 0 ? (minAodd + minAeven) / maxA / 2 : 0;
       nn[k] *= 2;
       --nn[k];
       if ( err <= tol ) done[k] = true;

@@ -20,6 +20,7 @@ public:
   virtual std::string name()const {return "CustomPolynomial";}
   /// Returns the integral of the weight function
   virtual double weightIntegral() const;
+  void function1D(double *out, const double *xValues, const size_t nData) const;
 
   /* Own public methods */
   double startX() const {return m_fun.startX();}

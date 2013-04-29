@@ -3,6 +3,7 @@
 
 #include "Numeric/DllExport.h"
 #include "Numeric/IFunction.h"
+#include "Numeric/GSLVector.h"
 
 #include "API/TableWorkspace.h"
 

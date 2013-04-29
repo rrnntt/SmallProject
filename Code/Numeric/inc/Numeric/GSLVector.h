@@ -13,6 +13,9 @@
 namespace Numeric
 {
 
+/**
+  @brief A general purpose vector of doubles.
+ */
 class NUMERIC_EXPORT GSLVector
 {
 public:
@@ -31,6 +34,8 @@ public:
 
     GSLVector& operator=(const GSLVector& v);
 
+    GSLVector& operator=(const std::vector<double>& v);
+
     /// Destructor.
     ~GSLVector();
 
@@ -40,11 +45,7 @@ public:
     /// Get the pointer to the GSL vector
     const gsl_vector * gsl() const {return m_vector;}
 
-    void resize(const size_t n)
-    {
-      gsl_vector_free(m_vector);
-      m_vector = gsl_vector_alloc(n);
-    }
+    void resize(const size_t n);
 
     /// Size of the vector
     size_t size() const {return m_vector? m_vector->size : 0;}
