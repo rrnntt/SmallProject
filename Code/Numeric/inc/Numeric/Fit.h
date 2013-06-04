@@ -7,6 +7,12 @@
 namespace Numeric
 {
 
+//=================================================
+// Forward declarations
+//=================================================
+class FunctionDomain;
+class FunctionValues;
+
 class NUMERIC_EXPORT Fit: public API::Algorithm
 {
 public:
@@ -15,9 +21,11 @@ public:
 protected:
   virtual void exec();
   void applyProperty(const std::string& name);
+  void declareMultiDomainProperties();
 private:
   bool m_functionSet;
   bool m_workspaceSet;
+  bool m_isMultiDomain;
 };
 
 } // NUMERIC

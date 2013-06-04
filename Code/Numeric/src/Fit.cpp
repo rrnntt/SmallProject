@@ -6,11 +6,14 @@
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/ChebfunWorkspace.h"
 #include "Numeric/GSLMatrix.h"
+#include "Numeric/MultiDomainFunction.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
 
 #include "Kernel/CommonProperties.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace Numeric
 {
@@ -42,7 +45,8 @@ namespace
 Fit::Fit():
     API::Algorithm(),
     m_functionSet(false),
-    m_workspaceSet(false)
+    m_workspaceSet(false),
+    m_isMultiDomain(false)
 {
   // FunctionFcatory init string for a fitting function
   declareClass("Function",&FunctionFactory::instance());
@@ -54,7 +58,8 @@ Fit::Fit():
   declareInt("MaxIterations");
 }
 
-/**----------------------------------------------------------------------
+//----------------------------------------------------------------------
+/**
  * Execute algorithm.
  */
 void Fit::exec()
@@ -100,20 +105,51 @@ void Fit::exec()
   leastSquares->calActiveCovarianceMatrix( covar );
 }
 
+//----------------------------------------------------------------------
 /**
   * Declare additional properties (if needed) after Function and Workspace
   * have been set.
+  *
   * @param name :: Name of property just set.
   */
 void Fit::applyProperty(const std::string &name)
 {
     if (name == "Function")
     {
+        if ( m_functionSet )
+        {
+            throw std::runtime_error("Fit: Function property has already been set.");
+        }
         m_functionSet = true;
+        declareMultiDomainProperties();
     }
-    if (name == "W")
+    else if ( !m_functionSet )
     {
-        m_functionSet = true;
+        throw std::runtime_error("Fit: Function property must be set first.");
+    }
+}
+
+//----------------------------------------------------------------------
+/**
+ * If the fitting function is a multi-domain one examine it here
+ * and declare additional properties for additional columns of fitting data.
+ *
+ */
+void Fit::declareMultiDomainProperties()
+{
+    IFunction_sptr fun = getClass("Function");
+    MultiDomainFunction *mdfun = dynamic_cast<MultiDomainFunction*>( fun.get() );
+    if ( !mdfun ) return;
+    m_isMultiDomain = true;
+    // get number of domains needed for this function
+    size_t n = mdfun->getMaxIndex() + 1;
+    // declare new properties
+    for(size_t i = 1; i < n; ++i)
+    {
+        std::string suffix = boost::lexical_cast<std::string>( i );
+        declareString("XColumn_" + suffix);
+        declareString("YColumn_" + suffix);
+        declareString("ErrColumn_" + suffix);
     }
 }
 
@@ -122,8 +158,10 @@ void Fit::applyProperty(const std::string &name)
 //======================================================================
 namespace
 {
-  /**-------------------------------------------------------------------
+  //--------------------------------------------------------------------
+  /**
    * Create fitting domain and values from a table workspace.
+   *
    * @param domain :: Created domain.
    * @param values :: Created and filled with fitting data and errors values struct.
    * @param tws :: The source table workspace.
@@ -165,8 +203,10 @@ namespace
     }
   }
 
-  /**-------------------------------------------------------------------
+  //--------------------------------------------------------------------
+  /**
    * Create fitting domain and values from a chebfun workspace.
+   *
    * @param domain :: Created domain.
    * @param values :: Created and filled with fitting data and errors values struct.
    * @param cws :: The source chebfun workspace.

@@ -32,12 +32,13 @@ public:
 
   /// Associate a function and a domain
   void setDomainIndex(size_t funIndex, size_t domainIndex);
-
   /// Associate a function and a list of domains
   void setDomainIndices(size_t funIndex, const std::vector<size_t>& domainIndices);
-
   /// Clear all domain indices
   void clearDomainIndices();
+  /// Get the largest domain index. Max index is used to determine the size
+  /// of the composite domain needed for this function.
+  size_t getMaxIndex() const {return m_maxIndex;}
 
   /// Returns the number of attributes associated with the function
   virtual size_t nLocalAttributes()const {return 1;}
