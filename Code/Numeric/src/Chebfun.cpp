@@ -592,6 +592,27 @@ namespace Numeric
     return tmp.integr();
   }
 
+  /**
+   * Get norms of the base functions == sqrt(baseFunction integrals).
+   *
+   * @return :: Vector of norms.
+   */
+  std::vector<double> chebfun::baseNorm() const
+  {
+      chebfun c( *this );
+      std::vector<double> p(n()+1,0.0);
+      std::vector<double> norms(p);
+      for(size_t i = 0; i < p.size(); ++i)
+      {
+          p[i] = 1.0;
+          if ( i > 0 ) p[i - 1] = 0.0;
+          c.setP( p );
+          c.square();
+          norms[i] = std::sqrt( c.integr() );
+      }
+      return norms;
+  }
+
   void chebfun::fit(const IFunction& ifun)
   {
     auto& x = m_base->x;

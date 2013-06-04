@@ -205,9 +205,10 @@ namespace Numeric
 
     double integrate(int pwr = 1);
     double integr() const;
-    /// Integrate this function woth weight sqrt(1-x^2)
+    /// Integrate this function with weight sqrt(1-x^2)
     double integrateWeighted() const;
     double norm2();
+    std::vector<double> baseNorm() const;
 
     void square();
     void sqrt();

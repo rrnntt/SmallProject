@@ -149,6 +149,19 @@ namespace Numeric
       if (i < m_matrix->size1 && j < m_matrix->size2) return gsl_matrix_get(m_matrix,i,j);
       throw std::out_of_range("GSLMatrix indices are out of range.");
     }
+    /// multiply an element by a factor
+    void multiplyBy(size_t i, size_t j, double factor)
+    {
+      if (i < m_matrix->size1 && j < m_matrix->size2)
+      {
+          double value = gsl_matrix_get(m_matrix,i,j) * factor;
+          gsl_matrix_set(m_matrix,i,j,value);
+      }
+      else
+      {
+        throw std::out_of_range("GSLMatrix indices are out of range.");
+      }
+    }
 
     // Set this matrix to identity matrix
     void identity()

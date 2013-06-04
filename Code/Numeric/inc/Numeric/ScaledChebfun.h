@@ -77,6 +77,8 @@ public:
   /// Get the roots of the function
   void roots(std::vector<double>& r) const;
   const std::vector<double>& coeffs() const {return m_fun.coeffs();}
+  /// Get the unscaled function
+  const chebfun& getUnscaled() const {return m_fun;}
 
   /*=== Operations on ScaledChebfun ===*/
 

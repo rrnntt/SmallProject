@@ -71,6 +71,25 @@ void Schrodinger1D::exec()
   GSLMatrix v;
   L.diag( d, v );
 
+  std::vector<double> norms = vpot.baseNorm();
+  assert(norms.size() == L.size1());
+  assert(norms.size() == L.size2());
+
+  for(size_t i = 0; i < norms.size(); ++i)
+  {
+      double factor = 1.0 / norms[i];
+      for(size_t j = i; j < norms.size(); ++j)
+      {
+          v.multiplyBy(i,j,factor);
+      }
+  }
+
+//  eigenvectors orthogonality check
+//  GSLMatrix v1 = v;
+//  GSLMatrix tst;
+//  tst = Tr(v1) * v;
+//  std::cerr << tst << std::endl;
+
   std::vector<size_t> indx(L.size1());
   {
     size_t i = 0;
@@ -85,22 +104,6 @@ void Schrodinger1D::exec()
     if ( d1 < 0 && d2 < 0 ) return d2 < d1;
     return d1 < d2;
   });
-
-  //size_t imin = 0;
-  //double dmin = d[0];
-  //for(size_t i = 1; i < d.size(); ++i)
-  //{
-  //  const double tmp = d[i];
-  //  if ( tmp < dmin )
-  //  {
-  //    dmin = tmp;
-  //    imin = i;
-  //  }
-  //  std::cerr << i << ' ' << tmp << std::endl;
-  //}
-
-  //imin = 29;
-  //y.setP( v, indx[0] );
 
   auto eigenvalues = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory::instance().create("TableWorkspace"))
@@ -117,31 +120,17 @@ void Schrodinger1D::exec()
   auto& ec = eigenvalues->getDoubleData("Energy");
 
   auto eigenvectors = new ChebfunVector;
+  chebfun fun0(n,startX,endX);
   for(size_t j = 0; j < n; ++j)
   {
     nc[j] = double(j);
     ec[j] = d[indx[j]];
-    chebfun fun(n,startX,endX);
+    chebfun fun(fun0);
     fun.setP(v,indx[j]);
     eigenvectors->add(ChebFunction_sptr(new ChebFunction(fun)));
   }
   setProperty("Eigenvectors",ChebfunVector_sptr(eigenvectors));
 
-  //for(size_t i = 0; i < n; ++i)
-  //{
-  //  std::string colName = "Y" + boost::lexical_cast<std::string>( i );
-  //  tws->addColumn("double",colName);
-  //  auto yColumn = static_cast<API::TableColumn<double>*>(tws->getColumn(colName).get());
-  //  yColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
-  //  auto& yc = yColumn->data();
-  //  size_t k = indx[i];
-  //  for(size_t j = 0; j < n; ++j)
-  //  {
-  //    yc[j] = v.get(j, k);
-  //  }
-  //}
-
-  //setProperty("Table", tws);
 }
 
 } // namespace Numeric

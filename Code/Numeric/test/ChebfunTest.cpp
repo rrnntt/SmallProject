@@ -497,3 +497,20 @@ TEST(ChebfunTest, IntegrateWeightedTest)
   //  std::cerr << i << ' ' << x[i] << ' ' << p[i] << ' ' << w[i] << std::endl;
   //}
 }
+
+// I want to test if chebfun's base functions are orthogonal
+TEST(ChebfunTest, BaseOrthogonalityTest)
+{
+    chebfun cheb1(10);
+    chebfun cheb2(cheb1);
+    std::vector<double> p = cheb1.ypoints();
+    p[4] = 1.0;
+    cheb1.setP( p );
+    std::cerr << "I1=" << cheb1.integr() << std::endl;
+    p[4] = 0.0;
+    p[0] = 1.0;
+    cheb2.setP( p );
+    std::cerr << "I2=" << cheb2.integr() << std::endl;
+    cheb2 *= cheb1;
+    std::cerr << "I12=" << cheb2.integr() << std::endl;
+}
