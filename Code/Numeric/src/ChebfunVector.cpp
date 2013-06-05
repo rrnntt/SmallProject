@@ -22,7 +22,8 @@ ChebfunVector::~ChebfunVector()
 {
 }
 
-/**--------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------
+/**
  * Create a ChebfunVector (this) from another ChebfunVector as their linear combinations.
  * @param basis :: The basis functions for the linear combinations.
  * @param coeffs :: Coefficients for the combinations.
@@ -53,6 +54,7 @@ void ChebfunVector::fromLinearCombinations(const ChebfunVector& basis, const GSL
   }
 }
 
+//--------------------------------------------------------------------------------------------
 /// Sort the functions in the vector according to a table
 void ChebfunVector::sort(const std::vector<size_t>& indx)
 {

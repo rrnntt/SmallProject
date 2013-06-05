@@ -7,6 +7,14 @@
 namespace Numeric
 {
 
+//=================================================
+// Forward declarations
+//=================================================
+class ChebOperator;
+class ChebfunVector;
+class GSLVector;
+class GSLMatrix;
+
 /**
     Solves 1d Schrodinger equation with the operator
     
@@ -32,6 +40,8 @@ public:
   virtual std::string name() const {return "Schrodinger1D";}
 protected:
   virtual void exec();
+  void improve(ChebOperator *hamiltonian, ChebfunVector *basis, GSLVector &eigv, ChebfunVector **eigf)const;
+  void getSortedIndex(const GSLVector &v, std::vector<size_t> &indx) const;
 };
 
 } // NUMERIC
