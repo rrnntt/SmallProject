@@ -21,6 +21,7 @@ m_deriv(der)
 
 /**
  * Apply the conditions to an equation L.y = rhs
+ *
  * @param L :: Matrix of a differential operator.
  * @param rhs :: The right-hand-side vector of the equation
  */
@@ -31,7 +32,7 @@ void Cauchy::apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs) co
   assert( n == rhs.size() );
   double l00 = L.get(0, 0);
   L.set(0, 0, l00 + 1.0);
-  rhs.set(0, m_value);
+  rhs.set(0, m_value); // shouldn't we add m_value to rhs[0] ?
   GSLMatrix D;
   ChebDiff diff;
   diff.createMatrix( base, D );
@@ -42,7 +43,8 @@ void Cauchy::apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs) co
     t += D.get(0, i);
     L.set(1, i, t);
   }
-  rhs.set(1, m_deriv);
+  // Why is row index 1 ? shouldn't it be 0 ?
+  rhs.set(1, m_deriv); // shouldn't we add m_deriv to rhs[1] ?
 }
 
 //--------------------------------------------------------
@@ -97,8 +99,15 @@ void Dirichlet::apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs)
 
 /// Constructor
 ThroughPoint::ThroughPoint(double x, double y):
-m_x(x),m_y(y)
+    m_x(x),m_y(y),m_d(0),m_hasDeriv(false)
 {
+}
+
+/// Constructor
+ThroughPoint::ThroughPoint(double x, double y, double d):
+    m_x(x),m_y(y),m_d(d),m_hasDeriv(true)
+{
+    // this isn't working yet
 }
 
 /// Apply the conditions to an equation
@@ -117,7 +126,22 @@ void ThroughPoint::apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& r
       size_t j = i - 1;
       double tmp = L.get(j, j);
       L.set(j, j, tmp + 1.0);
-      rhs.set(j, m_y);
+      double updatedRHS = rhs.get(j) + m_y;
+
+      if ( m_hasDeriv )
+      {
+          GSLMatrix D;
+          ChebDiff diff;
+          diff.createMatrix( base, D );
+          for(size_t k = 0; k < n; ++k)
+          {
+            double t = L.get(j, k);
+            t += D.get(0, k);
+            L.set(j, k, t);
+          }
+          updatedRHS += m_d;
+      }
+      rhs.set(j, updatedRHS); // should I add ? I think it's right, but...
       std::cerr << "Trough " << x[j] << std::endl;
       break;
     }
@@ -224,6 +248,27 @@ void ChebOperator::solve(chebfun& y, const BoundaryConditions& bc)
 
   GSLVector rhs(n);
   rhs.zero();
+
+  bc.apply(y.getBase(), L, rhs);
+  GSLVector u(n);
+  L.solve(rhs, u);
+
+  y.setP( u );
+}
+
+/**
+ * Solve the equation L.y = r where L is the matrix of this operator
+ * @param y :: The solution
+ * @param r :: The right-hand side function
+ * @param bc :: The boundary conditions
+ */
+void ChebOperator::solve(chebfun& y, const chebfun& r, const BoundaryConditions& bc)
+{
+  GSLMatrix L;
+  size_t n = y.n() + 1;
+  createMatrix( y.getBase(), L );
+
+  GSLVector rhs(r.ypoints());
 
   bc.apply(y.getBase(), L, rhs);
   GSLVector u(n);
@@ -581,6 +626,14 @@ m_fun(fun)
 {
 }
 
+/// Constructor
+ChebTimes::ChebTimes(const chebfun &fun):
+  m_constant(0),
+  m_chebfun(new chebfun(fun))
+{
+    *m_chebfun = fun;
+}
+
 /**
  * Create operator matrix
  * @param base :: The base of the result function
@@ -601,6 +654,21 @@ void ChebTimes::createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L)
     {
       L.set( i, i, values.getCalculated(i) );
     }
+  }
+  else if ( m_chebfun )
+  {
+      if ( m_chebfun->getBase() == base )
+      {
+          auto &y = m_chebfun->ypoints();
+          for( size_t i = 0; i < n; ++i )
+          {
+              L.set( i, i, y[i] );
+          }
+      }
+      else
+      {
+          throw std::runtime_error("ChebTimes: chebfun has different base - not implemented.");
+      }
   }
   else
   {

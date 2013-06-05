@@ -83,7 +83,15 @@ CustomPolynomial::~CustomPolynomial()
 void CustomPolynomial::setWeightFunction(IFunction_const_sptr wgtFun, const double& tol)
 {
   m_weightFunction = wgtFun;
-  m_fun.bestFit( *wgtFun, tol );
+  auto cheb = dynamic_cast<const ChebFunction*>( wgtFun.get() );
+  if ( cheb && cheb->nfuns() == 1 && !cheb->cfun(0).hasScaling() )
+  {
+      m_fun = cheb->cfun(0).getUnscaled();
+  }
+  else
+  {
+    m_fun.bestFit( *wgtFun, tol );
+  }
 }
 
 /**

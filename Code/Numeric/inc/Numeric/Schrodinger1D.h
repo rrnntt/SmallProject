@@ -42,6 +42,7 @@ protected:
   virtual void exec();
   void improve(ChebOperator *hamiltonian, ChebfunVector *basis, GSLVector &eigv, ChebfunVector **eigf)const;
   void getSortedIndex(const GSLVector &v, std::vector<size_t> &indx) const;
+  void makeQuadrature(ChebfunVector *basis);
 };
 
 } // NUMERIC

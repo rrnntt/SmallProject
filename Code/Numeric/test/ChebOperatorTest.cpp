@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "Numeric/ChebOperator.h"
+#include "Numeric/FunctionFactory.h"
 
 using namespace Numeric;
 
@@ -130,4 +131,69 @@ TEST(Numeric_ChebOperator_Test, CreateTest)
 {
   auto oper = ChebOperator::create( "diff2 + diff + 1" );
   oper->log();
+}
+
+double VPot(double x)
+{
+    return 0.5*x*x - 0.5;
+}
+
+double InitialX(double x)
+{
+    return -0.5*x*x;
+}
+
+TEST(Numeric_ChebOperator_Test, NonLinearTest)
+{
+    //  beta*(y'' + y'^2) = V - E
+
+//    auto VPot = FunctionFactory::instance().createFitFunction("UserFunction1D");
+//    VPot->setAttributeValue("Formula","x^2/2");
+
+    double beta = 0.5;
+    chebfun vpot(200, -10, 10);
+    vpot.fit(VPot);
+
+    chebfun x(vpot);
+    x.fit(InitialX);
+    chebfun dx( x );
+
+    ThroughPoint bc(0, 0, 0);
+
+    size_t counter = 0;
+    double tol = 1.0;
+    while( tol > 0.001 && counter < 10)
+    {
+        dx.fromDerivative( x );
+
+        ChebCompositeOperator H;
+        H.addRight( new ChebTimes(beta) );
+        auto derivs = new ChebPlus;
+        derivs->add( '+', new ChebDiff2 );
+        auto tmp = new ChebCompositeOperator;
+        tmp->addRight( new ChebDiff );
+        tmp->addRight( new ChebTimes(dx) );
+        derivs->add( '+', tmp );
+        H.addRight( derivs );
+
+        H.solve(x, vpot, bc);
+
+        chebfun dx1(x);
+        dx1.fromDerivative(x);
+        dx1.square();
+
+        chebfun dx2(x);
+        dx2.fromDerivative2(x);
+
+        dx2 += dx1;
+        dx2 *= beta;
+        dx2 -= vpot;
+        dx2.square();
+
+        tol = dx2.integr();
+        std::cerr << "tol=" << tol << std::endl;
+
+        ++counter;
+
+    }
 }

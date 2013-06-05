@@ -70,13 +70,17 @@ protected:
 class NUMERIC_EXPORT ThroughPoint: public BoundaryConditions
 {
 public:
-  /// Constructor
-  ThroughPoint(double x, double y);
+    /// Constructor
+    ThroughPoint(double x, double y);
+    /// Constructor
+    ThroughPoint(double x, double y, double d);
   /// Apply the conditions to an equation
   virtual void apply(ChebfunBase_const_sptr base, GSLMatrix& L, GSLVector& rhs) const;
 protected:
-  double m_x;
-  double m_y;
+  double m_x; ///< an x point
+  double m_y; ///< function value at m_x
+  double m_d; ///< derivative value at m_x
+  bool m_hasDeriv; ///< flag if derivative was set
 };
 
 /**
@@ -103,6 +107,8 @@ public:
   virtual void apply(const ScaledChebfun& arg, ScaledChebfun& res);
   /// Solve the equation L.y = 0 where L is the matrix of this operator
   void solve(chebfun& y, const BoundaryConditions& bc);
+  /// Solve the equation L.y = 0 where L is the matrix of this operator
+  void solve(chebfun& y, const chebfun& r, const BoundaryConditions& bc);
   /// Solve the equation L.y = 0 where L is the matrix of this operator
   void solve(ScaledChebfun& y, const BoundaryConditions& bc);
   /// Create an operator from a string.
@@ -232,6 +238,8 @@ public:
   ChebTimes(double factor);
   /// Constructor
   ChebTimes(IFunction_sptr fun);
+  /// Constructor
+  ChebTimes(const chebfun &fun);
   /// Create operator matrix
   /// @param base :: The base of the result function
   void createMatrix(ChebfunBase_const_sptr base, GSLMatrix& L);
@@ -246,6 +254,8 @@ protected:
   double m_constant;
   /// the function
   IFunction_sptr m_fun;
+  /// the function
+  chebfun_sptr m_chebfun;
 };
 
 } // NUMERIC

@@ -3,6 +3,7 @@
 #include "Numeric/ChebOperator.h"
 #include "Numeric/FunctionFactory.h"
 #include "Numeric/ChebfunVector.h"
+#include "Numeric/MakeQuadrature.h"
 
 #include "API/AlgorithmFactory.h"
 #include "API/TableWorkspace.h"
@@ -30,6 +31,7 @@ Schrodinger1D::Schrodinger1D()
   declareDouble("EndX");
   declareWorkspace("Eigenvalues");
   declareWorkspace("Eigenvectors");
+  //declareWorkspace("Quadrature");
 }
 
 /// Execute algorithm.
@@ -159,6 +161,8 @@ void Schrodinger1D::exec()
 
   setProperty("Eigenvectors",ChebfunVector_sptr(eigf));
 
+  makeQuadrature(eigf);
+
 }
 
 /**
@@ -249,6 +253,30 @@ void Schrodinger1D::getSortedIndex(const GSLVector &v, std::vector<size_t> &indx
       return d1 < d2;
     });
 
+}
+
+/**
+ * Make a custom quadrature with the square of the ground state function as its weight.
+ *
+ * @param basis :: The basis functions.
+ */
+void Schrodinger1D::makeQuadrature(ChebfunVector *basis)
+{
+    double startX = get("StartX");
+    double endX = get("EndX");
+
+    ChebFunction_sptr weight(new ChebFunction(basis->cfun(0)));
+    weight->square();
+
+    MakeQuadrature maker;
+    maker.setProperty("Type","Custom");
+    maker.setProperty("N",static_cast<int>( 12 ));
+    maker.setProperty("StartX", startX);
+    maker.setProperty("EndX", endX);
+    maker.setClassProperty("Weight", weight);
+    maker.setProperty("Quadrature","quad");
+
+    maker.execute();
 }
 
 } // namespace Numeric
