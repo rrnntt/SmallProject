@@ -46,12 +46,12 @@ void Schrodinger1D::exec()
   chebfun vpot( 0, startX, endX );
   vpot.bestFit( *VPot );
 
-  size_t n = vpot.n() + 1;
-  std::cerr << "n=" << n << std::endl;
+  size_t nBasis = vpot.n() + 1;
+  std::cerr << "n=" << nBasis << std::endl;
   //if (n < 3)
   {
-    n = 200;
-    vpot.resize( n );
+    nBasis = 200;
+    vpot.resize( nBasis );
   }
 
   const double beta = get("Beta");
@@ -64,7 +64,6 @@ void Schrodinger1D::exec()
   hamiltonian->add('+', new ChebTimes(VPot) );
 
   GSLMatrix L;
-  //size_t n = y.n() + 1;
   hamiltonian->createMatrix( vpot.getBase(), L );
 
   GSLVector d;
@@ -108,7 +107,7 @@ void Schrodinger1D::exec()
   auto eigenvalues = API::TableWorkspace_ptr(dynamic_cast<API::TableWorkspace*>(
     API::WorkspaceFactory::instance().create("TableWorkspace"))
     );
-  eigenvalues->setRowCount(n);
+  eigenvalues->setRowCount(nBasis);
   setProperty("Eigenvalues", eigenvalues);
 
   eigenvalues->addColumn("double","N");
@@ -117,17 +116,55 @@ void Schrodinger1D::exec()
   auto& nc = nColumn->data();
 
   eigenvalues->addDoubleColumn("Energy");
+  auto eColumn = static_cast<API::TableColumn<double>*>(eigenvalues->getColumn("Energy").get());
+  eColumn->asNumeric()->setPlotRole(API::NumericColumn::Y);
   auto& ec = eigenvalues->getDoubleData("Energy");
 
   auto eigenvectors = new ChebfunVector;
-  chebfun fun0(n,startX,endX);
-  for(size_t j = 0; j < n; ++j)
+  chebfun fun0(nBasis,startX,endX);
+  // collect indices of spurious eigenvalues to move them to the back
+  std::vector<size_t> spurious;
+  // index for good eigenvalues
+  size_t n = 0;
+  for(size_t j = 0; j < nBasis; ++j)
   {
-    nc[j] = double(j);
-    ec[j] = d[indx[j]];
+    size_t i = indx[j];
     chebfun fun(fun0);
-    fun.setP(v,indx[j]);
-    eigenvectors->add(ChebFunction_sptr(new ChebFunction(fun)));
+    fun.setP(v,i);
+
+    // check eigenvalues for spurious ones
+    chebfun dfun(fun);
+    dfun.square();
+    double norm = dfun.integr();
+
+    // I am not sure that it's a solid condition
+    if ( norm < 0.999999 )
+    {
+        // bad eigenvalue
+        spurious.push_back(j);
+    }
+    else
+    {
+        nc[n] = double(n);
+        ec[n] = d[i];
+        eigenvectors->add(ChebFunction_sptr(new ChebFunction(fun)));
+//        chebfun dfun(fun);
+//        hamiltonian->apply(fun,dfun);
+//        dfun *= fun;
+//        std::cerr << "ener["<<n<<"]=" << ec[n] << ' ' << norm << ' ' << dfun.integr() << std::endl;
+        ++n;
+    }
+  }
+
+  // add spurious eigenvalues/vectors at the back
+  for(size_t j = 0; j < spurious.size(); ++j,++n)
+  {
+      size_t i = indx[j];
+      nc[n] = double(n);
+      ec[n] = d[i];
+      chebfun fun(fun0);
+      fun.setP(v,i);
+      eigenvectors->add(ChebFunction_sptr(new ChebFunction(fun)));
   }
   setProperty("Eigenvectors",ChebfunVector_sptr(eigenvectors));
 
