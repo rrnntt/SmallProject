@@ -114,6 +114,8 @@ void Schrodinger1D::exec()
   boost::scoped_ptr<ChebfunVector> eigenvectors(new ChebfunVector);
 
   chebfun fun0(nBasis,startX,endX);
+  ChebFunction_sptr theSum(new ChebFunction(fun0));
+
   // collect indices of spurious eigenvalues to move them to the back
   std::vector<size_t> spurious;
   // index for good eigenvalues
@@ -140,6 +142,10 @@ void Schrodinger1D::exec()
         nc[n] = double(n);
         ec[n] = d[i];
         eigenvectors->add(ChebFunction_sptr(new ChebFunction(fun)));
+
+        // test sum of functions squares
+        *theSum += dfun;
+
 //        chebfun dfun(fun);
 //        hamiltonian->apply(fun,dfun);
 //        dfun *= fun;
@@ -159,9 +165,10 @@ void Schrodinger1D::exec()
       ec[i] = eigv[i];
   }
 
+  eigf->add(theSum);
   setProperty("Eigenvectors",ChebfunVector_sptr(eigf));
 
-  makeQuadrature(eigf);
+  //makeQuadrature(eigf);
 
 }
 
