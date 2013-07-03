@@ -27,10 +27,13 @@ set( INC_FILES
    inc/Numeric/DomainCreator.h
    inc/Numeric/DomainFactory.h
    inc/Numeric/DomainCreatorTable1D.h
+   inc/Numeric/DVRFunctionBase.h
+   inc/Numeric/DVRFunction.h
    inc/Numeric/FuncMinimizerFactory.h
    inc/Numeric/FunctionComposition.h
    inc/Numeric/FunctionDomain.h
    inc/Numeric/FunctionDomain1D.h
+   inc/Numeric/FunctionDomainMD.h
    inc/Numeric/FunctionFactory.h
    inc/Numeric/FunctionValues.h
    inc/Numeric/GSLJacobian.h
@@ -115,10 +118,13 @@ set( SRC_FILES
   src/DomainCreator.cpp
   src/DomainFactory.cpp
   src/DomainCreatorTable1D.cpp
+  src/DVRFunctionBase.cpp
+  src/DVRFunction.cpp
   src/FuncMinimizerFactory.cpp
   src/FunctionComposition.cpp
   src/FunctionDomain.cpp
   src/FunctionDomain1D.cpp
+  src/FunctionDomainMD.cpp
   src/FunctionFactory.cpp
   src/FunctionValues.cpp
   src/GSLVector.cpp
@@ -209,10 +215,13 @@ set( SRC_FILES
   test/CostFuncFittingTest.cpp
   test/CustomPolynomialTest.cpp
   test/DistributionTest.cpp
+  test/DVRFunctionBaseTest.cpp
+  test/DVRFunctionTest.cpp
   #test/LeastSquaresTest.cpp
   test/Function1DTest.cpp
   test/FunctionCompositionTest.cpp
   test/FunctionDomain1DTest.cpp
+  test/FunctionDomainMDTest.cpp
   test/FunctionFactoryTest.cpp
   test/FuncMinimizerFactoryTest.cpp
   test/JacobiPolynomialTest.cpp
