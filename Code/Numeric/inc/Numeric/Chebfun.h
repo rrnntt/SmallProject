@@ -213,6 +213,7 @@ namespace Numeric
 
     void square();
     void sqrt();
+    void convolution(const IFunction &fun1, const IFunction &fun2, double start, double end, bool inverse = false);
 
     void roots(std::vector<double>& r) const;
 

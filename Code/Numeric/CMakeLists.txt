@@ -81,6 +81,7 @@ set( INC_FILES
    inc/Numeric/AddFunctionValuesToTable.h
    inc/Numeric/AnalyseBasis.h
    inc/Numeric/ChebfunWorkspace.h
+   inc/Numeric/Convolution.h
    inc/Numeric/CopyChebfun.h
    inc/Numeric/CreateChebfun.h
    inc/Numeric/CreateQuadratureChebfuns.h
@@ -166,6 +167,7 @@ set( SRC_FILES
    src/AnalyseBasis.cpp
    src/ChebfunWorkspace.cpp
    src/CopyChebfun.cpp
+   src/Convolution.cpp
    src/CreateChebfun.cpp
    src/CreateQuadratureChebfuns.cpp
    src/ChebfunToTable.cpp

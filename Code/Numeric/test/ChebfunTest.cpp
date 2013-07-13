@@ -523,3 +523,7 @@ TEST(ChebfunTest, BaseOrthogonalityTest)
     cheb2 *= cheb1;
     std::cerr << "I12=" << cheb2.integr() << std::endl;
 }
+
+TEST(ChebfunTest, ConvolutionTest)
+{
+}

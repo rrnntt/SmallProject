@@ -1,5 +1,6 @@
 #include "Numeric/Chebfun.h"
 #include "Numeric/IFunction.h"
+#include "Numeric/IFunction1D.h"
 #include "Numeric/FunctionDomain1D.h"
 #include "Numeric/FunctionValues.h"
 
@@ -935,6 +936,44 @@ void chebfun::sqrt()
     d = std::sqrt( d );
   }
   invalidateA();
+}
+
+/**
+ * Make this chebfun a convolution of two others.
+ */
+void chebfun::convolution(const IFunction& fun1, const IFunction& fun2, double start, double end, bool inverse)
+{
+  auto *f1d = dynamic_cast<const IFunction1D*>(&fun1);
+  if ( !f1d )
+  {
+    throw std::invalid_argument("Convolution requires IFunction1D.");
+  }
+  set( 2, start, end );
+  bestFit( fun2 );
+  size_t n1 = n() + 1;
+  auto &x = xpoints();
+  auto &p = ypoints();
+  GSLMatrix R( n1, n1 );  // resolution function matrix
+  GSLVector y( n1 );
+  for(size_t i = 0; i < n1; ++i)
+  {
+    y.set( i, p[i] );
+    for(size_t j = 0; j < n1; ++j)
+    {
+      double dx = x[i] - x[j];
+      double f = 0;
+      f1d->function1D( &f, &dx, 1 );
+      R.set( i, j, f );
+    }
+  }
+  std::cerr << "Convolution " << inverse << std::endl;
+  if ( inverse )
+  {
+    R.invert();
+  }
+  GSLVector res;
+  R.multiply( y, res );
+  setP( res );
 }
 
 void chebfun::bestFit(const IFunction& fun, const double& tol)
