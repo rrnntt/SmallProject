@@ -262,20 +262,29 @@ TEST(ChebfunTest, IntegrateGaussTest)
   chebfun cheb(100,-10.0,10.0);
   cheb.fit(user);
   auto& a = cheb.coeffs();
+  auto &p = cheb.ypoints();
+  size_t n = cheb.n();
+
   for(size_t i = 0; i < a.size(); ++i)
   {
-    std::cerr << i << ' ' << a[i] << std::endl;
+    double b = 0.0;
+    for(size_t j = 0; j < a.size(); ++j)
+    {
+      double t = p[j];
+      if ( j == 0 || j == n ) t /= 2;
+      b += t * cos(M_PI*double(i*j)/n);
+    }
+    b /= n;
+    if ( i != 0 && i != n ) b *= 2;
+    if ( i % 2 == 0 )
+    std::cerr << i << ' ' << a[i] << ' ' << b << ' ' << a[i] - b << std::endl;
   }
 
-  auto& x = cheb.xpoints();
-  auto& y = cheb.ypoints();
-  //for(size_t i = 0; i < x.size(); ++i)
-  //{
-  //  double xi = x[i];
-  //  std::cerr << xi << ' ' << exp(-xi*xi) << ' ' << y[i] << std::endl;
-  //}
-  //EXPECT_NEAR( cheb.integr(), 2.0, 1e-15 );
+  EXPECT_NEAR( cheb.integr(), sqrt(M_PI), 1e-15 );
+  EXPECT_NEAR( cheb.integrate(), sqrt(M_PI), 1e-15 );
   std::cerr << cheb.integr() - sqrt(M_PI) << std::endl;
+  std::cerr << cheb.integr() << ' ' << sqrt(M_PI) << std::endl;
+  std::cerr << cheb.integrate() - sqrt(M_PI) << std::endl;
 }
   
 //-----------------------------------------------------------------------------

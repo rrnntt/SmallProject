@@ -5,7 +5,7 @@
 
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_fft_real.h>
-#include <gsl/gsl_integration.h>
+//#include <gsl/gsl_integration.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 #include <gsl/gsl_eigen.h>
 
@@ -533,28 +533,36 @@ namespace Numeric
     calcP();
   }
 
-  double chebfun_integration_function(double x,void* this_chebfun)
+  double chebfun::integrate()
   {
-    const chebfun& fun = *static_cast<const chebfun*>(this_chebfun);
-    return fun(x);
-  }
-
-  double chebfun_integration_function2(double x,void* this_chebfun)
-  {
-    const chebfun& fun = *static_cast<const chebfun*>(this_chebfun);
-    double f = fun(x);
-    return f*f;
-  }
-
-  double chebfun::integrate(int pwr)
-  {
-    gsl_integration_glfixed_table * quad = gsl_integration_glfixed_table_alloc( n() );
-    gsl_function fun;
-    fun.function = pwr == 1 ? chebfun_integration_function : chebfun_integration_function2;
-    fun.params = this;
-    double res = gsl_integration_glfixed (&fun, startX() ,endX(), quad);
-    gsl_integration_glfixed_table_free(quad);
-    return res;
+    std::vector<double> &w = m_base->iw3;
+    if ( w.empty() )
+    {
+      size_t N = n();
+      w.resize( N + 1 );
+      std::vector<double> &iw = m_base->iw;
+      for(size_t i = 0; i < iw.size(); ++i)
+      {
+        double b = 0.0;
+        for(size_t j = 0; j < iw.size(); ++j)
+        {
+          double t = iw[j];
+          if ( j == 0 || j == N ) t /= 2;
+          b += t * cos(M_PI*double(i*j)/N);
+        }
+        b /= N;
+        if ( i != 0 && i != N ) b *= 2;
+        w[i] = b;
+        //std::cerr << i << ' ' << b << std::endl;
+      }
+    }
+    double res = 0.0;
+    auto &p = ypoints();
+    for(size_t i = 0; i < w.size(); ++i)
+    {
+      res += w[i] * p[i];
+    }
+    return res * (endX() - startX()) / 2;
   }
 
   double chebfun::integr() const

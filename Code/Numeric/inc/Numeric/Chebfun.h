@@ -28,8 +28,9 @@ namespace Numeric
     size_t size() const {return x.size();} ///< number of x-points == n + 1
     std::vector<double> x;   ///< x-vaues for use in the barycentric formula, n + 1 items
     std::vector<double> w;   ///< weights used in the barycentric formula, n + 1 items
-    std::vector<double> iw;   ///< weights for integration
-    std::vector<double> iw2;   ///< weights for integration
+    std::vector<double> iw;   ///< weights for integration using a-coeffs
+    std::vector<double> iw2;   ///< weights for weighted integration
+    std::vector<double> iw3;   ///< weights for integration using p values
     void calcX();  ///< Calclulate x and w based on values of n, startX, and endX
   };
 
@@ -203,7 +204,7 @@ namespace Numeric
     /// Creates a domain for the region on which the workspace is defined.
     Numeric::FunctionDomain1D_sptr createDomain(size_t n) const;
 
-    double integrate(int pwr = 1);
+    double integrate();
     double integr() const;
     /// Integrate this function with weight sqrt(1-x^2)
     double integrateWeighted() const;
