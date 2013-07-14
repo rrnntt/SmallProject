@@ -56,6 +56,7 @@ namespace Numeric
     {
       gsl_vector_set( m_vector, i, v[i] );
     }
+    return *this;
   }
 
   /// Destructor.

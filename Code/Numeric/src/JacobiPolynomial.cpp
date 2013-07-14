@@ -41,7 +41,7 @@ void JacobiPolynomial::updateABC() const
   m_b.resize(m_n);
   m_c.resize(m_n);
 
-  if ( alpha == 0.0 and beta == 0.0 )
+  if ( alpha == 0.0 && beta == 0.0 )
   {
       for(int i = 0; i < m_n; ++i)
       {

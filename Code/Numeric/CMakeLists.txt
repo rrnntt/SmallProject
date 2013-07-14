@@ -10,6 +10,7 @@ set( INC_FILES
    inc/Numeric/Chebfun2DSpline.h
    inc/Numeric/ChebfunVector.h
    inc/Numeric/ChebFunction.h
+   inc/Numeric/ChFun.h
    inc/Numeric/ChebOperator.h
    inc/Numeric/Chebyshev.h
    inc/Numeric/CompositeDomain.h
@@ -73,6 +74,7 @@ set( INC_FILES
    inc/Numeric/Schrodinger0.h
    inc/Numeric/SolveODE.h
    inc/Numeric/StdJacobian.h
+   inc/Numeric/TiesFunction.h
    inc/Numeric/UserFunction1D.h
    inc/Numeric/V3D.h
    inc/Numeric/Vector.h
@@ -104,6 +106,7 @@ set( SRC_FILES
   src/Chebfun2DSpline.cpp
   src/ChebfunVector.cpp
   src/ChebFunction.cpp
+  src/ChFun.cpp
   src/ChebOperator.cpp
   src/Chebyshev.cpp
   src/CompositeFunction.cpp
@@ -152,6 +155,7 @@ set( SRC_FILES
   src/ProductFunction.cpp
   src/Quadrature.cpp
   src/ScaledChebfun.cpp
+  src/TiesFunction.cpp
 #  src/SeriesFunction.cpp
   src/SchrodScale.cpp
   src/Schrodinger0.cpp
@@ -209,6 +213,7 @@ set( SRC_FILES
   test/main.cpp
   test/BackToBackExponentialTest.cpp
   test/ChebFunctionTest.cpp
+  test/ChFunTest.cpp
   test/ChebOperatorTest.cpp
   test/ChebfunTest.cpp
   test/ChebfunVectorTest.cpp
