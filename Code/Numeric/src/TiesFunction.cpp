@@ -195,5 +195,20 @@ void TiesFunction::setParametersToSatisfyConstraints()
   }
 }
 
+/**
+ * Returns the index of parameter if the ref points to this ParamFunction
+ * @param ref :: A reference to a parameter
+ * @return Parameter index or number of nParams() if parameter not found
+ */
+size_t TiesFunction::getParameterIndex(const ParameterReference& ref)const
+{
+  if (ref.getFunction() == this && ref.getIndex() < nParams())
+  {
+    return ref.getIndex();
+  }
+  return nParams();
+}
+
+
 
 } // Numeric

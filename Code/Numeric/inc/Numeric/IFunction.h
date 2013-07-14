@@ -319,10 +319,7 @@ public:
   /// Return a value of attribute attName
   virtual Attribute getAttribute(const std::string& attName)const;
   /// Set a value to attribute attName
-  virtual void setAttribute(const std::string& attName,const Attribute& )
-  {
-    throw std::invalid_argument("Attribute "+attName+" not found in function "+this->name());
-  }
+  virtual void setAttribute(const std::string& attName,const Attribute& );
   /// Check if attribute attName exists
   virtual bool hasAttribute(const std::string& attName)const;
   template<typename T>

@@ -148,6 +148,21 @@ namespace Numeric
   }
 
   /**
+    * Set a y value.
+    * @param i :: Index of a point.
+    * @param y :: New value for the point.
+    */
+  void chebfun::setP(size_t i, double y)
+  {
+    if ( i >= m_p.size() )
+    {
+      throw std::range_error("chebfun point index out of range");
+    }
+    m_p[i] = y;
+    invalidateA();
+  }
+
+  /**
     * Calculate the function value as a T form expansion at point x
     * @param x :: Argument of the function
     */

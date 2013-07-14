@@ -16,8 +16,10 @@ public:
   ChFun(const ChFun& fun);
   ChFun& operator=(const ChFun& fun);
   ~ChFun();
+  std::string name()const {return "ChFun";}
   void function1D(double* out, const double* xValues, const size_t nData)const;
   void set(size_t n,const double& startX = -1,const double& endX = 1);
+  void reset(size_t n);
 
   /// Set i-th parameter
   virtual void setParameter(size_t, const double& value, bool explicitlySet = true);
@@ -32,7 +34,7 @@ public:
   /// Get parameter by name.
   virtual double getParameter(const std::string& name)const;
   /// Total number of parameters
-  virtual size_t nParams()const{return m_parameters.size();}
+  virtual size_t nParams()const{return n() + 1;}
   /// Returns the index of parameter name
   virtual size_t parameterIndex(const std::string& name)const;
   /// Returns the name of parameter i
@@ -53,12 +55,15 @@ public:
   /// Restores a declared parameter i to the active status
   virtual void unfix(size_t i);
 
-  /// Return parameter index from a parameter reference. Usefull for constraints and ties in composite functions
-  virtual size_t getParameterIndex(const ParameterReference& ref)const;
   /// Get the containing function
   IFunction_sptr getContainingFunction(const ParameterReference& ref)const;
   /// Get the containing function
   IFunction_sptr getContainingFunction(IFunction_sptr fun);
+
+  void setAttribute(const std::string& attName,const Attribute& att);
+
+protected:
+  void declareParameter(const std::string& name, double initValue = 0, const std::string& description="");
 
 private:
   /// The index map. m_indexMap[i] gives the total index for active parameter i

@@ -606,6 +606,15 @@ void IFunction::declareAttribute(const std::string &name, IFunction::Attribute i
     m_attributes[name] = initValue;
 }
 
+void IFunction::setAttribute(const std::string& attName,const IFunction::Attribute& att)
+{
+  auto it = m_attributes.find( attName );
+  if ( it == m_attributes.end() )
+  {
+    throw std::invalid_argument("Attribute "+attName+" not found in function "+this->name());
+  }
+  it->second = att;
+}
 
 } // namespace Numeric
 

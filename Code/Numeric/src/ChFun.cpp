@@ -1,6 +1,8 @@
 #include "Numeric/ChFun.h"
 #include "Numeric/FunctionFactory.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace Numeric
 {
 
@@ -12,16 +14,28 @@ namespace Numeric
 ChFun::ChFun(size_t n, const double& startX,const double& endX):
 chebfun(n,startX,endX),IFunction1D()
 {
+  m_errors.resize(n + 1);
+  m_isFixed.resize( n + 1 );
+  m_explicitlySet.resize( n + 1 );
+  declareAttribute("n", Attribute(3));
+  declareAttribute("StartX", Attribute(-1.0));
+  declareAttribute("EndX", Attribute(1.0));
 }
 
 ChFun::ChFun(const ChFun& fun):
 chebfun(fun)
 {
+  m_errors.assign(fun.m_errors.cbegin(),m_errors.cend());
+  m_isFixed.assign(m_isFixed.cbegin(),m_isFixed.cend());
+  m_explicitlySet.assign(m_explicitlySet.cbegin(),m_explicitlySet.cend());
 }
 
 ChFun& ChFun::operator=(const ChFun& fun)
 {
   chebfun::operator=(fun);
+  m_errors.assign(fun.m_errors.cbegin(),m_errors.cend());
+  m_isFixed.assign(m_isFixed.cbegin(),m_isFixed.cend());
+  m_explicitlySet.assign(m_explicitlySet.cbegin(),m_explicitlySet.cend());
   return *this;
 }
 
@@ -45,10 +59,17 @@ void ChFun::function1D(double* out, const double* xValues, const size_t nData)co
   }
 }
 
-void ChFun::set(size_t n,const double& startX = -1,const double& endX = 1)
+void ChFun::set( size_t n, const double& startX, const double& endX )
 {
   chebfun::set(n,startX,endX);
   m_errors.resize(n + 1);
+  m_isFixed.resize( n + 1 );
+  m_explicitlySet.resize( n + 1 );
+}
+
+void ChFun::reset(size_t n)
+{
+  set( n, startX(), endX() );
 }
 
 /** Sets a new value to the i-th parameter.
@@ -62,7 +83,7 @@ void ChFun::setParameter(size_t i, const double& value, bool explicitlySet)
   {
     throw std::out_of_range("ChFun parameter index out of range.");
   }
-  m_parameters[i] = value;
+  setP( i, value );
   if (explicitlySet)
   {
     m_explicitlySet[i] = true;
@@ -89,7 +110,7 @@ double ChFun::getParameter(size_t i)const
   {
     throw std::out_of_range("ChFun parameter index out of range.");
   }
-  return m_parameters[i];
+  return ypoints()[i];
 }
 
 /**
@@ -100,17 +121,26 @@ double ChFun::getParameter(size_t i)const
  */
 void ChFun::setParameter(const std::string& name, const double& value, bool explicitlySet)
 {
-  std::string ucName(name);
-  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
-  std::vector<std::string>::const_iterator it = 
-    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
-  if (it == m_parameterNames.end())
+  bool nameOK = name.size() > 1;
+  size_t index = 0;
+  if ( nameOK )
+  {
+    try
+    {
+      index = boost::lexical_cast<size_t>( name.substr(1) );
+    }
+    catch(...)
+    {
+      nameOK = false;
+    }
+  }
+  if ( !nameOK )
   {
     std::ostringstream msg;
-    msg << "ChFun parameter ("<<ucName<<") does not exist.";
+    msg << "ChFun parameter (" << name << ") does not exist.";
     throw std::invalid_argument(msg.str());
   }
-  setParameter(static_cast<int>(it - m_parameterNames.begin()),value,explicitlySet);
+  setParameter( index, value, explicitlySet );
 }
 
 /**
@@ -120,17 +150,7 @@ void ChFun::setParameter(const std::string& name, const double& value, bool expl
  */
 void ChFun::setParameterDescription(const std::string& name, const std::string& description)
 {
-  std::string ucName(name);
-  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
-  std::vector<std::string>::const_iterator it = 
-    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
-  if (it == m_parameterNames.end())
-  {
-    std::ostringstream msg;
-    msg << "ChFun parameter ("<<ucName<<") does not exist.";
-    throw std::invalid_argument(msg.str());
-  }
-  setParameterDescription(static_cast<int>(it - m_parameterNames.begin()),description);
+  throw std::runtime_error("Canot reset parameter description for ChFun.");
 }
 
 
@@ -141,17 +161,26 @@ void ChFun::setParameterDescription(const std::string& name, const std::string& 
  */
 double ChFun::getParameter(const std::string& name)const
 {
-  std::string ucName(name);
-  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
-  std::vector<std::string>::const_iterator it = 
-    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
-  if (it == m_parameterNames.end())
+  bool nameOK = name.size() > 1;
+  size_t index = 0;
+  if ( nameOK )
+  {
+    try
+    {
+      index = boost::lexical_cast<size_t>( name.substr(1) );
+    }
+    catch(...)
+    {
+      nameOK = false;
+    }
+  }
+  if ( !nameOK )
   {
     std::ostringstream msg;
-    msg << "ChFun parameter ("<<ucName<<") does not exist.";
+    msg << "ChFun parameter (" << name << ") does not exist.";
     throw std::invalid_argument(msg.str());
   }
-  return m_parameters[it - m_parameterNames.begin()];
+  return getParameter( index );
 }
 
 /**
@@ -161,17 +190,26 @@ double ChFun::getParameter(const std::string& name)const
  */
 size_t ChFun::parameterIndex(const std::string& name)const
 {
-  std::string ucName(name);
-  //std::transform(name.begin(), name.end(), ucName.begin(), toupper);
-  std::vector<std::string>::const_iterator it = 
-    std::find(m_parameterNames.begin(),m_parameterNames.end(),ucName);
-  if (it == m_parameterNames.end())
+  bool nameOK = name.size() > 1;
+  size_t index = 0;
+  if ( nameOK )
+  {
+    try
+    {
+      index = boost::lexical_cast<size_t>( name.substr(1) );
+    }
+    catch(...)
+    {
+      nameOK = false;
+    }
+  }
+  if ( !nameOK )
   {
     std::ostringstream msg;
-    msg << "ChFun "<<this->name()<<" does not have parameter ("<<ucName<<").";
+    msg << "ChFun parameter (" << name << ") does not exist.";
     throw std::invalid_argument(msg.str());
   }
-  return int(it - m_parameterNames.begin());
+  return index;
 }
 
 /** Returns the name of parameter i
@@ -184,7 +222,7 @@ std::string ChFun::parameterName(size_t i)const
   {
     throw std::out_of_range("ChFun parameter index out of range.");
   }
-  return m_parameterNames[i];
+  return "Y" + boost::lexical_cast<std::string>( i );
 }
 
 /** Returns the description of parameter i
@@ -197,7 +235,7 @@ std::string ChFun::parameterDescription(size_t i)const
   {
     throw std::out_of_range("ChFun parameter index out of range.");
   }
-  return m_parameterDescriptions[i];
+  return "Function value at point " + boost::lexical_cast<std::string>(i);
 }
 
 /** 
@@ -257,5 +295,38 @@ void ChFun::unfix(size_t i)
   if ( !isFixed(i) ) return;
   m_isFixed[i] = false;
 }
+
+void ChFun::declareParameter(const std::string&, double, const std::string&)
+{
+  throw std::runtime_error("Cannot declare new parameter for ChFun.");
+}
+
+void ChFun::setAttribute(const std::string& attName,const IFunction::Attribute& att)
+{
+  IFunction1D::setAttribute( attName, att );
+  if ( attName == "n" )
+  {
+    reset( att.asInt() );
+  }
+  else if ( attName == "StartX" )
+  {
+    set( n(), att.asDouble(), endX() );
+  }
+  else if ( attName == "EndX" )
+  {
+    set( n(), startX(), att.asDouble() );
+  }
+}
+
+/// Checks if a parameter has been set explicitly
+bool ChFun::isExplicitlySet(size_t i)const
+{
+  if (i >= nParams())
+  {
+    throw std::out_of_range("ParamFunction parameter index out of range.");
+  }
+  return m_explicitlySet[i];
+}
+
 
 } // Numeric

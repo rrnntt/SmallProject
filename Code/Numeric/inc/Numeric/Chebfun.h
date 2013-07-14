@@ -72,6 +72,8 @@ namespace Numeric
     void setP(const std::vector<double>& y);
     /// Set the y points from a GSL vector
     void setP(const GSLVector& y);
+    /// Set individual y point
+    void setP(size_t i, double y);
     /// Set the a-coeffs from a std vector
     void setA(const std::vector<double>& a);
     /// Set the y points from a column of a GSL matrix

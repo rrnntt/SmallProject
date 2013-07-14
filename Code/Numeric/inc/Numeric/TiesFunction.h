@@ -40,6 +40,9 @@ public:
   /// Set parameters to satisfy constraints
   void setParametersToSatisfyConstraints();
 
+  /// Return parameter index from a parameter reference. Usefull for constraints and ties in composite functions
+  virtual size_t getParameterIndex(const ParameterReference& ref)const;
+
 protected:
   /// Add a new tie
   virtual void addTie(ParameterTie* tie);
